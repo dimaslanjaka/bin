@@ -20,3 +20,4 @@ esac
 yarn workspace hexo exec "git remote add fork https://github.com/hexojs/hexo"
 yarn workspace hexo-front-matter exec "git remote add fork https://github.com/hexojs/hexo-front-matter"
 yarn workspace warehouse exec "git remote add fork https://github.com/hexojs/warehouse"
+yarn workspace hexo-asset-link exec "git remote add fork https://github.com/liolok/hexo-asset-link.git"

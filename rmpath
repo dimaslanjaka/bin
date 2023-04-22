@@ -16,6 +16,8 @@ case `uname` in
   *CYGWIN*) basedir=`cygpath -w "$basedir"`;;
 esac
 
+# fast huge folder deleter
+
 if [ -z "$1" ]; then
     echo "You need to provide a file or folder path"
     exit

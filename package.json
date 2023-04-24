@@ -4,7 +4,8 @@
   "description": "binary helper collections by L3n4r0x",
   "main": "index.js",
   "files": [
-    "!boilerplate"
+    "!boilerplate",
+    "!releases"
   ],
   "bin": {
     "clean-nodemodules": "clean-nodemodules",

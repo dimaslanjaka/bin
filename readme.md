@@ -3,8 +3,14 @@ binary helper collections by L3n4r0x
 
 ## installation
 
+clone direct folder
 ```bash
 git clone -b master https://github.com/dimaslanjaka/bin bin
+```
+
+via npm
+```bash
+npm install binary-collections@https://github.com/dimaslanjaka/bin
 ```
 
 ## Setup vscode

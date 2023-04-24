@@ -3,3 +3,6 @@ package-lock.json
 node_modules
 .yarn/cache
 .yarn/install*
+releases/*
+!releases/*.tgz
+!releases/*.tar.gz

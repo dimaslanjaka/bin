@@ -1,0 +1,32 @@
+{
+  "name": "binary-collections",
+  "version": "1.0.0",
+  "description": "binary helper collections by L3n4r0x",
+  "main": "index.js",
+  "files": [
+    "!boilerplate"
+  ],
+  "bin": {
+    "clean-nodemodules": "clean-nodemodules",
+    "submodule-remove": "submodule-remove",
+    "submodule-install": "submodule-install",
+    "rmpath": "rmpath",
+    "prod": "prod",
+    "nodekill.ps1": "nodekill.ps1",
+    "nodekill.cmd": "nodekill.cmd",
+    "nodekill": "nodekill",
+    "git-reduce-size": "git-reduce-size",
+    "empty": "empty",
+    "dev": "dev",
+    "clean-nodemodule": "clean-nodemodule"
+  },
+  "scripts": {
+    "build": "yarn pack && mv package.tgz releases/bin.tgz"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "glob": "^10.2.2"
+  }
+}

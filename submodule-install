@@ -17,7 +17,8 @@ case `uname` in
 esac
 
 # auto clone all submodules, prevent not-matched hash
-# usages: sh scripts/install-submodules.sh
+# set ACCESS_TOKEN=github_personal_tokens
+# usages: sh folder_this_repo/submodule-install
 
 # get script path
 SCRIPT=$(realpath "$0")

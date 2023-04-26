@@ -23,6 +23,12 @@ if [ -z "$1" ]; then
     exit
 fi
 
+# delete single file
+if [ -f "$1" ]; then
+  rm -rf "$1"
+  exit
+fi
+
 if [ ! -d "$1" ]; then
   echo "$1 not found"
   exit

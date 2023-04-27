@@ -28,5 +28,5 @@ const reads = glob
 
 fs.writeFileSync(
 	path.resolve(__dirname, "package.json"),
-	JSON.stringify(pkgj, null, 2)
+	JSON.stringify(pkgj, null, 2) + "\n"
 );

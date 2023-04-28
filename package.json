@@ -5,30 +5,35 @@
   "main": "index.js",
   "files": [
     "!boilerplate",
-    "!releases"
+    "!releases",
+    "!.yarn*"
   ],
   "bin": {
-    "git-fix-encoding": "git-fix-encoding",
+    "clean-nodemodule": "clean-nodemodule",
     "clean-nodemodules": "clean-nodemodules",
-    "submodule-remove": "submodule-remove",
-    "submodule-install": "submodule-install",
-    "rmpath": "rmpath",
-    "prod": "prod",
-    "nodekill.ps1": "nodekill.ps1",
-    "nodekill.cmd": "nodekill.cmd",
-    "nodekill": "nodekill",
-    "git-reduce-size": "git-reduce-size",
-    "empty": "empty",
     "dev": "dev",
-    "clean-nodemodule": "clean-nodemodule"
+    "empty": "empty",
+    "git-fix-encoding": "git-fix-encoding",
+    "git-reduce-size": "git-reduce-size",
+    "nodekill": "nodekill",
+    "nodekill.cmd": "nodekill.cmd",
+    "nodekill.ps1": "nodekill.ps1",
+    "prod": "prod",
+    "rmpath": "rmpath",
+    "submodule-install": "submodule-install",
+    "submodule-remove": "submodule-remove",
+    "rmfind": "rmfind",
+    "kill-process": "kill-process",
+    "git-fix-encoding.cmd": "git-fix-encoding.cmd"
   },
   "scripts": {
-    "build": "yarn pack && mv package.tgz releases/bin.tgz"
+    "build": "node index.js && yarn pack && mv package.tgz releases/bin.tgz"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "glob": "^10.2.2"
-  }
+  },
+  "packageManager": "yarn@3.5.0"
 }

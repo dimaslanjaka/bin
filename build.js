@@ -30,10 +30,10 @@ glob
 		],
 	})
 	//.map((str) => path.resolve(__dirname, str))
+	.filter(str => !str.isDirectory())
 	.filter(
 		(str) =>
-			![__filename].includes(path.resolve(__dirname, str)) &&
-			!["bin", "bash"].some((s) => str === s)
+			![__filename].includes(path.resolve(__dirname, str))
 	)
 	.forEach((str) => {
 		pkgj.bin[path.basename(str)] = path.toUnix(str);

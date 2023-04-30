@@ -3,7 +3,14 @@ const fs = require("fs");
 const glob = require("glob");
 const pkgj = require("./package.json");
 
-const reads = glob
+pkgj.bin = {
+	nrs: "lib/npm-run-series.js",
+	"run-s": "lib/npm-run-series.js",
+	"run-series": "lib/npm-run-series.js",
+	"npm-run-series": "lib/npm-run-series.js",
+};
+
+glob
 	.sync("**/*", {
 		cwd: __dirname,
 		ignore: [
@@ -14,10 +21,11 @@ const reads = glob
 			"**/package.json",
 			"**/releases/**",
 			"**/tmp/**",
+			"**/test/**",
 			"**/LICENSE",
 			"**/.yarn/**",
 			"**/.github/**",
-			"**/*.{md,ts}",
+			"**/*.{md,ts,js,txt,log}",
 		],
 	})
 	//.map((str) => path.resolve(__dirname, str))

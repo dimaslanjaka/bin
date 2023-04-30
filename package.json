@@ -43,6 +43,22 @@
     "nrs": "lib/npm-run-series.js",
     "run-s": "lib/npm-run-series.js",
     "run-series": "lib/npm-run-series.js",
-    "npm-run-series": "lib/npm-run-series.js"
+    "npm-run-series": "lib/npm-run-series.js",
+    "submodule-remove": "bin/submodule-remove",
+    "submodule-install": "bin/submodule-install",
+    "rmpath": "bin/rmpath",
+    "rmfind": "bin/rmfind",
+    "prod": "bin/prod",
+    "nodekill.ps1": "bin/nodekill.ps1",
+    "nodekill.cmd": "bin/nodekill.cmd",
+    "nodekill": "bin/nodekill",
+    "kill-process": "bin/kill-process",
+    "git-reduce-size": "bin/git-reduce-size",
+    "git-fix-encoding.cmd": "bin/git-fix-encoding.cmd",
+    "git-fix-encoding": "bin/git-fix-encoding",
+    "empty": "bin/empty",
+    "dev": "bin/dev",
+    "clean-nodemodules": "bin/clean-nodemodules",
+    "clean-nodemodule": "bin/clean-nodemodule"
   }
 }

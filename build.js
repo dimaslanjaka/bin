@@ -30,11 +30,11 @@ glob
 		],
 	})
 	//.map((str) => path.resolve(__dirname, str))
-	.filter(str => !str.isDirectory())
-	.filter(
-		(str) =>
-			![__filename].includes(path.resolve(__dirname, str))
-	)
+	.filter((str) => {
+		const resolved = path.resolve(__dirname, str);
+		if ([__filename].includes(resolved)) return false;
+		return fs.statSync(str).isFile();
+	})
 	.forEach((str) => {
 		pkgj.bin[path.basename(str)] = path.toUnix(str);
 	});

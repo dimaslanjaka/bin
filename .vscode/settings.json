@@ -1,0 +1,9 @@
+{
+	"files.autoSave": "off",
+	"terminal.integrated.env.linux": {
+		"PATH": "${workspaceFolder}/node_modules/.bin:${workspaceFolder}/bin:${env:PATH}"
+	},
+	"terminal.integrated.env.windows": {
+		"PATH": "${workspaceFolder}\\node_modules\\.bin;${workspaceFolder}\\bin;${env:PATH}"
+	}
+}

@@ -6,9 +6,13 @@
   "files": [
     "!boilerplate",
     "!releases",
-    "!.yarn*"
+    "!.yarn*",
+    "!test"
   ],
   "bin": {
+    "nrs": "lib/npm-run-series.js",
+    "run-s": "lib/npm-run-series.js",
+    "run-series": "lib/npm-run-series.js",
     "npm-run-series": "lib/npm-run-series.js",
     "lib": "lib",
     "submodule-remove": "bin\\submodule-remove",

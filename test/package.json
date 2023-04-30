@@ -7,7 +7,8 @@
     "build:a": "echo a",
     "build:b": "echo b",
     "build:c": "echo c",
-    "test": "npm i -D file:../ && npm-run-series build:**"
+    "test": "npm-run-series build:**",
+    "install-deps": "npm i -D file:../"
   },
   "keywords": [],
   "author": "",

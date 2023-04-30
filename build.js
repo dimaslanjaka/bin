@@ -2,7 +2,6 @@ const path = require("path");
 const fs = require("fs");
 const glob = require("glob");
 const pkgj = require("./package.json");
-const spawn = require("cross-spawn");
 
 pkgj.bin = {
 	nrs: "lib/npm-run-series.js",
@@ -33,7 +32,8 @@ glob
 	//.map((str) => path.resolve(__dirname, str))
 	.filter(
 		(str) =>
-			![__filename].includes(path.resolve(__dirname, str)) && str !== "bin"
+			![__filename].includes(path.resolve(__dirname, str)) &&
+			["bin", "bash"].some((s) => str == s)
 	)
 	.forEach((str) => {
 		pkgj.bin[path.basename(str)] = str;

@@ -4,33 +4,20 @@
   "description": "binary helper collections by L3n4r0x",
   "main": "index.js",
   "files": [
-    "bash",
+    "bin",
     "lib",
     "index.js"
   ],
+  "directories": {
+    "bin": "bin",
+    "lib": "lib"
+  },
   "bin": {
     "nrs": "lib/npm-run-series.js",
     "run-s": "lib/npm-run-series.js",
     "run-series": "lib/npm-run-series.js",
     "npm-run-series": "lib/npm-run-series.js",
-    "lib": "lib",
-    "bash": "bash",
-    "submodule-remove": "bash\\submodule-remove",
-    "submodule-install": "bash\\submodule-install",
-    "rmpath": "bash\\rmpath",
-    "rmfind": "bash\\rmfind",
-    "prod": "bash\\prod",
-    "nodekill.ps1": "bash\\nodekill.ps1",
-    "nodekill.cmd": "bash\\nodekill.cmd",
-    "nodekill": "bash\\nodekill",
-    "kill-process": "bash\\kill-process",
-    "git-reduce-size": "bash\\git-reduce-size",
-    "git-fix-encoding.cmd": "bash\\git-fix-encoding.cmd",
-    "git-fix-encoding": "bash\\git-fix-encoding",
-    "empty": "bash\\empty",
-    "dev": "bash\\dev",
-    "clean-nodemodules": "bash\\clean-nodemodules",
-    "clean-nodemodule": "bash\\clean-nodemodule"
+    "bin": "bin"
   },
   "scripts": {
     "build": "node build.js && yarn pack && mv package.tgz releases/bin.tgz",

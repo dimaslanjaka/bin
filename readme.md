@@ -11,6 +11,8 @@ git clone -b master https://github.com/dimaslanjaka/bin bin
 via npm
 ```bash
 npm install binary-collections@https://github.com/dimaslanjaka/bin
+# or
+npm install binary-collections@https://github.com/dimaslanjaka/bin/raw/master/releases/bin.tgz
 ```
 
 ## Setup vscode

@@ -13,15 +13,15 @@
     "lib": "lib"
   },
   "bin": {
+    "bin": "bin",
+    "npm-run-series": "lib/npm-run-series.js",
     "nrs": "lib/npm-run-series.js",
     "run-s": "lib/npm-run-series.js",
-    "run-series": "lib/npm-run-series.js",
-    "npm-run-series": "lib/npm-run-series.js",
-    "bin": "bin"
+    "run-series": "lib/npm-run-series.js"
   },
   "scripts": {
     "build": "node build.js && yarn pack && mv package.tgz releases/bin.tgz",
-    "test": "cd test && npm install file:../ &&",
+    "test": "cd test && npm install -D file:../ &&",
     "test:nrs": "npm test -- nrs build:**"
   },
   "keywords": [],

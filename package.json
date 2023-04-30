@@ -17,10 +17,12 @@
     "git-fix-encoding.cmd": "git-fix-encoding.cmd",
     "git-reduce-size": "git-reduce-size",
     "kill-process": "kill-process",
+    "lib": "lib",
     "nodekill": "nodekill",
     "nodekill.cmd": "nodekill.cmd",
     "nodekill.ps1": "nodekill.ps1",
     "npm-run-series": "lib/npm-run-series.js",
+    "nrs": "lib/npm-run-series.js",
     "prod": "prod",
     "rmfind": "rmfind",
     "rmpath": "rmpath",
@@ -30,13 +32,13 @@
     "submodule-remove": "submodule-remove"
   },
   "scripts": {
-    "build": "node index.js && yarn pack && mv package.tgz releases/bin.tgz",
-    "test": "cd test && yarn install && yarn test"
+    "build": "node build.js && yarn pack && mv package.tgz releases/bin.tgz"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/private/release/cross-spawn.tgz",
     "glob": "^10.2.2",
     "minimatch": "^9.0.0",
     "yargs": "^17.7.2"

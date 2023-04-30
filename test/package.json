@@ -7,12 +7,12 @@
     "build:a": "echo a",
     "build:b": "echo b",
     "build:c": "echo c",
-    "test": "npm i file:../ && npm-run-series build:**"
+    "test": "npm i -D file:../ && npm-run-series build:**"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
+  "devDependencies": {
     "binary-collections": "file:.."
   }
 }

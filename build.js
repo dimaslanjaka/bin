@@ -23,13 +23,16 @@ glob
 			"**/LICENSE",
 			"**/.yarn/**",
 			"**/.github/**",
-			"**/*.{md,ts,js,txt,log}",
+			"**/*.{md,ts,js,txt,log,json,lock}",
 		],
 	})
 	//.map((str) => path.resolve(__dirname, str))
-	.filter((str) => ![__filename].includes(path.resolve(__dirname, str)))
+	.filter(
+		(str) =>
+			![__filename].includes(path.resolve(__dirname, str)) && str !== "bin"
+	)
 	.forEach((str) => {
-		pkgj.bin[str] = str;
+		pkgj.bin[path.basename(str)] = str;
 	});
 
 fs.writeFileSync(

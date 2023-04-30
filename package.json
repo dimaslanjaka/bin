@@ -10,25 +10,23 @@
   ],
   "bin": {
     "npm-run-series": "lib/npm-run-series.js",
-    "package-lock.json": "package-lock.json",
     "lib": "lib",
-    "bin": "bin",
-    "bin\\submodule-remove": "bin\\submodule-remove",
-    "bin\\submodule-install": "bin\\submodule-install",
-    "bin\\rmpath": "bin\\rmpath",
-    "bin\\rmfind": "bin\\rmfind",
-    "bin\\prod": "bin\\prod",
-    "bin\\nodekill.ps1": "bin\\nodekill.ps1",
-    "bin\\nodekill.cmd": "bin\\nodekill.cmd",
-    "bin\\nodekill": "bin\\nodekill",
-    "bin\\kill-process": "bin\\kill-process",
-    "bin\\git-reduce-size": "bin\\git-reduce-size",
-    "bin\\git-fix-encoding.cmd": "bin\\git-fix-encoding.cmd",
-    "bin\\git-fix-encoding": "bin\\git-fix-encoding",
-    "bin\\empty": "bin\\empty",
-    "bin\\dev": "bin\\dev",
-    "bin\\clean-nodemodules": "bin\\clean-nodemodules",
-    "bin\\clean-nodemodule": "bin\\clean-nodemodule"
+    "submodule-remove": "bin\\submodule-remove",
+    "submodule-install": "bin\\submodule-install",
+    "rmpath": "bin\\rmpath",
+    "rmfind": "bin\\rmfind",
+    "prod": "bin\\prod",
+    "nodekill.ps1": "bin\\nodekill.ps1",
+    "nodekill.cmd": "bin\\nodekill.cmd",
+    "nodekill": "bin\\nodekill",
+    "kill-process": "bin\\kill-process",
+    "git-reduce-size": "bin\\git-reduce-size",
+    "git-fix-encoding.cmd": "bin\\git-fix-encoding.cmd",
+    "git-fix-encoding": "bin\\git-fix-encoding",
+    "empty": "bin\\empty",
+    "dev": "bin\\dev",
+    "clean-nodemodules": "bin\\clean-nodemodules",
+    "clean-nodemodule": "bin\\clean-nodemodule"
   },
   "scripts": {
     "build": "node build.js && yarn pack && mv package.tgz releases/bin.tgz",
@@ -40,8 +38,7 @@
   "dependencies": {
     "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/private/release/cross-spawn.tgz",
     "glob": "^10.2.2",
-    "minimatch": "^9.0.0",
-    "yargs": "^17.7.2"
+    "minimatch": "^9.0.0"
   },
   "packageManager": "yarn@3.5.0",
   "devDependencies": {

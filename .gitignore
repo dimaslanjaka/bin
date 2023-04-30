@@ -1,10 +1,12 @@
 yarn.lock
 package-lock.json
 node_modules
-.yarn/cache
-.yarn/install*
-.yarn/versions
-.yarn/patch*
+**/.yarn/cache
+**/.yarn/install*
+**/.yarn/versions
+**/.yarn/patch*
+**/.yarn/**/*.gz
+**/.yarn/**/*.tgz
 releases/*
 !releases/*.tgz
 !releases/*.tar.gz

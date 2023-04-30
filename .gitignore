@@ -8,6 +8,6 @@ node_modules
 **/.yarn/**/*.gz
 **/.yarn/**/*.tgz
 releases/*
-!releases/*.tgz
-!releases/*.tar.gz
+!releases/bin.tgz
+!releases/bin.tar.gz
 *.log

@@ -25,6 +25,7 @@ glob
 			"**/test/**",
 			"**/LICENSE",
 			"**/.yarn/**",
+			"**/.yarn*",
 			"**/.github/**",
 			"**/*.{md,ts,js,txt,log,json,lock}",
 		],

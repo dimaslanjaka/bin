@@ -1,4 +1,4 @@
-const path = require("path");
+const path = require("upath");
 const fs = require("fs");
 const glob = require("glob");
 const pkgj = require("./package.json");
@@ -33,10 +33,10 @@ glob
 	.filter(
 		(str) =>
 			![__filename].includes(path.resolve(__dirname, str)) &&
-			["bin", "bash"].some((s) => str == s)
+			!["bin", "bash"].some((s) => str === s)
 	)
 	.forEach((str) => {
-		pkgj.bin[path.basename(str)] = str;
+		pkgj.bin[path.basename(str)] = path.toUnix(str);
 	});
 
 fs.writeFileSync(

@@ -14,26 +14,34 @@
     "dev": "dev",
     "empty": "empty",
     "git-fix-encoding": "git-fix-encoding",
+    "git-fix-encoding.cmd": "git-fix-encoding.cmd",
     "git-reduce-size": "git-reduce-size",
+    "kill-process": "kill-process",
     "nodekill": "nodekill",
     "nodekill.cmd": "nodekill.cmd",
     "nodekill.ps1": "nodekill.ps1",
+    "npm-run-series": "lib/npm-run-series.js",
     "prod": "prod",
-    "rmpath": "rmpath",
-    "submodule-install": "submodule-install",
-    "submodule-remove": "submodule-remove",
     "rmfind": "rmfind",
-    "kill-process": "kill-process",
-    "git-fix-encoding.cmd": "git-fix-encoding.cmd"
+    "rmpath": "rmpath",
+    "run-s": "lib/npm-run-series.js",
+    "run-series": "lib/npm-run-series.js",
+    "submodule-install": "submodule-install",
+    "submodule-remove": "submodule-remove"
   },
   "scripts": {
-    "build": "node index.js && yarn pack && mv package.tgz releases/bin.tgz"
+    "build": "node index.js && yarn pack && mv package.tgz releases/bin.tgz",
+    "test": "cd test && yarn install && yarn test"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "glob": "^10.2.2"
+    "glob": "^10.2.2",
+    "minimatch": "^9.0.0"
   },
-  "packageManager": "yarn@3.5.0"
+  "packageManager": "yarn@3.5.0",
+  "devDependencies": {
+    "@types/node": "^18.16.3"
+  }
 }

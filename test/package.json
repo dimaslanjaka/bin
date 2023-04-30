@@ -7,12 +7,12 @@
     "build:a": "echo a",
     "build:b": "echo b",
     "build:c": "echo c",
-    "test": "touch yarn.lock && yarn add ../ && npm-run-series build:**"
+    "test": "npm i file:../ && npm-run-series build:**"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "binary-collections": "./.."
+    "binary-collections": "file:.."
   }
 }

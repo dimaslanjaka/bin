@@ -38,10 +38,12 @@
   "license": "ISC",
   "dependencies": {
     "glob": "^10.2.2",
-    "minimatch": "^9.0.0"
+    "minimatch": "^9.0.0",
+    "yargs": "^17.7.2"
   },
   "packageManager": "yarn@3.5.0",
   "devDependencies": {
-    "@types/node": "^18.16.3"
+    "@types/node": "^18.16.3",
+    "@types/yargs": "^17"
   }
 }

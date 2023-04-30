@@ -5,6 +5,9 @@ const pkgj = require("./package.json");
 const spawn = require("cross-spawn");
 
 pkgj.bin = {
+	nrs: "lib/npm-run-series.js",
+	"run-s": "lib/npm-run-series.js",
+	"run-series": "lib/npm-run-series.js",
 	"npm-run-series": "lib/npm-run-series.js",
 };
 

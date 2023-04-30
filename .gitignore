@@ -10,3 +10,4 @@ node_modules
 releases/*
 !releases/*.tgz
 !releases/*.tar.gz
+*.log

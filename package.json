@@ -1,12 +1,13 @@
 {
   "name": "binary-collections",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "binary helper collections by L3n4r0x",
   "main": "index.js",
   "files": [
     "bin",
     "lib",
-    "index.js"
+    "index.js",
+    "!releases"
   ],
   "directories": {
     "bin": "bin",
@@ -30,7 +31,7 @@
     "minimist": "^1.2.8",
     "upath": "^2.0.1"
   },
-  "packageManager": "yarn@3.5.0",
+  "packageManager": "yarn@3.5.1",
   "devDependencies": {
     "@types/minimist": "^1",
     "@types/node": "^18.16.3",

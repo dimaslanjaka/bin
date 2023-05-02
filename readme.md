@@ -55,3 +55,10 @@ create `.vscode/settings.json`
   "terminal.integrated.defaultProfile.windows": "Command Prompt",
 }
 ```
+
+## Usages
+
+see all binary at
+- https://github.com/dimaslanjaka/bin/tree/master/bin
+- https://github.com/dimaslanjaka/bin/tree/master/lib
+- https://github.com/dimaslanjaka/bin/blob/master/package.json

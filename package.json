@@ -10,8 +10,8 @@
     "!releases"
   ],
   "directories": {
-    "bin": "bin",
-    "lib": "lib"
+    "lib": "lib",
+    "test": "test"
   },
   "scripts": {
     "update:packer": "curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js > packer.js",

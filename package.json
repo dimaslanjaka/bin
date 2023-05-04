@@ -1,6 +1,6 @@
 {
   "name": "binary-collections",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "binary helper collections by L3n4r0x",
   "main": "index.js",
   "files": [
@@ -35,7 +35,8 @@
   "devDependencies": {
     "@types/minimist": "^1",
     "@types/node": "^18.16.3",
-    "@types/yargs": "^17"
+    "@types/yargs": "^17",
+    "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/private/release/cross-spawn.tgz"
   },
   "optionalDependencies": {
     "ansi-colors": "^4.1.3"

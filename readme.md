@@ -63,10 +63,37 @@ see all binary at
 - https://github.com/dimaslanjaka/bin/tree/master/lib
 - https://github.com/dimaslanjaka/bin/blob/master/package.json
 
+### npm scripts runner
+
+> binaries: `nrs`, `run-s`, `run-series`
+
+| arg | description |
+| :--- | :--- |
+| `--yarn` | using `yarn run <script-name>` |
+| `--verbose` `-v` | using `yarn run <script-name>` |
+
+example: `npm run namescript`
+
+```json
+{
+  "name": "package-name",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "namescript:xx": "echo xx",
+    "namescript:xxx": "echo xxx",
+    "namescript:xxxx": "echo xxxx",
+    "namescript:xxxxx": "echo xxxxx",
+    "namescript": "nrs --yarn=true --verbose=true 'namescript:**'"
+  },
+  "license": "ISC"
+}
+```
+
 ## troubleshooting
 ### submodule-install
 
-when you're facing error like 
+when you're facing error like
 ```log
 fatal: 'origin/<branch>' is not a commit and a branch '<branch>' cannot be created from it
 fatal: unable to checkout submodule '<folder>/<submodule>'

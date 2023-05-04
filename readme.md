@@ -67,8 +67,8 @@ see all binary at
 ### submodule-install
 when you're facing error like 
 ```log
-fatal: 'origin/private' is not a commit and a branch 'private' cannot be created from it
-fatal: unable to checkout submodule 'packages/git-embed'
+fatal: 'origin/<branch>' is not a commit and a branch '<branch>' cannot be created from it
+fatal: unable to checkout submodule '<folder>/<submodule>'
 ```
 solution: deleting `.git/modules` before execute `submodule-install`
 ```bash

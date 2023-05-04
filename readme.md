@@ -62,3 +62,25 @@ see all binary at
 - https://github.com/dimaslanjaka/bin/tree/master/bin
 - https://github.com/dimaslanjaka/bin/tree/master/lib
 - https://github.com/dimaslanjaka/bin/blob/master/package.json
+
+## troubleshooting
+### submodule-install
+when you're facing error like 
+```log
+fatal: 'origin/private' is not a commit and a branch 'private' cannot be created from it
+fatal: unable to checkout submodule 'packages/git-embed'
+```
+solution: deleting `.git/modules` before execute `submodule-install`
+```bash
+echo "init submodules"
+git submodule init
+git submodule foreach "git submodule init"
+echo "sync submodules"
+git submodule sync
+git submodule foreach "git submodule sync"
+echo "update submodules"
+mkdir bin
+curl -L https://github.com/dimaslanjaka/bin/raw/master/bin/submodule-install > bin/submodule-install
+rm -rf .git/modules
+bash ./bin/submodule-install
+```

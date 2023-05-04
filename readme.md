@@ -65,12 +65,16 @@ see all binary at
 
 ## troubleshooting
 ### submodule-install
+
 when you're facing error like 
 ```log
 fatal: 'origin/<branch>' is not a commit and a branch '<branch>' cannot be created from it
 fatal: unable to checkout submodule '<folder>/<submodule>'
 ```
-solution: deleting `.git/modules` before execute `submodule-install`
+
+solution: deleting `.git/modules` before execute `submodule-install`.
+
+example single execution:
 ```bash
 echo "init submodules"
 git submodule init
@@ -79,7 +83,7 @@ echo "sync submodules"
 git submodule sync
 git submodule foreach "git submodule sync"
 echo "update submodules"
-mkdir bin
+mkdir -p bin >/dev/null 2>&1
 curl -L https://github.com/dimaslanjaka/bin/raw/master/bin/submodule-install > bin/submodule-install
 rm -rf .git/modules
 bash ./bin/submodule-install

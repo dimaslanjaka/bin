@@ -84,7 +84,7 @@ example: `npm run namescript`
     "namescript:xxx": "echo xxx",
     "namescript:xxxx": "echo xxxx",
     "namescript:xxxxx": "echo xxxxx",
-    "namescript": "nrs --yarn=true --verbose=true 'namescript:**'"
+    "namescript": "nrs --yarn=true --verbose=true \"namescript:**\""
   },
   "license": "ISC"
 }

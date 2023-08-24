@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-# make cygwin bin as priority
-export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:$PATH";
+# put these on top of file
 
 (set -o igncr) 2>/dev/null && set -o igncr; # cygwin encoding fix
 
@@ -13,5 +12,16 @@ basedir=`dirname "$0"`
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 case `uname` in
-  *CYGWIN*) basedir=`cygpath -w "$basedir"`;;
+  *CYGWIN*)
+    basedir=`cygpath -w "$basedir"`
+    # make cygwin bin as priority
+    export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:$PATH"
+    ;;
 esac
+
+SUDO_CMD=""
+if [ "$USER" != "root" ]; then
+  SUDO_CMD="sudo "
+fi
+
+$SUDO_CMD echo "sudo granted"

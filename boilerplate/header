@@ -19,9 +19,10 @@ case `uname` in
     ;;
 esac
 
-SUDO_CMD=""
-if [ "$USER" != "root" ]; then
-  SUDO_CMD="sudo "
-fi
+# acquire sudo previlege
+#SUDO_CMD=""
+#if [ "$USER" != "root" ]; then
+#  SUDO_CMD="sudo "
+#fi
 
-$SUDO_CMD echo "sudo granted"
+#$SUDO_CMD echo "sudo granted"

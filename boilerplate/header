@@ -9,7 +9,7 @@ basecwd=${PWD}
 # base script directory
 basedir=`dirname "$0"`
 # absolute path script directory
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SCRIPT_DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 
 case `uname` in
   *CYGWIN*)

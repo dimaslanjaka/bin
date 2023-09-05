@@ -19,6 +19,12 @@ case `uname` in
     ;;
 esac
 
+# parse and export .env file (dotenv)
+if [ -f ".env" ]; then
+  # Export the vars in .env into your shell:
+  export $(egrep -v '^#' .env | xargs)
+fi
+
 # acquire sudo previlege
 #SUDO_CMD=""
 #if [ "$USER" != "root" ]; then

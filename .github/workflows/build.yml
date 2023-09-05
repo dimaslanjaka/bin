@@ -24,6 +24,8 @@ jobs:
       - name: push
         if: ${{ !contains(github.event.head_commit.message, 'update build from CI') }}
         run: |
+          git config --global user.name "dimaslanjaka"
+          git config --global user.email "dimaslanjaka@gmail.com"
           git add releases
           if [ $(git status --porcelain | wc -l) -gt "0" ]; then
             git commit -m "update build from CI"

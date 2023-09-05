@@ -18,6 +18,15 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+      - uses: actions/cache@v3
+        id: cache
+        name: init cache
+        with:
+          path: |
+            ./.yarn
+            ./yarn.lock
+          key: ${{ runner.os }}
+          restore-keys: ${{ runner.os }}
       - run: yarn install
       - run: npm run build
       - run: npm run pack

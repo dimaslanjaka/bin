@@ -14,9 +14,10 @@ jobs:
           ref: master
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
-      - run: npm ci
+          node-version: 18
+      - run: yarn install
       - run: npm run build
+      - run: npm run pack
 
   publish-npm:
     needs: build
@@ -28,6 +29,6 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org/
       - run: |
-          git add release
+          git add release releases
           git commit -m "update build from CI"
           git push

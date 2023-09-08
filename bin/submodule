@@ -135,10 +135,10 @@ remove_submodule() {
 
 case $1 in
   install|i)
-    update_submodule
+    update_submodule "$@"
     ;;
   uninstall|u|x)
-    remove_submodule
+    remove_submodule "$@"
     ;;
   *)
     echo "no option found. Usage:"

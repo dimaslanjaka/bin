@@ -15,7 +15,7 @@
   },
   "scripts": {
     "update:packer": "curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js > packer.js",
-    "build": "node build.js && yarn run pack",
+    "build": "node -r ts-node/register dotenv/config build.js && yarn run pack",
     "test": "cd test && npm install -D file:../ &&",
     "test:nrs": "npm test -- nrs build:**",
     "pack": "node packer.js --yarn --filename=bin"
@@ -38,7 +38,10 @@
     "@types/node": "^18.16.3",
     "@types/yargs": "^17",
     "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/ff4b648/release/cross-spawn.tgz",
-    "git-command-helper": "^2.0.1"
+    "dotenv": "^16.3.1",
+    "git-command-helper": "^2.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
   },
   "optionalDependencies": {
     "ansi-colors": "^4.1.3"

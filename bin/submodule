@@ -116,8 +116,12 @@ update_submodule() {
 }
 
 remove_submodule() {
-  echo "input submodule path"
-  read folderpath
+  if [[ -z $1 || $1 == "" ]]; then
+    echo "input submodule path"
+    read folderpath
+  else
+    folderpath="$1"
+  fi
 
   # Remove the submodule entry from .git/config
   git submodule deinit -f $folderpath

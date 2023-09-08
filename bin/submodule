@@ -1,12 +1,6 @@
 #!/usr/bin/env -S bash -e
 
-if [ -f ".env" ]; then
-  # Export the vars in .env into your shell:
-  export $(egrep -v '^#' .env | xargs)
-fi
-
-# make cygwin bin as priority
-export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:$PATH";
+# put these on top of file
 
 (set -o igncr) 2>/dev/null && set -o igncr; # cygwin encoding fix
 
@@ -21,8 +15,18 @@ SCRIPT=$(realpath "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
 
 case `uname` in
-  *CYGWIN*) basedir=`cygpath -w "$basedir"`;;
+  *CYGWIN*)
+    basedir=`cygpath -w "$basedir"`
+    # make cygwin bin as priority
+    export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:$PATH"
+    ;;
 esac
+
+# parse and export .env file (dotenv)
+if [ -f ".env" ]; then
+  # Export the vars in .env into your shell:
+  export $(egrep -v '^#' .env | xargs)
+fi
 
 # auto clone all submodules, prevent not-matched hash
 # set ACCESS_TOKEN=github_personal_tokens

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env -S bash -e
 
 # put these on top of file
 
@@ -10,6 +10,9 @@ basecwd=${PWD}
 basedir=`dirname "$0"`
 # absolute path script directory
 SCRIPT_DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
+# get script path
+SCRIPT=$(realpath "$0")
+SCRIPTPATH=$(dirname "$SCRIPT")
 
 case `uname` in
   *CYGWIN*)

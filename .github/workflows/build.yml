@@ -26,6 +26,7 @@ jobs:
           path: |
             ./.yarn
             ./yarn.lock
+            ./node_modules
           key: ${{ runner.os }}
           restore-keys: ${{ runner.os }}
       - run: yarn install

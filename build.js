@@ -38,7 +38,8 @@ glob
     return fs.statSync(resolved).isFile();
   })
   .forEach(str => {
-    pkgj.bin[path.basename(str)] = path.toUnix(str);
+    let basename = path.basename(str).replace(/\./gm, '-');
+    pkgj.bin[basename] = path.toUnix(str);
   });
 
 // sort

@@ -36,7 +36,7 @@ glob
   .filter(str => {
     const resolved = path.join(__dirname, str);
     if ([path.toUnix(__filename)].includes(resolved)) return false;
-    return fs.statSync(str).isFile();
+    return fs.statSync(resolved).isFile();
   })
   .forEach(str => {
     pkgj.bin[path.basename(str)] = path.toUnix(str);

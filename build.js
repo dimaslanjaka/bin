@@ -28,7 +28,7 @@ glob
       '**/.yarn*',
       '**/.github/**',
       '**/*.{md,ts,js,txt,log,json,lock}',
-      '**/bash-dummy',
+      '**/bash-dummy*',
     ],
   })
   //.map((str) => path.resolve(__dirname, str))

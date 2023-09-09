@@ -2,7 +2,6 @@ const path = require('upath');
 const fs = require('fs');
 const glob = require('glob');
 const pkgj = require('./package.json');
-const cp = require('cross-spawn');
 
 pkgj.bin = {
   nrs: 'lib/npm-run-series.js',
@@ -43,5 +42,5 @@ glob
   });
 
 fs.writeFileSync(path.resolve(__dirname, 'package.json'), JSON.stringify(pkgj, null, 2) + '\n');
-cp.sync('yarn', ['install'], { cwd: __dirname });
+//cp.sync('yarn', ['install'], { cwd: __dirname });
 // copy to test

@@ -116,15 +116,24 @@ update_submodule() {
 }
 
 remove_submodule() {
-  if [[ -z $1 || $1 == "" ]]; then
+  if [[ -z $2 || $2 == "" ]]; then
     echo "input submodule path"
     read folderpath
   else
-    folderpath="$1"
+    folderpath="$2"
   fi
 
+  if [ -z $folderpath ]; then
+    echo "Folder path is empty" ;
+    exit 1;
+  fi
+
+  echo "removing submodule $folderpath"
+
   # Remove the submodule entry from .git/config
-  git submodule deinit -f $folderpath
+  if [ -d $folderpath ]; then
+    git submodule deinit -f $folderpath
+  fi
 
   # Remove the submodule directory from the superproject's .git/modules directory
   if [ -d ".git/modules/$folderpath" ]; then

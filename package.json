@@ -1,6 +1,6 @@
 {
   "name": "binary-collections",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "binary helper collections by L3n4r0x",
   "main": "index.js",
   "files": [

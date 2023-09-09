@@ -15,7 +15,7 @@
   },
   "scripts": {
     "update:packer": "curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js > packer.js",
-    "build": "node -r ts-node/register dotenv/config build.js && yarn run pack",
+    "build": "node -r ts-node/register -r dotenv/config build.js && yarn run pack",
     "test": "cd test && npm install -D file:../ &&",
     "test:nrs": "npm test -- nrs build:**",
     "pack": "node packer.js --yarn --filename=bin"

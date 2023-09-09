@@ -41,6 +41,19 @@ glob
     pkgj.bin[path.basename(str)] = path.toUnix(str);
   });
 
+// sort
+pkgj.bin = sortObjectByKeys(pkgj.bin);
+
 fs.writeFileSync(path.resolve(__dirname, 'package.json'), JSON.stringify(pkgj, null, 2) + '\n');
 //cp.sync('yarn', ['install'], { cwd: __dirname });
 // copy to test
+
+/**
+ * sort object by keys
+ * @param {Record<string,any>} object
+ * @param {{desc?:boolean}} param1
+ * @returns
+ */
+function sortObjectByKeys(object, { desc = false } = {}) {
+  return Object.fromEntries(Object.entries(object).sort(([k1], [k2]) => ((k1 < k2) ^ desc ? -1 : 1)));
+}

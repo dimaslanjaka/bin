@@ -34,8 +34,8 @@ glob
     ],
   })
   .filter(str => {
-    const resolved = path.resolve(__dirname, str);
-    if ([__filename].includes(resolved)) return false;
+    const resolved = path.join(__dirname, str);
+    if ([path.toUnix(__filename)].includes(resolved)) return false;
     return fs.statSync(str).isFile();
   })
   .forEach(str => {

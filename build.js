@@ -19,19 +19,20 @@ glob
       '**/boilerplate/**',
       '**/.git*',
       '**/yarn.lock',
-      '**/package.json',
+      '**/{package,package-lock}.json',
       '**/releases/**',
       '**/tmp/**',
       '**/test/**',
       '**/LICENSE',
       '**/.yarn/**',
       '**/.yarn*',
+      '**/dist/**',
       '**/.github/**',
       '**/*.{md,ts,js,txt,log,json,lock}',
       '**/bash-dummy*',
+      '**/.yarn*',
     ],
   })
-  //.map((str) => path.resolve(__dirname, str))
   .filter(str => {
     const resolved = path.resolve(__dirname, str);
     if ([__filename].includes(resolved)) return false;

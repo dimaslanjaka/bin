@@ -28,4 +28,7 @@ if [ -f ".env" ]; then
   export $(egrep -v '^#' .env | xargs)
 fi
 
-ps -W | grep "$1" | awk '{print $1}' | xargs kill -f;
+# ps -W | grep "$1" | awk '{print $1}' | xargs kill -f;
+
+set -e;
+ps -aux | grep "$1" | awk '{print $1}' | xargs killall -9;

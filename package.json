@@ -22,7 +22,18 @@
     "update:ncu": "npx npm-check-updates -u -x jsdom,chalk,hexo,deepmerge-ts --enginesNode --root"
   },
   "keywords": [],
-  "author": "",
+  "author": {
+    "email": "dimaslanjaka@gmail.com",
+    "name": "dimaslanjaka",
+    "url": "https://webmanajemen.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dimaslanjaka/bin"
+  },
+  "bugs": {
+    "url": "https://github.com/dimaslanjaka/bin/issues"
+  },
   "license": "MIT",
   "dependencies": {
     "execa": "^8.0.1",

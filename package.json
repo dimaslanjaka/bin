@@ -34,6 +34,7 @@
   "bugs": {
     "url": "https://github.com/dimaslanjaka/bin/issues"
   },
+  "homepage": "https://www.webmanajemen.com/",
   "license": "MIT",
   "dependencies": {
     "execa": "^8.0.1",

@@ -10,6 +10,8 @@ git clone -b master https://github.com/dimaslanjaka/bin bin
 
 via npm
 ```bash
+npm install binary-collections
+# or
 npm install binary-collections@git+https://github.com/dimaslanjaka/bin.git
 # or
 npm install binary-collections@https://github.com/dimaslanjaka/bin/raw/master/releases/bin.tgz
@@ -95,6 +97,7 @@ example: `npm run namescript`
 ```bash
 del-nodemodules
 ```
+![image](https://github.com/dimaslanjaka/bin/assets/12471057/f03e5b51-1808-4e82-a474-0dd3c7eab5fe)
 
 ## troubleshooting
 ### submodule-install

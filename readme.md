@@ -90,6 +90,12 @@ example: `npm run namescript`
 }
 ```
 
+## node_modules cleaner
+
+```bash
+del-nodemodules
+```
+
 ## troubleshooting
 ### submodule-install
 

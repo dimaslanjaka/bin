@@ -8,6 +8,8 @@ pkgj.bin = {
   'run-s': 'lib/npm-run-series.js',
   'run-series': 'lib/npm-run-series.js',
   'npm-run-series': 'lib/npm-run-series.js',
+  'del-nodemodules': 'lib/del-nodemodules.js',
+  'find-nodemodules': 'lib/find-nodemodules.js'
 };
 
 glob
@@ -29,15 +31,15 @@ glob
       '**/.github/**',
       '**/*.{md,ts,js,txt,log,json,lock}',
       '**/bash-dummy*',
-      '**/.yarn*',
-    ],
+      '**/.yarn*'
+    ]
   })
-  .filter(str => {
+  .filter((str) => {
     const resolved = path.join(__dirname, str);
     if ([path.toUnix(__filename)].includes(resolved)) return false;
     return fs.statSync(resolved).isFile();
   })
-  .forEach(str => {
+  .forEach((str) => {
     let basename = path.basename(str).replace(/\./gm, '-');
     pkgj.bin[basename] = path.toUnix(str);
   });

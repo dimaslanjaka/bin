@@ -8,8 +8,9 @@ pkgj.bin = {
   'run-s': 'lib/npm-run-series.js',
   'run-series': 'lib/npm-run-series.js',
   'npm-run-series': 'lib/npm-run-series.js',
-  'del-nodemodules': 'lib/del-nodemodules.js',
-  'find-nodemodules': 'lib/find-nodemodules.js'
+  'del-nodemodules': 'lib/del-node-modules.js',
+  'del-yarncaches': 'lib/del-yarn-caches.js',
+  'find-nodemodules': 'lib/find-node-modules.js'
 };
 
 glob

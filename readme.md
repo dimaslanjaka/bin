@@ -99,6 +99,12 @@ del-nodemodules
 ```
 ![image](https://github.com/dimaslanjaka/bin/assets/12471057/f03e5b51-1808-4e82-a474-0dd3c7eab5fe)
 
+## yarn caches cleaner
+
+```bash
+del-yarncaches
+```
+
 ## troubleshooting
 ### submodule-install
 

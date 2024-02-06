@@ -1,6 +1,6 @@
 {
   "name": "binary-collections",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "binary helper collections by L3n4r0x",
   "main": "index.js",
   "files": [
@@ -71,10 +71,11 @@
   "bin": {
     "clean-nodemodule": "bin/clean-nodemodule",
     "clean-nodemodules": "bin/clean-nodemodules",
-    "del-nodemodules": "lib/del-nodemodules.js",
+    "del-nodemodules": "lib/del-node-modules.js",
+    "del-yarncaches": "lib/del-yarn-caches.js",
     "dev": "bin/dev",
     "empty": "bin/empty",
-    "find-nodemodules": "lib/find-nodemodules.js",
+    "find-nodemodules": "lib/find-node-modules.js",
     "git-fix-encoding": "bin/git-fix-encoding",
     "git-fix-encoding-cmd": "bin/git-fix-encoding.cmd",
     "git-reduce-size": "bin/git-reduce-size",

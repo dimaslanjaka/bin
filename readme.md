@@ -97,6 +97,7 @@ example: `npm run namescript`
 ```bash
 del-nodemodules
 ```
+
 ![image](https://github.com/dimaslanjaka/bin/assets/12471057/f03e5b51-1808-4e82-a474-0dd3c7eab5fe)
 
 ## yarn caches cleaner
@@ -104,6 +105,8 @@ del-nodemodules
 ```bash
 del-yarncaches
 ```
+
+![image](https://github.com/dimaslanjaka/bin/assets/12471057/2805c54e-28a7-491d-b381-de2593a854b3)
 
 ## troubleshooting
 ### submodule-install

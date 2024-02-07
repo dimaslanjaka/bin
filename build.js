@@ -10,7 +10,8 @@ pkgj.bin = {
   'npm-run-series': 'lib/npm-run-series.js',
   'del-nodemodules': 'lib/del-node-modules.js',
   'del-yarncaches': 'lib/del-yarn-caches.js',
-  'find-nodemodules': 'lib/find-node-modules.js'
+  'find-nodemodules': 'lib/find-node-modules.js',
+  'del-ps': 'lib/del-ps.js'
 };
 
 glob
@@ -32,7 +33,9 @@ glob
       '**/.github/**',
       '**/*.{md,ts,js,txt,log,json,lock}',
       '**/bash-dummy*',
-      '**/.yarn*'
+      '**/.yarn*',
+      // ignore .txt files
+      '**/*.txt'
     ]
   })
   .filter((str) => {

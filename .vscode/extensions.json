@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "k--kato.intellij-idea-keybindings",
+    "editorconfig.editorconfig",
+    "formulahendry.code-runner"
+  ]
+}

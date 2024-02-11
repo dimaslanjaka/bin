@@ -1,7 +1,7 @@
 {
   "name": "binary-collections",
   "version": "2.0.5",
-  "description": "binary helper collections by L3n4r0x",
+  "description": "Utility to clean any programming caches and more",
   "main": "index.js",
   "files": [
     "bin",
@@ -21,7 +21,11 @@
     "pack": "node packer.js --yarn --filename=bin",
     "update:ncu": "npx npm-check-updates -u -x jsdom,chalk,hexo,deepmerge-ts --enginesNode --root"
   },
-  "keywords": [],
+  "keywords": [
+    "cache",
+    "cleaner",
+    "utility"
+  ],
   "author": {
     "email": "dimaslanjaka@gmail.com",
     "name": "dimaslanjaka",
@@ -57,7 +61,7 @@
     "@types/yargs": "^17",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "@typescript-eslint/parser": "^6.20.0",
-    "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/09e200d/release/cross-spawn.tgz",
+    "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/private/release/cross-spawn.tgz",
     "dotenv": "^16.4.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",

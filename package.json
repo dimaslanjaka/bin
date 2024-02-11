@@ -40,6 +40,7 @@
   "homepage": "https://www.webmanajemen.com/",
   "license": "MIT",
   "dependencies": {
+    "dotenv": "^16.4.2",
     "execa": "^8.0.1",
     "fs-extra": "^11.2.0",
     "glob": "^10.3.10",
@@ -61,7 +62,6 @@
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "@typescript-eslint/parser": "^6.20.0",
     "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/private/release/cross-spawn.tgz",
-    "dotenv": "^16.4.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",

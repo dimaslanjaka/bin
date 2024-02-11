@@ -106,6 +106,14 @@ del-nodemodules
 del-yarncaches
 ```
 
+## gradle caches cleaner
+
+- delete gradle build folder
+
+```bash
+del-gradle
+```
+
 ![image](https://github.com/dimaslanjaka/bin/assets/12471057/2805c54e-28a7-491d-b381-de2593a854b3)
 
 ## troubleshooting

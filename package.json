@@ -73,7 +73,9 @@
   "bin": {
     "clean-nodemodule": "bin/clean-nodemodule",
     "clean-nodemodules": "bin/clean-nodemodules",
+    "del-gradle": "lib/del-gradle.js",
     "del-nodemodules": "lib/del-node-modules.js",
+    "del-ps": "lib/del-ps.js",
     "del-yarncaches": "lib/del-yarn-caches.js",
     "dev": "bin/dev",
     "empty": "bin/empty",

@@ -5,5 +5,47 @@
 	},
 	"terminal.integrated.env.windows": {
 		"PATH": "${workspaceFolder}\\node_modules\\.bin;${workspaceFolder}\\bin;${env:PATH}"
-	}
+	},
+	"files.exclude": {
+    "**/node_modules": true
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "never"
+  },
+  "[markdown]": {
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "never",
+      "source.organizeImports": "never"
+    }
+  },
+  "[typescript]": {
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit"
+    }
+  },
+  "[javascript]": {
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "never"
+    }
+  },
+  "files.eol": "\n",
+  "eslint.run": "onSave",
+  "code-runner.runInTerminal": true,
+  "code-runner.clearPreviousOutput": true,
+  "code-runner.saveAllFilesBeforeRun": true,
+  "code-runner.respectShebang": true,
+  "code-runner.executorMapByGlob": {
+    "*.test.ts": "npm test -- $fileNameWithoutExt"
+  },
+  "code-runner.executorMap": {
+    "javascript": "node",
+    "typescript": "node -r ./tshook.js"
+  },
+  "npm.packageManager": "yarn"
 }

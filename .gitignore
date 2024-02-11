@@ -11,3 +11,4 @@ releases/*
 !releases/bin.tgz
 !releases/bin.tar.gz
 *.log
+.env

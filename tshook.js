@@ -1,4 +1,4 @@
 require('ts-node').register({
   project: 'tsconfig.json'
 });
-require('dotenv').config();
+require('dotenv').config({ override: true });

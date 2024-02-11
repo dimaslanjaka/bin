@@ -7,11 +7,10 @@
     "bin",
     "lib",
     "index.js",
-    "!releases"
+    "!test"
   ],
   "directories": {
-    "lib": "lib",
-    "test": "test"
+    "lib": "lib"
   },
   "scripts": {
     "update:packer": "curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js > packer.js",

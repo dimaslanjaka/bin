@@ -114,6 +114,14 @@ del-yarncaches
 del-gradle
 ```
 
+## Git purge
+
+- prune reflogs from all git repositories
+
+```bash
+git-purge
+```
+
 ![image](https://github.com/dimaslanjaka/bin/assets/12471057/2805c54e-28a7-491d-b381-de2593a854b3)
 
 ## troubleshooting

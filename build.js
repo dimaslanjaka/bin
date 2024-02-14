@@ -12,7 +12,8 @@ pkgj.bin = {
   'del-yarncaches': 'lib/del-yarn-caches.js',
   'find-nodemodules': 'lib/find-node-modules.js',
   'del-ps': 'lib/del-ps.js',
-  'del-gradle': 'lib/del-gradle.js'
+  'del-gradle': 'lib/del-gradle.js',
+  'git-purge': 'lib/git-purge.js'
 };
 
 glob

@@ -7,7 +7,8 @@
     "bin",
     "lib",
     "index.js",
-    "!test"
+    "!test",
+    "package.json"
   ],
   "directories": {
     "lib": "lib"
@@ -85,6 +86,7 @@
     "find-nodemodules": "lib/find-node-modules.js",
     "git-fix-encoding": "bin/git-fix-encoding",
     "git-fix-encoding-cmd": "bin/git-fix-encoding.cmd",
+    "git-purge": "lib/git-purge.js",
     "git-reduce-size": "bin/git-reduce-size",
     "javakill-cmd": "bin/javakill.cmd",
     "kill-process": "bin/kill-process",

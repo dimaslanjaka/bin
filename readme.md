@@ -11,6 +11,8 @@ git clone -b master https://github.com/dimaslanjaka/bin bin
 via npm
 ```bash
 npm install binary-collections
+# or install as global package
+npm install binary-collections -g
 # or
 npm install binary-collections@git+https://github.com/dimaslanjaka/bin.git
 # or

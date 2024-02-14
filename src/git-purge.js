@@ -5,8 +5,12 @@ const { delay } = require('./utils');
 
 /** @type {string[]} */
 const dirs = [];
-
-const fetchDirs = (pattern = '**/.git') => {
+/**
+ * fetch directories
+ * @param {string|string[]} pattern
+ * @param {(filePath: string) => any} callback
+ */
+const fetchDirs = (pattern, callback) => {
   const globStream = new glob.Glob(pattern, {
     withFileTypes: false,
     cwd: process.cwd(),
@@ -15,6 +19,7 @@ const fetchDirs = (pattern = '**/.git') => {
 
   globStream.stream().on('data', (result) => {
     const fullPath = path.resolve(process.cwd(), result);
+    if (typeof callback == 'function') callback(fullPath);
     const base = path.dirname(fullPath);
     // push directory when not exist
     if (!dirs.includes(base)) dirs.push(base);
@@ -46,4 +51,4 @@ async function start() {
 
 // script starts here
 
-fetchDirs();
+fetchDirs('**/.git');

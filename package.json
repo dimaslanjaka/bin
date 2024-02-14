@@ -15,11 +15,12 @@
   },
   "scripts": {
     "update:packer": "curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js > packer.js",
-    "build": "node -r ts-node/register -r dotenv/config build.js && yarn run pack",
+    "build": "tsc -p tsconfig.build.json && node -r ts-node/register -r dotenv/config build.js && yarn run pack",
     "test": "cd test && npm install -D file:../ &&",
     "test:nrs": "npm test -- nrs build:**",
     "pack": "node packer.js --yarn --filename=bin",
-    "update:ncu": "npx npm-check-updates -u -x jsdom,chalk,hexo,deepmerge-ts --enginesNode --root"
+    "update:ncu": "npx npm-check-updates -u -x jsdom,chalk,hexo,deepmerge-ts --enginesNode --root",
+    "clean": "rimraf lib"
   },
   "keywords": [
     "cache",
@@ -68,6 +69,7 @@
     "eslint-plugin-prettier": "^5.1.3",
     "git-command-helper": "^2.0.2",
     "prettier": "^3.2.4",
+    "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },

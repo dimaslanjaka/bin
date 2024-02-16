@@ -43,7 +43,7 @@ async function start() {
     // git gc --prune=now --aggressive
 
     // delay 3s
-    delay(3);
+    await delay(3);
     // stop
     running = false;
   }

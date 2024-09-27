@@ -67,6 +67,11 @@ see all binary at
 - https://github.com/dimaslanjaka/bin/tree/master/lib
 - https://github.com/dimaslanjaka/bin/blob/master/package.json
 
+submodule remover
+
+![image](https://github.com/user-attachments/assets/659c2fa3-f12f-45cb-a66f-aed3807e0023)
+
+
 ### npm scripts runner
 
 > binaries: `nrs`, `run-s`, `run-series`

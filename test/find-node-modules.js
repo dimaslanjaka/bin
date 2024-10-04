@@ -1,3 +1,3 @@
-require('./env');
+require("./env");
 
-require('../lib/find-node-modules');
+require("../lib/find-node-modules");

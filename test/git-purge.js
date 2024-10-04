@@ -1,3 +1,3 @@
-require('./env');
+require("./env");
 
-require('../src/git-purge');
+require("../src/git-purge");

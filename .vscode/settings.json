@@ -47,5 +47,6 @@
     "javascript": "node",
     "typescript": "node -r ./tshook.js"
   },
-  "npm.packageManager": "yarn"
+  "npm.packageManager": "yarn",
+  "eslint.useFlatConfig": false
 }

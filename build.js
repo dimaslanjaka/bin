@@ -36,8 +36,9 @@ glob
       '**/*.{md,ts,js,txt,log,json,lock}',
       '**/bash-dummy*',
       '**/.yarn*',
-      // ignore .txt files
-      '**/*.txt'
+      '**/*.txt',
+      '**/*.d.*',
+      '**/chunk*'
     ]
   })
   .filter((str) => {

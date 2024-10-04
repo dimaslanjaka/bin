@@ -56,7 +56,9 @@ const config = {
         // disable require warning on js files
         '@typescript-eslint/no-var-requires': 'off',
         // disable include refenrences definition files on js
-        '@typescript-eslint/triple-slash-reference': 'off'
+        '@typescript-eslint/triple-slash-reference': 'off',
+        // disable require warning in js
+        '@typescript-eslint/no-require-imports': 'off'
       }
     }
   ],

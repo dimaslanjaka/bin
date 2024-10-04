@@ -1,5 +1,3 @@
-const { path } = require('sbg-utility');
-
-process.cwd = () => path.resolve(__dirname + '/../../../Repositories');
+require('./env');
 
 require('../lib/del-gradle');

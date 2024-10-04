@@ -1,25 +1,25 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
-const { Minimatch } = require('minimatch');
+const fs = require("fs");
+const path = require("path");
+const { Minimatch } = require("minimatch");
 
-const args = require('minimist')(process.argv.slice(2));
+const args = require("minimist")(process.argv.slice(2));
 const cwd = process.cwd();
-const packagejson = path.join(cwd, 'package.json');
-const verbose = args['v'] || args['verbose'];
-const usingYarn = args['yarn'];
+const packagejson = path.join(cwd, "package.json");
+const verbose = args["v"] || args["verbose"];
+const usingYarn = args["yarn"];
 
 (async function npmRunSeries() {
-  const { execa } = await import('execa');
+  const { execa } = await import("execa");
   if (fs.existsSync(packagejson)) {
     /**
      * @type {import('../package.json')}
      */
-    const parse = JSON.parse(fs.readFileSync(packagejson, 'utf-8'));
+    const parse = JSON.parse(fs.readFileSync(packagejson, "utf-8"));
 
-    if (parse !== null && typeof parse === 'object') {
-      if ('scripts' in parse) {
+    if (parse !== null && typeof parse === "object") {
+      if ("scripts" in parse) {
         const patterns = args._;
         const scripts = parse.scripts;
         const scriptNames = Object.keys(scripts);
@@ -31,9 +31,9 @@ const usingYarn = args['yarn'];
             const match = matcher.match(scriptName);
             if (verbose) console.log({ pattern, scriptName, match });
             if (match === true) {
-              await execa(usingYarn ? 'yarn' : 'npm', ['run', scriptName], {
+              await execa(usingYarn ? "yarn" : "npm", ["run", scriptName], {
                 cwd,
-                stdio: 'inherit'
+                stdio: "inherit"
               });
             }
           }

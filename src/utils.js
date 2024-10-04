@@ -1,5 +1,5 @@
-const { fs, path } = require('sbg-utility');
-const argv = require('minimist')(process.argv.slice(2));
+const { fs, path } = require("sbg-utility");
+const argv = require("minimist")(process.argv.slice(2));
 
 function getArgs() {
   return argv;
@@ -10,7 +10,7 @@ function getArgs() {
  * @param {glob.Glob} globStream
  */
 function delStream(globStream) {
-  globStream.stream().on('data', (result) => {
+  globStream.stream().on("data", (result) => {
     const fullPath = path.resolve(process.cwd(), result);
     if (fs.statSync(fullPath).isDirectory()) {
       // delete all files each package directory
@@ -37,9 +37,9 @@ function del(fullPath) {
   } else {
     try {
       fs.rmSync(fullPath, { recursive: true, force: true, retryDelay: 7000 });
-      console.log('deleted', fullPath);
+      console.log("deleted", fullPath);
     } catch (_) {
-      console.log('failed delete', fullPath);
+      console.log("failed delete", fullPath);
     }
   }
 }

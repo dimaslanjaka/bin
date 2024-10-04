@@ -6,7 +6,7 @@
  * 4, a domain group belongs to a title field if they vertically overlapped
  * 5, calculate all the edge info through the group domain and title field relations.
  */
-var ConnectedDomain = require('./connected-domain');
+var ConnectedDomain = require("./connected-domain");
 var EMPTY_EX = /\s/;
 
 /**
@@ -65,7 +65,7 @@ module.exports.parse = function (output) {
         }
       });
     } else {
-      twoDimArray[index - 1] = line.split('');
+      twoDimArray[index - 1] = line.split("");
     }
   });
 
@@ -235,10 +235,10 @@ function splitValue(value) {
     var maxQuotaCount = match.length % 2 == 0 ? match.length : match.length - 1;
 
     var previousItem = null;
-    var values = value.split('');
+    var values = value.split("");
 
     values.forEach(function (item, index) {
-      if (item !== ' ') {
+      if (item !== " ") {
         if (item === '"') {
           // quota chunk begin
           if (ifInWrappedChunk === false && quotaCount <= maxQuotaCount) {
@@ -246,9 +246,9 @@ function splitValue(value) {
             quotaCount++;
 
             // pure quota chunk begin
-            if (previousItem === ' ' || previousItem === null) {
+            if (previousItem === " " || previousItem === null) {
               ifInPureWrappedChunk = true;
-              chunk = '';
+              chunk = "";
             }
             // normal continue
             else {
@@ -273,7 +273,7 @@ function splitValue(value) {
           }
         }
         // normal begin
-        else if (ifInWrappedChunk === false && (previousItem === ' ' || previousItem === null)) {
+        else if (ifInWrappedChunk === false && (previousItem === " " || previousItem === null)) {
           chunk = item;
         }
         // normal or quota chunk continue.

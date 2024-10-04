@@ -1,7 +1,7 @@
-const { spawnAsync } = require('cross-spawn');
-const glob = require('glob');
-const path = require('path');
-const { delay } = require('./utils');
+const { spawnAsync } = require("cross-spawn");
+const glob = require("glob");
+const path = require("path");
+const { delay } = require("./utils");
 
 /** @type {string[]} */
 const dirs = [];
@@ -14,12 +14,12 @@ const fetchDirs = (pattern, callback) => {
   const globStream = new glob.Glob(pattern, {
     withFileTypes: false,
     cwd: process.cwd(),
-    ignore: ['**/node_modules/**', '**/vendor/**']
+    ignore: ["**/node_modules/**", "**/vendor/**"]
   });
 
-  globStream.stream().on('data', (result) => {
+  globStream.stream().on("data", (result) => {
     const fullPath = path.resolve(process.cwd(), result);
-    if (typeof callback == 'function') callback(fullPath);
+    if (typeof callback == "function") callback(fullPath);
     const base = path.dirname(fullPath);
     // push directory when not exist
     if (!dirs.includes(base)) dirs.push(base);
@@ -36,9 +36,9 @@ async function start() {
     running = true;
 
     const cwd = dirs.shift();
-    console.log('pruning reflog', cwd);
-    await spawnAsync('git', ['reflog', 'expire', '--expire=all', '--all'], { cwd, stdio: 'pipe', shell: true }).catch(
-      (e) => console.log('failed prune reflog', e.message)
+    console.log("pruning reflog", cwd);
+    await spawnAsync("git", ["reflog", "expire", "--expire=all", "--all"], { cwd, stdio: "pipe", shell: true }).catch(
+      (e) => console.log("failed prune reflog", e.message)
     );
     // git gc --prune=now --aggressive
 
@@ -51,4 +51,4 @@ async function start() {
 
 // script starts here
 
-fetchDirs('**/.git');
+fetchDirs("**/.git");

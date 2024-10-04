@@ -1,3 +1,3 @@
-require('./env');
+require("./env");
 
-require('../lib/del-gradle');
+require("../lib/del-gradle");

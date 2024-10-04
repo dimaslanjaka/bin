@@ -1,3 +1,3 @@
-require('./env');
+require("./env");
 
-require('../lib/del-node-modules');
+require("../lib/del-node-modules");

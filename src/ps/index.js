@@ -1,6 +1,6 @@
-var ChildProcess = require('child_process');
-var IS_WIN = require('./isWin');
-var TableParser = require('./table-parser');
+var ChildProcess = require("child_process");
+var IS_WIN = require("./isWin");
+var TableParser = require("./table-parser");
 /**
  * End of line.
  * Basically, the EOL should be:
@@ -9,7 +9,7 @@ var TableParser = require('./table-parser');
  * But i'm trying to get every possibilities covered.
  */
 var EOL = /(\r\n)|(\n\r)|\n|\r/;
-var SystemEOL = require('os').EOL;
+var SystemEOL = require("os").EOL;
 
 // ps-node
 
@@ -31,15 +31,15 @@ var Exec =
       // on windows, if use ChildProcess.exec(`wmic process get`), the stdout will gives you nothing
       // that's why I use `cmd` instead
       if (IS_WIN) {
-        var CMD = spawn('cmd');
-        var stdout = '';
+        var CMD = spawn("cmd");
+        var stdout = "";
         var stderr = null;
 
-        CMD.stdout.on('data', function (data) {
+        CMD.stdout.on("data", function (data) {
           stdout += data.toString();
         });
 
-        CMD.stderr.on('data', function (data) {
+        CMD.stderr.on("data", function (data) {
           if (stderr === null) {
             stderr = data.toString();
           } else {
@@ -47,13 +47,13 @@ var Exec =
           }
         });
 
-        CMD.on('exit', function () {
+        CMD.on("exit", function () {
           var beginRow;
           stdout = stdout.split(EOL);
 
           // Find the line index for the titles
           stdout.forEach(function (out, index) {
-            if (out && typeof beginRow == 'undefined' && out.indexOf('CommandLine') === 0) {
+            if (out && typeof beginRow == "undefined" && out.indexOf("CommandLine") === 0) {
               beginRow = index;
             }
           });
@@ -65,21 +65,21 @@ var Exec =
           callback(stderr, stdout.join(SystemEOL) || false);
         });
 
-        CMD.stdin.write('wmic process get ProcessId,ParentProcessId,CommandLine \n');
+        CMD.stdin.write("wmic process get ProcessId,ParentProcessId,CommandLine \n");
         CMD.stdin.end();
       } else {
-        if (typeof args === 'string') {
+        if (typeof args === "string") {
           args = args.split(/\s+/);
         }
-        const child = spawn('ps', args);
-        stdout = '';
+        const child = spawn("ps", args);
+        stdout = "";
         stderr = null;
 
-        child.stdout.on('data', function (data) {
+        child.stdout.on("data", function (data) {
           stdout += data.toString();
         });
 
-        child.stderr.on('data', function (data) {
+        child.stderr.on("data", function (data) {
           if (stderr === null) {
             stderr = data.toString();
           } else {
@@ -87,7 +87,7 @@ var Exec =
           }
         });
 
-        child.on('exit', function () {
+        child.on("exit", function () {
           if (stderr) {
             return callback(stderr.toString());
           } else {
@@ -114,7 +114,7 @@ exports.lookup = function (query, callback) {
   /**
    * add 'lx' as default ps arguments, since the default ps output in linux like "ubuntu", wont include command arguments
    */
-  var exeArgs = query.psargs || ['lx'];
+  var exeArgs = query.psargs || ["lx"];
   var filter = {};
   var idList;
 
@@ -133,15 +133,15 @@ exports.lookup = function (query, callback) {
   }
 
   if (query.command) {
-    filter['command'] = new RegExp(query.command, 'i');
+    filter["command"] = new RegExp(query.command, "i");
   }
 
   if (query.arguments) {
-    filter['arguments'] = new RegExp(query.arguments, 'i');
+    filter["arguments"] = new RegExp(query.arguments, "i");
   }
 
   if (query.ppid) {
-    filter['ppid'] = new RegExp(query.ppid);
+    filter["ppid"] = new RegExp(query.ppid);
   }
 
   return Exec(exeArgs, function (err, output) {
@@ -186,14 +186,14 @@ exports.lookup = function (query, callback) {
 
 exports.kill = function (pid, signal, next) {
   //opts are optional
-  if (arguments.length == 2 && typeof signal == 'function') {
+  if (arguments.length == 2 && typeof signal == "function") {
     next = signal;
     signal = undefined;
   }
 
   var checkTimeoutSeconds = (signal && signal.timeout) || 30;
 
-  if (typeof signal === 'object') {
+  if (typeof signal === "object") {
     signal = signal.signal;
   }
 
@@ -235,7 +235,7 @@ exports.kill = function (pid, signal, next) {
     next &&
     setTimeout(function () {
       checkIsTimeout = true;
-      next(new Error('Kill process timeout'));
+      next(new Error("Kill process timeout"));
     }, checkTimeoutSeconds * 1000);
 };
 
@@ -266,7 +266,7 @@ function formatOutput(data) {
 
     if (pid && cmd) {
       var command = cmd[0];
-      var args = '';
+      var args = "";
 
       if (cmd.length > 1) {
         args = cmd.slice(1);

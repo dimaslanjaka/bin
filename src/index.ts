@@ -1,1 +1,1 @@
-console.log('binary-collections main script :P');
+console.log("binary-collections main script :P");

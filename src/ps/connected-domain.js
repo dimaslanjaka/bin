@@ -12,11 +12,11 @@ module.exports = function (tdArray, indicator, hardlink) {
   hardlink = hardlink || false;
 
   if (!tdArray) {
-    throw new Error('tdArray must be provided');
+    throw new Error("tdArray must be provided");
   }
 
   if (!indicator) {
-    throw new Error('indicator must be provided');
+    throw new Error("indicator must be provided");
   }
 
   // clone 一份数据，因为需要对饮用进行修改，方便执行
@@ -40,24 +40,24 @@ module.exports = function (tdArray, indicator, hardlink) {
 
       // top neighbour
       if (tdArray[y - 1] && tdArray[y - 1][x] !== undefined) {
-        neighbours.push(pointsHash[x + '_' + (y - 1)]);
+        neighbours.push(pointsHash[x + "_" + (y - 1)]);
       }
 
       // left neighbour
       if (row[x - 1] !== undefined) {
-        neighbours.push(pointsHash[x - 1 + '_' + y]);
+        neighbours.push(pointsHash[x - 1 + "_" + y]);
       }
 
       // soft link will treat corner link as domain link.
       if (!hardlink) {
         // top left neighbour
         if (tdArray[y - 1] && tdArray[y - 1][x - 1] !== undefined) {
-          neighbours.push(pointsHash[x - 1 + '_' + (y - 1)]);
+          neighbours.push(pointsHash[x - 1 + "_" + (y - 1)]);
         }
 
         // top right neighbour
         if (tdArray[y - 1] && tdArray[y - 1][x + 1] !== undefined) {
-          neighbours.push(pointsHash[x + 1 + '_' + (y - 1)]);
+          neighbours.push(pointsHash[x + 1 + "_" + (y - 1)]);
         }
       }
 
@@ -75,7 +75,7 @@ module.exports = function (tdArray, indicator, hardlink) {
             // If more than one neighbour matched, check if these neighbours belong to the same domain
             // If not, merge these domains since they connects to each other.
             else {
-              var colItemPoint = pointsHash[x + '_' + y];
+              var colItemPoint = pointsHash[x + "_" + y];
               if (neighbour.domainId != colItemPoint.domainId) {
                 mergeDomains(neighbour.domainId, colItemPoint.domainId);
               }
@@ -177,7 +177,7 @@ module.exports = function (tdArray, indicator, hardlink) {
       domainId: newDomain.domainId
     };
 
-    pointsHash[x + '_' + y] = {
+    pointsHash[x + "_" + y] = {
       value: point,
       identifier: identifier,
       domainId: newDomain.domainId
@@ -205,7 +205,7 @@ module.exports = function (tdArray, indicator, hardlink) {
       domainId: domainId
     };
 
-    pointsHash[x + '_' + y] = {
+    pointsHash[x + "_" + y] = {
       value: point,
       identifier: domain.identifier,
       domainId: domainId
@@ -230,7 +230,7 @@ module.exports = function (tdArray, indicator, hardlink) {
 
       domainB.points.forEach(function (point) {
         point.domainId = domainA.domainId;
-        pointsHash[point.x + '_' + point.y].domainId = domainA.domainId;
+        pointsHash[point.x + "_" + point.y].domainId = domainA.domainId;
       });
 
       domainA.points = domainA.points.concat(domainB.points);

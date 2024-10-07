@@ -40,14 +40,3 @@ build({
   console.error("Build failed:", err);
   process.exit(1);
 });
-
-build({
-  ...baseOption,
-  format: "cjs",
-  outExtension() {
-    return { js: ".js", dts: ".d.ts" };
-  }
-}).catch((err) => {
-  console.error("Build failed:", err);
-  process.exit(1);
-});

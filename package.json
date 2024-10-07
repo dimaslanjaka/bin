@@ -1,8 +1,21 @@
 {
   "name": "binary-collections",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "Utility to clean any programming caches and more",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "require": {
+        "default": "./lib/index.cjs",
+        "types": "./lib/index.d.ts"
+      },
+      "import": {
+        "default": "./lib/index.mjs",
+        "types": "./lib/index.d.mts"
+      }
+    }
+  },
   "files": [
     "bin",
     "lib",
@@ -11,11 +24,12 @@
     "package.json"
   ],
   "directories": {
-    "lib": "lib"
+    "lib": "lib",
+    "bin": "bin"
   },
   "scripts": {
     "update:packer": "curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js > packer.js",
-    "build": "node build.tsup.js && npm run postbuild",
+    "build": "node build.tsup.js && tsc -b tsconfig.build.json && npm run postbuild",
     "postbuild": "node -r ts-node/register -r dotenv/config build.js && yarn run pack",
     "test": "cd test && npm install -D file:../ &&",
     "test:nrs": "npm test -- nrs build:**",
@@ -101,10 +115,12 @@
     "del-yarncaches": "lib/del-yarn-caches.cjs",
     "dev": "bin/dev",
     "empty": "bin/empty",
-    "eslint-config-cjs": "eslint.config.cjs",
+    "eslint-config-mjs": "eslint.config.mjs",
     "find-node-modules-cjs": "lib/find-node-modules.cjs",
+    "find-node-modules-cli-cjs": "lib/find-node-modules-cli.cjs",
+    "find-node-modules-cli-mjs": "lib/find-node-modules-cli.mjs",
     "find-node-modules-mjs": "lib/find-node-modules.mjs",
-    "find-nodemodules": "lib/find-node-modules.cjs",
+    "find-nodemodules": "lib/find-node-modules-cli.cjs",
     "git-fix-encoding": "bin/git-fix-encoding",
     "git-fix-encoding-cmd": "bin/git-fix-encoding.cmd",
     "git-purge": "lib/git-purge.cjs",
@@ -138,6 +154,7 @@
     "submodule-token": "bin/submodule-token",
     "table-parser-cjs": "lib/ps/table-parser.cjs",
     "table-parser-mjs": "lib/ps/table-parser.mjs",
+    "tsconfig-build-tsbuildinfo": "tsconfig.build.tsbuildinfo",
     "utils-cjs": "lib/utils.cjs",
     "utils-mjs": "lib/utils.mjs"
   }

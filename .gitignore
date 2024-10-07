@@ -12,3 +12,4 @@ releases/*
 !releases/bin.tar.gz
 *.log
 .env
+*.tsbuildinfo

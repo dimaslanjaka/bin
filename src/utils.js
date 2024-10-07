@@ -6,24 +6,6 @@ function getArgs() {
 }
 
 /**
- * glob stream handler
- * @param {glob.Glob} globStream
- */
-function delStream(globStream) {
-  globStream.stream().on("data", (result) => {
-    const fullPath = path.resolve(process.cwd(), result);
-    if (fs.statSync(fullPath).isDirectory()) {
-      // delete all files each package directory
-      const subdir = fs.readdirSync(fullPath).map((dirPath) => path.resolve(fullPath, dirPath));
-      for (let i = 0; i < subdir.length; i++) {
-        del(subdir[i]);
-      }
-    }
-    del(fullPath);
-  });
-}
-
-/**
  * delete file recursive
  * @param {string} fullPath
  */
@@ -42,6 +24,24 @@ function del(fullPath) {
       console.log("failed delete", fullPath);
     }
   }
+}
+
+/**
+ * glob stream handler
+ * @param {glob.Glob} globStream
+ */
+function delStream(globStream) {
+  globStream.stream().on("data", (result) => {
+    const fullPath = path.resolve(process.cwd(), result);
+    if (fs.statSync(fullPath).isDirectory()) {
+      // delete all files each package directory
+      const subdir = fs.readdirSync(fullPath).map((dirPath) => path.resolve(fullPath, dirPath));
+      for (let i = 0; i < subdir.length; i++) {
+        del(subdir[i]);
+      }
+    }
+    del(fullPath);
+  });
 }
 
 /**

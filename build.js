@@ -1,44 +1,44 @@
-const path = require('upath');
-const fs = require('fs');
-const glob = require('glob');
-const pkgj = require('./package.json');
+const path = require("upath");
+const fs = require("fs");
+const glob = require("glob");
+const pkgj = require("./package.json");
 
 pkgj.bin = {
-  nrs: 'lib/npm-run-series.js',
-  'run-s': 'lib/npm-run-series.js',
-  'run-series': 'lib/npm-run-series.js',
-  'npm-run-series': 'lib/npm-run-series.js',
-  'del-nodemodules': 'lib/del-node-modules.js',
-  'del-yarncaches': 'lib/del-yarn-caches.js',
-  'find-nodemodules': 'lib/find-node-modules.js',
-  'del-ps': 'lib/del-ps.js',
-  'del-gradle': 'lib/del-gradle.js',
-  'git-purge': 'lib/git-purge.js'
+  nrs: "lib/npm-run-series.cjs",
+  "run-s": "lib/npm-run-series.cjs",
+  "run-series": "lib/npm-run-series.cjs",
+  "npm-run-series": "lib/npm-run-series.cjs",
+  "del-nodemodules": "lib/del-node-modules.cjs",
+  "del-yarncaches": "lib/del-yarn-caches.cjs",
+  "find-nodemodules": "lib/find-node-modules.cjs",
+  "del-ps": "lib/del-ps.cjs",
+  "del-gradle": "lib/del-gradle.cjs",
+  "git-purge": "lib/git-purge.cjs"
 };
 
 glob
-  .sync('**/*', {
+  .sync("**/*", {
     cwd: __dirname,
     ignore: [
-      '**/node_modules/**',
-      '**/boilerplate/**',
-      '**/.git*',
-      '**/yarn.lock',
-      '**/{package,package-lock}.json',
-      '**/releases/**',
-      '**/tmp/**',
-      '**/test/**',
-      '**/LICENSE',
-      '**/.yarn/**',
-      '**/.yarn*',
-      '**/dist/**',
-      '**/.github/**',
-      '**/*.{md,ts,js,txt,log,json,lock}',
-      '**/bash-dummy*',
-      '**/.yarn*',
-      '**/*.txt',
-      '**/*.d.*',
-      '**/chunk*'
+      "**/node_modules/**",
+      "**/boilerplate/**",
+      "**/.git*",
+      "**/yarn.lock",
+      "**/{package,package-lock}.json",
+      "**/releases/**",
+      "**/tmp/**",
+      "**/test/**",
+      "**/LICENSE",
+      "**/.yarn/**",
+      "**/.yarn*",
+      "**/dist/**",
+      "**/.github/**",
+      "**/*.{md,ts,js,txt,log,json,lock}",
+      "**/bash-dummy*",
+      "**/.yarn*",
+      "**/*.txt",
+      "**/*.d.*",
+      "**/chunk*"
     ]
   })
   .filter((str) => {
@@ -47,14 +47,14 @@ glob
     return fs.statSync(resolved).isFile();
   })
   .forEach((str) => {
-    let basename = path.basename(str).replace(/\./gm, '-');
+    let basename = path.basename(str).replace(/\./gm, "-");
     pkgj.bin[basename] = path.toUnix(str);
   });
 
 // sort
 pkgj.bin = sortObjectByKeys(pkgj.bin);
 
-fs.writeFileSync(path.resolve(__dirname, 'package.json'), JSON.stringify(pkgj, null, 2) + '\n');
+fs.writeFileSync(path.resolve(__dirname, "package.json"), JSON.stringify(pkgj, null, 2) + "\n");
 //cp.sync('yarn', ['install'], { cwd: __dirname });
 // copy to test
 

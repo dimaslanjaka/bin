@@ -10,7 +10,7 @@ pkgj.bin = {
   "npm-run-series": "lib/npm-run-series.cjs",
   "del-nodemodules": "lib/del-node-modules.cjs",
   "del-yarncaches": "lib/del-yarn-caches.cjs",
-  "find-nodemodules": "lib/find-node-modules.cjs",
+  "find-nodemodules": "lib/find-node-modules-cli.cjs",
   "del-ps": "lib/del-ps.cjs",
   "del-gradle": "lib/del-gradle.cjs",
   "git-purge": "lib/git-purge.cjs"

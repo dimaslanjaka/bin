@@ -1,1 +1,3 @@
-console.log("binary-collections main script :P");
+import findNodeModules from "./find-node-modules";
+
+export { findNodeModules };

@@ -1,20 +1,16 @@
-import * as minimist from 'minimist';
-
 /**
  * delete file recursive
  * @param {string} fullPath
  */
-declare function del(fullPath: string): void;
+export function del(fullPath: string): void;
 /**
  * glob stream handler
  * @param {glob.Glob} globStream
  */
-declare function delStream(globStream: glob.Glob): void;
-declare function getArgs(): minimist.ParsedArgs;
+export function delStream(globStream: glob.Glob): void;
+export function getArgs(): import("minimist").ParsedArgs;
 /**
  * async delayed
  * @param {number} ms
  */
-declare function delay(ms: number): Promise<any>;
-
-export { del, delStream, delay, getArgs };
+export function delay(ms: number): Promise<any>;

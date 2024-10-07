@@ -3,6 +3,9 @@ const { build } = require("tsup");
 
 fs.rmSync(path.join(__dirname, "lib"), { force: true, recursive: true });
 
+/**
+ * @type {import("tsup").Options}
+ */
 const baseOption = {
   outDir: "lib",
   entry: ["./src/**/*"],
@@ -10,7 +13,11 @@ const baseOption = {
   target: "node14",
   dts: true,
   shims: true,
-  tsconfig: "tsconfig.build.json"
+  // splitting: false,
+  tsconfig: "tsconfig.build.json",
+  minify: false,
+  removeNodeProtocol: true,
+  skipNodeModulesBundle: true
 };
 
 build({

@@ -1,45 +1,45 @@
 #!/usr/bin/env node
 
-const { spawnSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+const { spawnSync } = require("child_process");
+const fs = require("fs");
+const path = require("path");
 
 // Path to .env file
-const envPath = path.resolve(__dirname, '.env');
+const envPath = path.resolve(__dirname, ".env");
 
 // Check if .env exists and read it
 if (fs.existsSync(envPath)) {
-  const envContent = fs.readFileSync(envPath, 'utf8');
+  const envContent = fs.readFileSync(envPath, "utf8");
 
   // Split into lines and process each
-  envContent.split('\n').forEach((line) => {
+  envContent.split("\n").forEach((line) => {
     const trimmedLine = line.trim();
 
     // Ignore empty lines and comments
-    if (!trimmedLine || trimmedLine.startsWith('#')) return;
+    if (!trimmedLine || trimmedLine.startsWith("#")) return;
 
     // Extract key and value
-    const [key, ...vals] = trimmedLine.split('=');
+    const [key, ...vals] = trimmedLine.split("=");
     if (!key) return;
 
     const value = vals
-      .join('=')
+      .join("=")
       .trim()
-      .replace(/^['"]|['"]$/g, ''); // Remove surrounding quotes
+      .replace(/^['"]|['"]$/g, ""); // Remove surrounding quotes
     process.env[key.trim()] = value;
   });
 }
 
 // Parse CLI args
 const args = process.argv.slice(2);
-let ROOT = runGit(['rev-parse', '--show-toplevel']).trim();
+let ROOT = runGit(["rev-parse", "--show-toplevel"]).trim();
 let REPO_PATH = ROOT;
 
 for (let i = 0; i < args.length; i++) {
-  if (args[i] === '-cwd' && args[i + 1]) {
+  if (args[i] === "-cwd" && args[i + 1]) {
     ROOT = path.resolve(args[++i]);
-  } else if (args[i].startsWith('--cwd=')) {
-    ROOT = path.resolve(args[i].split('=')[1]);
+  } else if (args[i].startsWith("--cwd=")) {
+    ROOT = path.resolve(args[i].split("=")[1]);
   }
 }
 
@@ -47,15 +47,15 @@ console.log(`Installing submodules at ${ROOT}`);
 
 // Get submodule paths
 const submoduleList = runGit([
-  '-C',
+  "-C",
   REPO_PATH,
-  'config',
-  '-f',
-  '.gitmodules',
-  '--get-regexp',
-  '^submodule\\..*\\.path$'
+  "config",
+  "-f",
+  ".gitmodules",
+  "--get-regexp",
+  "^submodule\\..*\\.path$"
 ])
-  .split('\n')
+  .split("\n")
   .filter(Boolean);
 
 for (const line of submoduleList) {
@@ -68,17 +68,17 @@ for (const line of submoduleList) {
   }
 
   const NAME = KEY.match(/^submodule\.(.*)\.path$/)[1];
-  const URL = runGit(['config', '-f', '.gitmodules', '--get', `submodule.${NAME}.url`]).trim();
+  const URL = runGit(["config", "-f", ".gitmodules", "--get", `submodule.${NAME}.url`]).trim();
 
-  let BRANCH = 'master';
+  let BRANCH = "master";
   try {
-    BRANCH = runGit(['config', '-f', '.gitmodules', '--get', `submodule.${NAME}.branch`]).trim();
+    BRANCH = runGit(["config", "-f", ".gitmodules", "--get", `submodule.${NAME}.branch`]).trim();
   } catch {
     // silently ignore if branch is not set
   }
 
   const addResult = runGit(
-    ['-C', REPO_PATH, 'submodule', 'add', '--force', '-b', BRANCH, '--name', NAME, URL, MODULE_PATH],
+    ["-C", REPO_PATH, "submodule", "add", "--force", "-b", BRANCH, "--name", NAME, URL, MODULE_PATH],
     true
   );
 
@@ -87,21 +87,21 @@ for (const line of submoduleList) {
     continue;
   }
 
-  const repo = URL.replace('https://github.com/', '');
-  const GIT_MODULES = path.join(RELATIVE_MODULE_PATH, '.gitmodules');
+  const repo = URL.replace("https://github.com/", "");
+  const GIT_MODULES = path.join(RELATIVE_MODULE_PATH, ".gitmodules");
 
   if (process.env.ACCESS_TOKEN) {
     const URL_WITH_TOKEN = `https://${process.env.ACCESS_TOKEN}@github.com/${repo}`;
     console.log(`Apply token for ${repo} at ${MODULE_PATH} branch ${BRANCH}`);
-    runGit(['-C', RELATIVE_MODULE_PATH, 'remote', 'set-url', 'origin', URL_WITH_TOKEN]);
+    runGit(["-C", RELATIVE_MODULE_PATH, "remote", "set-url", "origin", URL_WITH_TOKEN]);
   }
 
-  runGit(['-C', RELATIVE_MODULE_PATH, 'fetch', '--all']);
-  runGit(['-C', RELATIVE_MODULE_PATH, 'pull', 'origin', BRANCH, '-X', 'theirs']);
+  runGit(["-C", RELATIVE_MODULE_PATH, "fetch", "--all"]);
+  runGit(["-C", RELATIVE_MODULE_PATH, "pull", "origin", BRANCH, "-X", "theirs"]);
 
   if (fs.existsSync(GIT_MODULES)) {
     console.log(`${MODULE_PATH} has submodules`);
-    const result = spawnSync('node', [__filename, '-cwd', RELATIVE_MODULE_PATH], { stdio: 'inherit' });
+    const result = spawnSync("node", [__filename, "-cwd", RELATIVE_MODULE_PATH], { stdio: "inherit" });
     if (result.status !== 0) {
       console.error(`Recursive submodule failed for ${RELATIVE_MODULE_PATH}`);
       process.exit(result.status);
@@ -109,18 +109,18 @@ for (const line of submoduleList) {
   }
 }
 
-runGit(['-C', REPO_PATH, 'submodule', 'update', '--init', '--recursive']);
+runGit(["-C", REPO_PATH, "submodule", "update", "--init", "--recursive"]);
 
 // ----------- Helper Functions -----------
 
 function runGit(args, returnResult = false) {
-  const result = spawnSync('git', args, { encoding: 'utf-8' });
+  const result = spawnSync("git", args, { encoding: "utf-8" });
 
   if (returnResult) return result;
 
   if (result.status !== 0) {
-    throw new Error(result.stderr || `git ${args.join(' ')} failed`);
+    throw new Error(result.stderr || `git ${args.join(" ")} failed`);
   }
 
-  return result.stdout || '';
+  return result.stdout || "";
 }

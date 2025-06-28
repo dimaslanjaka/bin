@@ -2,6 +2,7 @@ const path = require("upath");
 const fs = require("fs");
 const glob = require("glob");
 const pkgj = require("./package.json");
+const colors = require("ansi-colors");
 
 pkgj.bin = {
   nrs: "lib/npm-run-series.cjs",
@@ -38,25 +39,41 @@ glob
       "**/.yarn*",
       "**/*.txt",
       "**/*.d.*",
-      "**/chunk*"
+      "**/chunk*",
+      "**/build.*",
+      "**/*tsbuildinfo",
+      "**/ps/**",
+      "**/*eslint*"
     ]
   })
   .filter((str) => {
     const resolved = path.join(__dirname, str);
-    if ([path.toUnix(__filename)].includes(resolved)) return false;
+    if ([path.toUnix(__filename)].includes(path.toUnix(resolved))) return false;
     return fs.statSync(resolved).isFile();
   })
+  .sort((a, b) => {
+    // Prioritize paths that include "bin/"
+    const aIsBin = path.toUnix(a).includes("bin/");
+    const bIsBin = path.toUnix(b).includes("bin/");
+    return aIsBin === bIsBin ? 0 : aIsBin ? -1 : 1;
+  })
   .forEach((str) => {
-    let basename = path.basename(str).replace(/\./gm, "-");
-    pkgj.bin[basename] = path.toUnix(str);
+    const basename = path.basename(str, path.extname(str));
+    const sanitizeName = basename.replace(/\./g, "-");
+    const value = path.toUnix(str);
+
+    const isBin = value.includes("bin/");
+    const key = isBin ? sanitizeName : basename;
+    const coloredKey = isBin ? colors.green(key) : colors.yellow(key);
+
+    console.log(`add ${coloredKey}: ${value}`);
+    pkgj.bin[key] = value;
   });
 
 // sort
 pkgj.bin = sortObjectByKeys(pkgj.bin);
 
 fs.writeFileSync(path.resolve(__dirname, "package.json"), JSON.stringify(pkgj, null, 2) + "\n");
-//cp.sync('yarn', ['install'], { cwd: __dirname });
-// copy to test
 
 /**
  * sort object by keys

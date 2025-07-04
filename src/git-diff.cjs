@@ -29,10 +29,27 @@ function showHelp() {
 function runGitDiff(command, successMessage, errorMessage) {
   try {
     const result = execSync(command, { encoding: 'utf8' });
+
+    // If result is empty, inform user but don't treat as error
+    if (!result || result.trim() === '') {
+      console.log(`[i] No changes found for the specified criteria`);
+      fs.writeFileSync(OUTPUT, '# No changes found\n');
+      console.log(`[✓] Empty diff saved to "${OUTPUT}"`);
+      return;
+    }
+
     fs.writeFileSync(OUTPUT, result);
     console.log(`[✓] ${successMessage}`);
-  } catch (_error) {
+  } catch (error) {
     console.error(`[✗] ${errorMessage}`);
+    console.error(`Command: ${command}`);
+    console.error(`Error: ${error.message}`);
+
+    // Check if it's a git-related error
+    if (error.message.includes('not a git repository')) {
+      console.error('Make sure you are in a git repository');
+    }
+
     process.exit(1);
   }
 }

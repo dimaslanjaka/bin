@@ -86,13 +86,29 @@ for (const line of submoduleList) {
     continue;
   }
 
-  const repo = URL.replace("https://github.com/", "");
   const GIT_MODULES = path.join(RELATIVE_MODULE_PATH, ".gitmodules");
 
   if (process.env.ACCESS_TOKEN) {
-    const URL_WITH_TOKEN = `https://${process.env.ACCESS_TOKEN}@github.com/${repo}`;
-    console.log(`Apply token for ${repo} at ${MODULE_PATH} branch ${BRANCH}`);
-    runGit(["-C", RELATIVE_MODULE_PATH, "remote", "set-url", "origin", URL_WITH_TOKEN]);
+    let URL_WITH_TOKEN = "";
+    let repoInfo;
+
+    if (URL.includes("github.com")) {
+      repoInfo = URL.replace("https://github.com/", "");
+      URL_WITH_TOKEN = `https://${process.env.ACCESS_TOKEN}@github.com/${repoInfo}`;
+    } else if (URL.includes("gitlab.com") && typeof process.env.GITLAB_TOKEN === "string") {
+      repoInfo = URL.replace("https://gitlab.com/", "");
+      URL_WITH_TOKEN = `https://oauth2:${process.env.ACCESS_TOKEN}@gitlab.com/${repoInfo}`;
+    } else {
+      // For other Git providers, try a generic approach
+      const urlObj = new URL(URL);
+      repoInfo = urlObj.pathname.substring(1); // Remove leading slash
+      URL_WITH_TOKEN = `${urlObj.protocol}//${process.env.ACCESS_TOKEN}@${urlObj.host}${urlObj.pathname}`;
+    }
+
+    if (URL_WITH_TOKEN && URL_WITH_TOKEN.length > 0) {
+      console.log(`Apply token for ${repoInfo} at ${MODULE_PATH} branch ${BRANCH}`);
+      runGit(["-C", RELATIVE_MODULE_PATH, "remote", "set-url", "origin", URL_WITH_TOKEN]);
+    }
   }
 
   runGit(["-C", RELATIVE_MODULE_PATH, "fetch", "--all"]);

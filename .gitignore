@@ -13,3 +13,5 @@ releases/*
 *.log
 .env
 *.tsbuildinfo
+**/.cache/**
+**/tmp/**

@@ -28,7 +28,10 @@ function showHelp() {
 function runGitDiff(command, successMessage, errorMessage) {
   try {
     console.log(`[i] Running command: ${command}`);
-    const result = execSync(command, { encoding: "utf8" });
+    const result = execSync(command, {
+      encoding: "utf8",
+      maxBuffer: 1024 * 1024 * 10 // 10MB buffer to handle large diffs
+    });
 
     // If result is empty, inform user but don't treat as error
     if (!result || result.trim() === "") {

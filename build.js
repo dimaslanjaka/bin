@@ -44,7 +44,7 @@ glob
       "**/chunk*",
       "**/build.*",
       "**/*tsbuildinfo",
-      "**/ps/**",
+      "**/{ps,git}/**",
       "**/*eslint*"
     ]
   })

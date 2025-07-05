@@ -1,26 +1,40 @@
-# binary helper collections
-binary helper collections by L3n4r0x
+# Binary Collections
 
-## installation
+A comprehensive collection of Node.js CLI tools designed to streamline common development workflows. This toolkit provides utilities for git operations, dependency management, build processes, and various development automation tasks.
 
-clone direct folder
+## Features
+
+- 🧹 **Cleanup Tools**: Remove node_modules, yarn caches, gradle builds
+- 🔄 **Git Utilities**: Submodule management, repository purging, diff tools
+- 📦 **Build Tools**: NPM script runners, package management utilities
+- ⚡ **Development Helpers**: Process management, environment setup tools
+
+## Installation
+
+### Clone Repository
 ```bash
 git clone -b master https://github.com/dimaslanjaka/bin bin
 ```
 
-via npm
+### NPM Installation
 ```bash
+# Install locally
 npm install binary-collections
-# or install as global package
+
+# Install globally
 npm install binary-collections -g
-# or
+
+# Install from Git
 npm install binary-collections@git+https://github.com/dimaslanjaka/bin.git
-# or
+
+# Install from release archive
 npm install binary-collections@https://github.com/dimaslanjaka/bin/raw/master/releases/bin.tgz
 ```
 
-## Setup vscode
-create `.vscode/settings.json`
+## VS Code Setup
+
+Create `.vscode/settings.json` to add binary tools to your PATH:
+
 ```jsonc
 {
   "terminal.integrated.env.linux": {
@@ -47,41 +61,93 @@ create `.vscode/settings.json`
     },
     "Cygwin": {
       "path": "C:\\cygwin64\\bin\\bash.exe",
-      "args": [
-        "--login",
-        "-i"
-      ],
+      "args": ["--login", "-i"],
       "env": {
         "CHERE_INVOKING": "1"
       }
     }
   },
-  "terminal.integrated.defaultProfile.windows": "Command Prompt",
+  "terminal.integrated.defaultProfile.windows": "Command Prompt"
 }
 ```
 
-## Usages
+## Available Tools
 
-see all binary at
-- https://github.com/dimaslanjaka/bin/tree/master/bin
-- https://github.com/dimaslanjaka/bin/tree/master/lib
-- https://github.com/dimaslanjaka/bin/blob/master/package.json
+### Quick Reference
 
-submodule remover
+| Category | Tools | Description |
+|----------|-------|-------------|
+| **Git** | `git-purge`, `git-diff`, `git-fix-encoding`, `git-reduce-size` | Git repository management and optimization |
+| **Submodules** | `submodule`, `submodule-install`, `submodule-remove`, `submodule-token` | Git submodule operations |
+| **NPM Scripts** | `nrs`, `run-s`, `run-series`, `npm-run-series` | Run npm scripts in series with pattern matching |
+| **Package Mgmt** | `yarn-reinstall`, `package-resolutions` | Yarn package management utilities |
+| **Node.js Dev** | `find-node-modules`, `find-nodemodules`, `dev`, `prod`, `empty` | Node.js development helpers |
+| **Process Mgmt** | `kill-process`, `nodekill`, `javakill`, `del-ps` | Process management and termination |
+| **File System** | `rmfind`, `rmpath`, `rmx` | File system operations |
+| **Cleanup** | `del-nodemodules`, `del-yarncaches`, `del-gradle` | Cache and build directory cleanup |
 
-![image](https://github.com/user-attachments/assets/659c2fa3-f12f-45cb-a66f-aed3807e0023)
+For a complete list of available binaries and utilities, see:
+- [Binary executables](https://github.com/dimaslanjaka/bin/tree/master/bin)
+- [Library modules](https://github.com/dimaslanjaka/bin/tree/master/lib)
+- [Package configuration](https://github.com/dimaslanjaka/bin/blob/master/package.json)
+
+### Git Tools
+
+#### Git Repository Purge
+Clean and optimize git repositories by pruning reflogs:
+
+```bash
+git-purge
+```
+
+![Git purge screenshot](https://github.com/dimaslanjaka/bin/assets/12471057/2805c54e-28a7-491d-b381-de2593a854b3)
+
+#### Git Diff Utility
+Enhanced git diff functionality:
+
+```bash
+git-diff
+```
+
+#### Git Encoding Fixer
+Fix git file encoding issues:
+
+```bash
+git-fix-encoding
+```
+
+#### Git Repository Size Reducer
+Reduce git repository size by cleaning up history:
+
+```bash
+git-reduce-size
+```
+
+#### Submodule Management
+- **`submodule`** - General submodule operations
+- **`submodule-install`** - Install and setup submodules
+- **`submodule-remove`** - Remove git submodules with interactive selection
+- **`submodule-token`** - Manage submodule tokens
+
+![Submodule remover screenshot](https://github.com/user-attachments/assets/659c2fa3-f12f-45cb-a66f-aed3807e0023)
 
 
-### npm scripts runner
+### NPM Script Runner
 
-> binaries: `nrs`, `run-s`, `run-series`
+**Binaries**: `nrs`, `run-s`, `run-series`, `npm-run-series`
 
-| arg | description |
-| :--- | :--- |
-| `--yarn` | using `yarn run <script-name>` |
-| `--verbose` `-v` | using `yarn run <script-name>` |
+Run multiple npm scripts in series with pattern matching support.
 
-example: `npm run namescript`
+#### Options
+
+| Flag | Description |
+|------|-------------|
+| `--yarn` | Use `yarn run <script-name>` instead of npm |
+| `--verbose`, `-v` | Enable verbose output |
+
+#### Example
+
+Execute all scripts matching the pattern `namescript:**`:
 
 ```json
 {
@@ -99,60 +165,119 @@ example: `npm run namescript`
 }
 ```
 
-## node_modules cleaner
+### Package Management Tools
+
+#### Yarn Package Reinstaller
+Reinstall yarn packages with dependency type flags:
 
 ```bash
-del-nodemodules
+yarn-reinstall <packageName> [--dev|-D|--peer|-P|--optional|-O]
 ```
 
-![image](https://github.com/dimaslanjaka/bin/assets/12471057/f03e5b51-1808-4e82-a474-0dd3c7eab5fe)
-
-## yarn caches cleaner
+#### Package Resolutions Manager
+Manage package resolutions in package.json:
 
 ```bash
-del-yarncaches
+package-resolutions
 ```
 
-## gradle caches cleaner
+### Node.js Development Tools
 
-- delete gradle build folder
+#### Node Modules Finder
+Find all node_modules directories in a project:
+
+```bash
+find-node-modules      # Library function
+find-node-modules-cli  # CLI tool
+find-nodemodules       # Alias
+```
+
+#### Development Environment Helpers
+- **`dev`** - Development environment setup
+- **`prod`** - Production environment setup
+- **`empty`** - Empty utility tool
+
+### Process Management Tools
+
+#### Process Killers
+Kill processes by name or pattern:
+
+```bash
+kill-process    # General process killer
+nodekill        # Kill Node.js processes
+javakill        # Kill Java processes (Windows)
+del-ps          # Kill processes by command name
+```
+
+#### File System Tools
+- **`rmfind`** - Find and remove files
+- **`rmpath`** - Remove from PATH
+- **`rmx`** - Remove executable files
+
+### Cleanup Tools
+
+#### Node Modules Cleaner
+Remove node_modules directories recursively:
+
+```bash
+del-nodemodules        # Primary command
+del-node-modules       # Alternative
+clean-nodemodule       # Legacy
+clean-nodemodules      # Legacy
+```
+
+![Node modules cleaner screenshot](https://github.com/dimaslanjaka/bin/assets/12471057/f03e5b51-1808-4e82-a474-0dd3c7eab5fe)
+
+#### Yarn Cache Cleaner
+Clear yarn cache directories:
+
+```bash
+del-yarncaches         # Primary command
+del-yarn-caches        # Alternative
+```
+
+#### Gradle Build Cleaner
+Delete gradle build folders:
 
 ```bash
 del-gradle
 ```
 
-## Git purge
+## Troubleshooting
 
-- prune reflogs from all git repositories
+### Submodule Installation Issues
 
-```bash
-git-purge
-```
+If you encounter the following error:
 
-![image](https://github.com/dimaslanjaka/bin/assets/12471057/2805c54e-28a7-491d-b381-de2593a854b3)
-
-## troubleshooting
-### submodule-install
-
-when you're facing error like
 ```log
 fatal: 'origin/<branch>' is not a commit and a branch '<branch>' cannot be created from it
 fatal: unable to checkout submodule '<folder>/<submodule>'
 ```
 
-solution: deleting `.git/modules` before execute `submodule-install`.
+**Solution**: Delete `.git/modules` directory before running `submodule-install`.
 
-example single execution:
+#### Complete Submodule Setup Example
+
 ```bash
-echo "init submodules"
+echo "Initializing submodules..."
 git submodule init
 git submodule foreach "git submodule init"
-echo "sync submodules"
+
+echo "Syncing submodules..."
 git submodule sync
 git submodule foreach "git submodule sync"
-echo "update submodules"
+
+echo "Updating submodules..."
 mkdir -p bin >/dev/null 2>&1
 curl -L https://github.com/dimaslanjaka/bin/raw/master/bin/submodule-install > bin/submodule-install
 rm -rf .git/modules
 bash ./bin/submodule-install
 ```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the terms specified in the LICENSE file.

@@ -191,5 +191,6 @@
     "**/*.sqlite*": true
   },
   "typescript.tsdk": "./node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": false
+  "typescript.enablePromptUseWorkspaceTsdk": false,
+  "git.autoStash": true
 }

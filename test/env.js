@@ -8,5 +8,5 @@ process.cwd = () => {
     path.join(__dirname, "/../../"),
     path.join(__dirname, "/..")
   ];
-  return paths.filter(fs.existsSync)[0];
+  return paths.filter((p) => fs.existsSync(p) && fs.existsSync(path.join(p, "package.json")))[0];
 };

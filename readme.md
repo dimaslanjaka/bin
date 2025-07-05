@@ -110,10 +110,12 @@ git-diff
 Comprehensive Git configuration fixer for cross-platform development (replaces the old `git-fix-encoding`):
 
 ```bash
-git-fix                   # Apply all fixes
-git-fix --lf-only         # Force LF line endings only
-git-fix --permissions     # Ignore file permissions only
-git-fix --normalize       # Normalize existing files only
+git-fix                          # Apply all fixes
+git-fix --lf-only                # Force LF line endings only
+git-fix --permissions            # Ignore file permissions only
+git-fix --normalize              # Normalize existing files only
+git-fix --user                   # Configure Git user from environment
+git-fix --user NAME EMAIL        # Configure Git user with specific values
 ```
 
 Features:
@@ -122,6 +124,16 @@ Features:
 - Sets pull strategy to false (prevents auto-rebase)
 - Normalizes existing line endings
 - Creates/updates .gitattributes with proper line ending rules
+- Configures Git user from environment variables or CLI arguments
+
+User Configuration:
+- Environment variables: `GITHUB_USER`, `GITHUB_EMAIL`
+- CLI arguments take precedence over environment variables
+- Examples:
+  ```bash
+  git-fix --user "John Doe" "john@example.com"  # Use CLI args
+  GITHUB_USER="Jane" GITHUB_EMAIL="jane@example.com" git-fix --user  # Use env vars
+  ```
 
 #### Git Repository Size Reducer
 Reduce git repository size by cleaning up history:

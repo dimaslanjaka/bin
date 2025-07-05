@@ -103,6 +103,7 @@
   },
   "bin": {
     "binary-collections": "lib/binary-collections.cjs",
+    "binary-collections-config": "lib/binary-collections-config.cjs",
     "clean-nodemodule": "bin/clean-nodemodule",
     "clean-nodemodules": "bin/clean-nodemodules",
     "del-gradle": "lib/del-gradle.cjs",

@@ -3,10 +3,11 @@
 const { execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
+const { getTempPath } = require("./binary-collections-config");
 
-// Output path
-const CACHE_DIR = ".cache/git";
-const OUTPUT = path.join(CACHE_DIR, "diff.txt");
+// Output path using centralized temp directory configuration
+const OUTPUT = getTempPath("git-diff.txt");
+const CACHE_DIR = path.dirname(OUTPUT);
 
 // Ensure output directory exists
 if (!fs.existsSync(CACHE_DIR)) {

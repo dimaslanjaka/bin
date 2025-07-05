@@ -74,7 +74,7 @@ Create `.vscode/settings.json` to add binary tools to your PATH:
 
 | Category | Tools | Description |
 |----------|-------|-------------|
-| **Git** | `git-purge`, `git-diff`, `git-fix-encoding`, `git-reduce-size` | Git repository management and optimization |
+| **Git** | `git-purge`, `git-diff`, `git-fix`, `git-reduce-size` | Git repository management and optimization |
 | **Submodules** | `submodule`, `submodule-install`, `submodule-remove`, `submodule-token` | Git submodule operations |
 | **NPM Scripts** | `nrs`, `run-s`, `run-series`, `npm-run-series` | Run npm scripts in series with pattern matching |
 | **Package Mgmt** | `yarn-reinstall`, `package-resolutions` | Yarn package management utilities |
@@ -106,12 +106,22 @@ Enhanced git diff functionality:
 git-diff
 ```
 
-#### Git Encoding Fixer
-Fix git file encoding issues:
+#### Git Fix Utility
+Comprehensive Git configuration fixer for cross-platform development (replaces the old `git-fix-encoding`):
 
 ```bash
-git-fix-encoding
+git-fix                   # Apply all fixes
+git-fix --lf-only         # Force LF line endings only
+git-fix --permissions     # Ignore file permissions only
+git-fix --normalize       # Normalize existing files only
 ```
+
+Features:
+- Forces LF line endings (core.autocrlf = false)
+- Ignores file permission changes (core.filemode = false)
+- Sets pull strategy to false (prevents auto-rebase)
+- Normalizes existing line endings
+- Creates/updates .gitattributes with proper line ending rules
 
 #### Git Repository Size Reducer
 Reduce git repository size by cleaning up history:

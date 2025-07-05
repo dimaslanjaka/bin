@@ -1,6 +1,6 @@
-const fs = require("fs");
 const path = require("path");
 const { runGitCommand } = require("./utils.cjs");
+const { updateGitAttributes } = require("./gitattributes.js");
 
 /**
  * Force LF line endings configuration
@@ -17,34 +17,53 @@ function forceLfLineEndings() {
 
   // Create or update .gitattributes
   const gitattributesPath = path.join(process.cwd(), ".gitattributes");
-  let gitattributesContent = "";
 
-  if (fs.existsSync(gitattributesPath)) {
-    gitattributesContent = fs.readFileSync(gitattributesPath, "utf8");
-  }
-
-  // Add line ending rules if not present
-  const rules = [
-    "* text=auto eol=lf",
-    "*.{cmd,bat} text eol=crlf",
-    "*.{png,jpg,jpeg,gif,ico,svg} binary",
-    "*.{zip,tar,gz,7z,rar} binary"
+  // Define desired rules with priorities
+  const desiredRules = [
+    { pattern: "*", attributes: "text=auto eol=lf", priority: 1 },
+    {
+      pattern: "*.{cmd,bat,ps1,sh,cmd1,cmd2,bat1,bat2,vbs}",
+      attributes: "text eol=crlf",
+      priority: 2
+    },
+    {
+      pattern: "*.{png,jpg,jpeg,gif,ico,svg,bmp,webp,avif,tiff,tif,psd,ai,eps,raw}",
+      attributes: "binary",
+      priority: 3
+    },
+    {
+      pattern:
+        "*.{zip,tar,gz,7z,rar,exe,dll,so,bin,jar,war,ear,apk,msi,deb,rpm,iso,img,dmg,pdf,mp3,mp4,mov,avi,mkv,flv,wmv,ogg,webm,wav,aac,m4a,otf,ttf,woff,woff2,eot}",
+      attributes: "binary",
+      priority: 3
+    }
   ];
 
-  let modified = false;
-  rules.forEach((rule) => {
-    const rulePattern = rule.split(" ")[0];
-    if (!gitattributesContent.includes(rulePattern)) {
-      gitattributesContent += (gitattributesContent.endsWith("\n") ? "" : "\n") + rule + "\n";
-      modified = true;
-    }
-  });
+  // Update .gitattributes using the dedicated module
+  const result = updateGitAttributes(gitattributesPath, desiredRules);
 
-  if (modified) {
-    fs.writeFileSync(gitattributesPath, gitattributesContent);
-    console.log("[✓] Updated .gitattributes with line ending rules");
+  // Report results
+  if (result.error) {
+    console.log(`[✗] Error updating .gitattributes: ${result.error}`);
+    return;
+  }
+
+  // Report conflicts if any
+  if (result.conflicts.length > 0) {
+    console.log("\n[!] Detected conflicts in .gitattributes:");
+    result.conflicts.forEach((conflict) => {
+      console.log(`    ${conflict.pattern}: ${conflict.existing} -> ${conflict.proposed} (${conflict.action})`);
+    });
+  }
+
+  // Report changes
+  if (result.success) {
+    console.log(`[✓] ${result.message}:`);
+    result.changes.forEach((change) => {
+      console.log(`    ${change.action}: ${change.pattern} ${change.attributes}`);
+    });
   } else {
-    console.log("[i] .gitattributes already contains line ending rules");
+    console.log(`[i] ${result.message}`);
   }
 }
 

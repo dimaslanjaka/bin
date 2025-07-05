@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 const compat = new FlatCompat({
   baseDirectory: __dirname,
   recommendedConfig: js.configs.recommended,
@@ -27,15 +28,17 @@ export default [
       "**/*.txt",
       "**/app/**/*",
       "**/dist/**/*",
-      "!**/.*.\\{js,cjs,mjs}"
+      "!**/.*.{js,cjs,mjs}"
     ]
   },
+
   ...compat.extends(
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended"
   ),
+
   {
     linterOptions: {
       reportUnusedDisableDirectives: true
@@ -50,7 +53,6 @@ export default [
         jQuery: "readonly",
         adsbygoogle: "writable"
       },
-
       parser: tsParser,
       ecmaVersion: 2020,
       sourceType: "module"
@@ -85,12 +87,22 @@ export default [
       "prefer-arrow-callback": "off"
     }
   },
+
   {
     files: ["**/*.js", "**/*.cjs"],
-
     rules: {
       "@typescript-eslint/no-var-requires": "off",
       "@typescript-eslint/no-require-imports": "off"
+    }
+  },
+
+  // ✅ Add Jest globals only for test files
+  {
+    files: ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
+    languageOptions: {
+      globals: {
+        ...globals.jest
+      }
     }
   }
 ];

@@ -16,8 +16,8 @@ function configureGitUser(cliUser = null, cliEmail = null) {
     email = cliEmail.trim();
     console.log("[i] Using CLI-provided user configuration");
   } else {
-    username = process.env.GITHUB_USER?.trim();
-    email = process.env.GITHUB_EMAIL?.trim();
+    username = process.env.GITHUB_USER ? process.env.GITHUB_USER.trim() : undefined;
+    email = process.env.GITHUB_EMAIL ? process.env.GITHUB_EMAIL.trim() : undefined;
     if (username || email) {
       console.log("[i] Using environment variable user configuration");
     }

@@ -5,6 +5,7 @@ const pkgj = require("./package.json");
 const colors = require("ansi-colors");
 
 pkgj.bin = {
+  "binary-collections": "lib/binary-collections.cjs",
   nrs: "lib/npm-run-series.cjs",
   "run-s": "lib/npm-run-series.cjs",
   "run-series": "lib/npm-run-series.cjs",

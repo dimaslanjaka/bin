@@ -2,8 +2,22 @@
   "name": "binary-collections",
   "version": "2.0.8",
   "description": "Utility to clean any programming caches and more",
+  "keywords": [
+    "cache",
+    "cleaner",
+    "utility"
+  ],
+  "homepage": "https://www.webmanajemen.com/",
+  "bugs": {
+    "url": "https://github.com/dimaslanjaka/bin/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "email": "dimaslanjaka@gmail.com",
+    "name": "dimaslanjaka",
+    "url": "https://webmanajemen.com"
+  },
   "main": "lib/index.js",
-  "types": "lib/index.d.ts",
   "exports": {
     ".": {
       "require": {
@@ -16,6 +30,7 @@
       }
     }
   },
+  "types": "lib/index.d.ts",
   "files": [
     "bin",
     "lib",
@@ -23,95 +38,6 @@
     "!test",
     "package.json"
   ],
-  "directories": {
-    "lib": "lib",
-    "bin": "bin"
-  },
-  "scripts": {
-    "update:packer": "curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js > packer.js",
-    "build": "node build.tsup.js && tsc -b tsconfig.build.json && npm run postbuild",
-    "postbuild": "node -r ts-node/register -r dotenv/config build.js && yarn run pack",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:nrs": "npm test -- nrs build:**",
-    "pack": "node packer.js --yarn --filename=bin",
-    "update:ncu": "npx npm-check-updates -u -x jsdom,chalk,hexo,deepmerge-ts --enginesNode --root",
-    "clean": "rimraf lib",
-    "prepare": "husky"
-  },
-  "keywords": [
-    "cache",
-    "cleaner",
-    "utility"
-  ],
-  "author": {
-    "email": "dimaslanjaka@gmail.com",
-    "name": "dimaslanjaka",
-    "url": "https://webmanajemen.com"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/dimaslanjaka/bin"
-  },
-  "bugs": {
-    "url": "https://github.com/dimaslanjaka/bin/issues"
-  },
-  "homepage": "https://www.webmanajemen.com/",
-  "license": "MIT",
-  "dependencies": {
-    "dotenv": "^16.4.5",
-    "execa": "^9.4.0",
-    "fs-extra": "^11.2.0",
-    "glob": "^11.0.3",
-    "minimatch": "^10.0.1",
-    "minimist": "^1.2.8",
-    "ps-node": "^0.1.6",
-    "remove": "^0.1.5",
-    "sbg-utility": "^1.1.8",
-    "upath": "^2.0.1",
-    "yaml": "^2.5.1",
-    "yarn": "^1.22.22"
-  },
-  "packageManager": "yarn@4.9.2",
-  "devDependencies": {
-    "@babel/core": "^7.28.0",
-    "@babel/preset-env": "^7.28.0",
-    "@eslint/eslintrc": "^3.3.1",
-    "@eslint/js": "^9.30.1",
-    "@types/babel__core": "^7",
-    "@types/babel__preset-env": "^7",
-    "@types/eslint": "^9",
-    "@types/fs-extra": "^11.0.4",
-    "@types/jest": "^30.0.0",
-    "@types/minimist": "^1",
-    "@types/node": "^22.7.4",
-    "@types/prettier": "^3",
-    "@types/ps-node": "^0",
-    "@types/yargs": "^17",
-    "@typescript-eslint/eslint-plugin": "^8.35.1",
-    "@typescript-eslint/parser": "^8.35.1",
-    "babel-jest": "^30.0.4",
-    "cross-env": "^7.0.3",
-    "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/private/release/cross-spawn.tgz",
-    "eslint": "^9.30.1",
-    "eslint-config-prettier": "^10.1.5",
-    "eslint-plugin-prettier": "^5.5.1",
-    "git-command-helper": "^2.0.2",
-    "globals": "^16.3.0",
-    "husky": "^9.1.7",
-    "jest": "^30.0.4",
-    "lint-staged": "^16.1.2",
-    "prettier": "^3.6.2",
-    "rimraf": "^6.0.1",
-    "ts-jest": "^29.4.0",
-    "ts-node": "^10.9.2",
-    "tsup": "^8.3.0",
-    "typescript": "^5.6.2"
-  },
-  "optionalDependencies": {
-    "ansi-colors": "^4.1.3"
-  },
   "bin": {
     "binary-collections": "lib/binary-collections.cjs",
     "binary-collections-config": "lib/binary-collections-config.cjs",
@@ -151,5 +77,79 @@
     "submodule-token": "bin/submodule-token",
     "utils": "lib/utils.cjs",
     "yarn-reinstall": "lib/yarn-reinstall.cjs"
-  }
+  },
+  "scripts": {
+    "update:packer": "curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js > packer.js",
+    "build": "node build.tsup.js && tsc -b tsconfig.build.json && npm run postbuild",
+    "postbuild": "node -r ts-node/register -r dotenv/config build.js && yarn run pack",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:nrs": "npm test -- nrs build:**",
+    "pack": "node packer.js --yarn --filename=bin",
+    "update:ncu": "npx npm-check-updates -u -x jsdom,chalk,hexo,deepmerge-ts --enginesNode --root",
+    "clean": "rimraf lib",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dimaslanjaka/bin"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "execa": "^9.4.0",
+    "fs-extra": "^11.2.0",
+    "glob": "^11.0.3",
+    "minimatch": "^10.0.1",
+    "minimist": "^1.2.8",
+    "ps-node": "^0.1.6",
+    "remove": "^0.1.5",
+    "sbg-utility": "^1.1.8",
+    "upath": "^2.0.1",
+    "yaml": "^2.5.1",
+    "yarn": "^1.22.22"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.0",
+    "@babel/preset-env": "^7.28.0",
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.30.1",
+    "@types/babel__core": "^7",
+    "@types/babel__preset-env": "^7",
+    "@types/eslint": "^9",
+    "@types/fs-extra": "^11.0.4",
+    "@types/jest": "^30.0.0",
+    "@types/minimist": "^1",
+    "@types/node": "^22.7.4",
+    "@types/prettier": "^3",
+    "@types/ps-node": "^0",
+    "@types/yargs": "^17",
+    "@typescript-eslint/eslint-plugin": "^8.35.1",
+    "@typescript-eslint/parser": "^8.35.1",
+    "babel-jest": "^30.0.4",
+    "cross-env": "^7.0.3",
+    "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/private/release/cross-spawn.tgz",
+    "eslint": "^9.30.1",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.5.1",
+    "git-command-helper": "^2.0.2",
+    "globals": "^16.3.0",
+    "husky": "^9.1.7",
+    "jest": "^30.0.4",
+    "lint-staged": "^16.1.2",
+    "prettier": "^3.6.2",
+    "rimraf": "^6.0.1",
+    "ts-jest": "^29.4.0",
+    "ts-node": "^10.9.2",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.2"
+  },
+  "optionalDependencies": {
+    "ansi-colors": "^4.1.3"
+  },
+  "directories": {
+    "lib": "lib",
+    "bin": "bin"
+  },
+  "packageManager": "yarn@4.9.2"
 }

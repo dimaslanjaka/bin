@@ -89,7 +89,51 @@ glob
 // sort
 pkgj.bin = sortObjectByKeys(pkgj.bin);
 
-fs.writeFileSync(path.resolve(__dirname, "package.json"), JSON.stringify(pkgj, null, 2) + "\n");
+// Reconstruct package.json with valid key order
+const orderedKeys = [
+  "name",
+  "version",
+  "description",
+  "keywords",
+  "homepage",
+  "bugs",
+  "license",
+  "author",
+  "funding",
+  "type",
+  "main",
+  "module",
+  "exports",
+  "types",
+  "typings",
+  "files",
+  "bin",
+  "scripts",
+  "repository",
+  "dependencies",
+  "devDependencies",
+  "peerDependencies",
+  "optionalDependencies",
+  "engines",
+  "os",
+  "cpu",
+  "private",
+  "publishConfig"
+];
+
+function reconstructPackageJson(obj, keyOrder) {
+  const result = {};
+  for (const key of keyOrder) {
+    if (key in obj) result[key] = obj[key];
+  }
+  for (const key of Object.keys(obj)) {
+    if (!keyOrder.includes(key)) result[key] = obj[key];
+  }
+  return result;
+}
+
+const orderedPkgj = reconstructPackageJson(pkgj, orderedKeys);
+fs.writeFileSync(path.resolve(__dirname, "package.json"), JSON.stringify(orderedPkgj, null, 2) + "\n");
 
 /**
  * sort object by keys

@@ -23,6 +23,19 @@ glob
   .sync("**/*", {
     cwd: __dirname,
     ignore: [
+      "**/.vscode/**",
+      "**/.idea/**",
+      "**/.DS_Store",
+      "**/Thumbs.db",
+      "**/coverage/**",
+      "**/logs/**",
+      "**/out/**",
+      "**/build/**",
+      "**/docs/**",
+      "**/examples/**",
+      "**/scripts/**",
+      "**/benchmarks/**",
+      "**/CHANGELOG*",
       "**/node_modules/**",
       "**/boilerplate/**",
       "**/.git*",
@@ -45,7 +58,8 @@ glob
       "**/build.*",
       "**/*tsbuildinfo",
       "**/{ps,git}/**",
-      "**/*eslint*"
+      "**/*eslint*",
+      "**/*.config.*"
     ]
   })
   .filter((str) => {

@@ -24,9 +24,6 @@ npm install binary-collections
 # Install globally
 npm install binary-collections -g
 
-# Install from Git
-npm install binary-collections@git+https://github.com/dimaslanjaka/bin.git
-
 # Install from release archive
 npm install binary-collections@https://github.com/dimaslanjaka/bin/raw/master/releases/bin.tgz
 ```

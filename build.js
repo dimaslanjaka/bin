@@ -15,7 +15,8 @@ pkgj.bin = {
   "find-nodemodules": "lib/find-node-modules-cli.cjs",
   "del-ps": "lib/del-ps.cjs",
   "del-gradle": "lib/del-gradle.cjs",
-  "git-purge": "lib/git-purge.cjs"
+  "git-purge": "lib/git-purge.cjs",
+  "git-fix": "lib/git-fix.cjs"
 };
 
 glob

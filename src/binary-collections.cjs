@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
-const path = require("path");
 const { spawn } = require("child_process");
+const { glob } = require("glob");
+const path = require("path");
 
 /**
  * Main binary-collections script that dynamically finds and executes other scripts
@@ -31,21 +31,38 @@ function showHelp() {
 
 function findScript(scriptName, searchDir = null) {
   if (!searchDir) searchDir = __dirname;
-  const extensions = ["cjs", "js", "mjs"];
 
-  for (const ext of extensions) {
-    const scriptPath = path.join(searchDir, `${scriptName}.${ext}`);
-    if (fs.existsSync(scriptPath)) {
-      return scriptPath;
+  // Define ignore patterns for library config and utils
+  const ignorePatterns = [
+    `**/*config*.{cjs,js,mjs}`,
+    `**/utils.{cjs,js,mjs}`,
+    `**/index.{cjs,js,mjs}`,
+    `**/chunk-*.{cjs,js,mjs}`,
+    `**/*.d.{ts,cts,mts}` // ignore TypeScript declaration files
+  ];
+
+  try {
+    // Use glob to find script files, excluding ignored patterns
+    // Use cwd option for better path handling
+    const pattern = `${scriptName}.{cjs,js,mjs}`;
+    const files = glob.sync(pattern, {
+      cwd: searchDir,
+      ignore: ignorePatterns,
+      absolute: true
+    });
+
+    // Return the first match if found
+    if (files.length > 0) {
+      return files[0];
     }
+  } catch (error) {
+    console.error(`🔍 Error searching for script: ${error.message}`);
   }
 
   return null;
 }
 
 function executeScript(scriptPath, args) {
-  console.log(`⚡ Executing: node "${scriptPath}" ${args.join(" ")}`);
-
   const child = spawn("node", [scriptPath, ...args], {
     stdio: "inherit",
     shell: true
@@ -64,8 +81,8 @@ function executeScript(scriptPath, args) {
 function main() {
   const args = process.argv.slice(2);
 
-  // Show help if no arguments or help flags
-  if (args.length === 0 || args.includes("--help") || args.includes("-h")) {
+  // Show help if no arguments or if help is requested without a script name
+  if (args.length === 0 || (args.length === 1 && (args[0] === "--help" || args[0] === "-h"))) {
     showHelp();
   }
 
@@ -83,7 +100,9 @@ function main() {
     process.exit(1);
   }
 
-  console.log(`✅ Found script: ${scriptPath}`);
+  // Show relative path from current working directory
+  const relativePath = path.relative(process.cwd(), scriptPath);
+  console.log(`✅ Found script: ${relativePath}`);
   executeScript(scriptPath, scriptArgs);
 }
 

@@ -1,13 +1,18 @@
-const { fs, path } = require("sbg-utility");
+const fs = require("fs");
+const path = require("upath");
 const argv = require("minimist")(process.argv.slice(2));
 
+/**
+ * Get command line arguments
+ * @returns {object} Parsed command line arguments
+ */
 function getArgs() {
   return argv;
 }
 
 /**
- * delete file recursive
- * @param {string} fullPath
+ * Delete file or directory recursively
+ * @param {string} fullPath - The full path to the file or directory to delete
  */
 function del(fullPath) {
   if (fs.statSync(fullPath).isDirectory()) {
@@ -27,8 +32,8 @@ function del(fullPath) {
 }
 
 /**
- * glob stream handler
- * @param {glob.Glob} globStream
+ * Handle glob stream to delete matched files and directories
+ * @param {glob.Glob} globStream - The glob stream object
  */
 function delStream(globStream) {
   globStream.stream().on("data", (result) => {
@@ -45,8 +50,9 @@ function delStream(globStream) {
 }
 
 /**
- * async delayed
- * @param {number} ms
+ * Create an async delay for the specified number of milliseconds
+ * @param {number} ms - Number of milliseconds to delay
+ * @returns {Promise<void>} Promise that resolves after the specified delay
  */
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 

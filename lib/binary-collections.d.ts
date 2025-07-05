@@ -10,20 +10,20 @@ const { spawn } = require("child_process");
  */
 
 function showHelp() {
-  console.log("Binary Collections - Dynamic Script Runner");
-  console.log("==========================================");
+  console.log("🚀 Binary Collections - Dynamic Script Runner");
+  console.log("═══════════════════════════════════════════════");
   console.log("");
-  console.log("Usage: npx binary-collections <script-name> [...args]");
+  console.log("📋 Usage: npx binary-collections <script-name> [...args]");
   console.log("");
-  console.log("Examples:");
-  console.log("  npx binary-collections git-diff -s");
-  console.log("  npx binary-collections del-node-modules");
-  console.log("  npx binary-collections find-node-modules --help");
+  console.log("✨ Examples:");
+  console.log("  📊 npx binary-collections git-diff -s");
+  console.log("  🧹 npx binary-collections del-node-modules");
+  console.log("  🔍 npx binary-collections find-node-modules --help");
   console.log("");
-  console.log("This tool will search for <script-name>.{cjs,js,mjs} in the script's directory");
-  console.log("and execute it with the provided arguments.");
+  console.log("ℹ️  This tool will search for <script-name>.{cjs,js,mjs} in the script's directory");
+  console.log("   and execute it with the provided arguments.");
   console.log("");
-  console.log("Options:");
+  console.log("⚙️  Options:");
   console.log("  --help, -h    Show this help message");
   process.exit(0);
 }
@@ -43,7 +43,7 @@ function findScript(scriptName, searchDir = null) {
 }
 
 function executeScript(scriptPath, args) {
-  console.log(`Executing: node "${scriptPath}" ${args.join(" ")}`);
+  console.log(`⚡ Executing: node "${scriptPath}" ${args.join(" ")}`);
 
   const child = spawn("node", [scriptPath, ...args], {
     stdio: "inherit",
@@ -51,7 +51,7 @@ function executeScript(scriptPath, args) {
   });
 
   child.on("error", (error) => {
-    console.error(`Error executing script: ${error.message}`);
+    console.error(`❌ Error executing script: ${error.message}`);
     process.exit(1);
   });
 
@@ -75,25 +75,25 @@ function main() {
   const scriptPath = findScript(scriptName);
 
   if (!scriptPath) {
-    console.error(`Error: Script "${scriptName}" not found.`);
-    console.error(`Searched for: ${scriptName}.{cjs,js,mjs} in ${__dirname}`);
+    console.error(`❌ Error: Script "${scriptName}" not found.`);
+    console.error(`🔍 Searched for: ${scriptName}.{cjs,js,mjs} in ${__dirname}`);
     console.error("");
-    console.error("Available extensions: .cjs, .js, .mjs");
+    console.error("📝 Available extensions: .cjs, .js, .mjs");
     process.exit(1);
   }
 
-  console.log(`Found script: ${scriptPath}`);
+  console.log(`✅ Found script: ${scriptPath}`);
   executeScript(scriptPath, scriptArgs);
 }
 
 // Handle uncaught exceptions
 process.on("uncaughtException", (error) => {
-  console.error("Uncaught Exception:", error.message);
+  console.error("💥 Uncaught Exception:", error.message);
   process.exit(1);
 });
 
 process.on("unhandledRejection", (reason, promise) => {
-  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+  console.error("⚠️  Unhandled Rejection at:", promise, "reason:", reason);
   process.exit(1);
 });
 

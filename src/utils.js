@@ -50,10 +50,53 @@ function delStream(globStream) {
 }
 
 /**
+ * Creates a directory/file tree string from a hash array of file paths and hashes.
+ * @param {string[]} hashArray - Array of strings in the format 'relative/path/to/file hash'.
+ * @returns {string} The directory/file tree as a string, with file hashes.
+ */
+function getFileTreeString(hashArray) {
+  const tree = {};
+  // Map file paths to hashes for quick lookup
+  const hashMap = {};
+  for (const entry of hashArray) {
+    const [filePath, hash] = entry.split(" ");
+    hashMap[filePath] = hash;
+    const parts = filePath.split("/");
+    let current = tree;
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      if (i === parts.length - 1) {
+        current[part] = null; // file
+      } else {
+        current[part] = current[part] || {};
+        current = current[part];
+      }
+    }
+  }
+  function printNode(node, prefix = "", parentPath = "") {
+    const keys = Object.keys(node).sort();
+    let lines = [];
+    keys.forEach((key, idx) => {
+      const isLast = idx === keys.length - 1;
+      const branch = isLast ? "└── " : "├── ";
+      const currentPath = parentPath ? parentPath + "/" + key : key;
+      if (node[key] === null) {
+        lines.push(prefix + branch + key + " [" + (hashMap[currentPath] || "") + "]");
+      } else {
+        lines.push(prefix + branch + key + "/");
+        lines = lines.concat(printNode(node[key], prefix + (isLast ? "    " : "│   "), currentPath));
+      }
+    });
+    return lines;
+  }
+  return printNode(tree, "", "").join("\n");
+}
+
+/**
  * Create an async delay for the specified number of milliseconds
  * @param {number} ms - Number of milliseconds to delay
  * @returns {Promise<void>} Promise that resolves after the specified delay
  */
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-module.exports = { del, delStream, getArgs, delay };
+module.exports = { del, delStream, getArgs, delay, getFileTreeString };

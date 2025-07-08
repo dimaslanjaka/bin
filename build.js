@@ -4,7 +4,7 @@ const glob = require("glob");
 const pkgj = require("./package.json");
 const colors = require("ansi-colors");
 
-pkgj.bin = {
+const defaultBin = {
   "binary-collections": "lib/binary-collections.cjs",
   nrs: "lib/npm-run-series.cjs",
   "run-s": "lib/npm-run-series.cjs",
@@ -17,8 +17,10 @@ pkgj.bin = {
   "git-purge": "lib/git-purge.cjs",
   "git-fix": "lib/git-fix.cjs",
   "print-tree": "lib/print-directory-tree.cjs",
-  "dir-tree": "lib/print-directory-tree.cjs"
+  "dir-tree": "lib/print-directory-tree.cjs",
+  "pkg-resolutions-updater": "lib/package-resolutions-updater.cjs"
 };
+pkgj.bin = defaultBin;
 
 glob
   .sync("**/*", {
@@ -60,7 +62,9 @@ glob
       "**/*tsbuildinfo",
       "**/{ps,git}/**",
       "**/*eslint*",
-      "**/*.config.*"
+      "**/*.config.*",
+      "**/utils.*",
+      "**/*-config.*"
     ]
   })
   .filter((str) => {
@@ -81,8 +85,21 @@ glob
 
     const isBin = value.includes("bin/");
     const key = isBin ? sanitizeName : basename;
-    const coloredKey = isBin ? colors.green(key) : colors.yellow(key);
+    // Use cyan for non-bin keys instead of yellow
+    const coloredKey = isBin ? colors.green(key) : colors.cyan(key);
 
+    if (defaultBin[key]) {
+      console.warn(
+        colors.yellow("[ignore]:\t") +
+          " " +
+          coloredKey +
+          " in " +
+          colors.green(value) +
+          " vs " +
+          colors.green(pkgj.bin[key])
+      );
+      return;
+    }
     console.log(`add ${coloredKey}: ${value}`);
     pkgj.bin[key] = value;
   });

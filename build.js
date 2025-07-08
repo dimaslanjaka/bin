@@ -12,11 +12,12 @@ pkgj.bin = {
   "npm-run-series": "lib/npm-run-series.cjs",
   "del-nodemodules": "lib/del-node-modules.cjs",
   "del-yarncaches": "lib/del-yarn-caches.cjs",
-  "find-nodemodules": "lib/find-node-modules-cli.cjs",
   "del-ps": "lib/del-ps.cjs",
   "del-gradle": "lib/del-gradle.cjs",
   "git-purge": "lib/git-purge.cjs",
-  "git-fix": "lib/git-fix.cjs"
+  "git-fix": "lib/git-fix.cjs",
+  "print-tree": "lib/print-directory-tree.cjs",
+  "dir-tree": "lib/print-directory-tree.cjs"
 };
 
 glob

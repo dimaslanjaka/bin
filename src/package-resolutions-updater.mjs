@@ -29,10 +29,8 @@ import ansiColors from "ansi-colors";
 import "dotenv/config";
 import fs from "fs";
 import https from "https";
+import os from "os";
 import path from "path";
-import { fileURLToPath } from "url";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // 📌 Static override rules
 const specialPackageOverrides = [
@@ -73,25 +71,58 @@ const specialPackageOverrides = [
   { pkg: "@types/git-command-helper", branch: "pre-release", repo: "git-command-helper", owner: "dimaslanjaka" }
 ];
 
+// --- Optimized: Load package.json once at the top ---
+const pkgPath = path.join(process.cwd(), "package.json");
+let pkg;
+try {
+  pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
+} catch (e) {
+  console.error(ansiColors.red(`Failed to read package.json: ${e.message}`));
+  process.exit(1);
+}
+
+// --- Use a random User-Agent for GitHub API requests ---
+const GITHUB_USER_AGENTS = [
+  "octokit-rest.js/19.0.7",
+  "GitHub CLI/2.40.0",
+  "Mozilla/5.0 (compatible; GitHubCopilot/1.0)",
+  "PostmanRuntime/7.32.3",
+  "binary-collections-resolver/1.0 (+https://github.com/dimaslanjaka/bin)"
+];
+
+// --- User-Agent persistence in system temp folder ---
+const userAgentDir = path.join(os.tmpdir(), "nodejs");
+const userAgentFile = path.join(userAgentDir, "useragent.txt");
+let selectedUserAgent;
+try {
+  if (!fs.existsSync(userAgentDir)) fs.mkdirSync(userAgentDir, { recursive: true });
+  if (fs.existsSync(userAgentFile)) {
+    const fileAgent = fs.readFileSync(userAgentFile, "utf-8").trim();
+    if (GITHUB_USER_AGENTS.includes(fileAgent)) {
+      selectedUserAgent = fileAgent;
+    }
+  }
+  if (!selectedUserAgent) {
+    selectedUserAgent = GITHUB_USER_AGENTS[Math.floor(Math.random() * GITHUB_USER_AGENTS.length)];
+    fs.writeFileSync(userAgentFile, selectedUserAgent, "utf-8");
+  }
+} catch (_e) {
+  // fallback to random if any error
+  selectedUserAgent = GITHUB_USER_AGENTS[Math.floor(Math.random() * GITHUB_USER_AGENTS.length)];
+}
+
 /**
  * Fetch JSON from a URL with GitHub headers.
  * @param {string} url
  * @returns {Promise<any>}
  */
 function fetchJson(url) {
-  const userAgents = [
-    "octokit-rest.js/19.0.7",
-    "GitHub CLI/2.40.0",
-    "Mozilla/5.0 (compatible; GitHubCopilot/1.0)",
-    "PostmanRuntime/7.32.3"
-  ];
   const headers = {
-    "User-Agent": userAgents[Math.floor(Math.random() * userAgents.length)],
+    "User-Agent": selectedUserAgent,
     Accept: "application/vnd.github.v3+json",
     "X-GitHub-Api-Version": "2022-11-28",
     ...(process.env.GITHUB_TOKEN ? { Authorization: `token ${process.env.GITHUB_TOKEN}` } : {})
   };
-
   return new Promise((resolve, reject) => {
     https
       .get(url, { headers }, (res) => {
@@ -221,23 +252,15 @@ function parseGitHubUrl(url) {
   throw new Error(`Unsupported GitHub URL: ${url}`);
 }
 
-// 🧠 Main logic
+// --- Main logic ---
 (async () => {
-  const pkgPath = path.join(process.cwd(), "package.json");
-  /** @type {import('../package.json')} */
-  const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
-
   const entries = Object.entries(pkg.resolutions || {});
-
   if (entries.length === 0) {
     console.log(ansiColors.yellow("No resolutions found in package.json"));
     return;
   }
-
   console.log(`Processing ${entries.length} resolution(s)...`);
-
   const updates = [];
-
   for (const [currentPkgName, url] of entries) {
     // Validate if URL is a GitHub URL
     let repo;
@@ -248,16 +271,12 @@ function parseGitHubUrl(url) {
       console.log(`⏭️  Skipping ${ansiColors.yellow(currentPkgName)}: ${error.message}`);
       continue;
     }
-
     try {
       const override = specialPackageOverrides.find((p) => p.pkg === currentPkgName);
-
       const latest = override
         ? await getLatestCommit(override.owner, override.repo, override.branch)
         : await getLatestCommitAcrossBranches(repo.owner, repo.repo);
-
       const new_url = replaceRawWithLatestHash(url, latest.sha);
-
       updates.push({
         currentPkgName,
         url,
@@ -269,25 +288,32 @@ function parseGitHubUrl(url) {
       console.log(`❌ Failed to process ${ansiColors.red(currentPkgName)}: ${error.message}`);
     }
   }
-
   if (updates.length === 0) {
     console.log(ansiColors.yellow("No GitHub URLs were processed"));
     return;
   }
-
   console.log(`\n📝 Applying updates to ${updates.length} GitHub URL(s)...`);
-
+  let changed = false;
   for (const { currentPkgName, url, new_url, repo, latest } of updates) {
     if (url !== new_url) {
       console.log(`\n${ansiColors.cyan(currentPkgName)}:`);
       console.log("  from:", url.replace(repo.branch, ansiColors.red(repo.branch)));
       console.log("    to:", new_url.replace(latest.sha, ansiColors.green(latest.sha)));
       pkg.resolutions[currentPkgName] = new_url;
+      changed = true;
     } else {
       console.log(`\n${ansiColors.cyan(currentPkgName)}: ${ansiColors.gray("already up-to-date")}`);
     }
   }
-
-  fs.writeFileSync(path.join(__dirname, "package.json"), JSON.stringify(pkg, null, 2));
-  console.log(`\n✅ package.json updated successfully`);
+  if (changed) {
+    try {
+      fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
+      console.log(`\n✅ package.json updated successfully`);
+    } catch (e) {
+      console.error(ansiColors.red(`Failed to write package.json: ${e.message}`));
+      process.exit(1);
+    }
+  } else {
+    console.log(ansiColors.green("No changes to package.json were necessary."));
+  }
 })();

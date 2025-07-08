@@ -18,7 +18,8 @@ const defaultBin = {
   "git-fix": "lib/git-fix.cjs",
   "print-tree": "lib/print-directory-tree.cjs",
   "dir-tree": "lib/print-directory-tree.cjs",
-  "pkg-resolutions-updater": "lib/package-resolutions-updater.cjs"
+  "pkg-resolutions-updater": "lib/package-resolutions-updater.cjs",
+  "pkg-res-updater": "lib/package-resolutions-updater.cjs"
 };
 pkgj.bin = defaultBin;
 

@@ -206,6 +206,29 @@ async function main() {
   }
 }
 
+if (argv.help || argv.h) {
+  console.log(`
+Usage: node print-directory-tree.cjs [options]
+
+Options:
+  --output, -o <file>           Output file path (default: tmp/directory-structure.txt)
+  --ext <exts>                  Comma-separated list of file extensions (no dot, e.g. js,ts)
+  --pattern <glob>              Glob pattern(s) for files (can be repeated)
+  --exclude <dirs>              Comma-separated list of directories to exclude (appends to default)
+  --override-exclude, -we       Override default exclude directories with --exclude
+  --git-add                     Add output file to git after writing
+  --help, -h                    Show this help message
+
+Examples:
+  node print-directory-tree.cjs --ext=js,ts
+  node print-directory-tree.cjs --pattern=src/**/*.js --pattern=test/**/*.js
+  node print-directory-tree.cjs --exclude=dist,build
+  node print-directory-tree.cjs --output=tmp/tree.txt
+`);
+  process.exit(0);
+}
+
+// Execute the main function
 main().catch((err) => {
   console.error(err);
   process.exit(1);

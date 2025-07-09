@@ -77,10 +77,10 @@ Create `.vscode/settings.json` to add binary tools to your PATH:
 | **Git** | `git-purge`, `git-diff`, `git-fix`, `git-reduce-size` | Git repository management and optimization |
 | **Submodules** | `submodule`, `submodule-install`, `submodule-remove`, `submodule-token` | Git submodule operations |
 | **NPM Scripts** | `nrs`, `run-s`, `run-series`, `npm-run-series` | Run npm scripts in series with pattern matching |
-| **Package Mgmt** | `yarn-reinstall`, `package-resolutions` | Yarn package management utilities |
+| **Package Mgmt** | `yarn-reinstall`, `package-resolutions`, `pkg-resolutions-updater`, `pkg-res-updater` | Yarn/package resolutions management utilities |
 | **Node.js Dev** | `find-node-modules`, `find-nodemodules`, `dev`, `prod`, `empty` | Node.js development helpers |
 | **Process Mgmt** | `kill-process`, `nodekill`, `javakill`, `del-ps` | Process management and termination |
-| **File System** | `rmfind`, `rmpath`, `rmx` | File system operations |
+| **File System** | `rmfind`, `rmpath`, `rmx`, `print-tree`, `dir-tree` | File system operations |
 | **Cleanup** | `del-nodemodules`, `del-yarncaches`, `del-gradle` | Cache and build directory cleanup |
 
 For a complete list of available binaries and utilities, see:
@@ -194,10 +194,11 @@ yarn-reinstall <packageName> [--dev|-D|--peer|-P|--optional|-O]
 ```
 
 #### Package Resolutions Manager
-Manage package resolutions in package.json:
+Manage package resolutions in package.json (aliases: `pkg-resolutions-updater`, `pkg-res-updater`):
 
 ```bash
-package-resolutions
+pkg-resolutions-updater
+pkg-res-updater
 ```
 
 ### Node.js Development Tools

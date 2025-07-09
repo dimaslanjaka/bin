@@ -49,6 +49,7 @@ export default [
         ...globals.browser,
         ...globals.amd,
         ...globals.node,
+        ...globals.jest,
         $: "readonly",
         jQuery: "readonly",
         adsbygoogle: "writable"
@@ -98,7 +99,7 @@ export default [
 
   // ✅ Add Jest globals only for test files
   {
-    files: ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
+    files: ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)", "**/*.(spec|test).cjs"],
     languageOptions: {
       globals: {
         ...globals.jest

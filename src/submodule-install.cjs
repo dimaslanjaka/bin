@@ -1,37 +1,18 @@
 #!/usr/bin/env node
 
 const { spawnSync } = require("child_process");
+
 const fs = require("fs");
 const path = require("path");
+const dotenv = require("dotenv");
 
-// Path to .env file
-const envPath = path.resolve(__dirname, ".env");
-
-// Check if .env exists and read it
-if (fs.existsSync(envPath)) {
-  const envContent = fs.readFileSync(envPath, "utf8");
-
-  // Split into lines and process each
-  envContent.split("\n").forEach((line) => {
-    const trimmedLine = line.trim();
-
-    // Ignore empty lines and comments
-    if (!trimmedLine || trimmedLine.startsWith("#")) return;
-
-    // Extract key and value
-    const [key, ...vals] = trimmedLine.split("=");
-    if (!key) return;
-
-    const value = vals
-      .join("=")
-      .trim()
-      .replace(/^['"]|['"]$/g, ""); // Remove surrounding quotes
-    process.env[key.trim()] = value;
-  });
-}
+// Load .env using dotenv from process.cwd()
+const envPath = path.resolve(process.cwd(), ".env");
+if (fs.existsSync(envPath)) dotenv.config({ path: envPath });
 
 // Parse CLI args
 const args = process.argv.slice(2);
+
 let ROOT = runGit(["rev-parse", "--show-toplevel"]).trim();
 let REPO_PATH = ROOT;
 

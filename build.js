@@ -26,6 +26,7 @@ pkgj.bin = defaultBin;
 glob
   .sync("**/*", {
     cwd: __dirname,
+    nodir: true,
     ignore: [
       "**/.vscode/**",
       "**/.idea/**",
@@ -65,7 +66,8 @@ glob
       "**/*eslint*",
       "**/*.config.*",
       "**/utils.*",
-      "**/*-config.*"
+      "**/*-config.*",
+      "**/packages/**"
     ]
   })
   .filter((str) => {

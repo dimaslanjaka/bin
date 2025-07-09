@@ -11,9 +11,6 @@
   "bugs": {
     "url": "https://github.com/dimaslanjaka/bin/issues"
   },
-  "workspaces": [
-    "packages/*"
-  ],
   "license": "MIT",
   "author": {
     "email": "dimaslanjaka@gmail.com",
@@ -67,6 +64,7 @@
     "npm-run-series": "lib/npm-run-series.cjs",
     "nrs": "lib/npm-run-series.cjs",
     "package-resolutions-updater": "src/package-resolutions-updater.mjs",
+    "pkg-res-updater": "lib/package-resolutions-updater.cjs",
     "pkg-resolutions-updater": "lib/package-resolutions-updater.cjs",
     "print-directory-tree": "src/print-directory-tree.cjs",
     "print-tree": "lib/print-directory-tree.cjs",
@@ -150,6 +148,9 @@
   "optionalDependencies": {
     "ansi-colors": "^4.1.3"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "directories": {
     "lib": "lib",
     "bin": "bin"

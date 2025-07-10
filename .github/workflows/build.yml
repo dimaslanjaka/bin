@@ -30,8 +30,10 @@ jobs:
             ./.yarn
             ./yarn.lock
             ./node_modules
-          key: ${{ runner.os }}
-          restore-keys: ${{ runner.os }}
+          key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ hashFiles('**/package.json') }}
+            ${{ runner.os }}-
       - run: yarn install
       - run: npm run build
       - run: npm run pack

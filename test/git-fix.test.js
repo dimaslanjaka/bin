@@ -24,6 +24,7 @@ describe("git-fix utility", () => {
   let consoleLogSpy;
   let consoleErrorSpy;
   let processExitSpy;
+  const gitFixPath = require.resolve("../src/git-fix.cjs");
 
   beforeEach(() => {
     // Reset all mocks
@@ -56,7 +57,7 @@ describe("git-fix utility", () => {
     delete process.env.GITHUB_EMAIL;
 
     // Mock process.argv
-    process.argv = ["node", "git-fix.cjs"];
+    process.argv = ["node", gitFixPath];
   });
 
   afterEach(() => {
@@ -67,7 +68,7 @@ describe("git-fix utility", () => {
 
   describe("help functionality", () => {
     it("should show help with --help flag", () => {
-      process.argv = ["node", "git-fix.cjs", "--help"];
+      process.argv = ["node", gitFixPath, "--help"];
 
       require("../src/git-fix.cjs");
 
@@ -76,7 +77,7 @@ describe("git-fix utility", () => {
     });
 
     it("should show help with -h flag", () => {
-      process.argv = ["node", "git-fix.cjs", "-h"];
+      process.argv = ["node", gitFixPath, "-h"];
 
       require("../src/git-fix.cjs");
 
@@ -88,7 +89,7 @@ describe("git-fix utility", () => {
   describe("git repository validation", () => {
     it("should exit with error if not in git repository", () => {
       mockIsGitRepository.mockReturnValue(false);
-      process.argv = ["node", "git-fix.cjs"];
+      process.argv = ["node", gitFixPath];
 
       require("../src/git-fix.cjs");
 
@@ -98,7 +99,7 @@ describe("git-fix utility", () => {
 
     it("should continue if in git repository", () => {
       mockIsGitRepository.mockReturnValue(true);
-      process.argv = ["node", "git-fix.cjs"];
+      process.argv = ["node", gitFixPath];
 
       require("../src/git-fix.cjs");
 
@@ -109,7 +110,7 @@ describe("git-fix utility", () => {
 
   describe("default behavior (all fixes)", () => {
     it("should run all fixes when no options provided", () => {
-      process.argv = ["node", "git-fix.cjs"];
+      process.argv = ["node", gitFixPath];
 
       require("../src/git-fix.cjs");
 
@@ -121,7 +122,7 @@ describe("git-fix utility", () => {
     });
 
     it("should display summary messages for all fixes", () => {
-      process.argv = ["node", "git-fix.cjs"];
+      process.argv = ["node", gitFixPath];
 
       require("../src/git-fix.cjs");
 
@@ -133,7 +134,7 @@ describe("git-fix utility", () => {
 
   describe("individual options", () => {
     it("should only force LF line endings with --lf-only", () => {
-      process.argv = ["node", "git-fix.cjs", "--lf-only"];
+      process.argv = ["node", gitFixPath, "--lf-only"];
 
       require("../src/git-fix.cjs");
 
@@ -145,7 +146,7 @@ describe("git-fix utility", () => {
     });
 
     it("should only ignore file permissions with --permissions", () => {
-      process.argv = ["node", "git-fix.cjs", "--permissions"];
+      process.argv = ["node", gitFixPath, "--permissions"];
 
       require("../src/git-fix.cjs");
 
@@ -157,7 +158,7 @@ describe("git-fix utility", () => {
     });
 
     it("should only normalize line endings with --normalize", () => {
-      process.argv = ["node", "git-fix.cjs", "--normalize"];
+      process.argv = ["node", gitFixPath, "--normalize"];
 
       require("../src/git-fix.cjs");
 
@@ -171,7 +172,7 @@ describe("git-fix utility", () => {
     it("should only configure user with --user (environment)", () => {
       process.env.GITHUB_USER = "testuser";
       process.env.GITHUB_EMAIL = "test@example.com";
-      process.argv = ["node", "git-fix.cjs", "--user"];
+      process.argv = ["node", gitFixPath, "--user"];
 
       require("../src/git-fix.cjs");
 
@@ -185,7 +186,7 @@ describe("git-fix utility", () => {
 
   describe("combined options", () => {
     it("should run multiple fixes when multiple options provided", () => {
-      process.argv = ["node", "git-fix.cjs", "--lf-only", "--permissions"];
+      process.argv = ["node", gitFixPath, "--lf-only", "--permissions"];
 
       require("../src/git-fix.cjs");
 
@@ -199,7 +200,7 @@ describe("git-fix utility", () => {
 
   describe("user configuration", () => {
     it("should configure user with CLI arguments", () => {
-      process.argv = ["node", "git-fix.cjs", "--user", "John Doe", "john@example.com"];
+      process.argv = ["node", gitFixPath, "--user", "John Doe", "john@example.com"];
       require("../src/git-fix.cjs");
       expect(mockConfigureGitUser).toHaveBeenCalledWith("John Doe", "john@example.com", { updateRemote: false });
     });
@@ -207,13 +208,13 @@ describe("git-fix utility", () => {
     it("should configure user from environment variables", () => {
       process.env.GITHUB_USER = "envuser";
       process.env.GITHUB_EMAIL = "env@example.com";
-      process.argv = ["node", "git-fix.cjs", "--user"];
+      process.argv = ["node", gitFixPath, "--user"];
       require("../src/git-fix.cjs");
       expect(mockConfigureGitUser).toHaveBeenCalledWith(null, null, { updateRemote: false });
     });
 
     it("should show error for incomplete --user arguments", () => {
-      process.argv = ["node", "git-fix.cjs", "--user", "OnlyName"];
+      process.argv = ["node", gitFixPath, "--user", "OnlyName"];
       require("../src/git-fix.cjs");
       expect(consoleErrorSpy).toHaveBeenCalledWith("[✗] Error: --user requires both NAME and EMAIL or no arguments");
       expect(processExitSpy).toHaveBeenCalledWith(1);
@@ -222,19 +223,19 @@ describe("git-fix utility", () => {
     it("should show user configuration applied message when user/email available", () => {
       process.env.GITHUB_USER = "testuser";
       process.env.GITHUB_EMAIL = "test@example.com";
-      process.argv = ["node", "git-fix.cjs"];
+      process.argv = ["node", gitFixPath];
       require("../src/git-fix.cjs");
       expect(consoleLogSpy).toHaveBeenCalledWith("[i] Git user configuration has been applied");
     });
 
     it("should not show user configuration message when no user/email", () => {
-      process.argv = ["node", "git-fix.cjs"];
+      process.argv = ["node", gitFixPath];
       require("../src/git-fix.cjs");
       expect(consoleLogSpy).not.toHaveBeenCalledWith("[i] Git user configuration has been applied");
     });
 
     it("should call configureGitUser with updateRemote true when --update-remote is present", () => {
-      process.argv = ["node", "git-fix.cjs", "--user", "John Doe", "john@example.com", "--update-remote"];
+      process.argv = ["node", gitFixPath, "--user", "John Doe", "john@example.com", "--update-remote"];
       require("../src/git-fix.cjs");
       expect(mockConfigureGitUser).toHaveBeenCalledWith("John Doe", "john@example.com", { updateRemote: true });
     });
@@ -242,7 +243,7 @@ describe("git-fix utility", () => {
     it("should call configureGitUser with updateRemote true when --user is used alone with --update-remote", () => {
       process.env.GITHUB_USER = "envuser";
       process.env.GITHUB_EMAIL = "env@example.com";
-      process.argv = ["node", "git-fix.cjs", "--user", "--update-remote"];
+      process.argv = ["node", gitFixPath, "--user", "--update-remote"];
       require("../src/git-fix.cjs");
       expect(mockConfigureGitUser).toHaveBeenCalledWith(null, null, { updateRemote: true });
     });
@@ -250,7 +251,7 @@ describe("git-fix utility", () => {
     it("should call configureGitUser with updateRemote true when only --update-remote is present (no --user)", () => {
       process.env.GITHUB_USER = "envuser";
       process.env.GITHUB_EMAIL = "env@example.com";
-      process.argv = ["node", "git-fix.cjs", "--update-remote"];
+      process.argv = ["node", gitFixPath, "--update-remote"];
       require("../src/git-fix.cjs");
       // If the implementation does not call configureGitUser when only --update-remote is present,
       // this test should expect not to be called. If it should, then the implementation must be fixed.
@@ -266,23 +267,23 @@ describe("git-fix utility", () => {
     it("should call configureGitUser with updateRemote false when --update-remote is not present", () => {
       process.env.GITHUB_USER = "envuser";
       process.env.GITHUB_EMAIL = "env@example.com";
-      process.argv = ["node", "git-fix.cjs", "--user"];
+      process.argv = ["node", gitFixPath, "--user"];
       require("../src/git-fix.cjs");
       expect(mockConfigureGitUser).toHaveBeenCalledWith(null, null, { updateRemote: false });
     });
 
     it("should call configureGitUser with updateRemote true when --user and --update-remote are combined in any order", () => {
-      process.argv = ["node", "git-fix.cjs", "--update-remote", "--user", "Jane", "jane@example.com"];
+      process.argv = ["node", gitFixPath, "--update-remote", "--user", "Jane", "jane@example.com"];
       require("../src/git-fix.cjs");
       expect(mockConfigureGitUser).toHaveBeenCalledWith("Jane", "jane@example.com", { updateRemote: true });
     });
     it("should call configureGitUser with updateRemote true when --user is last and --update-remote is first", () => {
-      process.argv = ["node", "git-fix.cjs", "--update-remote", "--user", "Jane", "jane@example.com"];
+      process.argv = ["node", gitFixPath, "--update-remote", "--user", "Jane", "jane@example.com"];
       require("../src/git-fix.cjs");
       expect(mockConfigureGitUser).toHaveBeenCalledWith("Jane", "jane@example.com", { updateRemote: true });
     });
     it("should call configureGitUser with updateRemote true when --user is first and --update-remote is last", () => {
-      process.argv = ["node", "git-fix.cjs", "--user", "Jane", "jane@example.com", "--update-remote"];
+      process.argv = ["node", gitFixPath, "--user", "Jane", "jane@example.com", "--update-remote"];
       require("../src/git-fix.cjs");
       expect(mockConfigureGitUser).toHaveBeenCalledWith("Jane", "jane@example.com", { updateRemote: true });
     });
@@ -290,7 +291,7 @@ describe("git-fix utility", () => {
 
   describe("summary messages", () => {
     it("should show appropriate summary for LF-only option", () => {
-      process.argv = ["node", "git-fix.cjs", "--lf-only"];
+      process.argv = ["node", gitFixPath, "--lf-only"];
 
       require("../src/git-fix.cjs");
 
@@ -300,7 +301,7 @@ describe("git-fix utility", () => {
     });
 
     it("should show appropriate summary for permissions option", () => {
-      process.argv = ["node", "git-fix.cjs", "--permissions"];
+      process.argv = ["node", gitFixPath, "--permissions"];
 
       require("../src/git-fix.cjs");
 
@@ -310,7 +311,7 @@ describe("git-fix utility", () => {
     });
 
     it("should show appropriate summary for normalize option", () => {
-      process.argv = ["node", "git-fix.cjs", "--normalize"];
+      process.argv = ["node", gitFixPath, "--normalize"];
 
       require("../src/git-fix.cjs");
 
@@ -321,7 +322,7 @@ describe("git-fix utility", () => {
 
   describe("edge cases", () => {
     it("should handle CLI user arguments with extra spaces", () => {
-      process.argv = ["node", "git-fix.cjs", "--user", "  John Doe  ", "  john@example.com  "];
+      process.argv = ["node", gitFixPath, "--user", "  John Doe  ", "  john@example.com  "];
 
       require("../src/git-fix.cjs");
 
@@ -331,7 +332,7 @@ describe("git-fix utility", () => {
     });
 
     it("should handle mixed option order", () => {
-      process.argv = ["node", "git-fix.cjs", "--permissions", "--user", "John", "john@test.com", "--lf-only"];
+      process.argv = ["node", gitFixPath, "--permissions", "--user", "John", "john@test.com", "--lf-only"];
 
       require("../src/git-fix.cjs");
 
@@ -343,7 +344,7 @@ describe("git-fix utility", () => {
     it("should handle environment variables with whitespace", () => {
       process.env.GITHUB_USER = "  spaced-user  ";
       process.env.GITHUB_EMAIL = "  spaced@email.com  ";
-      process.argv = ["node", "git-fix.cjs"];
+      process.argv = ["node", gitFixPath];
 
       require("../src/git-fix.cjs");
 

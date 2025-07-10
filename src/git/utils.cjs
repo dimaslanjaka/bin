@@ -29,7 +29,7 @@ function runGitCommand(args, description) {
  */
 function isGitRepository() {
   try {
-    execSync("git rev-parse --git-dir", { stdio: "pipe" });
+    execSync("git rev-parse --git-dir", { stdio: "pipe", cwd: process.cwd() });
     return true;
   } catch {
     return false;

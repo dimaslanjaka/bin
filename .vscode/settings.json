@@ -48,7 +48,7 @@
     "electron-*.ts": "cross-env-shell NODE_ENV=development electron -r ts-node/register",
     "*.py": "python -u",
     "*.electron.js": "cross-env-shell NODE_ENV=development electron -r ts-node/register",
-    "**/*.test.@(js|cjs|mjs)": "cross-env-shell NODE_ENV=test jest --runInBand --detectOpenHandles --forceExit --coverage"
+    "**/*.test.@(js|cjs|mjs|ts)": "cross-env-shell NODE_ENV=test jest --runInBand --detectOpenHandles --forceExit --coverage"
   },
   "code-runner.respectShebang": false,
   "debug.terminal.clearBeforeReusing": true,

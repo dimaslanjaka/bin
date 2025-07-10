@@ -5,6 +5,8 @@ const os = require("os");
 // Load .env file for project environment
 require("dotenv").config({ path: path.join(__dirname, "../.env") });
 
+const originalCwd = process.cwd();
+module.exports.originalCwd = originalCwd;
 const repoDir = path.join(__dirname, "../tmp/test-repo");
 module.exports.repoDir = repoDir;
 process.cwd = () => repoDir;

@@ -10,6 +10,7 @@ jest.mock("../src/git/utils.cjs");
 
 describe("git-user-config", () => {
   let consoleLogSpy;
+  let consoleWarnSpy;
   let mockRunGitCommand;
   let originalGithubUser;
   let originalGithubEmail;
@@ -17,6 +18,7 @@ describe("git-user-config", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     consoleLogSpy = jest.spyOn(console, "log").mockImplementation();
+    consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation();
     mockRunGitCommand = runGitCommand;
     mockRunGitCommand.mockReturnValue(true);
 
@@ -31,6 +33,7 @@ describe("git-user-config", () => {
 
   afterEach(() => {
     consoleLogSpy.mockRestore();
+    if (consoleWarnSpy) consoleWarnSpy.mockRestore();
 
     // Restore original .env variables
     if (originalGithubUser !== undefined) {
@@ -42,6 +45,82 @@ describe("git-user-config", () => {
   });
 
   describe("configureGitUser", () => {
+    describe("interactive remote URL update", () => {
+      let configureGitUserInteractive;
+      let mockRunGitCommandInteractive;
+      let consoleLogSpyInteractive;
+      let consoleWarnSpyInteractive;
+      let rlMock;
+      let readline;
+      let runGitCommandOutputSpy;
+
+      beforeEach(() => {
+        jest.resetModules();
+        jest.doMock("git-command-helper", () => ({
+          parseGitHubUrl: () => ({ owner: "otheruser", repo: "repo" })
+        }));
+        jest.doMock("../src/git/utils.cjs", () => {
+          const original = jest.requireActual("../src/git/utils.cjs");
+          return {
+            ...original,
+            runGitCommand: jest.fn(() => true),
+            runGitCommandOutput: jest.fn(() => "https://github.com/otheruser/repo.git")
+          };
+        });
+        readline = require("readline");
+        rlMock = {
+          question: jest.fn(),
+          close: jest.fn()
+        };
+        jest.spyOn(readline, "createInterface").mockReturnValue(rlMock);
+        consoleLogSpyInteractive = jest.spyOn(console, "log").mockImplementation();
+        consoleWarnSpyInteractive = jest.spyOn(console, "warn").mockImplementation();
+        ({ configureGitUser: configureGitUserInteractive } = require("../src/git/user-config.cjs"));
+        mockRunGitCommandInteractive = require("../src/git/utils.cjs").runGitCommand;
+        runGitCommandOutputSpy = require("../src/git/utils.cjs").runGitCommandOutput;
+      });
+
+      afterEach(() => {
+        jest.resetModules();
+        if (consoleLogSpyInteractive) consoleLogSpyInteractive.mockRestore();
+        if (consoleWarnSpyInteractive) consoleWarnSpyInteractive.mockRestore();
+      });
+
+      it("should prompt to update remote URL and update when user answers 'yes'", (done) => {
+        rlMock.question.mockImplementation((q, cb) => cb("yes"));
+        configureGitUserInteractive("testuser", "test@example.com");
+        setImmediate(() => {
+          expect(runGitCommandOutputSpy).toHaveBeenCalledWith(
+            ["remote", "get-url", "origin"],
+            "Fetching remote URL for verification"
+          );
+          expect(consoleLogSpyInteractive).toHaveBeenCalledWith(expect.stringContaining("Remote URL updated to"));
+          expect(mockRunGitCommandInteractive).toHaveBeenCalledWith(
+            ["remote", "set-url", "origin", expect.stringContaining("testuser")],
+            expect.stringContaining("Set origin to")
+          );
+          done();
+        });
+      });
+
+      it("should prompt to update remote URL and not update when user answers 'no'", (done) => {
+        rlMock.question.mockImplementation((q, cb) => cb("no"));
+        configureGitUserInteractive("testuser", "test@example.com");
+        setImmediate(() => {
+          const runGitCommandOutput = require("../src/git/utils.cjs").runGitCommandOutput;
+          expect(runGitCommandOutput).toHaveBeenCalledWith(
+            ["remote", "get-url", "origin"],
+            "Fetching remote URL for verification"
+          );
+          expect(consoleLogSpyInteractive).toHaveBeenCalledWith("[i] Remote URL not changed.");
+          expect(mockRunGitCommandInteractive).not.toHaveBeenCalledWith(
+            ["remote", "set-url", "origin", expect.stringContaining("testuser")],
+            expect.stringContaining("Set origin to")
+          );
+          done();
+        });
+      });
+    });
     it("should configure user from .env file variables", () => {
       // Restore .env variables for this test
       process.env.GITHUB_USER = originalGithubUser || "dimaslanjaka";

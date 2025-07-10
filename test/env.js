@@ -2,7 +2,9 @@ const { path } = require("sbg-utility");
 const fs = require("fs-extra");
 const { spawnSync } = require("child_process");
 
-process.cwd = () => path.join(__dirname, "../tmp/test-repo");
+const repoDir = path.join(__dirname, "../tmp/test-repo");
+module.exports.repoDir = repoDir;
+process.cwd = () => repoDir;
 
 if (!fs.existsSync(path.join(process.cwd(), ".git"))) {
   const result = spawnSync("git", ["clone", "https://github.com/dimaslanjaka/test-repo.git", process.cwd()], {

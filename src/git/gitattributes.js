@@ -109,67 +109,51 @@ function mergeGitAttributeRules(existingRules, desiredRules) {
   const changes = [];
 
   desiredRules.forEach((desired) => {
-    let conflictFound = false;
-
-    // Check for conflicts with existing rules
-    for (let i = 0; i < mergedRules.length; i++) {
-      const existing = mergedRules[i];
-
-      if (existing.type !== "rule") {
-        continue;
+    // Look for an exact pattern match in existing rules
+    const existingIdx = mergedRules.findIndex((r) => r.type === "rule" && r.pattern === desired.pattern);
+    if (existingIdx !== -1) {
+      const existing = mergedRules[existingIdx];
+      if (existing.attributes === desired.attributes) {
+        // Already present, do nothing
+        conflicts.push({
+          pattern: desired.pattern,
+          existing: existing.attributes,
+          proposed: desired.attributes,
+          action: "kept existing (identical)"
+        });
+      } else if (desired.priority > (existing.priority || 0)) {
+        // Replace with higher priority rule
+        mergedRules[existingIdx] = {
+          type: "rule",
+          pattern: desired.pattern,
+          attributes: desired.attributes,
+          content: `${desired.pattern} ${desired.attributes}`,
+          lineNumber: existing.lineNumber,
+          replaced: true
+        };
+        conflicts.push({
+          pattern: desired.pattern,
+          existing: existing.attributes,
+          proposed: desired.attributes,
+          action: "replaced (higher priority)"
+        });
+        changes.push({
+          action: "replaced",
+          pattern: desired.pattern,
+          attributes: desired.attributes,
+          oldAttributes: existing.attributes
+        });
+      } else {
+        // Keep existing rule
+        conflicts.push({
+          pattern: desired.pattern,
+          existing: existing.attributes,
+          proposed: desired.attributes,
+          action: "kept existing (lower priority)"
+        });
       }
-
-      if (patternsConflict(existing.pattern, desired.pattern)) {
-        conflictFound = true;
-
-        // Determine conflict resolution
-        if (existing.attributes === desired.attributes) {
-          // Same attributes, no real conflict
-          conflicts.push({
-            pattern: desired.pattern,
-            existing: existing.attributes,
-            proposed: desired.attributes,
-            action: "kept existing (identical)"
-          });
-        } else if (desired.priority > (existing.priority || 0)) {
-          // Replace with higher priority rule
-          mergedRules[i] = {
-            type: "rule",
-            pattern: desired.pattern,
-            attributes: desired.attributes,
-            content: `${desired.pattern} ${desired.attributes}`,
-            lineNumber: existing.lineNumber,
-            replaced: true
-          };
-
-          conflicts.push({
-            pattern: desired.pattern,
-            existing: existing.attributes,
-            proposed: desired.attributes,
-            action: "replaced (higher priority)"
-          });
-
-          changes.push({
-            action: "replaced",
-            pattern: desired.pattern,
-            attributes: desired.attributes,
-            oldAttributes: existing.attributes
-          });
-        } else {
-          // Keep existing rule
-          conflicts.push({
-            pattern: desired.pattern,
-            existing: existing.attributes,
-            proposed: desired.attributes,
-            action: "kept existing (lower priority)"
-          });
-        }
-        break;
-      }
-    }
-
-    // Add new rule if no conflict found
-    if (!conflictFound) {
+    } else {
+      // No exact pattern match, add new rule
       mergedRules.push({
         type: "rule",
         pattern: desired.pattern,
@@ -178,7 +162,6 @@ function mergeGitAttributeRules(existingRules, desiredRules) {
         lineNumber: mergedRules.length + 1,
         added: true
       });
-
       changes.push({
         action: "added",
         pattern: desired.pattern,

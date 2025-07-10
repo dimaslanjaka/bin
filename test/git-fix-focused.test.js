@@ -1,7 +1,7 @@
 /* eslint-env jest */
 // Load .env file for project environment
 require("dotenv").config({ path: require("path").join(__dirname, "../.env") });
-
+require("./env.js"); // Ensure environment is set up
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
@@ -73,9 +73,10 @@ describe("git-fix focused integration tests", () => {
     });
 
     it("should create .gitattributes file with correct content", () => {
+      // No need to chdir, cwd is forced by env.js
       forceLfLineEndings();
 
-      const gitattributesPath = path.join(tempDir, ".gitattributes");
+      const gitattributesPath = path.join(process.cwd(), ".gitattributes");
       expect(fs.existsSync(gitattributesPath)).toBe(true);
 
       const content = fs.readFileSync(gitattributesPath, "utf-8");
@@ -87,7 +88,7 @@ describe("git-fix focused integration tests", () => {
     });
 
     it("should handle pattern conflicts correctly", () => {
-      const gitattributesPath = path.join(tempDir, ".gitattributes");
+      const gitattributesPath = path.join(process.cwd(), ".gitattributes");
       // This content should NOT prevent the '* text=auto eol=lf' rule from being added
       // because the pattern matching checks for exact patterns
       const existingContent = "*.txt text\n*.js text\n";
@@ -106,7 +107,8 @@ describe("git-fix focused integration tests", () => {
     });
 
     it("should preserve existing .gitattributes content", () => {
-      const gitattributesPath = path.join(tempDir, ".gitattributes");
+      // No need to chdir, cwd is forced by env.js
+      const gitattributesPath = path.join(process.cwd(), ".gitattributes");
       // Use content that won't conflict with the patterns being added
       const existingContent = "# Existing content\n# Custom rules\n";
       fs.writeFileSync(gitattributesPath, existingContent);
@@ -114,13 +116,19 @@ describe("git-fix focused integration tests", () => {
       forceLfLineEndings();
 
       const content = fs.readFileSync(gitattributesPath, "utf-8");
+      // Debug output
+      console.log("CWD:", process.cwd());
+      console.log("gitattributes exists:", fs.existsSync(gitattributesPath));
+      if (fs.existsSync(gitattributesPath)) {
+        console.log("gitattributes content:", content);
+      }
       expect(content).toContain("# Existing content");
       expect(content).toContain("# Custom rules");
       expect(content).toContain("* text=auto eol=lf");
     });
 
     it("should not duplicate rules if already present", () => {
-      const gitattributesPath = path.join(tempDir, ".gitattributes");
+      const gitattributesPath = path.join(process.cwd(), ".gitattributes");
       const existingContent = "* text=auto eol=lf\n*.{cmd,bat,ps1,sh,cmd1,cmd2,bat1,bat2,vbs} text eol=crlf\n";
       fs.writeFileSync(gitattributesPath, existingContent);
 

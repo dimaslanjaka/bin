@@ -30,14 +30,15 @@ jobs:
             ./.yarn
             ./yarn.lock
             ./node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
+            ./tmp
+          key: ${{ runner.os }}-${{ hashFiles('**/package.json', '.github') }}
           restore-keys: |
-            ${{ runner.os }}-${{ hashFiles('**/package.json') }}
+            ${{ runner.os }}-${{ hashFiles('**/package.json', '.github') }}
             ${{ runner.os }}-
       - run: yarn install
-      - run: npm run test:coverage
       - run: npm run build
       - run: npm run pack
+      - run: npm run test:coverage
       - name: push
         if: ${{ !contains(github.event.head_commit.message, 'update build from CI') }}
         run: |

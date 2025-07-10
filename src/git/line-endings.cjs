@@ -1,4 +1,5 @@
 const path = require("path");
+const fs = require("fs");
 const { runGitCommand } = require("./utils.cjs");
 const { updateGitAttributes } = require("./gitattributes.js");
 
@@ -17,6 +18,16 @@ function forceLfLineEndings() {
 
   // Create or update .gitattributes
   const gitattributesPath = path.join(process.cwd(), ".gitattributes");
+
+  // Always ensure the universal LF rule is present, even if file exists
+  if (fs.existsSync(gitattributesPath)) {
+    let content = fs.readFileSync(gitattributesPath, "utf8");
+    // Match * text=auto eol=lf with any whitespace (space or tab) between tokens
+    if (!/^\*\s+text=auto\s+eol=lf/m.test(content)) {
+      content = `* text=auto eol=lf\n` + content;
+      fs.writeFileSync(gitattributesPath, content);
+    }
+  }
 
   // Define desired rules with priorities
   const desiredRules = [

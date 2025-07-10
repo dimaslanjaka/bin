@@ -1,13 +1,14 @@
 const gch = require("git-command-helper");
 const { runGitCommand, runGitCommandOutput } = require("./utils.cjs");
-const readline = require("readline");
 
 /**
  * Configure Git user from CLI arguments or environment variables
  * @param {string|null} cliUser - Username from CLI arguments
  * @param {string|null} cliEmail - Email from CLI arguments
+ * @param {object} [options] - Options object
+ * @param {boolean} [options.updateRemote] - If true, update remote URL without prompt
  */
-function configureGitUser(cliUser = null, cliEmail = null) {
+function configureGitUser(cliUser = null, cliEmail = null, options = {}) {
   console.log("\n=== Configuring Git User ===");
 
   // Determine user and email with CLI args taking precedence
@@ -64,47 +65,34 @@ function configureGitUser(cliUser = null, cliEmail = null) {
         );
         console.warn(`[!] If this is not intentional, consider updating the remote URL to use your username.`);
         console.warn(`[!] Example: git remote set-url origin https://github.com/${username}/<repo>.git\n`);
-        // Ask user interactively if they want to update the remote URL
-        const rl = readline.createInterface({
-          input: process.stdin,
-          output: process.stdout
-        });
-        rl.question(
-          `\nWould you like to update the remote URL to use your username for authentication (y/N)? `,
-          (answer) => {
-            const normalized = answer.trim().toLowerCase();
-            if (["y", "yes"].includes(normalized)) {
-              // Only update the username in the URL, not the repo path
-              let newUrl = remoteUrl;
-              // Handle https:// and git@ URLs
-              if (/^https:\/\//.test(remoteUrl)) {
-                newUrl = remoteUrl.replace(/https:\/\/(?:[^@]+@)?github.com/, `https://${username}@github.com`);
-              } else if (/^git@github.com:/.test(remoteUrl)) {
-                // For git@github.com:user/repo.git, do not change path, just warn user to use HTTPS with username if needed
-                console.warn(
-                  `[!] For SSH remotes, set your SSH config or use HTTPS with username if you want to change authentication user.`
-                );
-                rl.close();
-                return;
-              }
-              if (newUrl !== remoteUrl) {
-                const updated = runGitCommand(["remote", "set-url", "origin", newUrl], `Set origin to ${newUrl}`);
-                if (updated) {
-                  console.log(`[✓] Remote URL updated to: ${newUrl}`);
-                } else {
-                  console.warn(`[!] Failed to update remote URL. Please update it manually if needed.`);
-                }
-              } else {
-                console.log(`[i] Remote URL does not use HTTPS or already contains the username.`);
-              }
-            } else if (["n", "no"].includes(normalized) || normalized === "") {
-              console.log(`[i] Remote URL not changed.`);
-            } else {
-              console.log(`[i] Unrecognized answer. Remote URL not changed.`);
-            }
-            rl.close();
+        // Check for --update-remote CLI argument or options.updateRemote
+        const updateRemote = options.updateRemote || process.argv.includes("--update-remote");
+        if (updateRemote) {
+          // Only update the username in the URL, not the repo path
+          let newUrl = remoteUrl;
+          // Handle https:// and git@ URLs
+          if (/^https:\/\//.test(remoteUrl)) {
+            newUrl = remoteUrl.replace(/https:\/\/(?:[^@]+@)?github.com/, `https://${username}@github.com`);
+          } else if (/^git@github.com:/.test(remoteUrl)) {
+            // For git@github.com:user/repo.git, do not change path, just warn user to use HTTPS with username if needed
+            console.warn(
+              `[!] For SSH remotes, set your SSH config or use HTTPS with username if you want to change authentication user.`
+            );
+            return;
           }
-        );
+          if (newUrl !== remoteUrl) {
+            const updated = runGitCommand(["remote", "set-url", "origin", newUrl], `Set origin to ${newUrl}`);
+            if (updated) {
+              console.log(`[✓] Remote URL updated to: ${newUrl}`);
+            } else {
+              console.warn(`[!] Failed to update remote URL. Please update it manually if needed.`);
+            }
+          } else {
+            console.log(`[i] Remote URL does not use HTTPS or already contains the username.`);
+          }
+        } else {
+          console.log(`[i] Remote URL not changed. Use --update-remote to update automatically.`);
+        }
       }
     }
   }

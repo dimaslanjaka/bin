@@ -116,7 +116,7 @@ describe("git-fix utility", () => {
       expect(mockForceLfLineEndings).toHaveBeenCalled();
       expect(mockIgnoreFilePermissions).toHaveBeenCalled();
       expect(mockSetPullStrategy).toHaveBeenCalled();
-      expect(mockConfigureGitUser).toHaveBeenCalledWith(null, null);
+      expect(mockConfigureGitUser).toHaveBeenCalledWith(null, null, { updateRemote: false });
       expect(mockNormalizeLineEndings).toHaveBeenCalled();
     });
 
@@ -178,7 +178,7 @@ describe("git-fix utility", () => {
       expect(mockForceLfLineEndings).not.toHaveBeenCalled();
       expect(mockIgnoreFilePermissions).not.toHaveBeenCalled();
       expect(mockSetPullStrategy).not.toHaveBeenCalled();
-      expect(mockConfigureGitUser).toHaveBeenCalledWith(null, null);
+      expect(mockConfigureGitUser).toHaveBeenCalledWith(null, null, { updateRemote: false });
       expect(mockNormalizeLineEndings).not.toHaveBeenCalled();
     });
   });
@@ -200,27 +200,21 @@ describe("git-fix utility", () => {
   describe("user configuration", () => {
     it("should configure user with CLI arguments", () => {
       process.argv = ["node", "git-fix.cjs", "--user", "John Doe", "john@example.com"];
-
       require("../src/git-fix.cjs");
-
-      expect(mockConfigureGitUser).toHaveBeenCalledWith("John Doe", "john@example.com");
+      expect(mockConfigureGitUser).toHaveBeenCalledWith("John Doe", "john@example.com", { updateRemote: false });
     });
 
     it("should configure user from environment variables", () => {
       process.env.GITHUB_USER = "envuser";
       process.env.GITHUB_EMAIL = "env@example.com";
       process.argv = ["node", "git-fix.cjs", "--user"];
-
       require("../src/git-fix.cjs");
-
-      expect(mockConfigureGitUser).toHaveBeenCalledWith(null, null);
+      expect(mockConfigureGitUser).toHaveBeenCalledWith(null, null, { updateRemote: false });
     });
 
     it("should show error for incomplete --user arguments", () => {
       process.argv = ["node", "git-fix.cjs", "--user", "OnlyName"];
-
       require("../src/git-fix.cjs");
-
       expect(consoleErrorSpy).toHaveBeenCalledWith("[✗] Error: --user requires both NAME and EMAIL or no arguments");
       expect(processExitSpy).toHaveBeenCalledWith(1);
     });
@@ -229,18 +223,68 @@ describe("git-fix utility", () => {
       process.env.GITHUB_USER = "testuser";
       process.env.GITHUB_EMAIL = "test@example.com";
       process.argv = ["node", "git-fix.cjs"];
-
       require("../src/git-fix.cjs");
-
       expect(consoleLogSpy).toHaveBeenCalledWith("[i] Git user configuration has been applied");
     });
 
     it("should not show user configuration message when no user/email", () => {
       process.argv = ["node", "git-fix.cjs"];
-
       require("../src/git-fix.cjs");
-
       expect(consoleLogSpy).not.toHaveBeenCalledWith("[i] Git user configuration has been applied");
+    });
+
+    it("should call configureGitUser with updateRemote true when --update-remote is present", () => {
+      process.argv = ["node", "git-fix.cjs", "--user", "John Doe", "john@example.com", "--update-remote"];
+      require("../src/git-fix.cjs");
+      expect(mockConfigureGitUser).toHaveBeenCalledWith("John Doe", "john@example.com", { updateRemote: true });
+    });
+
+    it("should call configureGitUser with updateRemote true when --user is used alone with --update-remote", () => {
+      process.env.GITHUB_USER = "envuser";
+      process.env.GITHUB_EMAIL = "env@example.com";
+      process.argv = ["node", "git-fix.cjs", "--user", "--update-remote"];
+      require("../src/git-fix.cjs");
+      expect(mockConfigureGitUser).toHaveBeenCalledWith(null, null, { updateRemote: true });
+    });
+
+    it("should call configureGitUser with updateRemote true when only --update-remote is present (no --user)", () => {
+      process.env.GITHUB_USER = "envuser";
+      process.env.GITHUB_EMAIL = "env@example.com";
+      process.argv = ["node", "git-fix.cjs", "--update-remote"];
+      require("../src/git-fix.cjs");
+      // If the implementation does not call configureGitUser when only --update-remote is present,
+      // this test should expect not to be called. If it should, then the implementation must be fixed.
+      // For now, check both possible outcomes and provide a clear error if neither matches.
+      if (mockConfigureGitUser.mock.calls.length === 0) {
+        throw new Error(
+          "configureGitUser was not called when --update-remote was present without --user. Implementation may need to be updated to support this use case."
+        );
+      }
+      expect(mockConfigureGitUser).toHaveBeenCalledWith(null, null, { updateRemote: true });
+    });
+
+    it("should call configureGitUser with updateRemote false when --update-remote is not present", () => {
+      process.env.GITHUB_USER = "envuser";
+      process.env.GITHUB_EMAIL = "env@example.com";
+      process.argv = ["node", "git-fix.cjs", "--user"];
+      require("../src/git-fix.cjs");
+      expect(mockConfigureGitUser).toHaveBeenCalledWith(null, null, { updateRemote: false });
+    });
+
+    it("should call configureGitUser with updateRemote true when --user and --update-remote are combined in any order", () => {
+      process.argv = ["node", "git-fix.cjs", "--update-remote", "--user", "Jane", "jane@example.com"];
+      require("../src/git-fix.cjs");
+      expect(mockConfigureGitUser).toHaveBeenCalledWith("Jane", "jane@example.com", { updateRemote: true });
+    });
+    it("should call configureGitUser with updateRemote true when --user is last and --update-remote is first", () => {
+      process.argv = ["node", "git-fix.cjs", "--update-remote", "--user", "Jane", "jane@example.com"];
+      require("../src/git-fix.cjs");
+      expect(mockConfigureGitUser).toHaveBeenCalledWith("Jane", "jane@example.com", { updateRemote: true });
+    });
+    it("should call configureGitUser with updateRemote true when --user is first and --update-remote is last", () => {
+      process.argv = ["node", "git-fix.cjs", "--user", "Jane", "jane@example.com", "--update-remote"];
+      require("../src/git-fix.cjs");
+      expect(mockConfigureGitUser).toHaveBeenCalledWith("Jane", "jane@example.com", { updateRemote: true });
     });
   });
 
@@ -281,7 +325,9 @@ describe("git-fix utility", () => {
 
       require("../src/git-fix.cjs");
 
-      expect(mockConfigureGitUser).toHaveBeenCalledWith("  John Doe  ", "  john@example.com  ");
+      expect(mockConfigureGitUser).toHaveBeenCalledWith("  John Doe  ", "  john@example.com  ", {
+        updateRemote: false
+      });
     });
 
     it("should handle mixed option order", () => {
@@ -291,7 +337,7 @@ describe("git-fix utility", () => {
 
       expect(mockForceLfLineEndings).toHaveBeenCalled();
       expect(mockIgnoreFilePermissions).toHaveBeenCalled();
-      expect(mockConfigureGitUser).toHaveBeenCalledWith("John", "john@test.com");
+      expect(mockConfigureGitUser).toHaveBeenCalledWith("John", "john@test.com", { updateRemote: false });
     });
 
     it("should handle environment variables with whitespace", () => {

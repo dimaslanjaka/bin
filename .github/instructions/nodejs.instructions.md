@@ -12,3 +12,4 @@ Coding standards, domain knowledge, and preferences that AI should follow.
 - Test files should be placed in the `test/` directory.
 - Test current project as dependency in `test-project/` directory.
 - Always read `.env` file for project environment.
+- When doing testing, look for the `test/env.js` file to ensure the environment is set up correctly.

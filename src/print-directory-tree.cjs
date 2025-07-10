@@ -3,7 +3,7 @@ const path = require("path");
 const crypto = require("crypto");
 const { execSync } = require("child_process");
 const glob = require("glob");
-const minimist = require("minimist");
+const { getArgs } = require("./utils.js");
 const sbgUtil = require("sbg-utility");
 
 // Determine the current script directory and project directory
@@ -15,7 +15,7 @@ const envPath = path.join(projectDir, ".env");
 require("dotenv").config({ path: envPath });
 
 // Parse CLI arguments
-const argv = minimist(process.argv.slice(2));
+const argv = getArgs();
 
 // Main logic wrapped in an async function
 async function main() {

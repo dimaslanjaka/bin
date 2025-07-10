@@ -39,33 +39,26 @@ function showHelp() {
   process.exit(0);
 }
 
-// Parse command line arguments
-const args = process.argv.slice(2);
+const { getArgs } = require("./utils.js");
+const args = getArgs();
+const positional = args._ || [];
 
 // Show help if requested
-if (args.includes("--help") || args.includes("-h")) {
+if (args.help || args.h) {
   showHelp();
 }
 
 // Parse --user arguments with name and email
 let userConfig = { hasUserFlag: false, cliUser: null, cliEmail: null };
-const userIndex = args.indexOf("--user");
-if (userIndex !== -1) {
+if (args.user) {
   userConfig.hasUserFlag = true;
-  // Check if name and email are provided after --user
-  if (userIndex + 2 < args.length && !args[userIndex + 1].startsWith("--") && !args[userIndex + 2].startsWith("--")) {
-    userConfig.cliUser = args[userIndex + 1];
-    userConfig.cliEmail = args[userIndex + 2];
-    // Remove the --user NAME EMAIL from args for other option parsing
-    args.splice(userIndex, 3);
-  } else if (userIndex + 1 < args.length && !args[userIndex + 1].startsWith("--")) {
-    // Only one argument after --user, which is invalid
+  if (positional.length === 2) {
+    userConfig.cliUser = positional[0];
+    userConfig.cliEmail = positional[1];
+  } else if (positional.length === 1) {
     console.error("[✗] Error: --user requires both NAME and EMAIL or no arguments");
     console.error("Usage: --user (uses environment variables) or --user NAME EMAIL");
     process.exit(1);
-  } else {
-    // --user without arguments, use environment variables
-    args.splice(userIndex, 1);
   }
 }
 
@@ -81,12 +74,12 @@ console.log("===============");
 
 // Parse options
 const options = {
-  lfOnly: args.includes("--lf-only"),
-  permissions: args.includes("--permissions"),
-  normalize: args.includes("--normalize"),
+  lfOnly: args["lf-only"] === true,
+  permissions: args["permissions"] === true,
+  normalize: args["normalize"] === true,
   user: userConfig.hasUserFlag,
-  updateRemote: args.includes("--update-remote"),
-  all: !args.some((arg) => arg.startsWith("--")) && !userConfig.hasUserFlag
+  updateRemote: args["update-remote"] === true,
+  all: Object.keys(args).filter((k) => k !== "_" && args[k] === true).length === 0 && !userConfig.hasUserFlag
 };
 
 // Execute requested fixes

@@ -10,18 +10,17 @@ const dotenv = require("dotenv");
 const envPath = path.resolve(process.cwd(), ".env");
 if (fs.existsSync(envPath)) dotenv.config({ path: envPath });
 
-// Parse CLI args
-const args = process.argv.slice(2);
+const { getArgs } = require("./utils.js");
+const args = getArgs();
+const positional = args._ || [];
 
 let ROOT = runGit(["rev-parse", "--show-toplevel"]).trim();
 let REPO_PATH = ROOT;
 
-for (let i = 0; i < args.length; i++) {
-  if (args[i] === "-cwd" && args[i + 1]) {
-    ROOT = path.resolve(args[++i]);
-  } else if (args[i].startsWith("--cwd=")) {
-    ROOT = path.resolve(args[i].split("=")[1]);
-  }
+if (args.cwd) {
+  ROOT = path.resolve(args.cwd);
+} else if (positional.length > 0) {
+  ROOT = path.resolve(positional[0]);
 }
 
 console.log(`Installing submodules at ${ROOT}`);

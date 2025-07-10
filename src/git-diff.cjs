@@ -59,34 +59,27 @@ function runGitDiff(command, successMessage, errorMessage) {
   }
 }
 
-// Parse command line arguments
-const args = process.argv.slice(2);
+const { getArgs } = require("./utils.js");
+const args = getArgs();
+const positional = args._ || [];
 
 // Show help if no arguments or --help/-h is passed
-if (args[0] === "--help" || args[0] === "-h") {
+if (args.help || args.h) {
   showHelp();
 }
 
-// Parse options
-switch (args[0]) {
-  case "--staged-only":
-  case "-s":
-  case "-S":
-    runGitDiff("git --no-pager diff --staged", `Full staged diff saved to "${OUTPUT}"`, "Failed to save staged diff");
-    break;
-
-  default: {
-    // Handle specific file diff
-    const file = args[0];
-    if (!file) {
-      runGitDiff("git --no-pager diff", `Full staged diff saved to "${OUTPUT}"`, "Failed to save all diff's");
-    } else {
-      runGitDiff(
-        `git --no-pager diff --cached -- "${file}"`,
-        `Staged diff of "${file}" saved to "${OUTPUT}"`,
-        `Failed to generate diff for "${file}"`
-      );
-    }
-    break;
+if (args["staged-only"] || args.s || args.S) {
+  runGitDiff("git --no-pager diff --staged", `Full staged diff saved to "${OUTPUT}"`, "Failed to save staged diff");
+} else {
+  // Handle specific file diff
+  const file = positional[0];
+  if (!file) {
+    runGitDiff("git --no-pager diff", `Full staged diff saved to "${OUTPUT}"`, "Failed to save all diff's");
+  } else {
+    runGitDiff(
+      `git --no-pager diff --cached -- "${file}"`,
+      `Staged diff of "${file}" saved to "${OUTPUT}"`,
+      `Failed to generate diff for "${file}"`
+    );
   }
 }

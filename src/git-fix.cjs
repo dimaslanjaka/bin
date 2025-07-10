@@ -85,6 +85,7 @@ const options = {
   permissions: args.includes("--permissions"),
   normalize: args.includes("--normalize"),
   user: userConfig.hasUserFlag,
+  updateRemote: args.includes("--update-remote"),
   all: !args.some((arg) => arg.startsWith("--")) && !userConfig.hasUserFlag
 };
 
@@ -102,7 +103,10 @@ if (options.all) {
 }
 
 if (options.all || options.user) {
-  configureGitUser(userConfig.cliUser, userConfig.cliEmail);
+  configureGitUser(userConfig.cliUser, userConfig.cliEmail, { updateRemote: options.updateRemote });
+} else if (options.updateRemote) {
+  // If --update-remote is present without --user or --all, still call configureGitUser
+  configureGitUser(null, null, { updateRemote: true });
 }
 
 if (options.all || options.normalize) {

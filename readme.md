@@ -77,7 +77,7 @@ Create `.vscode/settings.json` to add binary tools to your PATH:
 | **Git** | `git-purge`, `git-diff`, `git-fix`, `git-reduce-size` | Git repository management and optimization |
 | **Submodules** | `submodule`, `submodule-install`, `submodule-remove`, `submodule-token` | Git submodule operations |
 | **NPM Scripts** | `nrs`, `run-s`, `run-series`, `npm-run-series` | Run npm scripts in series with pattern matching |
-| **Package Mgmt** | `yarn-reinstall`, `package-resolutions`, `pkg-resolutions-updater`, `pkg-res-updater` | Yarn/package resolutions management utilities |
+| **Package Mgmt** | `yarn-reinstall`, `pkg-resolutions-updater`, `pkg-res-updater` | Yarn/package resolutions management utilities |
 | **Node.js Dev** | `find-node-modules`, `find-nodemodules`, `dev`, `prod`, `empty` | Node.js development helpers |
 | **Process Mgmt** | `kill-process`, `nodekill`, `javakill`, `del-ps` | Process management and termination |
 | **File System** | `rmfind`, `rmpath`, `rmx`, `print-tree`, `dir-tree` | File system operations |
@@ -116,22 +116,29 @@ git-fix --permissions            # Ignore file permissions only
 git-fix --normalize              # Normalize existing files only
 git-fix --user                   # Configure Git user from environment
 git-fix --user NAME EMAIL        # Configure Git user with specific values
+git-fix --user --update-remote   # Also update remote URL to match user
+git-fix --user NAME EMAIL --update-remote  # Configure user and update remote URL
 ```
 
 Features:
-- Forces LF line endings (core.autocrlf = false)
-- Ignores file permission changes (core.filemode = false)
+- Forces LF line endings (`core.autocrlf = false`)
+- Ignores file permission changes (`core.filemode = false`)
 - Sets pull strategy to false (prevents auto-rebase)
 - Normalizes existing line endings
-- Creates/updates .gitattributes with proper line ending rules
+- Creates/updates `.gitattributes` with proper line ending rules
 - Configures Git user from environment variables or CLI arguments
+- **Non-interactive:** All configuration is now argument-driven; no interactive prompts
+- `--update-remote` flag: Update remote URL to match the configured user (for HTTPS remotes)
 
 User Configuration:
 - Environment variables: `GITHUB_USER`, `GITHUB_EMAIL`
 - CLI arguments take precedence over environment variables
+- Use `--update-remote` to update the remote URL with the configured user
 - Examples:
   ```bash
   git-fix --user "John Doe" "john@example.com"  # Use CLI args
+  git-fix --user --update-remote                 # Use env vars and update remote
+  git-fix --user "Jane" "jane@example.com" --update-remote  # CLI args and update remote
   GITHUB_USER="Jane" GITHUB_EMAIL="jane@example.com" git-fix --user  # Use env vars
   ```
 

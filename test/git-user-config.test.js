@@ -45,14 +45,13 @@ describe("git-user-config", () => {
   });
 
   describe("configureGitUser", () => {
-    describe("interactive remote URL update", () => {
+    describe("remote URL update via --update-remote or options", () => {
       let configureGitUserInteractive;
       let mockRunGitCommandInteractive;
       let consoleLogSpyInteractive;
       let consoleWarnSpyInteractive;
-      let rlMock;
-      let readline;
       let runGitCommandOutputSpy;
+      let originalArgv;
 
       beforeEach(() => {
         jest.resetModules();
@@ -67,58 +66,61 @@ describe("git-user-config", () => {
             runGitCommandOutput: jest.fn(() => "https://github.com/otheruser/repo.git")
           };
         });
-        readline = require("readline");
-        rlMock = {
-          question: jest.fn(),
-          close: jest.fn()
-        };
-        jest.spyOn(readline, "createInterface").mockReturnValue(rlMock);
         consoleLogSpyInteractive = jest.spyOn(console, "log").mockImplementation();
         consoleWarnSpyInteractive = jest.spyOn(console, "warn").mockImplementation();
         ({ configureGitUser: configureGitUserInteractive } = require("../src/git/user-config.cjs"));
         mockRunGitCommandInteractive = require("../src/git/utils.cjs").runGitCommand;
         runGitCommandOutputSpy = require("../src/git/utils.cjs").runGitCommandOutput;
+        originalArgv = process.argv;
       });
 
       afterEach(() => {
         jest.resetModules();
         if (consoleLogSpyInteractive) consoleLogSpyInteractive.mockRestore();
         if (consoleWarnSpyInteractive) consoleWarnSpyInteractive.mockRestore();
+        process.argv = originalArgv;
       });
 
-      it("should prompt to update remote URL and update when user answers 'yes'", (done) => {
-        rlMock.question.mockImplementation((q, cb) => cb("yes"));
-        configureGitUserInteractive("testuser", "test@example.com");
-        setImmediate(() => {
-          expect(runGitCommandOutputSpy).toHaveBeenCalledWith(
-            ["remote", "get-url", "origin"],
-            "Fetching remote URL for verification"
-          );
-          expect(consoleLogSpyInteractive).toHaveBeenCalledWith(expect.stringContaining("Remote URL updated to"));
-          expect(mockRunGitCommandInteractive).toHaveBeenCalledWith(
-            ["remote", "set-url", "origin", expect.stringContaining("testuser")],
-            expect.stringContaining("Set origin to")
-          );
-          done();
-        });
+      it("should update remote URL when options.updateRemote is true", () => {
+        configureGitUserInteractive("testuser", "test@example.com", { updateRemote: true });
+        expect(runGitCommandOutputSpy).toHaveBeenCalledWith(
+          ["remote", "get-url", "origin"],
+          "Fetching remote URL for verification"
+        );
+        expect(consoleLogSpyInteractive).toHaveBeenCalledWith(expect.stringContaining("Remote URL updated to"));
+        expect(mockRunGitCommandInteractive).toHaveBeenCalledWith(
+          ["remote", "set-url", "origin", expect.stringContaining("testuser")],
+          expect.stringContaining("Set origin to")
+        );
       });
 
-      it("should prompt to update remote URL and not update when user answers 'no'", (done) => {
-        rlMock.question.mockImplementation((q, cb) => cb("no"));
+      it("should not update remote URL and log info when options.updateRemote is false", () => {
+        configureGitUserInteractive("testuser", "test@example.com", { updateRemote: false });
+        expect(runGitCommandOutputSpy).toHaveBeenCalledWith(
+          ["remote", "get-url", "origin"],
+          "Fetching remote URL for verification"
+        );
+        expect(consoleLogSpyInteractive).toHaveBeenCalledWith(
+          "[i] Remote URL not changed. Use --update-remote to update automatically."
+        );
+        expect(mockRunGitCommandInteractive).not.toHaveBeenCalledWith(
+          ["remote", "set-url", "origin", expect.stringContaining("testuser")],
+          expect.stringContaining("Set origin to")
+        );
+      });
+
+      it("should update remote URL when --update-remote is in process.argv", () => {
+        process.argv = ["node", "script.js", "--update-remote"];
         configureGitUserInteractive("testuser", "test@example.com");
-        setImmediate(() => {
-          const runGitCommandOutput = require("../src/git/utils.cjs").runGitCommandOutput;
-          expect(runGitCommandOutput).toHaveBeenCalledWith(
-            ["remote", "get-url", "origin"],
-            "Fetching remote URL for verification"
-          );
-          expect(consoleLogSpyInteractive).toHaveBeenCalledWith("[i] Remote URL not changed.");
-          expect(mockRunGitCommandInteractive).not.toHaveBeenCalledWith(
-            ["remote", "set-url", "origin", expect.stringContaining("testuser")],
-            expect.stringContaining("Set origin to")
-          );
-          done();
-        });
+        expect(runGitCommandOutputSpy).toHaveBeenCalledWith(
+          ["remote", "get-url", "origin"],
+          "Fetching remote URL for verification"
+        );
+        expect(consoleLogSpyInteractive).toHaveBeenCalledWith(expect.stringContaining("Remote URL updated to"));
+        expect(mockRunGitCommandInteractive).toHaveBeenCalledWith(
+          ["remote", "set-url", "origin", expect.stringContaining("testuser")],
+          expect.stringContaining("Set origin to")
+        );
       });
     });
     it("should configure user from .env file variables", () => {

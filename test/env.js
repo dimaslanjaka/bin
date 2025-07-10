@@ -1,4 +1,4 @@
-const { path } = require("sbg-utility");
+const path = require("upath");
 const fs = require("fs-extra");
 const { spawnSync } = require("child_process");
 

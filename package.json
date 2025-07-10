@@ -158,6 +158,7 @@
   },
   "packageManager": "yarn@4.9.2",
   "resolutions": {
+    "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/7696e66ab84f319909c5dab9054303e91f898454/packages/sbg-utility/release/sbg-utility.tgz",
     "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/80999ac7a7031a81e11ddb5fab0f8ba433041c98/release/cross-spawn.tgz"
   }
 }

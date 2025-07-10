@@ -68,10 +68,10 @@ describe("git-user-config", () => {
         });
         consoleLogSpyInteractive = jest.spyOn(console, "log").mockImplementation();
         consoleWarnSpyInteractive = jest.spyOn(console, "warn").mockImplementation();
+        originalArgv = process.argv;
         ({ configureGitUser: configureGitUserInteractive } = require("../src/git/user-config.cjs"));
         mockRunGitCommandInteractive = require("../src/git/utils.cjs").runGitCommand;
         runGitCommandOutputSpy = require("../src/git/utils.cjs").runGitCommandOutput;
-        originalArgv = process.argv;
       });
 
       afterEach(() => {
@@ -111,16 +111,33 @@ describe("git-user-config", () => {
 
       it("should update remote URL when --update-remote is in process.argv", () => {
         process.argv = ["node", "script.js", "--update-remote"];
-        configureGitUserInteractive("testuser", "test@example.com");
-        expect(runGitCommandOutputSpy).toHaveBeenCalledWith(
+        jest.resetModules();
+        jest.doMock("git-command-helper", () => ({
+          parseGitHubUrl: () => ({ owner: "otheruser", repo: "repo" })
+        }));
+        jest.doMock("../src/git/utils.cjs", () => {
+          const original = jest.requireActual("../src/git/utils.cjs");
+          return {
+            ...original,
+            runGitCommand: jest.fn(() => true),
+            runGitCommandOutput: jest.fn(() => "https://github.com/otheruser/repo.git")
+          };
+        });
+        const consoleLogSpy = jest.spyOn(console, "log").mockImplementation();
+        const { configureGitUser } = require("../src/git/user-config.cjs");
+        const mockRunGitCommand = require("../src/git/utils.cjs").runGitCommand;
+        const runGitCommandOutput = require("../src/git/utils.cjs").runGitCommandOutput;
+        configureGitUser("testuser", "test@example.com");
+        expect(runGitCommandOutput).toHaveBeenCalledWith(
           ["remote", "get-url", "origin"],
           "Fetching remote URL for verification"
         );
-        expect(consoleLogSpyInteractive).toHaveBeenCalledWith(expect.stringContaining("Remote URL updated to"));
-        expect(mockRunGitCommandInteractive).toHaveBeenCalledWith(
+        expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining("Remote URL updated to"));
+        expect(mockRunGitCommand).toHaveBeenCalledWith(
           ["remote", "set-url", "origin", expect.stringContaining("testuser")],
           expect.stringContaining("Set origin to")
         );
+        consoleLogSpy.mockRestore();
       });
     });
     it("should configure user from .env file variables", () => {

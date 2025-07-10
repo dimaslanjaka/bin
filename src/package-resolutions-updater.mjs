@@ -26,11 +26,17 @@
  */
 
 import ansiColors from "ansi-colors";
-import "dotenv/config";
+import * as dotenv from "dotenv";
 import fs from "fs";
 import https from "https";
 import os from "os";
 import path from "path";
+
+const projectDir = process.cwd();
+const envPath = path.join(projectDir, ".env");
+
+// Load the .env file using dotenv (ESM import)
+if (fs.existsSync(envPath)) dotenv.config({ path: envPath });
 
 // 📌 Static override rules
 const specialPackageOverrides = [

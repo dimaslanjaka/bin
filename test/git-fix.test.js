@@ -1,6 +1,7 @@
 /* eslint-env jest */
 // Load .env file for project environment
 require("dotenv").config({ path: require("path").join(__dirname, "../.env") });
+require("./env.js"); // Ensure environment is set up
 
 // Mock all git modules
 jest.mock("../src/git/utils.cjs");

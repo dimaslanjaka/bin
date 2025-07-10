@@ -1,20 +1,24 @@
 const { execSync } = require("child_process");
+const { getArgs } = require("./utils.js");
+const args = getArgs();
+const positional = args._ || [];
 
-const args = process.argv.slice(2);
-
-if (args.length === 0) {
+if (positional.length === 0) {
   console.error("Usage: yarn-reinstall <packageName> [--dev|-D|--peer|-P|--optional|-O]");
   process.exit(1);
 }
 
-// Extract package name and flags
-const pkgIndex = args.findIndex((arg) => !arg.startsWith("-"));
-if (pkgIndex === -1) {
+const packageName = positional[0];
+const flags = positional.slice(1).concat(
+  Object.keys(args)
+    .filter((k) => k !== "_" && args[k] === true)
+    .map((k) => `--${k}`)
+);
+
+if (!packageName) {
   console.error("Please provide a package name.");
   process.exit(1);
 }
-const packageName = args[pkgIndex];
-const flags = args.slice(pkgIndex + 1);
 
 // Remove and add commands
 const removeCmd = `yarn remove ${packageName}`;

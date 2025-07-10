@@ -3,8 +3,9 @@
 const fs = require("fs");
 const path = require("path");
 const { Minimatch } = require("minimatch");
+const { getArgs } = require("./utils.js");
 
-const args = require("minimist")(process.argv.slice(2));
+const args = getArgs();
 const cwd = process.cwd();
 const packagejson = path.join(cwd, "package.json");
 const verbose = args["v"] || args["verbose"];

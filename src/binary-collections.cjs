@@ -3,6 +3,7 @@
 const { spawn } = require("child_process");
 const { glob } = require("glob");
 const path = require("path");
+const { getArgs } = require("./utils.js");
 
 /**
  * Main binary-collections script that dynamically finds and executes other scripts
@@ -79,15 +80,16 @@ function executeScript(scriptPath, args) {
 }
 
 function main() {
-  const args = process.argv.slice(2);
+  const args = getArgs();
+  const positional = args._ || [];
 
   // Show help if no arguments or if help is requested without a script name
-  if (args.length === 0 || (args.length === 1 && (args[0] === "--help" || args[0] === "-h"))) {
+  if (positional.length === 0 || (positional.length === 1 && (args.help || args.h))) {
     showHelp();
   }
 
-  const scriptName = args[0];
-  const scriptArgs = args.slice(1);
+  const scriptName = positional[0];
+  const scriptArgs = positional.slice(1);
 
   // Find the script in current directory
   const scriptPath = findScript(scriptName);

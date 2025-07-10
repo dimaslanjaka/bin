@@ -1,5 +1,6 @@
 const gch = require("git-command-helper");
 const { runGitCommand, runGitCommandOutput } = require("./utils.cjs");
+const { getArgs } = require("../utils.js");
 
 /**
  * Configure Git user from CLI arguments or environment variables
@@ -66,7 +67,8 @@ function configureGitUser(cliUser = null, cliEmail = null, options = {}) {
         console.warn(`[!] If this is not intentional, consider updating the remote URL to use your username.`);
         console.warn(`[!] Example: git remote set-url origin https://github.com/${username}/<repo>.git\n`);
         // Check for --update-remote CLI argument or options.updateRemote
-        const updateRemote = options.updateRemote || process.argv.includes("--update-remote");
+        const args = getArgs();
+        const updateRemote = options.updateRemote || args["update-remote"] === true;
         if (updateRemote) {
           // Only update the username in the URL, not the repo path
           let newUrl = remoteUrl;

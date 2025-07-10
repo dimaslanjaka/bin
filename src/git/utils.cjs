@@ -24,12 +24,14 @@ function runGitCommand(args, description) {
 }
 
 /**
- * Check if the current directory is a git repository
+ * Check if the given cwd (or current directory) is a git repository
+ * @param {string} [cwd] - Directory to check (defaults to current directory at call time)
  * @returns {boolean} - True if in a git repository, false otherwise
  */
-function isGitRepository() {
+function isGitRepository(cwd) {
+  const dir = typeof cwd === "string" ? cwd : process.cwd();
   try {
-    execSync("git rev-parse --git-dir", { stdio: "pipe", cwd: process.cwd() });
+    execSync("git rev-parse --git-dir", { stdio: "pipe", cwd: dir });
     return true;
   } catch {
     return false;

@@ -32,10 +32,11 @@ jobs:
         name: init cache
         with:
           path: |
-            ./.yarn
-            ./yarn.lock
-            ./node_modules
-            ./tmp
+            **/.yarn
+            **/yarn.lock
+            **/node_modules
+            **/tmp
+            **/*.bak
           key: ${{ runner.os }}-${{ hashFiles('**/package.json', '.github') }}
           restore-keys: |
             ${{ runner.os }}-${{ hashFiles('**/package.json', '.github') }}

@@ -1,14 +1,79 @@
 const fs = require("fs");
 const path = require("upath");
 const argv = require("minimist")(process.argv.slice(2));
+const { exec } = require("child_process");
+const { URL } = require("url");
+const { promisify } = require("util");
+
+/** Promisify exec  */
+const execAsync = promisify(exec);
+
+async function parseGitRemotes() {
+  try {
+    // Run the `git remote -v` command
+    const { stdout } = await execAsync("git remote -v");
+    // Split the output into lines
+    const lines = stdout.split("\n");
+    // Object to hold the remotes
+    const remotes = {};
+    // Process each line
+    lines.forEach((line) => {
+      const [name, url] = line.split("\t");
+      if (name && url) {
+        const [repoUrl] = url.split(" ");
+        try {
+          // Parse the URL
+          const parsedUrl = new URL(repoUrl);
+          // Extract the path from the URL
+          const pathParts = parsedUrl.pathname.split("/").filter(Boolean);
+          // Check if the URL is from GitHub and has the username/repo format
+          if (parsedUrl.hostname === "github.com" && pathParts.length === 2) {
+            // Remove the `.git` suffix if present
+            let repoPath = pathParts.join("/");
+            if (repoPath.endsWith(".git")) {
+              repoPath = repoPath.slice(0, -4); // Remove the `.git` suffix
+            }
+            remotes[name] = repoPath;
+          }
+        } catch (e) {
+          console.error("URL Parsing Error:", e.message);
+        }
+      }
+    });
+    return remotes;
+  } catch (error) {
+    console.error("Error:", error.message);
+    return {};
+  }
+}
+module.exports.parseGitRemotes = parseGitRemotes;
+
+/**
+ * Joins all given path segments together and normalizes the resulting path.
+ * Preserves the case of the drive letter on Windows.
+ *
+ * @param {...string} segments - The path segments to join.
+ * @returns {string} - The normalized path with the drive letter case preserved.
+ */
+function joinPathPreserveDriveLetter(...segments) {
+  let fullPath = require("path").join(...segments);
+  // Check if the path starts with a drive letter (e.g., C:\)
+  if (/^[a-z]:\\/.test(fullPath)) {
+    // Convert the drive letter to uppercase
+    fullPath = fullPath.charAt(0).toUpperCase() + fullPath.slice(1);
+  }
+  return fullPath;
+}
+module.exports.joinPathPreserveDriveLetter = joinPathPreserveDriveLetter;
 
 /**
  * Get command line arguments
- * @returns {object} Parsed command line arguments
+ * @returns {import('minimist').ParsedArgs} Parsed command line arguments
  */
 function getArgs() {
   return argv;
 }
+module.exports.getArgs = getArgs;
 
 /**
  * Delete file or directory recursively
@@ -30,6 +95,7 @@ function del(fullPath) {
     }
   }
 }
+module.exports.del = del;
 
 /**
  * Handle glob stream to delete matched files and directories
@@ -48,6 +114,7 @@ function delStream(globStream) {
     del(fullPath);
   });
 }
+module.exports.delStream = delStream;
 
 /**
  * Creates a directory/file tree string from a hash array of file paths and hashes.
@@ -91,6 +158,7 @@ function getFileTreeString(hashArray) {
   }
   return printNode(tree, "", "").join("\n");
 }
+module.exports.getFileTreeString = getFileTreeString;
 
 /**
  * Create an async delay for the specified number of milliseconds
@@ -98,5 +166,4 @@ function getFileTreeString(hashArray) {
  * @returns {Promise<void>} Promise that resolves after the specified delay
  */
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-module.exports = { del, delStream, getArgs, delay, getFileTreeString };
+module.exports.delay = delay;

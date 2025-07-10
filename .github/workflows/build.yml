@@ -51,7 +51,7 @@ jobs:
           git config --global user.name "dimaslanjaka"
           git config --global user.email "dimaslanjaka@gmail.com"
           git add releases
-          if [ $(git status --porcelain | wc -l) -gt "0" ]; then
+          if [ $(git status --porcelain releases | wc -l) -gt "0" ]; then
             git commit -m "update build from CI"
             git push
           fi

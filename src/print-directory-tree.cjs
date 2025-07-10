@@ -5,14 +5,13 @@ const { execSync } = require("child_process");
 const glob = require("glob");
 const { getArgs } = require("./utils.js");
 const sbgUtil = require("sbg-utility");
+const dotenv = require("dotenv");
 
-// Determine the current script directory and project directory
-const scriptDir = path.dirname(__filename);
-const projectDir = path.dirname(scriptDir);
+const projectDir = process.cwd();
 const envPath = path.join(projectDir, ".env");
 
-// Load the .env file using dotenv
-require("dotenv").config({ path: envPath });
+// Load the .env file using dotenv (ESM import)
+if (fs.existsSync(envPath)) dotenv.config({ path: envPath });
 
 // Parse CLI arguments
 const argv = getArgs();

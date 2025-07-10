@@ -10,7 +10,9 @@ if (!fs.existsSync(path.join(process.cwd(), ".git"))) {
   const result = spawnSync("git", ["clone", "https://github.com/dimaslanjaka/test-repo.git", process.cwd()], {
     stdio: "inherit"
   });
-  if (result.status !== 0) {
-    throw new Error(`git clone failed with code ${result.status}`);
+  if (!result || typeof result.status !== "number" || result.status !== 0) {
+    throw new Error(
+      `git clone failed with code ${result && typeof result.status === "number" ? result.status : "unknown"}`
+    );
   }
 }

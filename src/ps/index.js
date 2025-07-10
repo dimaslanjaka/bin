@@ -1,6 +1,7 @@
 var ChildProcess = require("child_process");
 var IS_WIN = require("./isWin");
 var TableParser = require("./table-parser");
+
 /**
  * End of line.
  * Basically, the EOL should be:
@@ -213,7 +214,7 @@ exports.kill = function (pid, signal, next) {
 
       if (err) {
         clearTimeout(checkTimeoutTimer);
-        finishCallback && finishCallback(err);
+        if (finishCallback) finishCallback(err);
       } else if (list.length > 0) {
         checkConfident = checkConfident - 1 || 0;
         checkKilled(finishCallback);
@@ -221,7 +222,7 @@ exports.kill = function (pid, signal, next) {
         checkConfident++;
         if (checkConfident === 5) {
           clearTimeout(checkTimeoutTimer);
-          finishCallback && finishCallback();
+          if (finishCallback) finishCallback();
         } else {
           checkKilled(finishCallback);
         }
@@ -229,7 +230,7 @@ exports.kill = function (pid, signal, next) {
     });
   }
 
-  next && checkKilled(next);
+  if (next) checkKilled(next);
 
   checkTimeoutTimer =
     next &&

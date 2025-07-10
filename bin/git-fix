@@ -33,4 +33,4 @@ if [ -f ".env" ]; then
   export $(egrep -v '^#' .env | xargs)
 fi
 
-node "$basedir/../src/git-fix.cjs" "$@"
+node "$basedir/../lib/git-fix.cjs" "$@"

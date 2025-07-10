@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SRC_DIR="$SCRIPT_DIR/../src"
-node "$SRC_DIR/git-diff.cjs" "$@"
+
+node "$SCRIPT_DIR/../lib/git-diff.cjs" "$@"

@@ -1,4 +1,7 @@
 @echo off
+setlocal
 set SCRIPT_DIR=%~dp0
-set SRC_DIR=%SCRIPT_DIR%..\src
-node "%SRC_DIR%\git-fix.cjs" %*
+
+echo Running script: %~f0
+
+node "%SCRIPT_DIR%..\lib\git-fix.cjs" %*

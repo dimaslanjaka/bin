@@ -1,5 +1,5 @@
 const glob = require("glob");
-const { path } = require("sbg-utility");
+const path = require("upath");
 const { del } = require("./utils");
 
 const globStream = new glob.Glob(["**/build.gradle"], {

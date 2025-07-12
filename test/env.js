@@ -74,10 +74,12 @@ function installYarnPackage() {
     shell: true
   });
   if (!result || typeof result.status !== "number" || result.status !== 0) {
+    const stdout = result && typeof result.stdout !== "undefined" ? result.stdout.toString() : "";
+    const stderr = result && typeof result.stderr !== "undefined" ? result.stderr.toString() : "";
     throw new Error(
       `yarn add failed with code ${result && typeof result.status === "number" ? result.status : "unknown"}\n` +
-        `stdout: ${result.stdout ? result.stdout.toString() : ""}\n` +
-        `stderr: ${result.stderr ? result.stderr.toString() : ""}`
+        `stdout: ${stdout}\n` +
+        `stderr: ${stderr}`
     );
   }
 }

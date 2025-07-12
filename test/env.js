@@ -31,10 +31,6 @@ if (!fs.existsSync(path.join(repoDir, ".git"))) {
 }
 
 /**
- * Ensure yarn project is initialized in the given directory.
- * If package.json exists but yarn.lock does not, restore yarn.lock from backup or create empty.
- */
-/**
  * Ensure yarn project is initialized in the test repo directory.
  * If package.json exists but yarn.lock does not, restore yarn.lock from backup or create empty.
  */

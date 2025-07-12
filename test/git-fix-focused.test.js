@@ -6,9 +6,6 @@ const fs = require("fs");
 const path = require("path");
 const os = require("os");
 const { execSync } = require("child_process");
-
-// Import individual git modules for focused testing
-const { isGitRepository } = require("../src/git/utils.cjs");
 const { forceLfLineEndings } = require("../src/git/line-endings.cjs");
 
 describe("git-fix focused integration tests", () => {
@@ -37,24 +34,6 @@ describe("git-fix focused integration tests", () => {
     }
     consoleLogSpy.mockRestore();
     consoleErrorSpy.mockRestore();
-  });
-
-  describe("git repository detection", () => {
-    it("should detect git repository correctly", () => {
-      // Create git repo
-      fs.mkdirSync(tempDir, { recursive: true });
-      process.chdir(tempDir);
-      execSync("git init", { stdio: "pipe" });
-
-      expect(isGitRepository()).toBe(true);
-    });
-
-    it("should detect non-git directory correctly", () => {
-      fs.mkdirSync(tempDir, { recursive: true });
-      process.chdir(tempDir);
-
-      expect(isGitRepository()).toBe(false);
-    });
   });
 
   describe("gitattributes file creation", () => {

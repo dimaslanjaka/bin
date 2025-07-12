@@ -54,7 +54,7 @@
     "empty": "bin/empty",
     "find-node-modules": "lib/find-node-modules.mjs",
     "find-node-modules-cli": "lib/find-node-modules-cli.mjs",
-    "git-diff": "bin/git-diff.cmd",
+    "git-diff": "lib/git-diff.cjs",
     "git-fix": "lib/git-fix.cjs",
     "git-purge": "lib/git-purge.cjs",
     "git-reduce-size": "bin/git-reduce-size",

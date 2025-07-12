@@ -6,6 +6,8 @@ const { ignoreFilePermissions } = require("./git/permissions.cjs");
 const { setPullStrategy } = require("./git/pull-strategy.cjs");
 const { configureGitUser } = require("./git/user-config.cjs");
 const { normalizeLineEndings } = require("./git/normalize.cjs");
+const { getArgs } = require("./utils.js");
+const path = require("upath");
 
 function showHelp() {
   console.log("Git Fix Utility");
@@ -39,34 +41,46 @@ function showHelp() {
   process.exit(0);
 }
 
-const { getArgs } = require("./utils.js");
 const args = getArgs();
-const positional = args._ || [];
 
-// Show help if requested
-if (args.help || args.h) {
-  showHelp();
-}
-
-// Parse --user arguments with name and email
 let userConfig = { hasUserFlag: false, cliUser: null, cliEmail: null };
-if (args.user) {
+if (Object.prototype.hasOwnProperty.call(args, "user")) {
   userConfig.hasUserFlag = true;
-  if (positional.length === 2) {
-    userConfig.cliUser = positional[0];
-    userConfig.cliEmail = positional[1];
-  } else if (positional.length === 1) {
+  // args.user can be string, array, or boolean
+  if (Array.isArray(args.user)) {
+    if (args.user.length === 2) {
+      userConfig.cliUser = args.user[0];
+      userConfig.cliEmail = args.user[1];
+    } else if (args.user.length === 1) {
+      // Only one value provided, error
+      console.error("[✗] Error: --user requires both NAME and EMAIL or no arguments");
+      console.error("Usage: --user (uses environment variables) or --user NAME EMAIL");
+      process.exit(1);
+    }
+    // If length === 0, treat as env
+  } else if (typeof args.user === "string") {
+    // Only one value provided, error
     console.error("[✗] Error: --user requires both NAME and EMAIL or no arguments");
     console.error("Usage: --user (uses environment variables) or --user NAME EMAIL");
     process.exit(1);
   }
 }
 
+// Show help if requested
+if (args.help || args.h) {
+  showHelp();
+  process.exit(0); // Exit after showing help
+}
+
+console.log("[i] Current working directory:", path.toUnix(process.cwd()));
+
 // Check if we're in a git repository
-if (!isGitRepository()) {
+if (!isGitRepository(process.cwd())) {
   console.error("[✗] Error: Not in a git repository");
   console.error("Please run this command from within a git repository");
   process.exit(1);
+} else {
+  console.log("[✓] Detected git repository");
 }
 
 console.log("Git Fix Utility");

@@ -5,7 +5,10 @@ const { exec } = require("child_process");
 const { URL } = require("url");
 const { promisify } = require("util");
 
-/** Promisify exec  */
+/**
+ * Promisified version of Node.js exec function for async shell command execution.
+ * @type {(command: string) => Promise<{ stdout: string, stderr: string }>}
+ */
 const execAsync = promisify(exec);
 
 async function parseGitRemotes() {
@@ -52,8 +55,8 @@ module.exports.parseGitRemotes = parseGitRemotes;
  * Joins all given path segments together and normalizes the resulting path.
  * Preserves the case of the drive letter on Windows.
  *
- * @param {...string} segments - The path segments to join.
- * @returns {string} - The normalized path with the drive letter case preserved.
+ * @param {...string} segments Path segments to join.
+ * @returns {string} Normalized path with drive letter case preserved.
  */
 function joinPathPreserveDriveLetter(...segments) {
   let fullPath = require("path").join(...segments);
@@ -67,7 +70,7 @@ function joinPathPreserveDriveLetter(...segments) {
 module.exports.joinPathPreserveDriveLetter = joinPathPreserveDriveLetter;
 
 /**
- * Get command line arguments
+ * Returns parsed command line arguments using minimist.
  * @returns {import('minimist').ParsedArgs} Parsed command line arguments
  */
 function getArgs() {
@@ -76,8 +79,8 @@ function getArgs() {
 module.exports.getArgs = getArgs;
 
 /**
- * Delete file or directory recursively
- * @param {string} fullPath - The full path to the file or directory to delete
+ * Recursively deletes a file or directory at the given path.
+ * @param {string} fullPath Absolute path to the file or directory to delete.
  */
 function del(fullPath) {
   if (fs.statSync(fullPath).isDirectory()) {
@@ -98,8 +101,8 @@ function del(fullPath) {
 module.exports.del = del;
 
 /**
- * Handle glob stream to delete matched files and directories
- * @param {glob.Glob} globStream - The glob stream object
+ * Handles a glob stream to delete matched files and directories recursively.
+ * @param {glob.Glob} globStream Glob stream object.
  */
 function delStream(globStream) {
   globStream.stream().on("data", (result) => {
@@ -117,9 +120,9 @@ function delStream(globStream) {
 module.exports.delStream = delStream;
 
 /**
- * Creates a directory/file tree string from a hash array of file paths and hashes.
- * @param {string[]} hashArray - Array of strings in the format 'relative/path/to/file hash'.
- * @returns {string} The directory/file tree as a string, with file hashes.
+ * Creates a directory/file tree string from an array of file paths and hashes.
+ * @param {string[]} hashArray Array of strings in the format 'relative/path/to/file hash'.
+ * @returns {string} Directory/file tree as a string, with file hashes.
  */
 function getFileTreeString(hashArray) {
   const tree = {};
@@ -161,9 +164,9 @@ function getFileTreeString(hashArray) {
 module.exports.getFileTreeString = getFileTreeString;
 
 /**
- * Create an async delay for the specified number of milliseconds
- * @param {number} ms - Number of milliseconds to delay
- * @returns {Promise<void>} Promise that resolves after the specified delay
+ * Creates an async delay for the specified number of milliseconds.
+ * @param {number} ms Number of milliseconds to delay.
+ * @returns {Promise<void>} Promise that resolves after the specified delay.
  */
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 module.exports.delay = delay;

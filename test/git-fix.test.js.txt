@@ -24,7 +24,7 @@ describe("git-fix utility", () => {
   let consoleLogSpy;
   let consoleErrorSpy;
   let processExitSpy;
-  const gitFixPath = require.resolve("../src/git-fix.cjs");
+  const gitFixPath = path.resolve(__dirname, "../src/git-fix.cjs");
 
   beforeEach(() => {
     // Reset all mocks

@@ -1,0 +1,113 @@
+name: Clean GitHub Actions Cache
+
+on:
+  schedule:
+    - cron: "0 */12 * * *" # Schedule every 12 hours
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - "**/*.tgz"
+  workflow_dispatch:
+  workflow_call:
+    secrets:
+      ACCESS_TOKEN:
+        required: true
+
+jobs:
+  clean-cache:
+    if: contains(github.repository, 'php-proxy-hunter')
+    runs-on: windows-latest
+    env:
+      PIP_CACHE_DIR: "${{ github.workspace }}/project/tmp/pip"
+      NUITKA_CACHE_DIR: "${{ github.workspace }}/project/tmp/nuitka-cache"
+      NODE_OPTIONS: "--max_old_space_size=4096" #8192 4096 --expose-gc
+      YARN_ENABLE_IMMUTABLE_INSTALLS: false
+      ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      YARN_CHECKSUM_BEHAVIOR: update
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: "dimaslanjaka/php-proxy-hunter"
+          ref: master
+          token: ${{ secrets.ACCESS_TOKEN }}
+          lfs: true
+
+      - name: Update Submodules
+        run: |
+          echo "init submodules"
+          git submodule init
+          git submodule foreach "git submodule init"
+          echo "sync submodules"
+          git submodule sync
+          git submodule foreach "git submodule sync"
+          echo "update submodules"
+          npm install -g rimraf binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz
+          npx rimraf .git/modules
+          npx submodule-install
+          git lfs track "*.rar"
+        shell: bash
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          architecture: "x64"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: Get pip cache dir
+        id: pip-cache
+        run: echo "pip_cache_dir=$(pip cache dir)" >> $GITHUB_ENV
+
+      - name: Setup Cache
+        id: cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ./dist/
+            ./tmp/
+            src/*.sqlite*
+            src/*.mmdb
+            node_modules/
+            .yarn/caches/
+            .yarn/*.gz
+            ./venv/
+            ${{ env.pip_cache_dir }}
+            ${{ env.NUITKA_CACHE_DIR }}
+            *.lock
+            *.txt
+            package-lock.json
+            assets/proxies/
+            vendor/
+            ${{ env.USERPROFILE }}\AppData\Local\Nuitka\Nuitka\Cache
+            $HOME/AppData/Local/Nuitka/Nuitka/Cache
+            config/
+            .cache/
+            working.json
+          key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ hashFiles('package.json') }}
+            ${{ runner.os }}-node-
+            ${{ runner.os }}-
+
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          corepack enable
+          yarn install
+
+      - name: Build Project
+        run: |
+          yarn build
+
+      - name: Clean github actions cache
+        env:
+          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        run: |
+          node lib/clean-github-actions-caches.cjs
+        shell: bash

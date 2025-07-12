@@ -20,7 +20,12 @@ const defaultBin = {
   "dir-tree": "lib/print-directory-tree.cjs",
   "pkg-resolutions-updater": "lib/package-resolutions-updater.cjs",
   "pkg-res-updater": "lib/package-resolutions-updater.cjs",
-  "git-diff": "lib/git-diff.cjs"
+  "git-diff": "lib/git-diff.cjs",
+  "clean-github-actions-caches": "lib/clean-github-actions-caches.cjs",
+  "clean-github-actions-cache": "lib/clean-github-actions-caches.cjs",
+  "clear-github-actions-cache": "lib/clean-github-actions-caches.cjs",
+  "clear-github-actions-caches": "lib/clean-github-actions-caches.cjs",
+  "clear-gh-caches": "lib/clean-github-actions-caches.cjs"
 };
 pkgj.bin = defaultBin;
 

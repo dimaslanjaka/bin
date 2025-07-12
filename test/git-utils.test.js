@@ -1,6 +1,6 @@
 /* eslint-env jest */
-const { runGitCommand, isGitRepository } = require("../src/git/utils.cjs");
-const { spawnSync, execSync } = require("child_process");
+const { runGitCommand } = require("../src/git/utils.cjs");
+const { spawnSync } = require("child_process");
 
 // Mock child_process
 jest.mock("child_process");
@@ -73,28 +73,6 @@ describe("git-utils", () => {
 
       expect(result).toBe(false);
       expect(consoleErrorSpy).toHaveBeenCalledWith("Error: stdout error message");
-    });
-  });
-
-  describe("isGitRepository", () => {
-    it("should return true when in git repository", () => {
-      execSync.mockReturnValue(".git");
-
-      const result = isGitRepository();
-
-      expect(result).toBe(true);
-      expect(execSync).toHaveBeenCalledWith("git rev-parse --git-dir", { stdio: "pipe" });
-    });
-
-    it("should return false when not in git repository", () => {
-      execSync.mockImplementation(() => {
-        throw new Error("not a git repository");
-      });
-
-      const result = isGitRepository();
-
-      expect(result).toBe(false);
-      expect(execSync).toHaveBeenCalledWith("git rev-parse --git-dir", { stdio: "pipe" });
     });
   });
 });

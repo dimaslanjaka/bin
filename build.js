@@ -25,7 +25,8 @@ const defaultBin = {
   "clean-github-actions-cache": "lib/clean-github-actions-caches.cjs",
   "clear-github-actions-cache": "lib/clean-github-actions-caches.cjs",
   "clear-github-actions-caches": "lib/clean-github-actions-caches.cjs",
-  "clear-gh-caches": "lib/clean-github-actions-caches.cjs"
+  "clear-gh-caches": "lib/clean-github-actions-caches.cjs",
+  "submodule-install": "lib/submodule-install.cjs"
 };
 pkgj.bin = defaultBin;
 
@@ -97,6 +98,18 @@ glob
     // Use cyan for non-bin keys instead of yellow
     const coloredKey = isBin ? colors.green(key) : colors.cyan(key);
 
+    // Prefer lib/.cjs for bin/src name collision
+    if (isBin) {
+      // Check if src/<basename> exists
+      const srcPath = path.join(__dirname, "src", basename);
+      const libCjsPath = path.join(__dirname, "lib", `${basename}.cjs`);
+      if (fs.existsSync(srcPath) && fs.existsSync(libCjsPath)) {
+        // Prefer lib/.cjs
+        pkgj.bin[key] = path.toUnix(libCjsPath);
+        console.log(`add ${coloredKey}: ${path.toUnix(libCjsPath)} (preferred lib/.cjs for bin/src collision)`);
+        return;
+      }
+    }
     if (defaultBin[key]) {
       console.warn(
         colors.yellow("[ignore]:\t") +

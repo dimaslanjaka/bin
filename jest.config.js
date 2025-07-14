@@ -17,5 +17,6 @@ module.exports = {
   coverageReporters: ["text", "lcov", "html"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "mjs", "cjs", "json", "node"],
   setupFilesAfterEnv: [],
-  testTimeout: 10000
+  testTimeout: 10000,
+  detectOpenHandles: true
 };

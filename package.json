@@ -40,9 +40,13 @@
   ],
   "bin": {
     "binary-collections": "lib/binary-collections.cjs",
-    "clean-github-actions-caches": "src/clean-github-actions-caches.cjs",
+    "clean-github-actions-cache": "lib/clean-github-actions-caches.cjs",
+    "clean-github-actions-caches": "lib/clean-github-actions-caches.cjs",
     "clean-nodemodule": "bin/clean-nodemodule",
     "clean-nodemodules": "bin/clean-nodemodules",
+    "clear-gh-caches": "lib/clean-github-actions-caches.cjs",
+    "clear-github-actions-cache": "lib/clean-github-actions-caches.cjs",
+    "clear-github-actions-caches": "lib/clean-github-actions-caches.cjs",
     "del-gradle": "lib/del-gradle.cjs",
     "del-node-modules": "lib/del-node-modules.mjs",
     "del-nodemodules": "lib/del-node-modules.cjs",
@@ -75,7 +79,7 @@
     "rmx": "bin/rmx",
     "run-s": "lib/npm-run-series.cjs",
     "run-series": "lib/npm-run-series.cjs",
-    "submodule-install": "src/submodule-install.cjs",
+    "submodule-install": "lib/submodule-install.cjs",
     "submodule-remove": "bin/submodule-remove",
     "submodule-token": "bin/submodule-token",
     "yarn-reinstall": "src/yarn-reinstall.cjs"

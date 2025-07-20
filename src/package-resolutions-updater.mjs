@@ -31,9 +31,34 @@ import fs from "fs";
 import https from "https";
 import os from "os";
 import path from "path";
+import { getArgs } from "./utils.js";
 
 const projectDir = process.cwd();
 const envPath = path.join(projectDir, ".env");
+const args = getArgs();
+const ACCESS_TOKEN = process.env.GITHUB_TOKEN || process.env.ACCESS_TOKEN;
+
+// Show help if --help/-h is passed
+if (args.help || args.h) {
+  showHelp();
+}
+
+/**
+ * Display help information for the package-resolutions-updater script.
+ */
+function showHelp() {
+  const helpText = `\n\
+GitHub Package Resolutions Updater\n\
+Usage:\n  node src/package-resolutions-updater.mjs [options]\n\
+Options:\n  --help, -h           Show this help message\n\
+Description:\n  Updates the commit hashes in package.json's 'resolutions' field for GitHub tarball URLs to point to the latest commit SHA of the corresponding repository and branch.\n\
+Features:\n  - Parses GitHub URLs to extract repository owner, name, and branch.\n  - Fetches the latest commit SHA across all branches using GitHub's API.\n  - Replaces the old branch or commit in the URL with the latest SHA.\n  - Overwrites package.json with the updated URLs.\n\
+Requirements:\n  - GitHub Personal Access Token (GITHUB_TOKEN) via .env\n  - ESM support (type: "module" in package.json)\n  - Node.js v18+ recommended\n\
+Dependencies:\n  - ansi-colors – for styled terminal output\n  - dotenv – to load GitHub token from .env\n\
+Examples:\n  node src/package-resolutions-updater.mjs\n  node src/package-resolutions-updater.mjs --help\n\n`;
+  console.log(helpText);
+  process.exit(0);
+}
 
 // Load the .env file using dotenv (ESM import)
 if (fs.existsSync(envPath)) dotenv.config({ path: envPath });
@@ -127,7 +152,7 @@ function fetchJson(url) {
     "User-Agent": selectedUserAgent,
     Accept: "application/vnd.github.v3+json",
     "X-GitHub-Api-Version": "2022-11-28",
-    ...(process.env.GITHUB_TOKEN ? { Authorization: `token ${process.env.GITHUB_TOKEN}` } : {})
+    ...(ACCESS_TOKEN ? { Authorization: `token ${ACCESS_TOKEN}` } : {})
   };
   return new Promise((resolve, reject) => {
     https

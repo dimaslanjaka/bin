@@ -4,6 +4,8 @@ const { spawn } = require("child_process");
 const { glob } = require("glob");
 const path = require("path");
 const { getArgs } = require("./utils.js");
+const pkgJson = require("../package.json");
+const fs = require("fs");
 
 /**
  * Main binary-collections script that dynamically finds and executes other scripts
@@ -52,9 +54,23 @@ function findScript(scriptName, searchDir = null) {
       absolute: true
     });
 
-    // Return the first match if found
     if (files.length > 0) {
+      // Return the first match if found
       return files[0];
+    } else {
+      // If not found pick from pkg.bin[scriptName] when exist
+      if (pkgJson.bin[scriptName]) {
+        const find = [
+          path.join(searchDir, pkgJson.bin[scriptName]),
+          path.join(process.cwd(), "node_modules/binary-collections", pkgJson.bin[scriptName])
+        ].filter((file) => fs.existsSync(file));
+        if (find.length > 0) {
+          return find[0];
+        } else {
+          console.warn(`⚠️  Script "${scriptName}" not found in ${searchDir}.`);
+          console.warn(`🔍 Searched for: ${pattern} in ${searchDir}`);
+        }
+      }
     }
   } catch (error) {
     console.error(`🔍 Error searching for script: ${error.message}`);

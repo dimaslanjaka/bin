@@ -24,8 +24,12 @@ function prepareInstallation(type) {
     if (fs.existsSync(file) && !fs.existsSync(backup)) fs.renameSync(file, backup);
   });
   // Restore only the relevant lock file for the install type
-  if (type === "yarn" && fs.existsSync(yarnLockFileBackup)) fs.renameSync(yarnLockFileBackup, yarnLockFile);
-  if (type === "npm" && fs.existsSync(npmLockFileBackup)) fs.renameSync(npmLockFileBackup, npmLockFile);
+  if (type === "yarn" && fs.existsSync(yarnLockFileBackup)) {
+    fs.renameSync(yarnLockFileBackup, yarnLockFile);
+  }
+  if (type === "npm" && fs.existsSync(npmLockFileBackup)) {
+    fs.renameSync(npmLockFileBackup, npmLockFile);
+  }
   // Remove main directories
   ["binary-collections", ".bin"].forEach((dir) => {
     const target = path.join(nodeModules, dir);
@@ -53,7 +57,7 @@ function checkBinLinks(id, tarball) {
   }
 }
 
-describe("npm install binary-collections from remote tarball", () => {
+describe("Test binary-collections tarball", () => {
   const tarballPath = path.resolve(__dirname, "../releases/bin.tgz");
 
   beforeAll(() => {
@@ -75,6 +79,7 @@ describe("npm install binary-collections from remote tarball", () => {
       });
     }
   });
+
   it(`should install binary-collections from tarball (${tarballPath}) using npm`, () => {
     prepareInstallation("npm");
     const result = spawnSync("npm", ["install", "--ignore-scripts", `binary-collections@${tarballPath}`], {
@@ -87,7 +92,8 @@ describe("npm install binary-collections from remote tarball", () => {
     expect(fs.existsSync(pkgDir)).toBe(true);
     expect(fs.existsSync(path.join(pkgDir, "package.json"))).toBe(true);
     checkBinLinks("-npm", tarballPath);
-  });
+    validateBinaries();
+  }, 120000);
 
   it(`should install binary-collections from tarball (${tarballPath}) using yarn`, () => {
     prepareInstallation("yarn");
@@ -103,5 +109,22 @@ describe("npm install binary-collections from remote tarball", () => {
     expect(fs.existsSync(pkgDir)).toBe(true);
     expect(fs.existsSync(path.join(pkgDir, "package.json"))).toBe(true);
     checkBinLinks("-yarn", tarballPath);
-  });
+    validateBinaries();
+  }, 120000);
 });
+
+function validateBinaries() {
+  [
+    { cmd: "git-diff", args: ["--help"] },
+    { cmd: "pkg-resolutions-updater", args: ["--help"] },
+    { cmd: "changelog", args: ["--help"] }
+  ].forEach(({ cmd, args }) => {
+    const result = spawnSync("npx", [cmd, ...args], {
+      cwd: repoDir,
+      stdio: "pipe",
+      shell: true
+    });
+    expect(result.error).toBeUndefined();
+    expect(result.status).toBe(0);
+  });
+}

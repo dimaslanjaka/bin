@@ -9,7 +9,7 @@ concurrency:
 on:
   push:
     paths-ignore:
-      - "**/release*"
+      - "**/*.tgz"
 
 jobs:
   build:

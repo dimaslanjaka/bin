@@ -13,7 +13,7 @@ if (fs.existsSync(envPath)) dotenv.config({ path: envPath });
 const { getArgs } = require("./utils.js");
 const args = getArgs();
 const positional = args._ || [];
-
+const ACCESS_TOKEN = process.env.GITHUB_TOKEN || process.env.ACCESS_TOKEN;
 let ROOT = runGit(["rev-parse", "--show-toplevel"]).trim();
 let REPO_PATH = ROOT;
 
@@ -69,21 +69,21 @@ for (const line of submoduleList) {
 
   const GIT_MODULES = path.join(RELATIVE_MODULE_PATH, ".gitmodules");
 
-  if (process.env.ACCESS_TOKEN) {
+  if (ACCESS_TOKEN) {
     let URL_WITH_TOKEN = "";
     let repoInfo;
 
     if (URL.includes("github.com")) {
       repoInfo = URL.replace("https://github.com/", "");
-      URL_WITH_TOKEN = `https://${process.env.ACCESS_TOKEN}@github.com/${repoInfo}`;
+      URL_WITH_TOKEN = `https://${ACCESS_TOKEN}@github.com/${repoInfo}`;
     } else if (URL.includes("gitlab.com") && typeof process.env.GITLAB_TOKEN === "string") {
       repoInfo = URL.replace("https://gitlab.com/", "");
-      URL_WITH_TOKEN = `https://oauth2:${process.env.ACCESS_TOKEN}@gitlab.com/${repoInfo}`;
+      URL_WITH_TOKEN = `https://oauth2:${ACCESS_TOKEN}@gitlab.com/${repoInfo}`;
     } else {
       // For other Git providers, try a generic approach
       const urlObj = new URL(URL);
       repoInfo = urlObj.pathname.substring(1); // Remove leading slash
-      URL_WITH_TOKEN = `${urlObj.protocol}//${process.env.ACCESS_TOKEN}@${urlObj.host}${urlObj.pathname}`;
+      URL_WITH_TOKEN = `${urlObj.protocol}//${ACCESS_TOKEN}@${urlObj.host}${urlObj.pathname}`;
     }
 
     if (URL_WITH_TOKEN && URL_WITH_TOKEN.length > 0) {

@@ -36,6 +36,9 @@ import { getArgs } from "./utils.js";
 const projectDir = process.cwd();
 const envPath = path.join(projectDir, ".env");
 const args = getArgs();
+
+// Load the .env file using dotenv (ESM import)
+if (fs.existsSync(envPath)) dotenv.config({ path: envPath });
 const ACCESS_TOKEN = process.env.GITHUB_TOKEN || process.env.ACCESS_TOKEN;
 
 // Show help if --help/-h is passed
@@ -59,9 +62,6 @@ Examples:\n  node src/package-resolutions-updater.mjs\n  node src/package-resolu
   console.log(helpText);
   process.exit(0);
 }
-
-// Load the .env file using dotenv (ESM import)
-if (fs.existsSync(envPath)) dotenv.config({ path: envPath });
 
 // 📌 Static override rules
 const specialPackageOverrides = [

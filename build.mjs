@@ -109,7 +109,7 @@ const binFiles = glob
 // Log each added binary
 for (const { filename, executorDestination } of binFiles) {
   // Log the binary and executor paths
-  console.log(`${filename}:`);
+  // console.log(`${filename}:`);
   const relativeExecutor = path.relative(__dirname, executorDestination);
   // console.log(`  ${color.yellow(executorDestination)} -> ${color.blueBright(relativeExecutor)}`);
   binBuilder[filename] = relativeExecutor; // Update binBuilder with executor path
@@ -122,6 +122,12 @@ const bin = Object.keys({ ...binBuilder, ...defaultBin })
     acc[key] = path.toUnix(binBuilder[key] || defaultBin[key]);
     return acc;
   }, {});
+
+// Log the final bin mapping
+console.log(color.greenBright(`Final bin mapping for package.json:`));
+for (const [key, value] of Object.entries(bin)) {
+  console.log(`  ${color.blueBright(key)}: ${color.yellow(value)}`);
+}
 
 // Assign bin mapping to package.json
 pkg.bin = bin;

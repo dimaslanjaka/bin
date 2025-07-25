@@ -51,8 +51,10 @@ jobs:
         run: npm run build
       - name: 📦 Pack project
         run: npm run pack
-      - name: 🧪 Run tests with coverage
-        run: npm run test:coverage -- --forceExit
+      - name: 🧪 Run CJS tests with coverage
+        run: npm run test --coverage=true
+      - name: 🧪 Run ESM tests with coverage
+        run: npm run test:esm --coverage=true
       - name: 🚀 Push tarball changes
         if: ${{ success() && !contains(github.event.head_commit.message, 'update build from CI') }}
         run: |

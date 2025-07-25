@@ -2,7 +2,7 @@
 applyTo: '**'
 ---
 
-- When updating `/readme.md`, ensure lookup for `build.js` and `src/` folder.
+- When updating `/readme.md`, ensure lookup for `build.mjs` and `src/` folder.
 - When i ask to create commit message, print as raw text (code block) without any formatting and use the following structure:
 
   **Commit types description:**

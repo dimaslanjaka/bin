@@ -96,7 +96,7 @@ Source code for utilities is located in the [`src/`](./src/) folder. To update t
 ```bash
 yarn run build
 # or
-node build.js
+node build.mjs
 ```
 
 This will scan the project and update `package.json` with all available binaries. The list may change as files are added or removed from the project.

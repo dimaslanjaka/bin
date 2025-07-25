@@ -7,8 +7,11 @@
   },
   "compilerOptions": {
     "strict": true,
-    "allowJs": true
+    "allowJs": true,
+    "outDir": "tmp/dist",
+    "removeComments": false,
+    "declaration": true
   },
-  "include": ["src", "test", "lib"],
+  "include": ["src", "test", "bin"],
   "exclude": ["**/node_modules", "node_modules", ".vscode"]
 }

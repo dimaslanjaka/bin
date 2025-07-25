@@ -1,7 +1,16 @@
-const { fs, path } = require("sbg-utility");
+const path = require("upath");
 const { build } = require("tsup");
+const packageJson = require("./package.json");
 
-fs.rmSync(path.join(__dirname, "lib"), { force: true, recursive: true });
+// Packages that should be bundled
+const bundledPackages = ["p-limit", "deepmerge-ts", "hexo-is", "is-stream", "markdown-it", "node-cache"];
+
+const externalDeps = [...Object.keys(packageJson.dependencies), ...Object.keys(packageJson.devDependencies)].filter(
+  (pkgName) => !bundledPackages.includes(pkgName)
+);
+
+// Remove any possible tsup shims from the external array
+const external = externalDeps.filter((dep) => !path.toUnix(dep).includes("/tsup/assets/"));
 
 /**
  * @type {import("tsup").Options}
@@ -9,10 +18,11 @@ fs.rmSync(path.join(__dirname, "lib"), { force: true, recursive: true });
 const baseOption = {
   outDir: "lib",
   entry: ["./src/**/*"],
-  exclude: ["**/node_modules", "**/test*", "**/*.spec*.ts", "**/*.test*.ts"],
   target: "node14",
   dts: true,
   shims: true,
+  // Explicitly exclude tsup shims from being marked as external
+  external,
   // splitting: false,
   tsconfig: "tsconfig.build.json",
   minify: false,

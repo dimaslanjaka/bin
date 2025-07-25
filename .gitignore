@@ -17,3 +17,4 @@ releases/*
 **/tmp/**
 **/lib/**
 **/coverage
+__*

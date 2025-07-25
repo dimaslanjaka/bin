@@ -2,6 +2,8 @@ const gch = require("git-command-helper");
 const { runGitCommand, runGitCommandOutput } = require("./utils.cjs");
 const { getArgs } = require("../utils.js");
 
+require("dotenv").config({ path: require("path").join(process.cwd(), ".env") });
+
 /**
  * Configure Git user from CLI arguments or environment variables
  * @param {string|null} cliUser - Username from CLI arguments

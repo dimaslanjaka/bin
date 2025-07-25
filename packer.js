@@ -1,19 +1,22 @@
-/* eslint-disable no-useless-escape */
+/**
+ * packer.js - Automated tarball (tgz) creator for release folder
+ *
+ * Requirements: npm i -D https://github.com/dimaslanjaka/node-cross-spawn/tarball/private upath fs-extra
+ * Source (raw): https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js
+ * GitHub:      https://github.com/dimaslanjaka/nodejs-package-types/blob/main/packer.js
+ * Update:      curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js > packer.js
+ * Usage:       node packer.js
+ * CI Example:  https://github.com/dimaslanjaka/nodejs-package-types/blob/main/.github/workflows/build-release.yml
+ *
+ * For ESM projects, download as package.cjs:
+ *   curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js -o package.cjs
+ */
+
 const { spawn } = require("child_process");
 const fs = require("fs-extra");
 const { resolve, join, dirname, toUnix, basename } = require("upath");
 const packagejson = require("./package.json");
 const crypto = require("crypto");
-
-// const os = require('os');
-
-// auto create tarball (tgz) on release folder
-// requred        : npm i -D https://github.com/dimaslanjaka/node-cross-spawn/tarball/private upath fs-extra
-// raw            : https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js
-// github         : https://github.com/dimaslanjaka/nodejs-package-types/blob/main/packer.js
-// update         : curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js > packer.js
-// usage          : node packer.js
-// github actions : https://github.com/dimaslanjaka/nodejs-package-types/blob/main/.github/workflows/build-release.yml
 
 //// CHECK REQUIRED PACKAGES
 
@@ -166,7 +169,10 @@ function bundleWithNpm() {
   if (!fs.existsSync(tgz)) {
     const filename2 = slugifyPkgName(`${packagejson.name}-${packagejson.version}.tgz`);
     const origintgz = join(__dirname, filename2);
-    fs.renameSync(origintgz, tgz);
+    // Only rename if source exists and is different from destination
+    if (fs.existsSync(origintgz) && origintgz !== tgz) {
+      fs.renameSync(origintgz, tgz);
+    }
   }
   const tgzlatest = join(releaseDir, slugifyPkgName(`${packagejson.name}.tgz`));
 
@@ -219,11 +225,9 @@ function parseVersion(versionString) {
  * create release/readme.md
  */
 async function addReadMe() {
-  if (["git-command-helper", "cross-spawn"].includes(packagejson.name)) {
-    console.error("cannot run add readme on", packagejson.name);
-    return;
-  }
-  const { async: spawnAsync } = await import("cross-spawn");
+  const isCrossSpawn = packagejson.name == "cross-spawn";
+  const isGitCommandHelper = packagejson.name == "git-command-helper";
+  const { async: spawnAsync } = isCrossSpawn ? await import("./dist/index.js") : await import("cross-spawn");
   // set username and email on CI
   if (_isCI) {
     await spawnAsync("git", ["config", "--global", "user.name", "dimaslanjaka"], {
@@ -239,9 +243,11 @@ async function addReadMe() {
   /**
    * @type {typeof import('git-command-helper')}
    */
-  const gch = packagejson.name !== "git-command-helper" ? require("git-command-helper") : require("./dist");
+  const { gitCommandHelper: gch } = isGitCommandHelper
+    ? await import("./dist/index.js")
+    : await import("git-command-helper");
 
-  const git = new gch.default(__dirname);
+  const git = new gch(__dirname);
   const branch = (await git.getbranch()).filter((o) => o.active)[0].branch;
   const gitlatest = await git.latestCommit();
 

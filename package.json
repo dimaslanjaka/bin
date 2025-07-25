@@ -28,7 +28,8 @@
         "default": "./lib/index.mjs",
         "types": "./lib/index.d.mts"
       }
-    }
+    },
+    "./package.json": "./package.json"
   },
   "types": "lib/index.d.ts",
   "files": [
@@ -39,7 +40,9 @@
     "package.json"
   ],
   "bin": {
+    "bc": "bin/bc.cmd",
     "binary-collections": "lib/binary-collections.cjs",
+    "changelog": "lib/changelog.mjs",
     "clean-github-actions-cache": "lib/clean-github-actions-caches.cjs",
     "clean-github-actions-caches": "lib/clean-github-actions-caches.cjs",
     "clean-nodemodule": "bin/clean-nodemodule",
@@ -75,7 +78,7 @@
     "print-tree": "lib/print-directory-tree.cjs",
     "prod": "bin/prod",
     "rmfind": "bin/rmfind",
-    "rmpath": "bin/rmpath",
+    "rmpath": "bin/rmpath.cmd",
     "rmx": "bin/rmx",
     "run-s": "lib/npm-run-series.cjs",
     "run-series": "lib/npm-run-series.cjs",
@@ -86,13 +89,13 @@
   },
   "scripts": {
     "update:packer": "curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js > packer.js",
-    "build": "node build.tsup.js && tsc -b tsconfig.build.json && npm run postbuild",
+    "build": "tsc -b tsconfig.build.json && node build.tsup.js && npm run postbuild",
     "postbuild": "node -r ts-node/register -r dotenv/config build.js && yarn run pack",
     "build:packages": "yarn workspaces foreach --worktree --no-private run build",
-    "test": "npx jest --runInBand --forceExit",
+    "test": "npx jest --runInBand --forceExit --testTimeout=120000 --testPathIgnorePatterns=\"\\.mjs$\"",
+    "test:esm": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --testPathIgnorePatterns=\"\\.(ts|js|cjs)$\"",
     "test:watch": "npm test --watch",
-    "test:coverage": "npm test --coverage",
-    "test:debug": "npm test -- --detectOpenHandles",
+    "test:coverage": "npm test --coverage --detectOpenHandles",
     "test:nrs": "npm test -- nrs build:**",
     "pack": "node packer.js --yarn --filename=bin",
     "update:ncu": "npx npm-check-updates -u -x jsdom,chalk,hexo,deepmerge-ts --enginesNode --root",
@@ -165,7 +168,8 @@
   },
   "packageManager": "yarn@4.9.2",
   "resolutions": {
-    "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/7696e66ab84f319909c5dab9054303e91f898454/packages/sbg-utility/release/sbg-utility.tgz",
+    "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/df939d4cb3e31fded39412534bcef11de9fe0dcc/packages/sbg-utility/release/sbg-utility.tgz",
+    "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/991214dbbea1769747acf40cbbdbe677c4f1ee2e/release/git-command-helper.tgz",
     "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/80999ac7a7031a81e11ddb5fab0f8ba433041c98/release/cross-spawn.tgz"
   }
 }

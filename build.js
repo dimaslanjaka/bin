@@ -47,7 +47,6 @@ glob
       "**/examples/**",
       "**/scripts/**",
       "**/benchmarks/**",
-      "**/CHANGELOG*",
       "**/node_modules/**",
       "**/boilerplate/**",
       "**/.git*",

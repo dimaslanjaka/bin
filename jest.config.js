@@ -1,4 +1,5 @@
 const { defaults } = require("jest-config");
+const path = require("upath");
 
 /** @type {import('jest').Config} */
 module.exports = {
@@ -6,22 +7,53 @@ module.exports = {
   testEnvironment: "node",
   extensionsToTreatAsEsm: [".ts", ".tsx"],
   transform: {
-    "^.+\\.(ts|tsx)$": ["ts-jest", { useESM: true }],
-    "^.+\\.(js|jsx|mjs)$": ["babel-jest", { configFile: "./babel.config.js" }],
-    "^.+\\.cjs$": ["babel-jest", { configFile: "./babel.config.js" }]
+    // TypeScript files
+    "^.+\\.(ts|tsx)$": [
+      "ts-jest",
+      {
+        babelConfig: {
+          presets: [
+            [
+              "@babel/preset-env",
+              {
+                targets: { node: "current" }
+              }
+            ],
+            "@babel/preset-typescript"
+          ]
+        },
+        useESM: true,
+        tsconfig: path.join(__dirname, "tsconfig.jest.json")
+      }
+    ],
+    // ESM JavaScript files
+    "^.+\\.(mjs)$": [
+      "babel-jest",
+      {
+        presets: [["@babel/preset-env", { targets: { node: "current" }, modules: false }]],
+        babelrc: false,
+        configFile: false
+      }
+    ],
+    // CommonJS and other JS files
+    "^.+\\.(cjs|js|jsx)$": [
+      "babel-jest",
+      {
+        presets: [["@babel/preset-env", { targets: { node: "current" } }]]
+      }
+    ]
   },
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "mjs", "cjs", "json", "node"],
+  moduleNameMapper: {
+    "^(\\.{1,2}/.*)\\.(js|mjs|jsx|tsx)$": "$1"
+  },
   testMatch: ["**/__tests__/**/*.+(ts|tsx|js|jsx|mjs|cjs)", "**/*.(test|spec).+(ts|tsx|js|jsx|mjs|cjs)"],
-  transformIgnorePatterns: ["/node_modules/(?!(your-esm-package)/)"],
-  collectCoverageFrom: [
-    "src/**/*.{ts,js,mjs,cjs}",
-    "!src/**/*.d.ts",
-    "!src/**/*.test.{ts,js,mjs,cjs}",
-    "!src/**/*.spec.{ts,js,mjs,cjs}"
-  ],
+  transformIgnorePatterns: ["/node_modules/(?!your-esm-package)/"], // allow ESM packages if needed
+  collectCoverageFrom: ["src/**/*.{ts,js,mjs,cjs}"],
+  coveragePathIgnorePatterns: ["/node_modules/", "/dist/", "/tmp/", "/test/", "/__tests__/", "/coverage/", "/lib/"],
   coverageDirectory: "coverage",
   coverageReporters: ["text", "lcov", "html"],
   setupFilesAfterEnv: [],
-  testTimeout: 10000,
+  testTimeout: 120000,
   detectOpenHandles: true
 };

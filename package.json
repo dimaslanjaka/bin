@@ -33,7 +33,6 @@
   },
   "types": "lib/index.d.ts",
   "files": [
-    "bin",
     "lib",
     "index.js",
     "!test",
@@ -107,6 +106,7 @@
     "url": "git+https://github.com/dimaslanjaka/bin"
   },
   "dependencies": {
+    "ansi-colors": "^4.1.3",
     "axios": "^1.10.0",
     "dotenv": "^17.2.0",
     "execa": "^9.6.0",
@@ -134,7 +134,7 @@
     "@types/fs-extra": "^11.0.4",
     "@types/jest": "^30.0.0",
     "@types/minimist": "^1",
-    "@types/node": "^24.0.10",
+    "@types/node": "^24.1.0",
     "@types/prettier": "^3",
     "@types/ps-node": "^0",
     "@types/yargs": "^17",
@@ -157,16 +157,9 @@
     "tsup": "^8.5.0",
     "typescript": "^5.8.3"
   },
-  "optionalDependencies": {
-    "ansi-colors": "^4.1.3"
-  },
   "workspaces": [
     "packages/*"
   ],
-  "directories": {
-    "lib": "lib",
-    "bin": "bin"
-  },
   "packageManager": "yarn@4.9.2",
   "resolutions": {
     "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/df939d4cb3e31fded39412534bcef11de9fe0dcc/packages/sbg-utility/release/sbg-utility.tgz",

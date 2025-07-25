@@ -1,5 +1,10 @@
 {
   "extends": "./tsconfig.base.json",
+  "ts-node": {
+    "compilerOptions": {
+      "strict": false
+    }
+  },
   "compilerOptions": {
     "strict": true,
     "allowJs": true

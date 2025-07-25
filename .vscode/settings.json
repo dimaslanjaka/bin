@@ -80,7 +80,8 @@
     "editor.codeActionsOnSave": {
       "source.organizeImports": "never",
       "source.fixAll": "never"
-    }
+    },
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[html]": {
     "editor.suggest.insertMode": "replace",
@@ -176,5 +177,16 @@
   },
   "typescript.tsdk": "./node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": false,
-  "git.autoStash": true
+  "git.autoStash": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "css.format.enable": true,
+  "eslint.format.enable": false,
+  "scss.format.enable": true,
+  "less.format.enable": true,
+  "javascript.format.enable": true,
+  "typescript.format.enable": true,
+  "eslint.codeActionsOnSave.mode": "all",
+  "eslint.lintTask.enable": false,
+  "eslint.onIgnoredFiles": "off",
+  "eslint.run": "onSave"
 }

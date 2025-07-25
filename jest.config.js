@@ -1,12 +1,18 @@
+const { defaults } = require("jest-config");
+
 /** @type {import('jest').Config} */
 module.exports = {
+  ...defaults,
   testEnvironment: "node",
-  roots: ["<rootDir>/src", "<rootDir>/test"],
-  testMatch: ["**/__tests__/**/*.+(ts|tsx|js|mjs|cjs)", "**/*.(test|spec).+(ts|tsx|js|mjs|cjs)"],
+  extensionsToTreatAsEsm: [".ts", ".tsx"],
   transform: {
-    "^.+\\.(ts|tsx)$": "ts-jest",
-    "^.+\\.(js|jsx|mjs|cjs)$": "babel-jest"
+    "^.+\\.(ts|tsx)$": ["ts-jest", { useESM: true }],
+    "^.+\\.(js|jsx|mjs)$": ["babel-jest", { configFile: "./babel.config.js" }],
+    "^.+\\.cjs$": ["babel-jest", { configFile: "./babel.config.js" }]
   },
+  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "mjs", "cjs", "json", "node"],
+  testMatch: ["**/__tests__/**/*.+(ts|tsx|js|jsx|mjs|cjs)", "**/*.(test|spec).+(ts|tsx|js|jsx|mjs|cjs)"],
+  transformIgnorePatterns: ["/node_modules/(?!(your-esm-package)/)"],
   collectCoverageFrom: [
     "src/**/*.{ts,js,mjs,cjs}",
     "!src/**/*.d.ts",
@@ -15,7 +21,6 @@ module.exports = {
   ],
   coverageDirectory: "coverage",
   coverageReporters: ["text", "lcov", "html"],
-  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "mjs", "cjs", "json", "node"],
   setupFilesAfterEnv: [],
   testTimeout: 10000,
   detectOpenHandles: true

@@ -48,7 +48,8 @@
     "electron-*.ts": "cross-env-shell NODE_ENV=development electron -r ts-node/register",
     "*.py": "python -u",
     "*.electron.js": "cross-env-shell NODE_ENV=development electron -r ts-node/register",
-    "**/*.test.@(js|cjs|mjs|ts)": "cross-env-shell NODE_ENV=test npm test"
+    "**/*.test.@(js|cjs|ts)": "cross-env-shell NODE_ENV=test npm test",
+    "**/*.test.mjs": "cross-env-shell NODE_ENV=test yarn test:esm"
   },
   "code-runner.respectShebang": false,
   "debug.terminal.clearBeforeReusing": true,

@@ -1,0 +1,19 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:a": "echo a",
+    "build:b": "echo b",
+    "build:c": "echo c",
+    "test": "npm-run-series build:**",
+    "install-deps": "npm i -D file:../"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "binary-collections": "./.."
+  }
+}

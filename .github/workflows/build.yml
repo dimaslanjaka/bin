@@ -1,0 +1,86 @@
+# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
+# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
+
+name: Node.js Package Build
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    paths-ignore:
+      - "**/*.tgz"
+      - "**/release*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout main repository
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          token: "${{ secrets.ACCESS_TOKEN }}"
+      - name: ⬇️ Checkout test-repo
+        uses: actions/checkout@v4
+        with:
+          repository: dimaslanjaka/test-repo
+          path: tmp/test-repo
+          token: "${{ secrets.ACCESS_TOKEN }}"
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - uses: actions/cache@v4
+        id: cache
+        name: 📚 Init cache
+        with:
+          path: |
+            **/.yarn
+            **/yarn.lock
+            **/node_modules
+            **/tmp
+            **/*.bak
+          key: ${{ runner.os }}-${{ hashFiles('**/package.json', '.github') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ hashFiles('**/package.json', '.github') }}
+            ${{ runner.os }}-
+      - name: 📦 Install dependencies
+        run: yarn install
+      - name: 🛠️ Build project
+        run: npm run build
+      - name: 📦 Pack project
+        run: npm run pack
+      - name: 🧪 Run tests with coverage
+        run: npm run test:coverage -- --forceExit
+      - name: 🚀 Push tarball changes
+        if: ${{ success() && !contains(github.event.head_commit.message, 'update build from CI') }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add releases
+
+          # Check if there are staged changes in releases/
+          if [ "$(git status --porcelain releases | wc -l)" -gt "0" ]; then
+            # Get current commit hash (the tarball commit)
+            CURRENT_COMMIT_HASH=$(git rev-parse HEAD)
+
+            # Get the previous commit hash that touched src/ (excluding the current one)
+            SRC_COMMIT_HASH=$(git log --pretty=format:"%h" src | grep -v "$CURRENT_COMMIT_HASH" | head -n 1)
+
+            # If no matching commit found, exit safely
+            if [ -z "$SRC_COMMIT_HASH" ]; then
+              echo "❌ No previous commit found in 'src/' before the current tarball commit."
+              exit 1
+            fi
+
+            # Amend the current commit message to include the src commit reference
+            NEW_MESSAGE="chore(tarball): update tarball artifacts from CI build based on src at $SRC_COMMIT_HASH"
+            git commit --amend -m "$NEW_MESSAGE"
+
+            # Push the amended commit (force required due to amend)
+            git push --force
+          else
+            echo "✅ No changes to release. Skipping push."
+          fi

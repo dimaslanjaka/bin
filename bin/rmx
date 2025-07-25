@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+# put these on top of file
+
+(set -o igncr) 2>/dev/null && set -o igncr; # cygwin encoding fix
+
+# absolute path working directory
+basecwd=${PWD}
+# base script directory
+basedir=`dirname "$0"`
+# absolute path script directory
+SCRIPT_DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
+# get script path
+SCRIPT=$(realpath "$0")
+SCRIPTPATH=$(dirname "$SCRIPT")
+
+# Detect Cygwin or MinGW
+case "$(uname)" in
+  *CYGWIN*)
+    basedir=$(cygpath -w "$basedir")
+    # make cygwin bin as priority
+    export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:$PATH"
+    ;;
+  *MINGW*)
+    # make mingw bin as priority
+    export PATH="/mingw64/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:$PATH"
+    ;;
+esac
+
+# parse and export .env file (dotenv)
+if [ -f ".env" ]; then
+  # Export the vars in .env into your shell:
+  export $(egrep -v '^#' .env | xargs)
+fi
+
+# fast huge folder deleter
+
+if [ -z "$1" ]; then
+    echo "You need to provide a file or folder path"
+    exit
+fi
+
+# delete single file
+if [ -f "$1" ]; then
+  rm -rf "$1"
+  exit
+fi
+
+if [ ! -d "$1" ]; then
+  echo "$1 not found"
+  exit
+fi
+
+rm -rf "$1" &
+
+# vowels=( a i u e o A I U E O )
+vowels=( a i u e o A I U E O 0 1 2 3 4 5 6 7 8 9 _ - . )
+for letter in {{a..z},{A..Z}}; do
+    for vowel in "${vowels[@]}"; do
+      toBeDeleted=( "$1/.${letter}*" "$1/@${letter}*" "$1/${letter}*" "$1/@${letter}${vowel}*" "$1/.${letter}${vowel}*" "$1/${letter}${vowel}*" )
+      shuffled=( $(shuf -e "${toBeDeleted[@]}") )
+      for fpath in "${shuffled[@]}"; do
+        if [ -d "$1" ]; then
+          rm -rf $fpath && echo "removed $fpath" || echo "cannot delete $fpath" &
+        fi
+      done
+    done
+done
+
+wait

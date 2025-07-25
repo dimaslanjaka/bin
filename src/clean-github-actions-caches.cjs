@@ -12,8 +12,9 @@ if (fs.existsSync(envPath)) {
   console.warn(`.env file not found at ${envPath}`);
 }
 
-// delete caches leaving single last cache based on creation date
+require("dotenv").config({ path: path.join(process.cwd(), ".env") });
 
+// delete caches leaving single last cache based on creation date
 const ACCESS_TOKEN = process.env.GITHUB_TOKEN || process.env.ACCESS_TOKEN;
 
 if (!ACCESS_TOKEN) {

@@ -14,6 +14,8 @@
 
 const path = require("path");
 
+require("dotenv").config({ path: path.join(process.cwd(), ".env") });
+
 /**
  * Get the base temporary directory path
  * Can be overridden via TEMP_DIR environment variable

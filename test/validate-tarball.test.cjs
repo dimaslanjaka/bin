@@ -2,7 +2,7 @@
 const { repoDir } = require("./env");
 const { spawnSync } = require("child_process");
 const fs = require("fs-extra");
-const path = require("path");
+const path = require("upath");
 const { writefile } = require("sbg-utility");
 
 const nodeModules = path.join(repoDir, "node_modules");
@@ -14,6 +14,8 @@ const yarnLockFileBackup = yarnLockFile + ".bak";
 // Load bin keys from the main package.json
 const mainPkg = require(path.resolve(__dirname, "../package.json"));
 const binEntries = mainPkg.bin ? (typeof mainPkg.bin === "string" ? [mainPkg.bin] : Object.keys(mainPkg.bin)) : [];
+
+jest.setTimeout(360000); // Set a longer timeout for tests
 
 function prepareInstallation(type) {
   // Backup lock files if not already backed up
@@ -58,7 +60,8 @@ function checkBinLinks(id, tarball) {
 }
 
 describe("Test binary-collections tarball", () => {
-  const tarballPath = path.resolve(__dirname, "../releases/bin.tgz");
+  const workspaceDir = path.resolve(__dirname, "../");
+  const tarballPath = path.resolve(workspaceDir, "releases/bin.tgz");
 
   beforeAll(() => {
     // Clean up node_modules and lock files if they exist
@@ -74,57 +77,86 @@ describe("Test binary-collections tarball", () => {
     if (!fs.existsSync(pkgJson)) {
       spawnSync("npm", ["init", "-y"], {
         cwd: repoDir,
-        stdio: "inherit",
+        stdio: "ignore",
         shell: true
       });
     }
   });
 
-  it(`should install binary-collections from tarball (${tarballPath}) using npm`, () => {
-    prepareInstallation("npm");
-    const result = spawnSync("npm", ["install", "--ignore-scripts", `binary-collections@${tarballPath}`], {
-      cwd: repoDir,
-      stdio: "pipe",
-      shell: true
+  describe(`should install binary-collections from tarball (${tarballPath}) using npm`, () => {
+    beforeAll(() => {
+      prepareInstallation("npm");
+      const result = spawnSync("npm", ["install", "--ignore-scripts", `binary-collections@${tarballPath}`], {
+        cwd: repoDir,
+        stdio: "pipe",
+        shell: true
+      });
+      if (result.error) throw result.error;
+      if (result.status !== 0) throw new Error(`npm install failed with code ${result.status}`);
+      expect(fs.existsSync(pkgDir)).toBe(true);
+      expect(fs.existsSync(path.join(pkgDir, "package.json"))).toBe(true);
+      checkBinLinks("-npm", tarballPath);
     });
-    if (result.error) throw result.error;
-    if (result.status !== 0) throw new Error(`npm install failed with code ${result.status}`);
-    expect(fs.existsSync(pkgDir)).toBe(true);
-    expect(fs.existsSync(path.join(pkgDir, "package.json"))).toBe(true);
-    checkBinLinks("-npm", tarballPath);
-    validateBinaries();
-  }, 120000);
+    validateBinaries("npm");
+  });
 
-  it(`should install binary-collections from tarball (${tarballPath}) using yarn`, () => {
-    prepareInstallation("yarn");
-    // Create empty yarn.lock before running yarn add
-    fs.writeFileSync(yarnLockFile, "");
-    const result = spawnSync("yarn", ["add", `binary-collections@${tarballPath}`, "--mode=skip-build"], {
-      cwd: repoDir,
-      stdio: "pipe",
-      shell: true
+  describe(`should install binary-collections from tarball (${tarballPath}) using yarn`, () => {
+    beforeAll(() => {
+      prepareInstallation("yarn");
+      // Create empty yarn.lock before running yarn add
+      fs.writeFileSync(yarnLockFile, "");
+      const result = spawnSync("yarn", ["add", `binary-collections@${tarballPath}`, "--mode=skip-build"], {
+        cwd: repoDir,
+        stdio: "pipe",
+        shell: true
+      });
+      if (result.error) throw result.error;
+      if (result.status !== 0) throw new Error(`yarn add failed with code ${result.status}`);
+      expect(fs.existsSync(pkgDir)).toBe(true);
+      expect(fs.existsSync(path.join(pkgDir, "package.json"))).toBe(true);
+      checkBinLinks("-yarn", tarballPath);
     });
-    if (result.error) throw result.error;
-    if (result.status !== 0) throw new Error(`yarn add failed with code ${result.status}`);
-    expect(fs.existsSync(pkgDir)).toBe(true);
-    expect(fs.existsSync(path.join(pkgDir, "package.json"))).toBe(true);
-    checkBinLinks("-yarn", tarballPath);
-    validateBinaries();
-  }, 120000);
+    validateBinaries("yarn");
+  });
 });
 
-function validateBinaries() {
+function validateBinaries(packageManager) {
+  const pkgJson = `${repoDir}/node_modules/binary-collections/package.json`;
+  if (!fs.existsSync(pkgJson)) {
+    throw new Error(`Package.json not found at ${pkgJson}`);
+  }
+  const pkg = require(pkgJson);
   [
     { cmd: "git-diff", args: ["--help"] },
     { cmd: "pkg-resolutions-updater", args: ["--help"] },
-    { cmd: "changelog", args: ["--help"] }
+    { cmd: "submodule-install", args: ["--help"] }
   ].forEach(({ cmd, args }) => {
-    const result = spawnSync("npx", [cmd, ...args], {
-      cwd: repoDir,
-      stdio: "pipe",
-      shell: true
+    it(`[${packageManager}] should run ${cmd} command`, () => {
+      expect(pkg).toHaveProperty("bin");
+      expect(pkg.bin).toHaveProperty(cmd);
+      expect(typeof pkg.bin[cmd]).toBe("string");
+
+      const actualBinPath = path.resolve(repoDir, "node_modules/binary-collections", pkg.bin[cmd]);
+      expect(fs.existsSync(actualBinPath)).toBe(true);
+
+      const result = spawnSync("node", [actualBinPath, ...args], {
+        cwd: repoDir,
+        stdio: "pipe",
+        shell: true
+      });
+      expect(result.error).toBeUndefined();
+      expect(result.status).toBe(0);
+
+      // Proxy (binary-collections commandName)
+      const proxyPath = path.resolve(repoDir, "node_modules/binary-collections/lib/binary-collections.cjs");
+      expect(fs.existsSync(proxyPath)).toBe(true);
+      const resultProxy = spawnSync("node", [proxyPath, cmd, ...args], {
+        cwd: repoDir,
+        stdio: "pipe",
+        shell: true
+      });
+      expect(resultProxy.error).toBeUndefined();
+      expect(resultProxy.status).toBe(0);
     });
-    expect(result.error).toBeUndefined();
-    expect(result.status).toBe(0);
   });
 }

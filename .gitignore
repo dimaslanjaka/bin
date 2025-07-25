@@ -18,3 +18,4 @@ releases/*
 **/lib/**
 **/coverage
 __*
+/binaries

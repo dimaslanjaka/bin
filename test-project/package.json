@@ -1,0 +1,16 @@
+{
+  "name": "test-binary-collections",
+  "version": "1.0.0",
+  "description": "Test project for binary-collections",
+  "main": "index.js",
+  "scripts": {
+    "init-lock": "echo > yarn.lock"
+  },
+  "keywords": [],
+  "author": "dimaslanjaka@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "binary-collections": "file:../releases/bin.tgz"
+  },
+  "packageManager": "yarn@4.9.2"
+}

@@ -17,7 +17,7 @@ const external = externalDeps.filter((dep) => !path.toUnix(dep).includes("/tsup/
  */
 const baseOption = {
   outDir: "lib",
-  entry: ["./src/**/*"],
+  entry: ["./src/**/*.ts", "./src/**/*.js", "./src/**/*.cjs", "./src/**/*.mjs"],
   target: "node14",
   dts: true,
   shims: true,

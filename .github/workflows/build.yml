@@ -79,10 +79,8 @@ jobs:
 
             # Amend the current commit message to include the src commit reference
             NEW_MESSAGE="chore(tarball): update tarball artifacts from CI build based on src at $SRC_COMMIT_HASH"
-            git commit --amend -m "$NEW_MESSAGE"
-
-            # Push the amended commit (force required due to amend)
-            git push --force
+            git commit -m "$NEW_MESSAGE"
+            git push
           else
             echo "✅ No changes to release. Skipping push."
           fi

@@ -40,6 +40,7 @@
     "package.json"
   ],
   "bin": {
+    "bc": "bin/bc.cmd",
     "binary-collections": "lib/binary-collections.cjs",
     "changelog": "lib/changelog.mjs",
     "clean-github-actions-cache": "lib/clean-github-actions-caches.cjs",
@@ -77,7 +78,7 @@
     "print-tree": "lib/print-directory-tree.cjs",
     "prod": "bin/prod",
     "rmfind": "bin/rmfind",
-    "rmpath": "bin/rmpath",
+    "rmpath": "bin/rmpath.cmd",
     "rmx": "bin/rmx",
     "run-s": "lib/npm-run-series.cjs",
     "run-series": "lib/npm-run-series.cjs",

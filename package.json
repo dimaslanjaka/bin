@@ -85,16 +85,16 @@
     "yarn-reinstall": "lib/yarn-reinstall.cjs"
   },
   "scripts": {
-    "update:packer": "curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js > packer.js",
+    "build:packages": "yarn workspaces foreach --worktree --exclude=binary-collections --no-private run build",
     "build": "tsc -b tsconfig.build.json && node build.tsup.js && npm run postbuild",
     "postbuild": "node -r ts-node/register -r dotenv/config build.mjs && yarn run pack",
-    "build:packages": "yarn workspaces foreach --worktree --no-private run build",
     "test": "npx jest --runInBand --forceExit --testTimeout=120000 --testPathIgnorePatterns=\"\\.mjs$\"",
     "test:esm": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --testPathIgnorePatterns=\"\\.(ts|js|cjs)$\"",
     "test:watch": "npm test --watch",
     "test:coverage": "npm test --coverage --detectOpenHandles",
     "test:nrs": "npm test -- nrs build:**",
     "pack": "node packer.js --yarn --filename=bin",
+    "update:packer": "curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js > packer.js",
     "update:ncu": "npx npm-check-updates -u -x jsdom,chalk,hexo,deepmerge-ts --enginesNode --root",
     "clean": "rimraf lib tmp/dist binaries",
     "prepare": "husky"

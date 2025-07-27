@@ -189,6 +189,7 @@
     "ts-node": "^10.9.2",
     "tsup": "^8.5.0",
     "typedoc": "^0.28.7",
+    "typedoc-plugin-ga": "^1.0.5",
     "typescript": "^5.8.3"
   },
   "directories": {

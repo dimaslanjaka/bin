@@ -12,12 +12,24 @@ const fs = require("fs");
 const path = require("path");
 const git = pkgjson.name === "git-command-helper" ? require("./dist").default : require("git-command-helper").default;
 
-// required : upath semver typedoc git-command-helper gulp cross-spawn
-// update   : curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/typedoc-runner.js > typedoc-runner.js
-// repo     : https://github.com/dimaslanjaka/nodejs-package-types/blob/main/typedoc-runner.js
-// usages
-// - git clone https://github.com/dimaslanjaka/docs.git
-// - node typedoc-runner.js
+/**
+ * TypeDoc runner script
+ *
+ * Requirements:
+ *   - upath
+ *   - semver
+ *   - typedoc
+ *   - git-command-helper
+ *   - gulp
+ *   - cross-spawn
+ * Update:
+ *   curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/typedoc-runner.js > typedoc-runner.js
+ * Repository:
+ *   https://github.com/dimaslanjaka/nodejs-package-types/blob/main/typedoc-runner.js
+ * Usages:
+ *   - git clone https://github.com/dimaslanjaka/docs.git
+ *   - node typedoc-runner.js
+ */
 
 const REPO_URL = "https://github.com/dimaslanjaka/docs.git";
 

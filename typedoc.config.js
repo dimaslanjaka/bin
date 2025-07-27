@@ -2,6 +2,7 @@ const fs = require("fs-extra");
 const path = require("upath");
 const pkgjson = require("./package.json");
 const { minimatch } = require("minimatch");
+const { marked } = require("marked");
 
 // required: npm i upath
 // required: npm i -D typedoc typedoc-plugin-missing-exports
@@ -35,6 +36,7 @@ entryPoints = entryPoints
 const readme = [path.join(__dirname, "readme.md"), path.join(__dirname, "README.md")].filter((str) =>
   fs.existsSync(str)
 )[0];
+const outputReadme = path.join(tmp, "readme.md");
 if (typeof readme === "string") {
   if (fs.existsSync(readme)) {
     let content = fs.readFileSync(readme, "utf-8");
@@ -48,7 +50,7 @@ if (typeof readme === "string") {
     }
 
     if (!fs.existsSync(tmp)) fs.mkdirSync(tmp, { recursive: true });
-    fs.writeFileSync(path.join(tmp, "readme.md"), content);
+    fs.writeFileSync(outputReadme, content);
   }
 }
 
@@ -95,6 +97,21 @@ const defaultOptions = {
   //version: true,
   //includeVersion: true
 };
+
+// Extract local link from readme
+const readmeContent = fs.readFileSync(outputReadme, "utf-8");
+const hyperlinks = extractAllLocalLinks(readmeContent);
+for (const link of hyperlinks) {
+  // Only process local links (not http/https)
+  if (!/^https?:\/\//i.test(link)) {
+    const absolutePath = path.resolve(__dirname, link);
+    if (fs.existsSync(absolutePath)) {
+      const destinationPath = path.join(tmp, link);
+      console.log(`📄 Copying local link "${link}":\n  Source: "${absolutePath}"\n  Destination: "${destinationPath}"`);
+      fs.copySync(absolutePath, destinationPath);
+    }
+  }
+}
 
 const generatedOptionFile = path.join(tmp, "options.json");
 let localTypedocOptions = defaultOptions;
@@ -153,4 +170,64 @@ function getFilesRecursively(directory) {
       });
     }
   }
+}
+
+/**
+ * Extracts all local links (including images, reference, and raw URLs) from markdown text.
+ * @param {string} markdownText - Markdown content to parse.
+ * @returns {string[]} Array of local link paths.
+ */
+function extractAllLocalLinks(markdownText) {
+  const links = new Set();
+  const tokens = marked.lexer(markdownText);
+  // Collect reference definitions
+  const referenceDefs = {};
+  for (const token of tokens) {
+    if (token.type === "def") {
+      referenceDefs[token.tag] = token.href;
+    }
+  }
+  function walkTokens(tokens) {
+    for (const token of tokens) {
+      // Standard links
+      if (token.type === "link" && token.href) {
+        links.add(token.href);
+      }
+      // Images
+      if (token.type === "image" && token.href) {
+        links.add(token.href);
+      }
+      // Reference-style links
+      if (token.type === "text" && token.tokens) {
+        for (const t of token.tokens) {
+          if (t.type === "link" && t.href) {
+            links.add(t.href);
+          }
+          if (t.type === "image" && t.href) {
+            links.add(t.href);
+          }
+          // Reference link: [text][ref]
+          if (t.type === "link" && t.ref && referenceDefs[t.ref]) {
+            links.add(referenceDefs[t.ref]);
+          }
+        }
+      }
+      // Raw URLs in text
+      if (token.type === "paragraph" && token.text) {
+        // Match local file paths, skip lookbehind for compatibility
+        // Compatible regex for local file paths (no lookbehind, valid escapes)
+        const urlRegex = /(\.\/|\.\.\/|\/)?[a-zA-Z0-9_\-./]+\.[a-zA-Z0-9]{2,}/g;
+        let match;
+        while ((match = urlRegex.exec(token.text)) !== null) {
+          links.add(match[0]);
+        }
+      }
+      if (token.tokens) {
+        walkTokens(token.tokens);
+      }
+    }
+  }
+  walkTokens(tokens);
+  // Remove external links
+  return Array.from(links).filter((href) => !/^https?:\/\//i.test(href));
 }

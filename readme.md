@@ -28,6 +28,16 @@ npm install binary-collections -g
 npm install binary-collections@https://github.com/dimaslanjaka/bin/raw/master/releases/bin.tgz
 ```
 
+### Direct run
+
+```bash
+# Yarn berry
+yarn dlx binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz <command-name>
+
+# NPX
+npx binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz <command-name>
+```
+
 ## VS Code Setup
 
 Create `.vscode/settings.json` to add binary tools to your PATH:
@@ -72,7 +82,7 @@ Create `.vscode/settings.json` to add binary tools to your PATH:
 
 ### Quick Reference
 
-| Category | Tools | Description |
+| Category | Commands | Description |
 |----------|-------|-------------|
 | **Git** | `git-purge`, `git-diff`, `git-fix`, `git-reduce-size` | Git repository management and optimization |
 | **Submodules** | `submodule`, `submodule-install`, `submodule-remove`, `submodule-token` | Git submodule operations |
@@ -306,6 +316,34 @@ Delete gradle build folders:
 del-gradle
 ```
 
+---
+**Free ChatGPT Automation Tool**
+
+Automates browser interaction with ChatGPT using Puppeteer and stealth plugins. Features include:
+
+- Automated login, question submission, and response retrieval from chat.openai.com.
+- Supports direct questions or loading from a file.
+- Saves session cookies for persistence (`./tmp/cookies`).
+- Handles dynamic DOM updates and streaming responses.
+- Stores the latest response in `tmp/response.txt`.
+- Requires firewall access to ChatGPT domains.
+
+Usage:
+
+```bash
+free-chatgpt --question "Your question here"
+chatgpt --qfile path/to/question.txt
+```
+
+> both `free-chatgpt` and `chatgpt` is same entry point to `lib/free-chatgpt.cjs`
+
+Options:
+- `--question`, `-q`: Ask a question directly.
+- `--qfile`, `-qf`: Load question from a file.
+- `--help`, `-h`: Show help.
+
+---
+
 ## Troubleshooting
 
 ### Submodule Installation Issues
@@ -331,10 +369,8 @@ git submodule sync
 git submodule foreach "git submodule sync"
 
 echo "Updating submodules..."
-mkdir -p bin >/dev/null 2>&1
-curl -L https://github.com/dimaslanjaka/bin/raw/master/bin/submodule-install > bin/submodule-install
-rm -rf .git/modules
-bash ./bin/submodule-install
+npx --yes rimraf .git/modules
+npx --yes binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz submodule-install
 ```
 
 ## Contributing

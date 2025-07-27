@@ -7,6 +7,7 @@ const { spawnAsync } = require("cross-spawn");
 const axios = require("axios");
 const fs = require("fs");
 const path = require("upath");
+const { buildReadme } = require("./typedoc.readme");
 const git = pkgjson.name === "git-command-helper" ? require("./dist").default : require("git-command-helper").default;
 
 /**
@@ -38,6 +39,7 @@ let compiled = 0;
  * @param {(...args: any[]) => any} callback
  */
 const compile = async function (options = {}, callback = null) {
+  await buildReadme();
   const outDir = path.join(__dirname, "docs");
   const projectDocsDir = path.join(outDir, pkgjson.name);
   if (options) setTypedocOptions(options);

@@ -49,6 +49,7 @@ function runGitDiff(command, successMessage, errorMessage) {
       `Hello, ChatGPT!\nCan you create a conventional commit message by diff content below:\n\n\`\`\`${result}\n\`\`\`Give me result as codeblock with language "text" only.\n\nThank you!`
     );
     console.log(`\u{2705} ${successMessage}`);
+    console.log(`\u{1F4BE} GPT diff prompt saved to "${GPT_DIFF_OUTPUT}"`);
   } catch (error) {
     console.error(`\u{274C} ${errorMessage}`);
     console.error(`\u{1F4DD} Command: ${command}`);

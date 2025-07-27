@@ -166,24 +166,6 @@ function setTypedocOptions(newOpt) {
   return opt;
 }
 
-if (require.main === module) {
-  (async () => {
-    const argv = process.argv;
-    // node typedoc-runner.js --publish
-    if (argv.includes("--publish")) {
-      console.log("[publish] start");
-      await publish();
-      console.log("[publish] finish");
-    } else {
-      console.log("[compile] start");
-      await compile();
-      console.log("[compile] finish");
-    }
-  })();
-} else {
-  //console.log('required as a module');
-}
-
 /**
  * create docs/readme.md
  */
@@ -228,3 +210,19 @@ module.exports = {
   getTypedocOptions,
   setTypedocOptions
 };
+
+if (require.main === module) {
+  (async () => {
+    const argv = process.argv;
+    // node typedoc-runner.js --publish
+    if (argv.includes("--publish")) {
+      console.log("[publish] start");
+      await publish();
+      console.log("[publish] finish");
+    } else {
+      console.log("[compile] start");
+      await compile();
+      console.log("[compile] finish");
+    }
+  })();
+}

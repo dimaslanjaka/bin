@@ -93,6 +93,22 @@ const defaultOptions = {
   //theme: 'hierarchy',
   //ignoreCompilerErrors: true,
   logLevel: "Verbose",
+  highlightLanguages: [
+    "typescript",
+    "javascript",
+    "json",
+    "html",
+    "css",
+    "bash",
+    "shell",
+    "cmd",
+    "xml",
+    "yaml",
+    "yml",
+    "batch",
+    "jsonc",
+    "log"
+  ],
   //version: true,
   //includeVersion: true
   plugin: [

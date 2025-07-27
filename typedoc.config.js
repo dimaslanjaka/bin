@@ -132,13 +132,6 @@ for (const link of hyperlinks) {
   }
 }
 
-const generatedOptionFile = path.join(tmp, "options.json");
-let localTypedocOptions = defaultOptions;
-if (fs.existsSync(generatedOptionFile)) {
-  localTypedocOptions = JSON.parse(readfile(generatedOptionFile, "utf-8"));
-  localTypedocOptions = Object.assign(defaultOptions, localTypedocOptions);
-}
-
 /*
 const cjson = path.join(__dirname, 'typedoc.json');
 const scriptName = path.basename(__filename);
@@ -151,25 +144,7 @@ if (scriptName.endsWith('-config.js')) {
   if (fs.existsSync(cjson)) fs.rm(cjson);
 }*/
 
-/**
- * read file with validation
- * @param {string} str
- * @param {import('fs').EncodingOption} encoding
- * @returns
- */
-function readfile(str, encoding = "utf-8") {
-  if (fs.existsSync(str)) {
-    if (fs.statSync(str).isFile()) {
-      return fs.readFileSync(str, encoding);
-    } else {
-      throw str + " is directory";
-    }
-  } else {
-    throw str + " not found";
-  }
-}
-
-module.exports = localTypedocOptions;
+module.exports = defaultOptions;
 
 /**
  * read files recursively then push to {@link entryPoints}

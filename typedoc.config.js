@@ -91,11 +91,14 @@ const defaultOptions = {
   gitRevision: "master",
   githubPages: true,
   //theme: 'hierarchy',
-  //plugin: ['typedoc-plugin-missing-exports'],
   //ignoreCompilerErrors: true,
-  logLevel: "Verbose"
+  logLevel: "Verbose",
   //version: true,
   //includeVersion: true
+  plugin: [
+    "typedoc-plugin-ga"
+    //'typedoc-plugin-missing-exports'
+  ]
 };
 
 // Extract local link from readme

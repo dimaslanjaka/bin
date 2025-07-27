@@ -22,7 +22,7 @@ require("dotenv").config({ path: path.join(process.cwd(), ".env") });
  * @returns {string} The base temporary directory path
  */
 function getTempDir() {
-  return process.env.TEMP_DIR || "tmp";
+  return process.env.TEMP_DIR || path.join(process.cwd(), "tmp");
 }
 
 /**

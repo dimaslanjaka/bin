@@ -257,7 +257,7 @@ del-ps          # Kill processes by command name
 ### Cleanup Tools
 
 #### GitHub Actions Cache Cleaner
-See full documentation in [`docs/clean-github-actions-caches.md`](./docs/clean-github-actions-caches.md).
+See full documentation in [`docs-src/clean-github-actions-caches.md`](./docs-src/clean-github-actions-caches.md).
 
 #### Node Modules Cleaner
 Remove node_modules directories recursively:
@@ -282,7 +282,7 @@ Delete gradle build folders:
 del-gradle
 ```
 
-[For full documentation of the ChatGPT automation tool, see `docs/free-chatgpt.md`.](./docs/free-chatgpt.md)
+[For full documentation of the ChatGPT automation tool, see `docs-src/free-chatgpt.md`.](./docs-src/free-chatgpt.md)
 
 ---
 

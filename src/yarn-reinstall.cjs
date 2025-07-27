@@ -1,5 +1,5 @@
 const { execSync } = require("child_process");
-const { getArgs } = require("./utils.cjs");
+const { getArgs } = require("./utils/index.js");
 const args = getArgs();
 const positional = args._ || [];
 

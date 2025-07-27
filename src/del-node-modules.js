@@ -1,5 +1,5 @@
 const glob = require("glob");
-const { delStream } = require("./utils.cjs");
+const { delStream } = require("./utils/index.js");
 
 const globalIgnore = [
   // ignore .git .github folder

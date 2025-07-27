@@ -3,7 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 const { Minimatch } = require("minimatch");
-const { getArgs } = require("./utils.cjs");
+const { getArgs } = require("./utils/index.js");
 
 const args = getArgs();
 const cwd = process.cwd();

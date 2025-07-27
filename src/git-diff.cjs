@@ -59,7 +59,7 @@ function runGitDiff(command, successMessage, errorMessage) {
   }
 }
 
-const { getArgs } = require("./utils.js");
+const { getArgs } = require("./utils.cjs");
 const args = getArgs();
 const positional = args._ || [];
 

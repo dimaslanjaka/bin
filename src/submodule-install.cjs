@@ -10,7 +10,7 @@ const dotenv = require("dotenv");
 const envPath = path.resolve(process.cwd(), ".env");
 if (fs.existsSync(envPath)) dotenv.config({ path: envPath });
 
-const { getArgs } = require("./utils.js");
+const { getArgs } = require("./utils.cjs");
 const args = getArgs();
 const positional = args._ || [];
 

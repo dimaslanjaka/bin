@@ -3,7 +3,7 @@ const path = require("path");
 const crypto = require("crypto");
 const { execSync } = require("child_process");
 const glob = require("glob");
-const { getArgs } = require("./utils.js");
+const { getArgs } = require("./utils.cjs");
 const sbgUtil = require("sbg-utility");
 const dotenv = require("dotenv");
 

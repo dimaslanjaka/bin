@@ -19,3 +19,4 @@ releases/*
 **/coverage
 __*
 /binaries
+/docs

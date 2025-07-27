@@ -86,7 +86,7 @@ const defaultOptions = {
       : "./tsconfig.json",
   //includes: ['src'],
   exclude,
-  htmlLang: "en",
+  // htmlLang: "en",
   //gitRemote: 'https://github.com/dimaslanjaka/static-blog-generator-hexo.git',
   gitRevision: "master",
   githubPages: true,

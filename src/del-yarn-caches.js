@@ -1,5 +1,5 @@
 const glob = require("glob");
-const { delStream } = require("./utils");
+const { delStream } = require("./utils.cjs");
 
 const g3 = new glob.Glob(["**/.yarn/cache*", "**/.yarn/*.gz"], {
   withFileTypes: false,

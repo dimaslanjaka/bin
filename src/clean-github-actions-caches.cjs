@@ -1,5 +1,5 @@
 const axios = require("axios");
-const { parseGitRemotes } = require("./utils");
+const { parseGitRemotes } = require("./utils.cjs");
 const path = require("upath");
 const fs = require("fs");
 const projectDir = process.cwd();

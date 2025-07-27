@@ -1,4 +1,4 @@
-const { getFileTreeString } = require("../src/utils");
+const { getFileTreeString } = require("../src/utils.cjs");
 
 describe("getFileTreeString", () => {
   it("should return a tree for a flat file list", () => {

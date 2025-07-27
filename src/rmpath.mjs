@@ -6,7 +6,7 @@ import fs from "fs-extra";
 import * as glob from "glob";
 import path from "upath";
 import { fileURLToPath, pathToFileURL } from "url";
-import { getArgs } from "./utils.js";
+import { getArgs } from "./utils.cjs";
 
 // Polyfill __filename and __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);

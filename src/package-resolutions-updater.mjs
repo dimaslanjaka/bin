@@ -31,7 +31,7 @@ import fs from "fs";
 import https from "https";
 import os from "os";
 import path from "path";
-import { getArgs } from "./utils.js";
+import { getArgs } from "./utils.cjs";
 
 const projectDir = process.cwd();
 const envPath = path.join(projectDir, ".env");

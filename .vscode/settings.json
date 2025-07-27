@@ -36,7 +36,7 @@
   "files.autoSave": "onWindowChange",
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",
-    "source.organizeImports": "explicit"
+    "source.organizeImports": "never"
   },
   "editor.formatOnPaste": false,
   "editor.formatOnSave": false,

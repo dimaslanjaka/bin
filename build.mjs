@@ -32,7 +32,9 @@ const defaultBin = {
   "clear-github-actions-cache": "lib/clean-github-actions-caches.cjs",
   "clear-github-actions-caches": "lib/clean-github-actions-caches.cjs",
   "clear-gh-caches": "lib/clean-github-actions-caches.cjs",
-  "submodule-install": "lib/submodule-install.cjs"
+  "submodule-install": "lib/submodule-install.cjs",
+  chatgpt: "lib/free-chatgpt.cjs",
+  "free-chatgpt": "lib/free-chatgpt.cjs"
 };
 
 // Build binary mapping from lib/*.cjs and bin/*

@@ -46,7 +46,7 @@ function runGitDiff(command, successMessage, errorMessage) {
     fs.writeFileSync(DIFF_OUTPUT, result);
     fs.writeFileSync(
       GPT_DIFF_OUTPUT,
-      `Hello, ChatGPT!\nCan you create a conventional commit message by diff content below:\n\n\`\`\`${result}\n\`\`\`Give me result as codeblock with language "text" only.\n\nThank you!`
+      `Hello, ChatGPT!\nCan you create a conventional commit message by diff content below:\n\n\`\`\`${result}\n\`\`\`\n\nGive me result as codeblock with language "text" only.\n\nThank you!`
     );
     console.log(`\u{2705} ${successMessage}`);
     console.log(`\u{1F4BE} GPT diff prompt saved to "${GPT_DIFF_OUTPUT}"`);

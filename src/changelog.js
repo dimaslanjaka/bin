@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { EOL } = require("os");
-const { getArgs } = require("./utils.cjs");
+const { getArgs } = require("./utils/index.js");
 const spawn = require("child_process").spawn;
 
 const pkgPath = path.join(process.cwd(), "package.json");

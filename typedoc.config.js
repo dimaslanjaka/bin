@@ -4,10 +4,17 @@ const pkgjson = require("./package.json");
 const { minimatch } = require("minimatch");
 const { marked } = require("marked");
 
-// required: npm i upath
-// required: npm i -D typedoc typedoc-plugin-missing-exports
-// update   : curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/typedoc.config.js > typedoc.config.js
-// repo     : https://github.com/dimaslanjaka/nodejs-package-types/blob/main/typedoc.config.js
+/**
+ * TypeDoc configuration script
+ *
+ * Requirements:
+ *   - npm i upath
+ *   - npm i -D typedoc typedoc-plugin-missing-exports
+ * Update:
+ *   curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/typedoc.config.js > typedoc.config.js
+ * Repository:
+ *   https://github.com/dimaslanjaka/nodejs-package-types/blob/main/typedoc.config.js
+ */
 
 const tmp = path.join(__dirname, "tmp/typedoc");
 const exclude = ["*.test.ts", "*.test.js"];

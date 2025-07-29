@@ -94,6 +94,7 @@
     "print-directory-tree2": "lib/print-directory-tree2.cjs",
     "print-tree": "lib/print-directory-tree.cjs",
     "prod": "binaries/prod.cjs",
+    "remove-module": "lib/remove-module.cjs",
     "rmfind": "binaries/rmfind.cjs",
     "rmpath": "lib/rmpath.cjs",
     "rmx": "binaries/rmx.cjs",

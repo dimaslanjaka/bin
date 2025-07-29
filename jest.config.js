@@ -55,5 +55,6 @@ module.exports = {
   coverageReporters: ["text", "lcov", "html"],
   setupFilesAfterEnv: [],
   testTimeout: 120000,
-  detectOpenHandles: true
+  detectOpenHandles: true,
+  modulePathIgnorePatterns: ["<rootDir>/test/package.json"]
 };

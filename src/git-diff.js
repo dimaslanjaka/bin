@@ -3,9 +3,13 @@
 import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath, pathToFileURL } from "url";
 import { getTempPath } from "./binary-collections-config.cjs";
-import { runChatGpt } from "./utils/chatgpt.js";
 import { getArgs } from "./utils/index.cjs";
+import { runChatGpt } from "./utils/chatgpt.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Output path using centralized temp directory configuration
 const DIFF_OUTPUT = getTempPath("git-diff.txt");
@@ -64,7 +68,7 @@ function showHelp() {
  */
 function runGitDiff(command, successMessage, errorMessage) {
   try {
-    console.log(`\u{1F50E} [i] Running command: ${command}`);
+    console.log(`🔍 [i] Running command: ${command}`);
     const result = execSync(command, {
       encoding: "utf8",
       maxBuffer: 1024 * 1024 * 10 // 10MB buffer to handle large diffs
@@ -72,9 +76,9 @@ function runGitDiff(command, successMessage, errorMessage) {
 
     // If result is empty, inform user but don't treat as error
     if (!result || result.trim() === "") {
-      console.log(`\u{1F6C8} [i] No changes found for the specified criteria`);
+      console.log(`ℹ️ [i] No changes found for the specified criteria`);
       fs.writeFileSync(DIFF_OUTPUT, "# No changes found\n");
-      console.log(`\u{2705} Empty diff saved to "${DIFF_OUTPUT_RELATIVE}"`);
+      console.log(`✅ Empty diff saved to "${DIFF_OUTPUT_RELATIVE}"`);
       return;
     }
 
@@ -83,16 +87,16 @@ function runGitDiff(command, successMessage, errorMessage) {
       GPT_DIFF_OUTPUT,
       `Hello, ChatGPT!\nCan you create a conventional commit message by diff content below:\n\n\`\`\`${result}\n\`\`\`\n\nGive me result as codeblock with language "text" only.\n\nThank you!`
     );
-    console.log(`\u{2705} ${successMessage}`);
-    console.log(`\u{1F4BE} GPT diff prompt saved to "${GPT_DIFF_OUTPUT_RELATIVE}"`);
+    console.log(`✅ ${successMessage}`);
+    console.log(`💾 GPT diff prompt saved to "${GPT_DIFF_OUTPUT_RELATIVE}"`);
   } catch (error) {
-    console.error(`\u{274C} ${errorMessage}`);
-    console.error(`\u{1F4DD} Command: ${command}`);
-    console.error(`\u{26A0} Error: ${error.message}`);
+    console.error(`❌ ${errorMessage}`);
+    console.error(`📝 Command: ${command}`);
+    console.error(`⚠️ Error: ${error.message}`);
 
     // Check if it's a git-related error
     if (error.message.includes("not a git repository")) {
-      console.error("\u{1F6A7} Make sure you are in a git repository");
+      console.error("🚧 Make sure you are in a git repository");
     }
 
     process.exit(1);
@@ -133,13 +137,35 @@ async function mainGitDiff() {
   }
 
   // Generate commit message prompt from ChatGPT
-  await runChatGpt({ headless: false, questionFile: GPT_DIFF_OUTPUT });
+  await runChatGpt({ headless: true, questionFile: GPT_DIFF_OUTPUT });
 }
 
 export default runGitDiff;
 export { runGitDiff as gitDiff };
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Detect if the script is run directly in both CommonJS and ESM
+let isMain = false;
+
+try {
+  // CommonJS detection
+  if (typeof require !== "undefined" && typeof module !== "undefined" && require.main === module) {
+    isMain = true;
+  }
+} catch (_e) {
+  // Ignore errors in ESM environments
+}
+
+try {
+  // ES Module detection
+  const mainArg = process.argv[1] && path.resolve(process.argv[1]);
+  if (mainArg && import.meta.url === pathToFileURL(mainArg).href) {
+    isMain = true;
+  }
+} catch (_e) {
+  // Ignore errors in CommonJS environments
+}
+
+if (isMain) {
   (async () => {
     await mainGitDiff();
   })();

@@ -7,23 +7,18 @@
     "cleaner",
     "utility"
   ],
+  "homepage": "https://www.webmanajemen.com/",
+  "bugs": {
+    "url": "https://github.com/dimaslanjaka/bin/issues"
+  },
   "license": "MIT",
   "author": {
     "name": "dimaslanjaka",
     "email": "dimaslanjaka@gmail.com",
     "url": "https://webmanajemen.com"
   },
-  "homepage": "https://www.webmanajemen.com/",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/dimaslanjaka/bin"
-  },
-  "bugs": {
-    "url": "https://github.com/dimaslanjaka/bin/issues"
-  },
-  "main": "lib/index.js",
   "type": "module",
-  "types": "lib/index.d.ts",
+  "main": "lib/index.js",
   "exports": {
     ".": {
       "require": {
@@ -37,6 +32,14 @@
     },
     "./package.json": "./package.json"
   },
+  "types": "lib/index.d.ts",
+  "files": [
+    "binaries",
+    "lib",
+    "package.json",
+    "docs-src/**/*.md",
+    "readme.md"
+  ],
   "bin": {
     "binary-collections": "lib/binary-collections.cjs",
     "binary-collections-config2": "lib/binary-collections-config2.cjs",
@@ -61,7 +64,6 @@
     "del-ps": "lib/del-ps.cjs",
     "del-ps2": "lib/del-ps2.cjs",
     "del-yarn-caches": "lib/del-yarn-caches.cjs",
-    "del-yarn-caches2": "lib/del-yarn-caches2.cjs",
     "del-yarncaches": "lib/del-yarn-caches.cjs",
     "dev": "binaries/dev.cjs",
     "dir-tree": "lib/print-directory-tree.cjs",
@@ -105,25 +107,14 @@
     "yarn-reinstall": "lib/yarn-reinstall.cjs",
     "yarn-reinstall2": "lib/yarn-reinstall2.cjs"
   },
-  "files": [
-    "binaries",
-    "lib",
-    "package.json",
-    "docs-src/**/*.md",
-    "readme.md"
-  ],
-  "directories": {
-    "lib": "lib",
-    "bin": "binaries"
-  },
   "scripts": {
-    "build": "tsc -b tsconfig.build.json && npm run build:tsup && npm run postbuild",
+    "build": "tsc -b tsconfig.build.json && npm run build:rollup && npm run postbuild",
     "build:packages": "yarn workspaces foreach --worktree --exclude=binary-collections --no-private run build",
     "build:rollup": "rollup -c rollup.config.cjs",
     "build:tsup": "node build.tsup.js",
     "clean": "rimraf lib tmp/dist binaries",
     "pack": "node packer.cjs --yarn --filename=bin",
-    "postbuild": "node -r ts-node/register -r dotenv/config build.mjs && yarn run pack",
+    "postbuild": "node -r ts-node/register -r dotenv/config build.exports.mjs && yarn run pack",
     "prepare": "husky",
     "test": "npx jest --runInBand --forceExit --testTimeout=120000 --testPathIgnorePatterns=\"\\.mjs$\"",
     "test:coverage": "npm test --coverage --detectOpenHandles",
@@ -132,6 +123,10 @@
     "test:watch": "npm test --watch",
     "update:ncu": "npx npm-check-updates -u -x jsdom,chalk,hexo,deepmerge-ts --enginesNode --root",
     "update:packer": "curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js > packer.cjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dimaslanjaka/bin"
   },
   "dependencies": {
     "ansi-colors": "^4.1.3",
@@ -198,6 +193,10 @@
     "typedoc": "^0.28.7",
     "typedoc-plugin-ga": "^1.0.5",
     "typescript": "^5.8.3"
+  },
+  "directories": {
+    "lib": "lib",
+    "bin": "binaries"
   },
   "workspaces": [
     "packages/*"

@@ -19,7 +19,7 @@ const baseOption = {
   outDir: "lib",
   entry: ["./src/**/*.ts", "./src/**/*.js", "./src/**/*.cjs", "./src/**/*.mjs"],
   target: "node14",
-  dts: true,
+  // dts: true,
   shims: true,
   // Explicitly exclude tsup shims from being marked as external
   external,

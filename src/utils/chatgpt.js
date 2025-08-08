@@ -440,9 +440,13 @@ export async function runChatGpt(chatgptOptions = {}) {
     }
 
     // Upload the question file
-    const plusButton = await page.$('[data-testid="composer-plus-btn"]');
-    if (plusButton) {
-      await plusButton.click();
+    const plusButtonExists = await page.evaluate(() => {
+      const button = document.querySelector('[data-testid="composer-plus-btn"]');
+      return button !== null;
+    });
+
+    if (plusButtonExists) {
+      await page.click('[data-testid="composer-plus-btn"]');
       await sleep(500); // Wait for the menu to open
       const menuItems = await page.$$('[role="menuitem"]');
       let clicked = false;

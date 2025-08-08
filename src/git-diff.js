@@ -31,9 +31,11 @@ function showHelp() {
   console.log("  \u{1F4C2} git-diff FILE             Show staged diff of specified file");
   console.log("  \u{1F4C2} git-diff --staged-only    Show staged diff of all files");
   console.log("  \u{1F4C2} git-diff -s | -S          Same as --staged-only");
+  console.log("  \u{1F4C2} git-diff --ai             Run ChatGPT automation for commit message");
   console.log("  \u{1F4C2} git-diff --help | -h      Show this help message");
   console.log("");
   console.log(`\u{1F4BE} Output is saved to: ${DIFF_OUTPUT_RELATIVE}`);
+  console.log(`\u{1F916} GPT prompt is saved to: ${GPT_DIFF_OUTPUT_RELATIVE}`);
   process.exit(0);
 }
 
@@ -136,8 +138,21 @@ async function mainGitDiff() {
     }
   }
 
-  // Generate commit message prompt from ChatGPT
-  await runChatGpt({ headless: true, questionFile: GPT_DIFF_OUTPUT });
+  // Generate commit message prompt from ChatGPT (only if --ai is specified)
+  if (args.ai) {
+    try {
+      await runChatGpt({ headless: true, questionFile: GPT_DIFF_OUTPUT });
+    } catch (error) {
+      console.error("❌ Error running ChatGPT:", error.message);
+      console.error("💡 Try running with visible browser mode or check if Chrome is installed");
+      console.error(`📁 The diff has been saved to: ${DIFF_OUTPUT_RELATIVE}`);
+      console.error(`📁 GPT prompt saved to: ${GPT_DIFF_OUTPUT_RELATIVE}`);
+    }
+  } else {
+    console.log("💡 Tip: Use --ai flag to generate commit message with ChatGPT");
+    console.log(`📁 Diff saved to: ${DIFF_OUTPUT_RELATIVE}`);
+    console.log(`📁 GPT prompt saved to: ${GPT_DIFF_OUTPUT_RELATIVE}`);
+  }
 }
 
 export default runGitDiff;

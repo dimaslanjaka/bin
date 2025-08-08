@@ -6,7 +6,7 @@ const { ignoreFilePermissions } = require("./git/permissions.cjs");
 const { setPullStrategy } = require("./git/pull-strategy.cjs");
 const { configureGitUser } = require("./git/user-config.cjs");
 const { normalizeLineEndings } = require("./git/normalize.cjs");
-const { getArgs } = require("./utils/index.js");
+const { getArgs } = require("./utils/index.cjs");
 const path = require("upath");
 
 require("dotenv").config({ path: path.join(process.cwd(), ".env") });

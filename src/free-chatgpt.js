@@ -2,7 +2,7 @@ import fs from "fs-extra";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import path from "upath";
-import { getArgs } from "./utils/index.js";
+import { getArgs } from "./utils/index.cjs";
 
 const argv = getArgs();
 if (argv.help || argv.h) {

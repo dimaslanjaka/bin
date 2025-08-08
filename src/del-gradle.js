@@ -1,6 +1,6 @@
 const glob = require("glob");
 const path = require("upath");
-const { del } = require("./utils/index.js");
+const { del } = require("./utils/index.cjs");
 
 const globStream = new glob.Glob(["**/build.gradle"], {
   withFileTypes: false,

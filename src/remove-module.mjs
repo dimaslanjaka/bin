@@ -1,4 +1,4 @@
-import { getArgs } from "./utils/index.js";
+import { getArgs } from "./utils/index.cjs";
 import fs from "fs";
 import path from "path";
 import * as glob from "glob";

@@ -3,7 +3,7 @@
 const { spawn } = require("child_process");
 const { glob } = require("glob");
 const path = require("upath");
-const { getArgs } = require("./utils/index.js");
+const { getArgs } = require("./utils/index.cjs");
 const pkgJson = require("../package.json");
 const fs = require("fs-extra");
 

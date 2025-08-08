@@ -1,6 +1,6 @@
 const gch = require("git-command-helper");
 const { runGitCommand, runGitCommandOutput } = require("./utils.cjs");
-const { getArgs } = require("../utils/index.js");
+const { getArgs } = require("../utils/index.cjs");
 
 require("dotenv").config({ path: require("path").join(process.cwd(), ".env") });
 

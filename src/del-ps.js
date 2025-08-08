@@ -1,7 +1,7 @@
 const crossSpawn = require("cross-spawn");
 const ps = require("ps-node");
 const isWin = require("./ps/isWin");
-const { getArgs } = require("./utils/index.js");
+const { getArgs } = require("./utils/index.cjs");
 
 getArgs()._.forEach((command) => {
   ps.lookup(

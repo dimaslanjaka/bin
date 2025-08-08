@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
-const { parseGitAttributes } = require("../src/git/gitattributes.js");
+const { parseGitAttributes } = require("../src/git/gitattributes.js").default;
 require("./env.js");
 
 describe("parseGitAttributes", () => {

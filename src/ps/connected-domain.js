@@ -8,7 +8,7 @@
  * @param {Boolean} hardlink If use hard link. Default to false.
  * @return {Object} [{ bounding: { w: 12, h: 19, x: 0, y: 1 }, points: [ { x: 1, y: 2, point: {} } ], identifier: 'blue', domainId: 1 } ]
  */
-module.exports = function (tdArray, indicator, hardlink) {
+export default function (tdArray, indicator, hardlink) {
   hardlink = hardlink || false;
 
   if (!tdArray) {
@@ -241,4 +241,4 @@ module.exports = function (tdArray, indicator, hardlink) {
   }
 
   return result;
-};
+}

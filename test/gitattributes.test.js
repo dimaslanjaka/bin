@@ -1,13 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
-const {
-  parseGitAttributes,
-  patternsConflict,
-  mergeGitAttributeRules,
-  formatGitAttributes,
-  updateGitAttributes
-} = require("../src/git/gitattributes.js");
+const { parseGitAttributes, patternsConflict, mergeGitAttributeRules, formatGitAttributes, updateGitAttributes } =
+  require("../src/git/gitattributes.js").default;
 
 describe("GitAttributes Parser", () => {
   let tempDir;

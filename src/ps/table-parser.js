@@ -6,7 +6,7 @@
  * 4, a domain group belongs to a title field if they vertically overlapped
  * 5, calculate all the edge info through the group domain and title field relations.
  */
-var ConnectedDomain = require("./connected-domain");
+import ConnectedDomain from "./connected-domain";
 var EMPTY_EX = /\s/;
 
 /**
@@ -14,7 +14,7 @@ var EMPTY_EX = /\s/;
  * @param output
  * @returns {Array}
  */
-module.exports.parse = function (output) {
+export function parse(output) {
   // Split into lines
   // Basically, the EOL should be:
   // - windows: \r\n
@@ -192,7 +192,7 @@ module.exports.parse = function (output) {
   });
 
   return result;
-};
+}
 
 /**
  * Test if two bounding overlapped vertically

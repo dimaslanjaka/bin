@@ -1,11 +1,11 @@
-const path = require("upath");
-const { build } = require("tsup");
-const packageJson = require("./package.json");
+import path from "upath";
+import { build } from "tsup";
+import pkgJson from "./package.json" with { type: "json" };
 
 // Packages that should be bundled
 const bundledPackages = ["p-limit", "deepmerge-ts", "hexo-is", "is-stream", "markdown-it", "node-cache"];
 
-const externalDeps = [...Object.keys(packageJson.dependencies), ...Object.keys(packageJson.devDependencies)].filter(
+const externalDeps = [...Object.keys(pkgJson.dependencies), ...Object.keys(pkgJson.devDependencies)].filter(
   (pkgName) => !bundledPackages.includes(pkgName)
 );
 

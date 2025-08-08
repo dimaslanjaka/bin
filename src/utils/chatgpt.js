@@ -2,7 +2,7 @@ import fs from "fs-extra";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import path from "upath";
-import esMain from "es-main";
+import { pathToFileURL } from "url";
 
 const COOKIE_DIR = path.join(process.cwd(), "tmp", "cookies");
 const DEFAULT_COOKIE_PATH = path.join(COOKIE_DIR, "cookies.json");
@@ -337,7 +337,13 @@ export async function runChatGpt(chatgptOptions = {}) {
   const headless = chatgptOptions.headless !== undefined ? chatgptOptions.headless : true;
   const questionFile = chatgptOptions.questionFile;
   let question = chatgptOptions.question;
-  if ((!question && !questionFile) || (question.trim().length === 0 && questionFile.trim().length === 0)) {
+
+  // Validate input parameters
+  const noInputProvided = !question && !questionFile;
+  const questionIsEmpty = question && question.trim().length === 0;
+  const questionFileIsEmpty = questionFile && questionFile.trim().length === 0;
+
+  if (noInputProvided || questionIsEmpty || questionFileIsEmpty) {
     throw new Error("You must provide a question or a question file.");
   }
 
@@ -448,7 +454,7 @@ export async function runChatGpt(chatgptOptions = {}) {
   await browser.close();
 }
 
-if (esMain(import.meta)) {
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   (async () => {
     try {
       await runChatGpt({ headless: false, questionFile: path.join(process.cwd(), "tmp/gpt-question.txt") });

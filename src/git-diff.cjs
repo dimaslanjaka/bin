@@ -10,6 +10,10 @@ const DIFF_OUTPUT = getTempPath("git-diff.txt");
 const GPT_DIFF_OUTPUT = getTempPath("gpt-question.txt");
 const CACHE_DIR = path.dirname(DIFF_OUTPUT);
 
+// Relative paths for display in logs
+const DIFF_OUTPUT_RELATIVE = path.relative(process.cwd(), DIFF_OUTPUT);
+const GPT_DIFF_OUTPUT_RELATIVE = path.relative(process.cwd(), GPT_DIFF_OUTPUT);
+
 // Ensure output directory exists
 if (!fs.existsSync(CACHE_DIR)) {
   fs.mkdirSync(CACHE_DIR, { recursive: true });
@@ -23,7 +27,7 @@ function showHelp() {
   console.log("  \u{1F4C2} git-diff -s | -S          Same as --staged-only");
   console.log("  \u{1F4C2} git-diff --help | -h      Show this help message");
   console.log("");
-  console.log(`\u{1F4BE} Output is saved to: ${DIFF_OUTPUT}`);
+  console.log(`\u{1F4BE} Output is saved to: ${DIFF_OUTPUT_RELATIVE}`);
   process.exit(0);
 }
 
@@ -39,7 +43,7 @@ function runGitDiff(command, successMessage, errorMessage) {
     if (!result || result.trim() === "") {
       console.log(`\u{1F6C8} [i] No changes found for the specified criteria`);
       fs.writeFileSync(DIFF_OUTPUT, "# No changes found\n");
-      console.log(`\u{2705} Empty diff saved to "${DIFF_OUTPUT}"`);
+      console.log(`\u{2705} Empty diff saved to "${DIFF_OUTPUT_RELATIVE}"`);
       return;
     }
 
@@ -49,7 +53,7 @@ function runGitDiff(command, successMessage, errorMessage) {
       `Hello, ChatGPT!\nCan you create a conventional commit message by diff content below:\n\n\`\`\`${result}\n\`\`\`\n\nGive me result as codeblock with language "text" only.\n\nThank you!`
     );
     console.log(`\u{2705} ${successMessage}`);
-    console.log(`\u{1F4BE} GPT diff prompt saved to "${GPT_DIFF_OUTPUT}"`);
+    console.log(`\u{1F4BE} GPT diff prompt saved to "${GPT_DIFF_OUTPUT_RELATIVE}"`);
   } catch (error) {
     console.error(`\u{274C} ${errorMessage}`);
     console.error(`\u{1F4DD} Command: ${command}`);
@@ -76,18 +80,22 @@ if (args.help || args.h) {
 if (args["staged-only"] || args.s || args.S) {
   runGitDiff(
     "git --no-pager diff --staged",
-    `Full staged diff saved to "${DIFF_OUTPUT}"`,
+    `Full staged diff saved to "${DIFF_OUTPUT_RELATIVE}"`,
     "Failed to save staged diff"
   );
 } else {
   // Handle specific file diff
   const file = positional[0];
   if (!file) {
-    runGitDiff("git --no-pager diff", `Full staged diff saved to "${DIFF_OUTPUT}"`, "Failed to save all diff's");
+    runGitDiff(
+      "git --no-pager diff",
+      `Full staged diff saved to "${DIFF_OUTPUT_RELATIVE}"`,
+      "Failed to save all diff's"
+    );
   } else {
     runGitDiff(
       `git --no-pager diff --cached -- "${file}"`,
-      `Staged diff of "${file}" saved to "${DIFF_OUTPUT}"`,
+      `Staged diff of "${file}" saved to "${DIFF_OUTPUT_RELATIVE}"`,
       `Failed to generate diff for "${file}"`
     );
   }

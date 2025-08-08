@@ -45,6 +45,11 @@ function findNodeModules(dir = process.cwd(), callback = null) {
   });
 }
 
+// ESM export support
+module.exports = findNodeModules;
+module.exports.default = findNodeModules;
+module.exports.findNodeModules = findNodeModules;
+
 // Support both CommonJS and ESM usage
 if (typeof module !== "undefined" && require.main === module) {
   findNodeModules(null, console.log)
@@ -55,7 +60,3 @@ if (typeof module !== "undefined" && require.main === module) {
       console.error("Error finding node_modules directories:", err);
     });
 }
-
-// ESM export support
-module.exports = findNodeModules;
-module.exports.default = findNodeModules;

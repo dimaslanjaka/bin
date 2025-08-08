@@ -4,6 +4,7 @@ const { execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const { getTempPath } = require("./binary-collections-config.cjs");
+const { getArgs } = require("./utils/index.cjs");
 
 // Output path using centralized temp directory configuration
 const DIFF_OUTPUT = getTempPath("git-diff.txt");
@@ -31,6 +32,35 @@ function showHelp() {
   process.exit(0);
 }
 
+/**
+ * Executes a git diff command and saves the output to configured temp files.
+ *
+ * This function runs the specified git command, captures its output, and saves it to two files:
+ * - A standard diff output file for manual inspection
+ * - A GPT-formatted prompt file for generating conventional commit messages
+ *
+ * @param {string} command - The git command to execute (e.g., "git --no-pager diff --staged")
+ * @param {string} successMessage - Message to display when the command executes successfully
+ * @param {string} errorMessage - Message to display when the command fails
+ *
+ * @throws {Error} Exits the process with code 1 if the git command fails
+ *
+ * @example
+ * // Generate staged diff for all files
+ * runGitDiff(
+ *   "git --no-pager diff --staged",
+ *   "Staged diff saved successfully",
+ *   "Failed to generate staged diff"
+ * );
+ *
+ * @example
+ * // Generate diff for a specific file
+ * runGitDiff(
+ *   'git --no-pager diff --cached -- "src/file.js"',
+ *   'File diff saved successfully',
+ *   'Failed to generate file diff'
+ * );
+ */
 function runGitDiff(command, successMessage, errorMessage) {
   try {
     console.log(`\u{1F50E} [i] Running command: ${command}`);
@@ -68,35 +98,43 @@ function runGitDiff(command, successMessage, errorMessage) {
   }
 }
 
-const { getArgs } = require("./utils/index.cjs");
-const args = getArgs();
-const positional = args._ || [];
+function mainGitDiff() {
+  const args = getArgs();
+  const positional = args._ || [];
 
-// Show help if no arguments or --help/-h is passed
-if (args.help || args.h) {
-  showHelp();
-}
+  // Show help if no arguments or --help/-h is passed
+  if (args.help || args.h) {
+    showHelp();
+  }
 
-if (args["staged-only"] || args.s || args.S) {
-  runGitDiff(
-    "git --no-pager diff --staged",
-    `Full staged diff saved to "${DIFF_OUTPUT_RELATIVE}"`,
-    "Failed to save staged diff"
-  );
-} else {
-  // Handle specific file diff
-  const file = positional[0];
-  if (!file) {
+  if (args["staged-only"] || args.s || args.S) {
     runGitDiff(
-      "git --no-pager diff",
+      "git --no-pager diff --staged",
       `Full staged diff saved to "${DIFF_OUTPUT_RELATIVE}"`,
-      "Failed to save all diff's"
+      "Failed to save staged diff"
     );
   } else {
-    runGitDiff(
-      `git --no-pager diff --cached -- "${file}"`,
-      `Staged diff of "${file}" saved to "${DIFF_OUTPUT_RELATIVE}"`,
-      `Failed to generate diff for "${file}"`
-    );
+    // Handle specific file diff
+    const file = positional[0];
+    if (!file) {
+      runGitDiff(
+        "git --no-pager diff",
+        `Full staged diff saved to "${DIFF_OUTPUT_RELATIVE}"`,
+        "Failed to save all diff's"
+      );
+    } else {
+      runGitDiff(
+        `git --no-pager diff --cached -- "${file}"`,
+        `Staged diff of "${file}" saved to "${DIFF_OUTPUT_RELATIVE}"`,
+        `Failed to generate diff for "${file}"`
+      );
+    }
   }
+}
+
+module.exports = runGitDiff;
+module.exports.gitDiff = runGitDiff;
+
+if (typeof module !== "undefined" && require.main === module) {
+  mainGitDiff();
 }

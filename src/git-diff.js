@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
-const { execSync } = require("child_process");
-const fs = require("fs");
-const path = require("path");
-const { getTempPath } = require("./binary-collections-config.cjs");
-const { getArgs } = require("./utils/index.cjs");
+import { execSync } from "child_process";
+import fs from "fs";
+import path from "path";
+import { getTempPath } from "./binary-collections-config.cjs";
+import { runChatGpt } from "./utils/chatgpt.js";
+import { getArgs } from "./utils/index.cjs";
 
 // Output path using centralized temp directory configuration
 const DIFF_OUTPUT = getTempPath("git-diff.txt");
@@ -130,11 +131,14 @@ function mainGitDiff() {
       );
     }
   }
+
+  // Generate commit message prompt from ChatGPT
+  runChatGpt({ headless: false, questionFile: path.join(process.cwd(), "tmp/gpt-question.txt") });
 }
 
-module.exports = runGitDiff;
-module.exports.gitDiff = runGitDiff;
+export default runGitDiff;
+export { runGitDiff as gitDiff };
 
-if (typeof module !== "undefined" && require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   mainGitDiff();
 }

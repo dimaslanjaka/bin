@@ -147,7 +147,7 @@ const config = {
       preserveModulesRoot: "src"
     },
     {
-      format: "esm",
+      format: "cjs",
       dir: "lib",
       entryFileNames: entryFileNamesWithExt("cjs"),
       entryChunkFileNames: chunkFileNamesWithExt("cjs"),

@@ -99,7 +99,7 @@ function runGitDiff(command, successMessage, errorMessage) {
   }
 }
 
-function mainGitDiff() {
+async function mainGitDiff() {
   const args = getArgs();
   const positional = args._ || [];
 
@@ -133,12 +133,14 @@ function mainGitDiff() {
   }
 
   // Generate commit message prompt from ChatGPT
-  runChatGpt({ headless: false, questionFile: GPT_DIFF_OUTPUT });
+  await runChatGpt({ headless: false, questionFile: GPT_DIFF_OUTPUT });
 }
 
 export default runGitDiff;
 export { runGitDiff as gitDiff };
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  mainGitDiff();
+  (async () => {
+    await mainGitDiff();
+  })();
 }

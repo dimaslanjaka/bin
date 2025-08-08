@@ -133,7 +133,7 @@ function mainGitDiff() {
   }
 
   // Generate commit message prompt from ChatGPT
-  runChatGpt({ headless: false, questionFile: path.join(process.cwd(), "tmp/gpt-question.txt") });
+  runChatGpt({ headless: false, questionFile: GPT_DIFF_OUTPUT });
 }
 
 export default runGitDiff;

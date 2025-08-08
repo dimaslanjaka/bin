@@ -8,9 +8,12 @@
   "compilerOptions": {
     "strict": true,
     "allowJs": true,
-    "outDir": "tmp/dist",
+    "checkJs": false,
+    "outDir": "lib",
     "removeComments": false,
-    "declaration": true
+    "declaration": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src", "test", "bin"],
   "exclude": ["**/node_modules", "node_modules", ".vscode"]

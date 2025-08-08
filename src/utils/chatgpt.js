@@ -312,9 +312,54 @@ async function isLoggedIn(page) {
  * @returns {Promise<import("puppeteer-extra").Browser>} The created browser instance.
  */
 async function createBrowser(browserOptions = {}) {
-  return await puppeteer
-    .use(StealthPlugin())
-    .launch({ headless: false, userDataDir: path.join(process.cwd(), "tmp/puppeteer-profile"), ...browserOptions });
+  /**
+   * @type {Parameters<import("puppeteer-extra").VanillaPuppeteer["launch"]>[0]}
+   */
+  const defaultOptions = {
+    headless: false,
+    userDataDir: path.join(process.cwd(), "tmp/puppeteer-profile"),
+    // Windows-specific options to handle browser launch issues
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-accelerated-2d-canvas",
+      "--no-first-run",
+      "--no-zygote",
+      "--disable-gpu",
+      "--disable-background-timer-throttling",
+      "--disable-backgrounding-occluded-windows",
+      "--disable-renderer-backgrounding"
+    ],
+    ignoreDefaultArgs: ["--disable-extensions"],
+    ...(process.platform === "win32" && {
+      // Additional Windows-specific options
+      executablePath: undefined // Let Puppeteer find Chrome automatically
+    })
+  };
+
+  try {
+    return await puppeteer.use(StealthPlugin()).launch({ ...defaultOptions, ...browserOptions });
+  } catch (_error) {
+    console.error("Failed to launch browser with default options. Trying fallback options...");
+
+    // Fallback: Try with minimal options
+    try {
+      return await puppeteer.use(StealthPlugin()).launch({
+        headless: browserOptions.headless || false,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        ignoreDefaultArgs: false,
+        ...browserOptions
+      });
+    } catch (fallbackError) {
+      console.error("Browser launch failed completely. Common solutions:");
+      console.error("1. Install Google Chrome if not installed");
+      console.error("2. Update Node.js to the latest version");
+      console.error("3. Try running: npm install puppeteer --force");
+      console.error("4. Check if antivirus is blocking browser launch");
+      throw new Error(`Browser launch failed: ${fallbackError.message}`);
+    }
+  }
 }
 
 /**
@@ -388,115 +433,131 @@ export async function runChatGpt(chatgptOptions = {}) {
     throw new Error("You must provide a question or a question file.");
   }
 
-  const browser = await createBrowser({ headless });
+  let browser;
+  try {
+    browser = await createBrowser({ headless });
+  } catch (error) {
+    console.error("Error running ChatGPT:", error);
+    console.error("\nTroubleshooting steps:");
+    console.error("1. Make sure Google Chrome is installed");
+    console.error("2. Try running: yarn add puppeteer --force");
+    console.error("3. Check if your antivirus is blocking the browser");
+    console.error("4. Close any running Chrome instances and try again");
+    throw error;
+  }
+
   /** @type {import('puppeteer').Page} */
   const page = (await browser.pages()).length > 0 ? (await browser.pages())[0] : await browser.newPage();
 
-  const url = "https://chat.openai.com";
-  const navigate = await navigatePage(page, url);
-
-  // Check temporary chat - wait for page to load and try to click temporary chat button
-  await navigate.waitForDomIdle(2000, 15000);
-
   try {
-    const tempChatButton = await page.$('button[aria-label="Turn on temporary chat"]');
-    if (tempChatButton) {
-      await page.evaluate((el) => el.click(), tempChatButton);
-      console.log("Successfully clicked temporary chat button");
-      await navigate.waitForDomIdle(1000, 10000);
-    } else {
-      console.log("Temporary chat button not found, proceeding without it.");
-    }
-  } catch (error) {
-    console.log(`Failed to click temporary chat button: ${error.message}`);
-  }
+    const url = "https://chat.openai.com";
+    const navigate = await navigatePage(page, url);
 
-  if (question) {
-    await writeQuestion(page, question);
-    // Submit the question
-    await clickSubmitButton(page);
-    await navigate.waitForDomIdle(1000, 30000); // Wait for DOM to stabilize
+    // Check temporary chat - wait for page to load and try to click temporary chat button
+    await navigate.waitForDomIdle(2000, 15000);
 
-    // Wait for the initial response
-    await waitForInitialResponse(page);
-    // Handle the streaming response
-    await handleStreamingResponse(page, responseFile);
-
-    // Save cookies for this host at the end
-    await saveCookies(page, getCookiePathForUrl(url));
-  } else if (questionFile) {
-    // Wait for page to fully load before checking login status
-    await navigate.waitForDomIdle(2000, 10000);
-
-    // Check if logged in
-    const isUserLoggedIn = await isLoggedIn(page);
-
-    console.log(`Login status: ${isUserLoggedIn ? "Logged in" : "Not logged in"}`);
-    if (!isUserLoggedIn) {
-      console.log(
-        "Not logged in. Please log in to ChatGPT in the browser window, then close it and run the command again."
-      );
-      return loginToChatGpt();
+    try {
+      const tempChatButton = await page.$('button[aria-label="Turn on temporary chat"]');
+      if (tempChatButton) {
+        await page.evaluate((el) => el.click(), tempChatButton);
+        console.log("Successfully clicked temporary chat button");
+        await navigate.waitForDomIdle(1000, 10000);
+      } else {
+        console.log("Temporary chat button not found, proceeding without it.");
+      }
+    } catch (error) {
+      console.log(`Failed to click temporary chat button: ${error.message}`);
     }
 
-    // Upload the question file
-    const plusButtonExists = await page.evaluate(() => {
-      const button = document.querySelector('[data-testid="composer-plus-btn"]');
-      return button !== null;
-    });
+    if (question) {
+      await writeQuestion(page, question);
+      // Submit the question
+      await clickSubmitButton(page);
+      await navigate.waitForDomIdle(1000, 30000); // Wait for DOM to stabilize
 
-    if (plusButtonExists) {
-      await page.click('[data-testid="composer-plus-btn"]');
-      await sleep(500); // Wait for the menu to open
-      const menuItems = await page.$$('[role="menuitem"]');
-      let clicked = false;
-      for (const item of menuItems) {
-        const text = await page.evaluate((el) => el.innerText, item);
-        if (text && text.includes("Add photos") && text.includes("files")) {
-          await item.hover();
-          clicked = true;
-          break;
+      // Wait for the initial response
+      await waitForInitialResponse(page);
+      // Handle the streaming response
+      await handleStreamingResponse(page, responseFile);
+
+      // Save cookies for this host at the end
+      await saveCookies(page, getCookiePathForUrl(url));
+    } else if (questionFile) {
+      // Wait for page to fully load before checking login status
+      await navigate.waitForDomIdle(2000, 10000);
+
+      // Check if logged in
+      const isUserLoggedIn = await isLoggedIn(page);
+
+      console.log(`Login status: ${isUserLoggedIn ? "Logged in" : "Not logged in"}`);
+      if (!isUserLoggedIn) {
+        console.log(
+          "Not logged in. Please log in to ChatGPT in the browser window, then close it and run the command again."
+        );
+        return loginToChatGpt();
+      }
+
+      // Upload the question file
+      const plusButtonExists = await page.evaluate(() => {
+        const button = document.querySelector('[data-testid="composer-plus-btn"]');
+        return button !== null;
+      });
+
+      if (plusButtonExists) {
+        await page.click('[data-testid="composer-plus-btn"]');
+        await sleep(500); // Wait for the menu to open
+        const menuItems = await page.$$('[role="menuitem"]');
+        let clicked = false;
+        for (const item of menuItems) {
+          const text = await page.evaluate((el) => el.innerText, item);
+          if (text && text.includes("Add photos") && text.includes("files")) {
+            await item.hover();
+            clicked = true;
+            break;
+          }
         }
-      }
-      if (!clicked) {
-        console.log('Could not find the "Add photos & files" menu item.');
-        return;
-      }
-
-      // Wait for file input to appear and upload the file
-      try {
-        await sleep(1000); // Wait for file dialog to be ready
-
-        // Look for the file input element
-        const fileInput = await page.waitForSelector('input[type="file"]', { timeout: 10000 });
-        if (fileInput) {
-          console.log(`Uploading file: ${questionFile}`);
-          await fileInput.uploadFile(questionFile);
-
-          // Wait for the file to be processed
-          await navigate.waitForDomIdle(2000, 15000);
-          console.log("File uploaded successfully");
-
-          // Optionally submit after file upload
-          await clickSubmitButton(page);
-          await navigate.waitForDomIdle(1000, 30000);
-
-          // Wait for and handle response
-          await waitForInitialResponse(page);
-          await handleStreamingResponse(page, responseFile);
-        } else {
-          console.log("Could not find file input element");
+        if (!clicked) {
+          console.log('Could not find the "Add photos & files" menu item.');
+          return;
         }
-      } catch (error) {
-        console.log(`Error uploading file: ${error.message}`);
+
+        // Wait for file input to appear and upload the file
+        try {
+          await sleep(1000); // Wait for file dialog to be ready
+
+          // Look for the file input element
+          const fileInput = await page.waitForSelector('input[type="file"]', { timeout: 10000 });
+          if (fileInput) {
+            console.log(`Uploading file: ${questionFile}`);
+            await fileInput.uploadFile(questionFile);
+
+            // Wait for the file to be processed
+            await navigate.waitForDomIdle(2000, 15000);
+            console.log("File uploaded successfully");
+
+            // Optionally submit after file upload
+            await clickSubmitButton(page);
+            await navigate.waitForDomIdle(1000, 30000);
+
+            // Wait for and handle response
+            await waitForInitialResponse(page);
+            await handleStreamingResponse(page, responseFile);
+          } else {
+            console.log("Could not find file input element");
+          }
+        } catch (error) {
+          console.log(`Error uploading file: ${error.message}`);
+        }
+      } else {
+        console.log('Could not find the [data-testid="composer-plus-btn"] button.');
       }
-    } else {
-      console.log('Could not find the [data-testid="composer-plus-btn"] button.');
+    }
+  } finally {
+    // Always close the browser, even if an error occurred
+    if (browser) {
+      await browser.close();
     }
   }
-
-  // Close the browser
-  await browser.close();
 }
 
 // Detect if the script is run directly in both CommonJS and ESM

@@ -5,6 +5,7 @@ import { nodeResolve } from "@rollup/plugin-node-resolve";
 import color from "ansi-colors";
 import path from "upath";
 import pkgJson from "./package.json" with { type: "json" };
+import * as glob from "glob";
 import fs from "fs";
 
 const { dependencies = {}, devDependencies = {} } = pkgJson;
@@ -133,54 +134,68 @@ function externalPackagesFilter(source, importer, isResolved) {
 }
 
 /**
- * @type {import('rollup').RollupOptions}
+ * @type {import('rollup').RollupOptions[]}
  */
-const config = {
-  input: "src/index.ts",
-  output: [
-    {
-      format: "esm",
-      dir: "lib",
-      entryFileNames: entryFileNamesWithExt("mjs"),
-      entryChunkFileNames: chunkFileNamesWithExt("mjs"),
-      preserveModules: true,
-      preserveModulesRoot: "src"
-    },
-    {
-      format: "cjs",
-      dir: "lib",
-      entryFileNames: entryFileNamesWithExt("cjs"),
-      entryChunkFileNames: chunkFileNamesWithExt("cjs"),
-      preserveModules: true,
-      preserveModulesRoot: "src"
-    }
-  ],
-  plugins: [
-    nodeResolve({
-      extensions: [".js", ".ts", ".cjs", ".mjs", ".json", ".node"],
-      preferBuiltins: true
-    }),
-    commonjs({
-      transformMixedEsModules: true
-    }),
-    json(),
-    babel({
-      babelHelpers: "bundled",
-      extensions: [".js", ".ts", ".cjs", ".mjs"],
-      exclude: "**/node_modules/**",
-      presets: [
-        "@babel/preset-typescript",
-        [
-          "@babel/preset-env",
-          {
-            targets: {
-              node: "14"
+const configs = [];
+const inputs = glob.sync("src/**/*", { nodir: true });
+
+for (let input of inputs) {
+  input = path.toUnix(input);
+  /**
+   * @type {import('rollup').RollupOptions}
+   */
+  const rollupConfig = {
+    input,
+    output: [
+      {
+        format: "esm",
+        dir: "lib",
+        entryFileNames: entryFileNamesWithExt("mjs"),
+        entryChunkFileNames: chunkFileNamesWithExt("mjs")
+      },
+      {
+        format: "cjs",
+        dir: "lib",
+        entryFileNames: entryFileNamesWithExt("cjs"),
+        entryChunkFileNames: chunkFileNamesWithExt("cjs")
+      }
+    ],
+    external: externalPackagesFilter,
+    plugins: [
+      nodeResolve({
+        extensions: [".js", ".ts", ".cjs", ".mjs", ".json", ".node"],
+        preferBuiltins: true
+      }),
+      commonjs({
+        transformMixedEsModules: true
+      }),
+      json()
+    ]
+  };
+
+  // Add Babel plugin for TypeScript files
+  if (input.endsWith(".ts")) {
+    rollupConfig.plugins.push(
+      babel({
+        babelHelpers: "bundled",
+        extensions: [".js", ".ts", ".cjs", ".mjs"],
+        exclude: "**/node_modules/**",
+        presets: [
+          "@babel/preset-typescript",
+          [
+            "@babel/preset-env",
+            {
+              targets: {
+                node: "14"
+              }
             }
-          }
+          ]
         ]
-      ]
-    })
-  ],
-  external: externalPackagesFilter
-};
-export default config;
+      })
+    );
+  }
+
+  configs.push(rollupConfig);
+}
+
+export default configs;

@@ -1,7 +1,7 @@
 const path = require("upath");
 const fs = require("fs");
 const { runGitCommand } = require("./utils.cjs");
-const { updateGitAttributes } = require("./gitattributes.js");
+const { updateGitAttributes } = require("./gitattributes.js").default;
 
 /**
  * Force LF line endings configuration

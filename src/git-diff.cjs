@@ -3,7 +3,7 @@
 const { execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
-const { getTempPath } = require("./binary-collections-config");
+const { getTempPath } = require("./binary-collections-config.cjs");
 
 // Output path using centralized temp directory configuration
 const DIFF_OUTPUT = getTempPath("git-diff.txt");

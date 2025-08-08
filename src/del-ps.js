@@ -1,6 +1,6 @@
 const crossSpawn = require("cross-spawn");
 const ps = require("ps-node");
-const isWin = require("./ps/isWin");
+const isWin = require("./ps/isWin.js").default;
 const { getArgs } = require("./utils/index.cjs");
 
 getArgs()._.forEach((command) => {

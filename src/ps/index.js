@@ -1,5 +1,5 @@
 var ChildProcess = require("child_process");
-var IS_WIN = require("./isWin");
+var IS_WIN = require("./isWin").default;
 var TableParser = require("./table-parser");
 
 /**

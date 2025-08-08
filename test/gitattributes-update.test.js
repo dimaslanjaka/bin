@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
-const { updateGitAttributes } = require("../src/git/gitattributes.js");
+const { updateGitAttributes } = require("../src/git/gitattributes.js").default;
 require("./env.js"); // Ensure environment is set up
 
 describe("updateGitAttributes integration", () => {

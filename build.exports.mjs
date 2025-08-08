@@ -181,3 +181,24 @@ const orderedPkg = reconstructPackageJson(pkg, orderedKeys);
 fs.writeFileSync(path.resolve(__dirname, "package.json"), JSON.stringify(orderedPkg, null, 2) + "\n");
 console.log(color.greenBright(`Updated package.json with ${Object.keys(bin).length} binaries`));
 console.log(color.greenBright(`package.json written successfully!`));
+
+// Build src/index.ts to export all modules
+const indexFilePath = path.resolve(__dirname, "src/index.ts");
+const indexContent = [];
+glob.sync("src/*.{ts,mjs,js,cjs}", { cwd: __dirname, nodir: true, ignore: ["src/index.ts"] }).forEach((file) => {
+  const ext = path.extname(file);
+  const modulePath = path.basename(file, ext);
+  const moduleName = modulePath.replace(/[-.]/g, "_"); // Replace dashes and dots with underscores for valid JS identifiers
+  if (ext === ".ts") {
+    indexContent.push(`export * from './${modulePath}';`);
+  } else if (ext === ".mjs" || ext === ".js") {
+    indexContent.push(`export * from "./${modulePath}${ext}";`);
+  } else if (ext === ".cjs") {
+    const content = `import * as ${moduleName} from "./${modulePath}${ext}";\nexport { ${moduleName} };`;
+    indexContent.push(content);
+  } else {
+    console.warn(color.yellow(`Skipping unsupported file type: ${file}`));
+  }
+});
+fs.writeFileSync(indexFilePath, indexContent.join("\n") + "\n");
+console.log(color.greenBright(`Updated src/index.ts with exports for all modules`));

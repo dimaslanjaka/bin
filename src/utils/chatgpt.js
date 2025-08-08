@@ -8,6 +8,13 @@ const COOKIE_DIR = path.join(process.cwd(), "tmp", "cookies");
 const DEFAULT_COOKIE_PATH = path.join(COOKIE_DIR, "cookies.json");
 fs.ensureDirSync(COOKIE_DIR);
 
+/**
+ * Saves cookies from a Puppeteer page to a specified file path.
+ *
+ * @param {import('puppeteer').Page} page - Puppeteer page instance.
+ * @param {string} [path=DEFAULT_COOKIE_PATH] - Path to save the cookies file.
+ * @returns {Promise<void>} Resolves when cookies are saved.
+ */
 async function saveCookies(page, path = DEFAULT_COOKIE_PATH) {
   const cookies = await page.cookies();
   fs.writeFileSync(path, JSON.stringify(cookies, null, 2));
@@ -113,6 +120,13 @@ function loadCookies(cookieFilePath = DEFAULT_COOKIE_PATH) {
   return JSON.parse(fs.readFileSync(cookieFilePath));
 }
 
+/**
+ * Restores cookies from a file to a Puppeteer page.
+ *
+ * @param {import('puppeteer').Page} page - Puppeteer page instance.
+ * @param {string} [cookieFilePath=DEFAULT_COOKIE_PATH] - Path to the cookie file.
+ * @returns {Promise<void>} Resolves when cookies are restored.
+ */
 async function _restoreCookies(page, cookieFilePath = DEFAULT_COOKIE_PATH) {
   const cookies = loadCookies(cookieFilePath);
   if (cookies) {
@@ -120,6 +134,13 @@ async function _restoreCookies(page, cookieFilePath = DEFAULT_COOKIE_PATH) {
   }
 }
 
+/**
+ * Writes a question to the ChatGPT prompt textarea, handling multi-line questions.
+ *
+ * @param {import('puppeteer').Page} page - Puppeteer page instance.
+ * @param {string} question - The question text to write.
+ * @returns {Promise<void>} Resolves when the question is written.
+ */
 async function writeQuestion(page, question) {
   const questions = question.split("\n");
   const promptTextarea = await page.waitForSelector("#prompt-textarea", { timeout: 30000 });
@@ -153,6 +174,12 @@ async function writeQuestion(page, question) {
   }
 }
 
+/**
+ * Clicks the submit button in ChatGPT interface, trying different button variants.
+ *
+ * @param {import('puppeteer').Page} page - Puppeteer page instance.
+ * @returns {Promise<void>} Resolves when the submit button is clicked or attempt is made.
+ */
 async function clickSubmitButton(page) {
   try {
     const fruitjuiceSendButton = await page.evaluate(() => {
@@ -178,6 +205,12 @@ let lastMessageId = null;
 let messageCount = 0;
 const is_streaming = false; // Set to true if you want to stream the response
 
+/**
+ * Creates a promise that resolves after a specified number of milliseconds.
+ *
+ * @param {number} ms - The number of milliseconds to wait.
+ * @returns {Promise<void>} A promise that resolves after the specified delay.
+ */
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -212,9 +245,10 @@ async function waitForInitialResponse(page, timeout = 30000) {
  * Handles streaming response from the assistant, printing output as it arrives.
  *
  * @param {import('puppeteer').Page} page - Puppeteer page instance.
+ * @param {string} [outputFile] - Path to save the response. Defaults to tmp/response.txt.
  * @returns {Promise<void>} Resolves when streaming is complete.
  */
-async function handleStreamingResponse(page) {
+async function handleStreamingResponse(page, outputFile = path.join(process.cwd(), "tmp/response.txt")) {
   let previousText = "";
   let completeResponse = "";
   let newContentDetected = false;
@@ -248,10 +282,9 @@ async function handleStreamingResponse(page) {
   if (!is_streaming) {
     console.log(completeResponse.trim());
     console.log("\n\n");
-    const responseFile = path.join(process.cwd(), "tmp/response.txt");
-    fs.ensureDirSync(path.dirname(responseFile));
-    fs.writeFileSync(responseFile, completeResponse.trim());
-    console.log(`Response saved to ${responseFile}`);
+    fs.ensureDirSync(path.dirname(outputFile));
+    fs.writeFileSync(outputFile, completeResponse.trim());
+    console.log(`Response saved to ${outputFile}`);
   }
 }
 
@@ -274,7 +307,8 @@ async function isLoggedIn(page) {
 
 /**
  * Creates a new Puppeteer browser instance with StealthPlugin enabled.
- * @param {Parameters<import("puppeteer-extra").VanillaPuppeteer["launch"]>[0]} browserOptions
+ *
+ * @param {Parameters<import("puppeteer-extra").VanillaPuppeteer["launch"]>[0]} [browserOptions={}] - Browser launch options.
  * @returns {Promise<import("puppeteer-extra").Browser>} The created browser instance.
  */
 async function createBrowser(browserOptions = {}) {
@@ -283,6 +317,11 @@ async function createBrowser(browserOptions = {}) {
     .launch({ headless: false, userDataDir: path.join(process.cwd(), "tmp/puppeteer-profile"), ...browserOptions });
 }
 
+/**
+ * Handles the login process for ChatGPT by launching a browser and clicking the login button if needed.
+ *
+ * @returns {Promise<void>} Resolves when the login process is complete.
+ */
 async function loginToChatGpt() {
   const browser = await createBrowser({ headless: false });
   const page = (await browser.pages()).length > 0 ? (await browser.pages())[0] : await browser.newPage();
@@ -316,7 +355,8 @@ async function loginToChatGpt() {
  * @param {boolean} [chatgptOptions.headless=true] - Whether to run the browser in headless mode.
  * @param {string} [chatgptOptions.question] - Text question to send to ChatGPT. Either question or questionFile must be provided.
  * @param {string} [chatgptOptions.questionFile] - Path to a file to upload to ChatGPT. Either question or questionFile must be provided.
- * @returns {Promise<void>} Resolves when the ChatGPT interaction is complete. Responses are logged to console and saved to tmp/response.txt.
+ * @param {string} [chatgptOptions.responseFile] - Path to save the response. Defaults to tmp/response.txt.
+ * @returns {Promise<void>} Resolves when the ChatGPT interaction is complete. Responses are logged to console and saved to specified file.
  * @throws {Error} Throws an error if neither question nor questionFile is provided.
  *
  * @example
@@ -337,6 +377,7 @@ export async function runChatGpt(chatgptOptions = {}) {
   const headless = chatgptOptions.headless !== undefined ? chatgptOptions.headless : true;
   const questionFile = chatgptOptions.questionFile;
   let question = chatgptOptions.question;
+  const responseFile = chatgptOptions.responseFile || path.join(process.cwd(), "tmp", "response.txt");
 
   // Validate input parameters
   const noInputProvided = !question && !questionFile;
@@ -379,7 +420,7 @@ export async function runChatGpt(chatgptOptions = {}) {
     // Wait for the initial response
     await waitForInitialResponse(page);
     // Handle the streaming response
-    await handleStreamingResponse(page);
+    await handleStreamingResponse(page, responseFile);
 
     // Save cookies for this host at the end
     await saveCookies(page, getCookiePathForUrl(url));
@@ -438,7 +479,7 @@ export async function runChatGpt(chatgptOptions = {}) {
 
           // Wait for and handle response
           await waitForInitialResponse(page);
-          await handleStreamingResponse(page);
+          await handleStreamingResponse(page, responseFile);
         } else {
           console.log("Could not find file input element");
         }
@@ -454,7 +495,29 @@ export async function runChatGpt(chatgptOptions = {}) {
   await browser.close();
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+// Detect if the script is run directly in both CommonJS and ESM
+let isMain = false;
+
+try {
+  // CommonJS detection
+  if (typeof require !== "undefined" && typeof module !== "undefined" && require.main === module) {
+    isMain = true;
+  }
+} catch (_e) {
+  // Ignore errors in ESM environments
+}
+
+try {
+  // ES Module detection
+  const mainArg = process.argv[1] && path.resolve(process.argv[1]);
+  if (mainArg && import.meta.url === pathToFileURL(mainArg).href) {
+    isMain = true;
+  }
+} catch (_e) {
+  // Ignore errors in CommonJS environments
+}
+
+if (isMain) {
   (async () => {
     try {
       await runChatGpt({ headless: false, questionFile: path.join(process.cwd(), "tmp/gpt-question.txt") });

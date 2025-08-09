@@ -78,6 +78,13 @@ for (const { file, filename, bins } of libs) {
     );
     binBuilder[filename] = file;
   }
+  // capture *-cli* file
+  if (filename.includes("-cli")) {
+    binBuilder[filename.replace("-cli", "")] = file; // Update binBuilder with CLI file
+    if (filename in binBuilder) {
+      delete binBuilder[filename]; // Remove from binBuilder if it exists
+    }
+  }
 }
 
 // Ensure binaries directory exists and is empty

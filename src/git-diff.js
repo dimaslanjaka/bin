@@ -3,10 +3,10 @@
 import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
-import { fileURLToPath, pathToFileURL } from "url";
+import { fileURLToPath } from "url";
 import { getTempPath } from "./binary-collections-config.cjs";
-import { getArgs } from "./utils/index.cjs";
 import { runChatGpt } from "./utils/chatgpt.js";
+import { getArgs } from "./utils/index.cjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -156,32 +156,12 @@ async function mainGitDiff() {
 }
 
 export default runGitDiff;
-export { runGitDiff as gitDiff };
-
-// Detect if the script is run directly in both CommonJS and ESM
-let isMain = false;
-
-try {
-  // CommonJS detection
-  if (typeof require !== "undefined" && typeof module !== "undefined" && require.main === module) {
-    isMain = true;
-  }
-} catch (_e) {
-  // Ignore errors in ESM environments
-}
-
-try {
-  // ES Module detection
-  const mainArg = process.argv[1] && path.resolve(process.argv[1]);
-  if (mainArg && import.meta.url === pathToFileURL(mainArg).href) {
-    isMain = true;
-  }
-} catch (_e) {
-  // Ignore errors in CommonJS environments
-}
-
-if (isMain) {
-  (async () => {
-    await mainGitDiff();
-  })();
-}
+export {
+  CACHE_DIR,
+  DIFF_OUTPUT,
+  DIFF_OUTPUT_RELATIVE,
+  runGitDiff as gitDiff,
+  GPT_DIFF_OUTPUT,
+  GPT_DIFF_OUTPUT_RELATIVE,
+  mainGitDiff
+};

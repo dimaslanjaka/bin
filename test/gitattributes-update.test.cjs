@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const os = require("os");
 const { updateGitAttributes } = require("../src/git/gitattributes.cjs").default;
-require("./env.js"); // Ensure environment is set up
+require("./env.cjs"); // Ensure environment is set up
 
 describe("updateGitAttributes integration", () => {
   let tempDir;

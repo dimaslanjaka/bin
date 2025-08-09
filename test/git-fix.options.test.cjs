@@ -1,5 +1,5 @@
 /* eslint-env jest */
-const { repoDir, originalCwd } = require("./env.js");
+const { repoDir, originalCwd } = require("./env.cjs");
 const path = require("upath");
 
 jest.mock("../src/git/utils.cjs");

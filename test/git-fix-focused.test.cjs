@@ -1,7 +1,7 @@
 /* eslint-env jest */
 // Load .env file for project environment
 require("dotenv").config({ path: require("path").join(__dirname, "../.env") });
-require("./env.js"); // Ensure environment is set up
+require("./env.cjs"); // Ensure environment is set up
 const fs = require("fs");
 const path = require("path");
 const os = require("os");

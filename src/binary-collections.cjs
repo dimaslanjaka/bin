@@ -13,6 +13,11 @@ const fs = require("fs-extra");
  * Example: npx binary-collections git-diff -s
  */
 
+/**
+ * Displays help information and usage instructions for the binary-collections tool
+ * @function showHelp
+ * @returns {void} Exits the process after displaying help
+ */
 function showHelp() {
   console.log("🚀 Binary Collections - Dynamic Script Runner");
   console.log("═══════════════════════════════════════════════");
@@ -32,8 +37,16 @@ function showHelp() {
   process.exit(0);
 }
 
+/**
+ * Searches for a script file by name in the specified directory
+ * @function findScript
+ * @param {string} scriptName - The name of the script to find (without extension)
+ * @param {string|null} [searchDir=null] - The directory to search in. Defaults to __dirname if not provided
+ * @returns {string|undefined} The absolute path to the found script file, or undefined if not found
+ */
 function findScript(scriptName, searchDir = null) {
   if (!searchDir) searchDir = __dirname;
+  let result;
 
   // Define ignore patterns for library config and utils
   const ignorePatterns = [
@@ -56,7 +69,7 @@ function findScript(scriptName, searchDir = null) {
 
     if (files.length > 0) {
       // Return the first match if found
-      return files[0];
+      result = files[0];
     } else {
       // If not found pick from pkg.bin[scriptName] when exist
       if (pkgJson.bin[scriptName]) {
@@ -68,7 +81,7 @@ function findScript(scriptName, searchDir = null) {
         ];
         const filtered = find.filter((file) => fs.existsSync(file));
         if (filtered.length > 0) {
-          return filtered[0];
+          result = filtered[0];
         } else {
           console.warn(`⚠️  Script "${scriptName}" not found in ${searchDir}.`);
           console.warn(`🔍 Searched for: ${pattern} in ${searchDir}`);
@@ -79,10 +92,29 @@ function findScript(scriptName, searchDir = null) {
     console.error(`🔍 Error searching for script: ${error.message}`);
   }
 
-  return null;
+  // Find *-cli* file if exists
+  if (result && !result.includes("-cli")) {
+    const ext = path.extname(result);
+    const filename = path.basename(result, ext);
+    const cliFile = path.join(path.dirname(result), `${filename}-cli${ext}`);
+    if (fs.existsSync(cliFile)) {
+      result = cliFile;
+      console.log(`🔍 Found CLI version: ${cliFile}`);
+    }
+  }
+
+  return result;
 }
 
+/**
+ * Executes a script file using Node.js with the provided arguments
+ * @function executeScript
+ * @param {string} scriptPath - The absolute path to the script file to execute
+ * @param {string[]} args - Array of arguments to pass to the script
+ * @returns {void} Exits the process when the script execution completes
+ */
 function executeScript(scriptPath, args) {
+  console.log(`🔧 Executing script: ${scriptPath} args: ${args.join(" ")}`);
   const child = spawn("node", [scriptPath, ...args], {
     stdio: "inherit",
     shell: true
@@ -98,17 +130,45 @@ function executeScript(scriptPath, args) {
   });
 }
 
+/**
+ * Main entry point of the binary-collections script
+ * Parses command line arguments, finds the requested script, and executes it
+ * @function main
+ * @returns {void} Exits the process after executing the script or showing help
+ */
 function main() {
   const args = getArgs();
   const positional = args._ || [];
+  console.log(`🔍 Parsed arguments: ${JSON.stringify(args)}`);
 
-  // Show help if no arguments or if help is requested without a script name
-  if (positional.length === 0 || (positional.length === 1 && (args.help || args.h))) {
-    showHelp();
+  // Show help if no script name is provided (covers both `bc` and `bc -h` cases)
+  if (positional.length === 0) {
+    return showHelp();
   }
 
   const scriptName = positional[0];
-  const scriptArgs = positional.slice(1);
+
+  // Reconstruct all arguments except the script name
+  // Include both positional arguments and flags
+  const scriptArgs = [];
+
+  // Add remaining positional arguments
+  scriptArgs.push(...positional.slice(1));
+
+  // Add flag arguments back
+  Object.keys(args).forEach((key) => {
+    if (key !== "_") {
+      const value = args[key];
+      if (typeof value === "boolean" && value) {
+        // Add boolean flags like -s, --help, -h
+        scriptArgs.push(key.length === 1 ? `-${key}` : `--${key}`);
+      } else if (value !== true && value !== false) {
+        // Add flags with values like --output=file.txt
+        scriptArgs.push(key.length === 1 ? `-${key}` : `--${key}`);
+        scriptArgs.push(value);
+      }
+    }
+  });
 
   // Find the script in current directory
   const scriptPath = findScript(scriptName);

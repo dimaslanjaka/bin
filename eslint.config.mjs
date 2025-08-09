@@ -28,6 +28,7 @@ export default [
       "**/*.txt",
       "**/app/**/*",
       "**/dist/**/*",
+      "**/lib/**/*",
       "!**/.*.{js,cjs,mjs}"
     ]
   },

@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const os = require("os");
 const { parseGitAttributes } = require("../src/git/gitattributes.cjs").default;
-require("./env.js");
+require("./env.cjs");
 
 describe("parseGitAttributes", () => {
   let tempDir;

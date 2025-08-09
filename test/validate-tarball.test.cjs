@@ -1,5 +1,5 @@
 // Environment setup
-const { repoDir } = require("./env");
+const { repoDir } = require("./env.cjs");
 const { spawnSync } = require("child_process");
 const fs = require("fs-extra");
 const path = require("upath");

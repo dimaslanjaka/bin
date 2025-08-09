@@ -1,4 +1,4 @@
-require("./env");
+require("./env.cjs");
 
 const api = require("../lib/find-node-modules");
 const ansiColors = require("ansi-colors");

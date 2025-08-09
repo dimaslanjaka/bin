@@ -1,5 +1,5 @@
 const { execSync } = require("child_process");
-const env = require("./env.js");
+const env = require("./env.cjs");
 
 const TEST_REPO = env.repoDir;
 

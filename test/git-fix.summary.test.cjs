@@ -1,6 +1,6 @@
 /* eslint-env jest */
 const { execSync } = require("child_process");
-const env = require("./env.js");
+const env = require("./env.cjs");
 const path = require("upath");
 
 describe("git-fix utility - summary messages", () => {

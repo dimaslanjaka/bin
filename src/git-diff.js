@@ -145,13 +145,9 @@ async function mainGitDiff() {
     } catch (error) {
       console.error("❌ Error running ChatGPT:", error.message);
       console.error("💡 Try running with visible browser mode or check if Chrome is installed");
-      console.error(`📁 The diff has been saved to: ${DIFF_OUTPUT_RELATIVE}`);
-      console.error(`📁 GPT prompt saved to: ${GPT_DIFF_OUTPUT_RELATIVE}`);
     }
   } else {
     console.log("💡 Tip: Use --ai flag to generate commit message with ChatGPT");
-    console.log(`📁 Diff saved to: ${DIFF_OUTPUT_RELATIVE}`);
-    console.log(`📁 GPT prompt saved to: ${GPT_DIFF_OUTPUT_RELATIVE}`);
   }
 }
 

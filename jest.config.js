@@ -1,8 +1,11 @@
-const { defaults } = require("jest-config");
-const path = require("upath");
+import { defaults } from "jest-config";
+import path from "upath";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('jest').Config} */
-module.exports = {
+export default {
   ...defaults,
   testEnvironment: "node",
   extensionsToTreatAsEsm: [".ts", ".tsx"],

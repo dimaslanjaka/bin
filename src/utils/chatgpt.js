@@ -2,7 +2,6 @@ import fs from "fs-extra";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import path from "upath";
-import { pathToFileURL } from "url";
 
 const COOKIE_DIR = path.join(process.cwd(), "tmp", "cookies");
 const DEFAULT_COOKIE_PATH = path.join(COOKIE_DIR, "cookies.json");
@@ -558,36 +557,4 @@ export async function runChatGpt(chatgptOptions = {}) {
       await browser.close();
     }
   }
-}
-
-// Detect if the script is run directly in both CommonJS and ESM
-let isMain = false;
-
-try {
-  // CommonJS detection
-  if (typeof require !== "undefined" && typeof module !== "undefined" && require.main === module) {
-    isMain = true;
-  }
-} catch (_e) {
-  // Ignore errors in ESM environments
-}
-
-try {
-  // ES Module detection
-  const mainArg = process.argv[1] && path.resolve(process.argv[1]);
-  if (mainArg && import.meta.url === pathToFileURL(mainArg).href) {
-    isMain = true;
-  }
-} catch (_e) {
-  // Ignore errors in CommonJS environments
-}
-
-if (isMain) {
-  (async () => {
-    try {
-      await runChatGpt({ headless: false, questionFile: path.join(process.cwd(), "tmp/gpt-question.txt") });
-    } catch (error) {
-      console.error("Error running ChatGPT:", error);
-    }
-  })();
 }

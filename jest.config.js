@@ -5,9 +5,11 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('jest').Config} */
-export default {
+const config = {
   ...defaults,
   testEnvironment: "node",
+  rootDir: "test",
+  cacheDirectory: "tmp/jest-cache",
   extensionsToTreatAsEsm: [".ts", ".tsx"],
   transform: {
     // TypeScript files
@@ -61,3 +63,5 @@ export default {
   detectOpenHandles: true,
   modulePathIgnorePatterns: ["<rootDir>/test/package.json"]
 };
+
+export default config;

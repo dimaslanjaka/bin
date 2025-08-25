@@ -85,7 +85,7 @@
     "run-s": "lib/npm-run-series.cjs",
     "run-series": "lib/npm-run-series.cjs",
     "submodule-install": "lib/submodule-install.cjs",
-    "submodule-remove": "binaries/submodule-remove.cjs",
+    "submodule-remove": "lib/submodule-remove-cli.cjs",
     "submodule-token": "binaries/submodule-token.cjs",
     "yarn-reinstall": "lib/yarn-reinstall.cjs"
   },

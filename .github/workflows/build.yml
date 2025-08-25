@@ -47,6 +47,8 @@ jobs:
             ${{ runner.os }}-
       - name: 📦 Install dependencies
         run: yarn install
+      - name: 🧹 Clean project
+        run: npm run clean
       - name: 🛠️ Build project
         run: npm run build
       - name: 📦 Pack project

@@ -125,7 +125,7 @@
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "remove": "^0.1.5",
-    "sbg-utility": "^2.0.8",
+    "sbg-utility": "^2.0.10",
     "upath": "^2.0.1",
     "yaml": "^2.8.0",
     "yarn": "^1.22.22"
@@ -186,6 +186,6 @@
   "resolutions": {
     "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/80999ac7a7031a81e11ddb5fab0f8ba433041c98/release/cross-spawn.tgz",
     "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/47133aa918c1292c15949c7f190be9cb302cd6f4/release/git-command-helper.tgz",
-    "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/b3d1e17759aecc307c24562b02792a82cb14a6ba/packages/sbg-utility/release/sbg-utility.tgz"
+    "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/f58af787eab404891d8394fe0570ce603e0d7308/packages/sbg-utility/release/sbg-utility.tgz"
   }
 }

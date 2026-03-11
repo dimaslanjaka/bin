@@ -83,19 +83,56 @@ module.exports.getArgs = getArgs;
  * @param {string} fullPath Absolute path to the file or directory to delete.
  */
 function del(fullPath) {
-  if (fs.statSync(fullPath).isDirectory()) {
-    // delete all files each package directory
-    const subdir = fs.readdirSync(fullPath).map((dirPath) => path.resolve(fullPath, dirPath));
-    for (let i = 0; i < subdir.length; i++) {
-      del(subdir[i]);
+  try {
+    if (!fs.existsSync(fullPath)) return;
+    const stat = fs.lstatSync(fullPath);
+    // If this is a symlink, remove the link only and don't follow into target
+    if (stat.isSymbolicLink()) {
+      try {
+        fs.unlinkSync(fullPath);
+        console.log("deleted symlink", fullPath);
+      } catch (e) {
+        console.log("failed delete symlink", fullPath, e && e.message);
+      }
+      return;
     }
-  } else {
+
+    if (stat.isDirectory()) {
+      // delete all files each package directory (do not follow symlinks)
+      const subdir = fs.readdirSync(fullPath).map((dirPath) => path.resolve(fullPath, dirPath));
+      for (let i = 0; i < subdir.length; i++) {
+        del(subdir[i]);
+      }
+      // remove the now-empty directory
+      try {
+        fs.rmdirSync(fullPath);
+        console.log("deleted", fullPath);
+      } catch (e) {
+        // fallback to rmSync for older Node versions or non-empty dirs
+        try {
+          fs.rmSync(fullPath, { recursive: true, force: true, retryDelay: 7000 });
+          console.log("deleted", fullPath);
+        } catch (ee) {
+          console.log("failed delete", fullPath, ee && ee.message);
+        }
+      }
+      return;
+    }
+
+    // File or other: remove
     try {
-      fs.rmSync(fullPath, { recursive: true, force: true, retryDelay: 7000 });
+      fs.unlinkSync(fullPath);
       console.log("deleted", fullPath);
-    } catch (_) {
-      console.log("failed delete", fullPath);
+    } catch (e) {
+      try {
+        fs.rmSync(fullPath, { recursive: true, force: true, retryDelay: 7000 });
+        console.log("deleted", fullPath);
+      } catch (ee) {
+        console.log("failed delete", fullPath, ee && ee.message);
+      }
     }
+  } catch (err) {
+    console.log("failed delete", fullPath, err && err.message);
   }
 }
 module.exports.del = del;
@@ -107,14 +144,30 @@ module.exports.del = del;
 function delStream(globStream) {
   globStream.stream().on("data", (result) => {
     const fullPath = path.resolve(process.cwd(), result);
-    if (fs.statSync(fullPath).isDirectory()) {
-      // delete all files each package directory
-      const subdir = fs.readdirSync(fullPath).map((dirPath) => path.resolve(fullPath, dirPath));
-      for (let i = 0; i < subdir.length; i++) {
-        del(subdir[i]);
+    try {
+      if (fs.existsSync(fullPath)) {
+        const stat = fs.lstatSync(fullPath);
+        if (stat.isSymbolicLink()) {
+          // remove the symlink only
+          try {
+            fs.unlinkSync(fullPath);
+            console.log("deleted symlink", fullPath);
+          } catch (e) {
+            console.log("failed delete symlink", fullPath, e && e.message);
+          }
+          return;
+        }
+        if (stat.isDirectory()) {
+          const subdir = fs.readdirSync(fullPath).map((dirPath) => path.resolve(fullPath, dirPath));
+          for (let i = 0; i < subdir.length; i++) {
+            del(subdir[i]);
+          }
+        }
       }
+      del(fullPath);
+    } catch (err) {
+      console.log("failed processing", fullPath, err && err.message);
     }
-    del(fullPath);
   });
 }
 module.exports.delStream = delStream;

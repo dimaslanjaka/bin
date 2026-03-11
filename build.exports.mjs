@@ -141,50 +141,7 @@ for (const [key, value] of Object.entries(bin)) {
 // Assign bin mapping to package.json
 pkg.bin = bin;
 
-// Reconstruct package.json with preferred key order
-const orderedKeys = [
-  "name",
-  "version",
-  "description",
-  "keywords",
-  "homepage",
-  "bugs",
-  "license",
-  "author",
-  "funding",
-  "type",
-  "main",
-  "module",
-  "exports",
-  "types",
-  "typings",
-  "files",
-  "bin",
-  "scripts",
-  "repository",
-  "dependencies",
-  "devDependencies",
-  "peerDependencies",
-  "optionalDependencies",
-  "engines",
-  "os",
-  "cpu",
-  "private",
-  "publishConfig"
-];
-// Helper to order package.json keys
-function reconstructPackageJson(obj, keyOrder) {
-  const result = {};
-  for (const key of keyOrder) {
-    if (key in obj) result[key] = obj[key];
-  }
-  for (const key of Object.keys(obj)) {
-    if (!keyOrder.includes(key)) result[key] = obj[key];
-  }
-  return result;
-}
-const orderedPkg = reconstructPackageJson(pkg, orderedKeys);
 // Write updated package.json
-fs.writeFileSync(path.resolve(__dirname, "package.json"), JSON.stringify(orderedPkg, null, 2) + "\n");
+fs.writeFileSync(path.resolve(__dirname, "package.json"), JSON.stringify(pkg, null, 2) + "\n");
 console.log(color.greenBright(`Updated package.json with ${Object.keys(bin).length} binaries`));
 console.log(color.greenBright(`package.json written successfully!`));

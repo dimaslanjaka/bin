@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename);
 // Load .env if present
 const dotenvPath = path.resolve(process.cwd(), ".env");
 if (fs.existsSync(dotenvPath)) {
-  dotenv.config({ path: dotenvPath });
+  dotenv.config({ path: dotenvPath, override: true, quiet: true });
 }
 
 const argv = getArgs();

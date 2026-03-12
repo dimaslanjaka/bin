@@ -91,6 +91,18 @@ for (const { file, filename, bins } of libs) {
 fs.ensureDirSync(path.resolve(__dirname, "binaries"));
 fs.emptyDirSync(path.resolve(__dirname, "binaries"));
 
+// Copy required supporting scripts that are referenced by lib/* commands.
+const requiredBinFiles = ["bin/kill-night-crows.ps1"];
+for (const file of requiredBinFiles) {
+  const source = path.resolve(__dirname, file);
+  if (!fs.existsSync(source)) {
+    continue;
+  }
+  const destination = path.join(__dirname, "binaries", path.basename(file));
+  fs.copySync(source, destination);
+  console.log(`${color.yellow(file)} copied to ${color.greenBright(destination)}`);
+}
+
 // Build ignore list for bin/* files already mapped
 const binIgnores = Object.keys({ ...binBuilder, ...defaultBin })
   .map((key) => `bin/${key}*`)
@@ -109,6 +121,7 @@ const binFiles = glob
     const filename = path.basename(file, path.extname(file));
     // Copy binary file to binaries directory
     fs.copySync(absolute, destination);
+    console.log(`${color.yellow(file)} copied to ${color.greenBright(destination)}`);
     // Copy binary-executor.cjs for each binary
     const executorDestination = path.join(__dirname, `binaries/${filename}.cjs`);
     fs.copySync(path.resolve(__dirname, "bin/binary-executor.cjs"), executorDestination);

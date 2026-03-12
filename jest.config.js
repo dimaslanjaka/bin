@@ -6,7 +6,7 @@ export default {
   testEnvironment: "node",
   roots: ["<rootDir>/test"],
   extensionsToTreatAsEsm: [".ts", ".tsx"],
-  moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json", "node"],
+  moduleFileExtensions: ["js", "jsx", "ts", "tsx", "mjs", "cjs", "json", "node"],
   moduleNameMapper: {
     "^(\\.{1,2}/.*)\\.js$": "$1"
   },

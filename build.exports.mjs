@@ -92,7 +92,7 @@ fs.ensureDirSync(path.resolve(__dirname, "binaries"));
 fs.emptyDirSync(path.resolve(__dirname, "binaries"));
 
 // Copy required supporting scripts that are referenced by lib/* commands.
-const requiredBinFiles = ["bin/kill-night-crows.ps1"];
+const requiredBinFiles = ["bin/kill-night-crows.ps1", "bin/kill-night-crows.bat"];
 for (const file of requiredBinFiles) {
   const source = path.resolve(__dirname, file);
   if (!fs.existsSync(source)) {

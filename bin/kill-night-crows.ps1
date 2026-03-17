@@ -21,7 +21,7 @@ if (-not $isAdmin) {
 
 $IntervalSeconds = 5
 $WatchSeconds = 5
-$KeepWindowOpen = $true
+$KeepWindowOpen = $false
 $ShippingProcessName = "MadGlobal-Win64-Shipping"
 $LauncherProcessName = "MadGlobal.exe"
 

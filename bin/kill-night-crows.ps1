@@ -54,63 +54,47 @@ function Get-ParentProcess {
 
 function Stop-ProcessTree {
     param(
-        [int]$RootPid
+        [int]$RootPid,
+        [string]$ExpectedProcessName
     )
 
-    $all = Get-CimInstance Win32_Process -ErrorAction SilentlyContinue
-    if (-not $all) {
-        Write-Log "Unable to enumerate processes for tree kill."
+    if ($RootPid -le 0) {
+        Write-Log "Invalid root PID: $RootPid"
         return $false
     }
 
-    $childrenByParent = @{}
-    foreach ($proc in $all) {
-        $ppid = [int]$proc.ParentProcessId
-        if (-not $childrenByParent.ContainsKey($ppid)) {
-            $childrenByParent[$ppid] = @()
-        }
-
-        $childrenByParent[$ppid] += [int]$proc.ProcessId
+    if ($RootPid -eq $PID) {
+        Write-Log "Refusing to kill current PowerShell process PID $RootPid"
+        return $false
     }
 
-    $toVisit = @([int]$RootPid)
-    $allPidsInTree = @()
+    $root = Get-Process -Id $RootPid -ErrorAction SilentlyContinue
+    if (-not $root) {
+        Write-Log "Root process PID $RootPid no longer exists."
+        return $false
+    }
 
-    while ($toVisit.Count -gt 0) {
-        $current = $toVisit[0]
-        if ($toVisit.Count -eq 1) {
-            $toVisit = @()
-        }
-        else {
-            $toVisit = $toVisit[1..($toVisit.Count - 1)]
-        }
-
-        if ($allPidsInTree -contains $current) {
-            continue
-        }
-
-        $allPidsInTree += $current
-
-        if ($childrenByParent.ContainsKey($current)) {
-            $toVisit += $childrenByParent[$current]
+    if ($ExpectedProcessName) {
+        $actualName = "$($root.ProcessName).exe"
+        if ($actualName -ine $ExpectedProcessName) {
+            Write-Log "Refusing to kill PID $RootPid because process is $actualName (expected $ExpectedProcessName)."
+            return $false
         }
     }
 
-    [array]::Reverse($allPidsInTree)
+    $taskkillOutput = & taskkill /F /T /PID $RootPid 2>&1
+    $taskkillExitCode = $LASTEXITCODE
 
-    $stoppedAny = $false
-    foreach ($processId in $allPidsInTree) {
-        try {
-            Stop-Process -Id $processId -Force -ErrorAction Stop
-            $stoppedAny = $true
-            Write-Log "Stopped PID $processId"
+    if ($taskkillExitCode -ne 0) {
+        Write-Log "taskkill failed for PID $RootPid with exit code $taskkillExitCode"
+        foreach ($line in $taskkillOutput) {
+            Write-Log "taskkill: $line"
         }
-        catch {
-            # Ignore races where process exits on its own.
-        }
+        return $false
     }
 
-    return $stoppedAny
+    Write-Log "Killed process tree for PID $RootPid"
+    return $true
 }
 
 $startedAt = Get-Date
@@ -156,7 +140,7 @@ while ($true) {
 
         if ($parent.Name -ieq $LauncherProcessName) {
             Write-Log "Killing launcher tree: $($parent.Name) PID $($parent.ProcessId)"
-            $result = Stop-ProcessTree -RootPid ([int]$parent.ProcessId)
+            $result = Stop-ProcessTree -RootPid ([int]$parent.ProcessId) -ExpectedProcessName $LauncherProcessName
             if (-not $result) {
                 Write-Log "Launcher tree kill found no running processes."
             }

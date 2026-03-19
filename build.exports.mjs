@@ -148,7 +148,17 @@ const bin = Object.keys({ ...binBuilder, ...defaultBin })
 // Log the final bin mapping
 console.log(color.greenBright(`Final bin mapping for package.json:`));
 for (const [key, value] of Object.entries(bin)) {
-  console.log(`  ${color.blueBright(key)}: ${color.yellow(value)}`);
+  let shebangAdded = false;
+  if (value.endsWith(".cjs")) {
+    // Fix missing shebang for .cjs files by adding `#!/usr/bin/env node` at the top of the file
+    const filePath = path.resolve(__dirname, value);
+    const content = fs.readFileSync(filePath, "utf-8");
+    if (!content.startsWith("#!")) {
+      fs.writeFileSync(filePath, `#!/usr/bin/env node\n${content}`);
+      shebangAdded = true;
+    }
+  }
+  console.log(`  ${color.blueBright(key)}: ${color.yellow(value)} ${shebangAdded ? color.greenBright("(shebang added)") : ""}`);
 }
 
 // Assign bin mapping to package.json

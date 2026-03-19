@@ -14,6 +14,7 @@ on:
 
 jobs:
   build:
+    if: ${{ !contains(join(github.event.commits.*.added, ' '), '.tgz') && !contains(join(github.event.commits.*.modified, ' '), '.tgz') && !contains(join(github.event.commits.*.removed, ' '), '.tgz') }}
     runs-on: ubuntu-latest
     steps:
       - name: ⬇️ Checkout main repository

@@ -55,7 +55,8 @@
     "test:nrs": "npm test -- nrs build:**",
     "test:watch": "npm test --watch",
     "update:ncu": "npx npm-check-updates -u -x jsdom,chalk,hexo,deepmerge-ts --enginesNode --root",
-    "update:packer": "curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js > packer.cjs"
+    "update:packer": "curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js > packer.cjs",
+    "puppeteer:browser": "npx puppeteer browsers install chrome"
   },
   "repository": {
     "type": "git",

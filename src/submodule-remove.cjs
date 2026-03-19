@@ -3,7 +3,10 @@ const path = require("upath");
 const fs = require("fs-extra");
 const dotenv = require("dotenv");
 
-dotenv.config({ path: path.resolve(process.cwd(), ".env"), override: true, quiet: true });
+const envPath = path.resolve(process.cwd(), ".env");
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath, override: true, quiet: true });
+}
 
 async function removeSubmodule(submodulePath) {
   // Deinitialize the submodule

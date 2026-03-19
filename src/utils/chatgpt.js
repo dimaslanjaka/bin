@@ -470,8 +470,20 @@ export async function runChatGpt(chatgptOptions = {}) {
     throw error;
   }
 
+  await page.bringToFront();
+  // close other pages if more than 1 page is open, to prevent confusion and ensure we are working with a single page
+  const allPages = await browser.pages();
+  if (allPages.length > 1) {
+    for (const p of allPages) {
+      if (p !== page) {
+        await p.close();
+      }
+    }
+  }
+
   /** @type {import('puppeteer').Page} */
-  const page = (await browser.pages()).length > 0 ? (await browser.pages())[0] : await browser.newPage();
+  const page = allPages.length > 0 ? allPages[0] : await browser.newPage();
+
 
   try {
     const url = "https://chat.openai.com";

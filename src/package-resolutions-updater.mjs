@@ -38,7 +38,7 @@ const envPath = path.join(projectDir, ".env");
 const args = utils.getArgs();
 
 // Load the .env file using dotenv (ESM import)
-if (fs.existsSync(envPath)) dotenv.config({ path: envPath });
+if (fs.existsSync(envPath)) dotenv.config({ path: envPath, quiet: true, override: true });
 const ACCESS_TOKEN = process.env.GITHUB_TOKEN || process.env.ACCESS_TOKEN;
 
 // Show help if --help/-h is passed

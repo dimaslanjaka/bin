@@ -56,7 +56,8 @@
     "test:watch": "npm test --watch",
     "update:ncu": "npx npm-check-updates -u -x jsdom,chalk,hexo,deepmerge-ts --enginesNode --root",
     "update:packer": "curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js > packer.cjs",
-    "puppeteer:browser": "npx puppeteer browsers install chrome"
+    "puppeteer:browser": "npx -y puppeteer browsers install chrome",
+    "postinstall": "npm run puppeteer:browser"
   },
   "repository": {
     "type": "git",
@@ -73,7 +74,7 @@
     "minimatch": "^10.0.3",
     "minimist": "^1.2.8",
     "ps-node": "^0.1.6",
-    "puppeteer": "^24.17.0",
+    "puppeteer": "^24.39.1",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "remove": "^0.1.5",

@@ -5,7 +5,27 @@ import path from "upath";
 
 const COOKIE_DIR = path.join(process.cwd(), "tmp", "cookies");
 const DEFAULT_COOKIE_PATH = path.join(COOKIE_DIR, "cookies.json");
+const NAVIGATION_TIMEOUT_MS = 90000;
+const NETWORK_IDLE_TIMEOUT_MS = 15000;
 fs.ensureDirSync(COOKIE_DIR);
+
+/**
+ * Navigates to a page with a resilient strategy for apps that keep long-lived network connections.
+ *
+ * @param {import('puppeteer').Page} page - Puppeteer page instance.
+ * @param {string} url - URL to navigate to.
+ * @returns {Promise<void>} Resolves when the page is at least DOM-ready.
+ */
+async function gotoWithFallback(page, url) {
+  await page.goto(url, { waitUntil: "domcontentloaded", timeout: NAVIGATION_TIMEOUT_MS });
+
+  // Best effort: settle initial bursty requests without hard-failing on persistent streams.
+  try {
+    await page.waitForNetworkIdle({ idleTime: 1000, timeout: NETWORK_IDLE_TIMEOUT_MS });
+  } catch {
+    // Ignore network-idle timeouts because ChatGPT keeps active connections open.
+  }
+}
 
 /**
  * Saves cookies from a Puppeteer page to a specified file path.
@@ -50,8 +70,8 @@ async function navigatePage(page, url) {
     await page.setCookie(...cookies);
   }
 
-  // Navigate and wait until fully loaded
-  await page.goto(url, { waitUntil: "networkidle0" });
+  // Navigate with fallback for pages that keep persistent network connections.
+  await gotoWithFallback(page, url);
 
   // Inject DOM mutation observer to handle dynamic content
   await page.evaluate(() => {
@@ -384,8 +404,13 @@ async function loginToChatGpt() {
   if (loginButtonExists) {
     console.log("Login button found, clicking to log in...");
     await page.click('[data-testid="login-button"]');
-    // Wait for the login process to complete
-    await page.waitForNavigation({ waitUntil: "networkidle0" });
+    // Wait for the login process to complete without requiring full network idleness.
+    await page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: NAVIGATION_TIMEOUT_MS });
+    try {
+      await page.waitForNetworkIdle({ idleTime: 1000, timeout: NETWORK_IDLE_TIMEOUT_MS });
+    } catch {
+      // Ignore: authentication pages can keep background connections active.
+    }
     console.log("Login process completed.");
   } else {
     console.log("No login required - user appears to be already logged in.");

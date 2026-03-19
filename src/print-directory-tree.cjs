@@ -11,7 +11,7 @@ const projectDir = process.cwd();
 const envPath = path.join(projectDir, ".env");
 
 // Load the .env file using dotenv (ESM import)
-if (fs.existsSync(envPath)) dotenv.config({ path: envPath });
+if (fs.existsSync(envPath)) dotenv.config({ path: envPath, quiet: true, override: true });
 
 // Parse CLI arguments
 const argv = getArgs();

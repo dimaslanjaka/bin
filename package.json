@@ -38,7 +38,8 @@
     "lib",
     "package.json",
     "docs-src/**/*.md",
-    "readme.md"
+    "readme.md",
+    ".puppeterrc.*"
   ],
   "scripts": {
     "build": "tsc -b tsconfig.build.json && npm run build:tsup && npm run postbuild",
@@ -56,8 +57,7 @@
     "test:watch": "npm test --watch",
     "update:ncu": "npx npm-check-updates -u -x jsdom,chalk,hexo,deepmerge-ts --enginesNode --root",
     "update:packer": "curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js > packer.cjs",
-    "puppeteer:browser": "npx -y puppeteer browsers install chrome",
-    "postinstall": "npm run puppeteer:browser"
+    "puppeteer:browser": "npx -y puppeteer browsers install chrome"
   },
   "repository": {
     "type": "git",

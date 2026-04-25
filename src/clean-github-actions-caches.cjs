@@ -7,12 +7,12 @@ const envPath = path.join(projectDir, ".env");
 
 // Load the .env file using dotenv
 if (fs.existsSync(envPath)) {
-  require("dotenv").config({ path: envPath });
+  require("dotenv").config({ path: envPath, quiet: true });
 } else {
   console.warn(`.env file not found at ${envPath}`);
 }
 
-require("dotenv").config({ path: path.join(process.cwd(), ".env") });
+require("dotenv").config({ path: path.join(process.cwd(), ".env"), quiet: true });
 
 // delete caches leaving single last cache based on creation date
 const ACCESS_TOKEN = process.env.GITHUB_TOKEN || process.env.ACCESS_TOKEN;

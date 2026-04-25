@@ -1,6 +1,6 @@
 /* eslint-env jest */
 // Load .env file for project environment
-require("dotenv").config({ path: require("path").join(__dirname, "../.env") });
+require("dotenv").config({ path: require("path").join(__dirname, "../.env"), quiet: true });
 require("./env.cjs"); // Ensure environment is set up
 const { configureGitUser } = require("../src/git/user-config.cjs");
 const { runGitCommand } = require("../src/git/utils.cjs");

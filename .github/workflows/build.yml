@@ -40,8 +40,10 @@ jobs:
             **/.yarn
             **/yarn.lock
             **/node_modules
-            **/tmp
+            **/tmp/**
             **/*.bak
+            **/test/**
+            **/test-project
           key: ${{ runner.os }}-${{ hashFiles('**/package.json', '.github') }}
           restore-keys: |
             ${{ runner.os }}-${{ hashFiles('**/package.json', '.github') }}

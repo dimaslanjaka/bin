@@ -3,6 +3,11 @@
  * Jest configuration for browser-automation project.
  */
 export default {
+  globals: {
+    "ts-jest": {
+      tsconfig: "tsconfig.jest.json"
+    }
+  },
   testEnvironment: "node",
   roots: ["<rootDir>/test"],
   extensionsToTreatAsEsm: [".ts", ".tsx"],

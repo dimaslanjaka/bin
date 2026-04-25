@@ -22,7 +22,7 @@
     "skipDefaultLibCheck": true,
     "skipLibCheck": true,
     "typeRoots": ["node_modules/@types"],
-    "types": ["jest"]
+    "types": ["jest", "node"]
   },
   "exclude": ["**/*.runner.*", "**/*.explicit.*", "**/*.builder.*", "**/dist/**", "**/node_modules/**", "**/tmp/**"],
   "include": ["./test/**/*", "./src/**/*"]

@@ -18,12 +18,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: ⬇️ Checkout main repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: master
           token: "${{ secrets.ACCESS_TOKEN }}"
       - name: ⬇️ Checkout test-repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: dimaslanjaka/test-repo
           path: tmp/test-repo

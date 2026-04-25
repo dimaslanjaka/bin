@@ -1,4 +1,4 @@
 require('ts-node').register({
   project: 'tsconfig.json'
 });
-require('dotenv').config({ override: true });
+require('dotenv').config({ override: true, quiet: true });

@@ -34,7 +34,12 @@ const defaultBin = {
   "clear-gh-caches": "lib/clean-github-actions-caches.cjs",
   "submodule-install": "lib/submodule-install.cjs",
   chatgpt: "lib/free-chatgpt.cjs",
-  "free-chatgpt": "lib/free-chatgpt.cjs"
+  "free-chatgpt": "lib/free-chatgpt.cjs",
+  "undo-commit": "lib/git/undo-commit.cjs",
+  "undo-last-commit": "lib/git/undo-commit.cjs",
+  "git-undo-commit": "lib/git/undo-commit.cjs",
+  "undo-staged": "lib/git/undo-staged.cjs",
+  "git-undo-staged": "lib/git/undo-staged.cjs",
 };
 
 // Build binary mapping from lib/*.cjs and bin/*

@@ -168,6 +168,8 @@
     "git-fix": "lib/git-fix.cjs",
     "git-purge": "lib/git-purge.cjs",
     "git-reduce-size": "binaries/git-reduce-size.cjs",
+    "git-undo-commit": "lib/git/undo-commit.cjs",
+    "git-undo-staged": "lib/git/undo-staged.cjs",
     "javakill": "binaries/javakill.cjs",
     "kill-night-crows": "lib/kill-night-crows.cjs",
     "kill-process": "binaries/kill-process.cjs",
@@ -190,6 +192,9 @@
     "submodule-install": "lib/submodule-install.cjs",
     "submodule-remove": "lib/submodule-remove-cli.cjs",
     "submodule-token": "binaries/submodule-token.cjs",
+    "undo-commit": "lib/git/undo-commit.cjs",
+    "undo-last-commit": "lib/git/undo-commit.cjs",
+    "undo-staged": "lib/git/undo-staged.cjs",
     "yarn-reinstall": "lib/yarn-reinstall.cjs"
   }
 }

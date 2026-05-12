@@ -179,7 +179,7 @@
     "package-resolutions-updater": "lib/package-resolutions-updater-cli.cjs",
     "php-cs-fixer-staged": "lib/php-cs-fixer-staged.cjs",
     "pkg-res-updater": "lib/package-resolutions-updater-cli.cjs",
-    "pkg-resolutions-updater": "lib/package-resolutions-updater.cjs",
+    "pkg-resolutions-updater": "lib/package-resolutions-updater-cli.cjs",
     "print-directory-tree": "lib/print-directory-tree.cjs",
     "print-tree": "lib/print-directory-tree.cjs",
     "prod": "binaries/prod.cjs",

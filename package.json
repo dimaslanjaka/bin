@@ -138,8 +138,8 @@
   "packageManager": "yarn@4.9.2",
   "resolutions": {
     "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/80999ac7a7031a81e11ddb5fab0f8ba433041c98/release/cross-spawn.tgz",
-    "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/8e2300a5b0280b0bb6326619afe63fc4aa99b08f/release/git-command-helper.tgz",
-    "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/600e4bf0e79ee76bfd173ca6e2fdb46175523b21/packages/sbg-utility/release/sbg-utility.tgz"
+    "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/bb9d6c795b8d00f9d7debae8ce1810a05d9c9c65/release/git-command-helper.tgz",
+    "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/3605a27eb43ca84e4d25c885af87626ad33b1816/packages/sbg-utility/release/sbg-utility.tgz"
   },
   "bin": {
     "binary-collections": "lib/binary-collections.cjs",
@@ -176,9 +176,9 @@
     "nodekill": "binaries/nodekill.cjs",
     "npm-run-series": "lib/npm-run-series.cjs",
     "nrs": "lib/npm-run-series.cjs",
-    "package-resolutions-updater": "lib/package-resolutions-updater.cjs",
+    "package-resolutions-updater": "lib/package-resolutions-updater-cli.cjs",
     "php-cs-fixer-staged": "lib/php-cs-fixer-staged.cjs",
-    "pkg-res-updater": "lib/package-resolutions-updater.cjs",
+    "pkg-res-updater": "lib/package-resolutions-updater-cli.cjs",
     "pkg-resolutions-updater": "lib/package-resolutions-updater.cjs",
     "print-directory-tree": "lib/print-directory-tree.cjs",
     "print-tree": "lib/print-directory-tree.cjs",
@@ -192,6 +192,7 @@
     "submodule-install": "lib/submodule-install.cjs",
     "submodule-remove": "lib/submodule-remove-cli.cjs",
     "submodule-token": "binaries/submodule-token.cjs",
+    "test-fail": "binaries/test-fail.cjs",
     "undo-commit": "lib/git/undo-commit.cjs",
     "undo-last-commit": "lib/git/undo-commit.cjs",
     "undo-staged": "lib/git/undo-staged.cjs",

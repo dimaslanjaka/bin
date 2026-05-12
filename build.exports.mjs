@@ -25,7 +25,7 @@ const defaultBin = {
   "print-tree": "lib/print-directory-tree.cjs",
   "dir-tree": "lib/print-directory-tree.cjs",
   "pkg-resolutions-updater": "lib/package-resolutions-updater.cjs",
-  "pkg-res-updater": "lib/package-resolutions-updater.cjs",
+  "pkg-res-updater": "lib/package-resolutions-updater-cli.cjs",
   "git-diff": "lib/git-diff.cjs",
   "clean-github-actions-caches": "lib/clean-github-actions-caches.cjs",
   "clean-github-actions-cache": "lib/clean-github-actions-caches.cjs",
@@ -39,7 +39,7 @@ const defaultBin = {
   "undo-last-commit": "lib/git/undo-commit.cjs",
   "git-undo-commit": "lib/git/undo-commit.cjs",
   "undo-staged": "lib/git/undo-staged.cjs",
-  "git-undo-staged": "lib/git/undo-staged.cjs",
+  "git-undo-staged": "lib/git/undo-staged.cjs"
 };
 
 // Build binary mapping from lib/*.cjs and bin/*
@@ -163,7 +163,9 @@ for (const [key, value] of Object.entries(bin)) {
       shebangAdded = true;
     }
   }
-  console.log(`  ${color.blueBright(key)}: ${color.yellow(value)} ${shebangAdded ? color.greenBright("(shebang added)") : ""}`);
+  console.log(
+    `  ${color.blueBright(key)}: ${color.yellow(value)} ${shebangAdded ? color.greenBright("(shebang added)") : ""}`
+  );
 }
 
 // Assign bin mapping to package.json

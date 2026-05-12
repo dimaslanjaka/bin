@@ -20,14 +20,14 @@ import {
     { pkg: "sbg-cli", branch: "master", repo: "static-blog-generator", owner: "dimaslanjaka" },
     { pkg: "static-blog-generator", branch: "master", repo: "static-blog-generator", owner: "dimaslanjaka" },
     // Hexo family
-    { pkg: "hexo", branch: "monorepo-v7", repo: "hexo", owner: "dimaslanjaka" },
-    { pkg: "hexo-util", branch: "monorepo-v7", repo: "hexo", owner: "dimaslanjaka" },
-    { pkg: "warehouse", branch: "monorepo-v7", repo: "hexo", owner: "dimaslanjaka" },
-    { pkg: "hexo-server", branch: "monorepo-v7", repo: "hexo", owner: "dimaslanjaka" },
-    { pkg: "hexo-log", branch: "monorepo-v7", repo: "hexo", owner: "dimaslanjaka" },
-    { pkg: "hexo-front-matter", branch: "monorepo-v7", repo: "hexo", owner: "dimaslanjaka" },
-    { pkg: "hexo-cli", branch: "monorepo-v7", repo: "hexo", owner: "dimaslanjaka" },
-    { pkg: "hexo-asset-link", branch: "monorepo-v7", repo: "hexo", owner: "dimaslanjaka" },
+    // { pkg: "hexo", branch: "monorepo-v7", repo: "hexo", owner: "dimaslanjaka" },
+    // { pkg: "hexo-util", branch: "monorepo-v7", repo: "hexo", owner: "dimaslanjaka" },
+    // { pkg: "warehouse", branch: "monorepo-v7", repo: "hexo", owner: "dimaslanjaka" },
+    // { pkg: "hexo-server", branch: "monorepo-v7", repo: "hexo", owner: "dimaslanjaka" },
+    // { pkg: "hexo-log", branch: "monorepo-v7", repo: "hexo", owner: "dimaslanjaka" },
+    // { pkg: "hexo-front-matter", branch: "monorepo-v7", repo: "hexo", owner: "dimaslanjaka" },
+    // { pkg: "hexo-cli", branch: "monorepo-v7", repo: "hexo", owner: "dimaslanjaka" },
+    // { pkg: "hexo-asset-link", branch: "monorepo-v7", repo: "hexo", owner: "dimaslanjaka" },
     { pkg: "hexo-post-parser", branch: "pre-release", repo: "hexo-post-parser", owner: "dimaslanjaka" },
     { pkg: "hexo-seo", branch: "pre-release", repo: "hexo-seo", owner: "dimaslanjaka" },
     { pkg: "hexo-is", branch: "master", repo: "hexo-is", owner: "dimaslanjaka" },
@@ -45,7 +45,7 @@ import {
     { pkg: "cross-spawn", branch: "private", repo: "node-cross-spawn", owner: "dimaslanjaka" },
     { pkg: "hexo-generator-redirect", branch: "master", repo: "hexo-generator-redirect", owner: "dimaslanjaka" },
     { pkg: "binary-collections", branch: "master", repo: "bin", owner: "dimaslanjaka" },
-    { pkg: "@types/hexo", branch: "monorepo-v7", repo: "hexo", owner: "dimaslanjaka" },
+    // { pkg: "@types/hexo", branch: "monorepo-v7", repo: "hexo", owner: "dimaslanjaka" },
     { pkg: "@types/git-command-helper", branch: "pre-release", repo: "git-command-helper", owner: "dimaslanjaka" }
   ];
 

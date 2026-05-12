@@ -24,7 +24,7 @@ const defaultBin = {
   "git-fix": "lib/git-fix.cjs",
   "print-tree": "lib/print-directory-tree.cjs",
   "dir-tree": "lib/print-directory-tree.cjs",
-  "pkg-resolutions-updater": "lib/package-resolutions-updater.cjs",
+  "pkg-resolutions-updater": "lib/package-resolutions-updater-cli.cjs",
   "pkg-res-updater": "lib/package-resolutions-updater-cli.cjs",
   "git-diff": "lib/git-diff.cjs",
   "clean-github-actions-caches": "lib/clean-github-actions-caches.cjs",

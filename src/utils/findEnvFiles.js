@@ -38,16 +38,24 @@ const DEFAULT_IGNORES = [
 ];
 
 /**
- * Find .env files in:
- * - current directory
- * - parent directories
- * - subdirectories
+ * Find .env files.
  *
  * @param {string} startDir
+ * @param {(file:string)=>boolean} [filter]
  * @returns {string[]}
  */
-export function findEnvFiles(startDir = process.cwd()) {
+export function findEnvFiles(startDir = process.cwd(), filter) {
   const found = new Set();
+
+  function addFile(file) {
+    const normalized = path.normalize(file);
+
+    if (typeof filter === "function" && !filter(normalized)) {
+      return;
+    }
+
+    found.add(normalized);
+  }
 
   /* --------------------------------
    * Parent directories
@@ -58,7 +66,7 @@ export function findEnvFiles(startDir = process.cwd()) {
     const envPath = path.join(current, ".env");
 
     if (fs.existsSync(envPath)) {
-      found.add(path.normalize(envPath));
+      addFile(envPath);
     }
 
     const parent = path.dirname(current);
@@ -73,7 +81,7 @@ export function findEnvFiles(startDir = process.cwd()) {
   /* --------------------------------
    * Subdirectories via glob
    * -------------------------------- */
-  const files = glob.globSync("**/.env", {
+  const files = glob.globSync("**/.env*", {
     cwd: startDir,
     absolute: true,
     nodir: true,
@@ -81,7 +89,7 @@ export function findEnvFiles(startDir = process.cwd()) {
   });
 
   for (const file of files) {
-    found.add(path.normalize(file));
+    addFile(file);
   }
 
   return [...found];

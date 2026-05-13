@@ -97,23 +97,24 @@ import {
     console.log(ansiColors.yellow("No GitHub URLs were processed"));
     return;
   }
-  console.log(`\n📝 Applying updates to ${updates.length} GitHub URL(s)...`);
+  console.log(`📝 Applying updates to ${updates.length} GitHub URL(s)...`);
   let changed = false;
   for (const { currentPkgName, url, new_url, repo, latest } of updates) {
     if (url !== new_url) {
-      console.log(`\n${ansiColors.cyan(currentPkgName)}:`);
+      console.log(`${ansiColors.cyan(currentPkgName)}:`);
       console.log("  from:", url.replace(repo.branch, ansiColors.red(repo.branch)));
       console.log("    to:", new_url.replace(latest.sha, ansiColors.green(latest.sha)));
       pkg.resolutions[currentPkgName] = new_url;
       changed = true;
     } else {
-      console.log(`\n${ansiColors.cyan(currentPkgName)}: ${ansiColors.gray("already up-to-date")}`);
+      console.log(`${ansiColors.cyan(currentPkgName)}: ${ansiColors.gray("already up-to-date")}`);
     }
   }
+  console.log("\n📌 Summary:");
   if (changed) {
     try {
-      fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
-      console.log(`\n✅ package.json updated successfully`);
+      fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "");
+      console.log(`✅ package.json updated successfully`);
     } catch (e) {
       console.error(ansiColors.red(`Failed to write package.json: ${e.message}`));
       process.exit(1);

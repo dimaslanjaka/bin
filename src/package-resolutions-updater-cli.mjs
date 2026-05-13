@@ -71,7 +71,7 @@ import {
     let repo;
     try {
       repo = parseGitHubUrl(url);
-      console.log(`✅ Valid GitHub URL for ${ansiColors.cyan(currentPkgName)}: ${url}`);
+      // console.log(`✅ Valid GitHub URL for ${ansiColors.cyan(currentPkgName)}: ${url}`);
     } catch (error) {
       console.log(`⏭️  Skipping ${ansiColors.yellow(currentPkgName)}: ${error.message}`);
       continue;

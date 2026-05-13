@@ -106,7 +106,7 @@
     "@types/yargs": "^17",
     "@typescript-eslint/eslint-plugin": "^8.59.0",
     "@typescript-eslint/parser": "^8.59.0",
-    "babel-jest": "^30.3.0",
+    "babel-jest": "^30.4.1",
     "browser-sync": "^3.0.4",
     "cross-env": "^10.1.0",
     "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/80999ac7a7031a81e11ddb5fab0f8ba433041c98/release/cross-spawn.tgz",
@@ -116,7 +116,7 @@
     "globals": "^17.5.0",
     "gulp": "^5.0.1",
     "husky": "^9.1.7",
-    "jest": "^30.3.0",
+    "jest": "^30.4.2",
     "lint-staged": "^16.4.0",
     "marked": "^18.0.3",
     "prettier": "^3.8.3",
@@ -197,6 +197,7 @@
     "undo-commit": "lib/git/undo-commit.cjs",
     "undo-last-commit": "lib/git/undo-commit.cjs",
     "undo-staged": "lib/git/undo-staged.cjs",
+    "yarn-clean": "binaries/yarn-clean.cjs",
     "yarn-reinstall": "lib/yarn-reinstall.cjs"
   }
 }

@@ -126,7 +126,7 @@ function validateBinaries(packageManager) {
     { cmd: "git-diff", args: ["--help"] },
     { cmd: "pkg-resolutions-updater", args: ["--help"] },
     { cmd: "submodule-install", args: ["--help"] },
-    { cmd: 'kill-night-crows', args: ['--help'] },
+    { cmd: "kill-night-crows", args: ["--help"] }
   ].forEach(({ cmd, args }) => {
     it(`[${packageManager}] should run ${cmd} command`, () => {
       if (!fs.existsSync(pkgJson)) {

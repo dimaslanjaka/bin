@@ -117,7 +117,7 @@ for (const line of submoduleList) {
   const GIT_MODULES = path.join(RELATIVE_MODULE_PATH, ".gitmodules");
 
   if (ACCESS_TOKEN) {
-    let URL_WITH_TOKEN = "";
+    let URL_WITH_TOKEN;
     let repoInfo;
 
     if (URL.includes("github.com")) {

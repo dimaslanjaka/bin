@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+CURRENT_FILE_PATH="$(realpath "$0")"
+echo "Current file path: $CURRENT_FILE_PATH"
+
+python "$SCRIPT_DIR/yarn-clean.py" "$@"

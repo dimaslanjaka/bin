@@ -3,17 +3,38 @@ import path from "node:path";
 import * as glob from "glob";
 
 const DEFAULT_IGNORES = [
-  "node_modules",
-  ".git",
-  ".yarn",
-  ".pnpm",
-  "dist",
-  "build",
-  "coverage",
-  "vendor",
-  "tmp",
-  ".cache",
-  "assets"
+  "**/node_modules/**",
+  "**/.git/**",
+  "**/.yarn/**",
+  "**/.pnpm/**",
+  "**/dist/**",
+  "**/build/**",
+  "**/coverage/**",
+  "**/vendor/**",
+  "**/tmp/**",
+  "**/.cache/**",
+  "**/assets/**",
+  "**/logs/**",
+  "**/output/**",
+  "**/public/**",
+  "**/static/**",
+  "**/temp/**",
+  "**/backup/**",
+  "**/backups/**",
+  "**/examples/**",
+  "**/docs/**",
+  "**/tests/**",
+  "**/__tests__/**",
+  "**/spec/**",
+  "**/__specs__/**",
+  "**/scripts/**",
+  "**/bin/**",
+  "**/hooks/**",
+  "**/config/**",
+  "**/configs/**",
+  "**/settings/**",
+  "**/.vscode/**",
+  "**/.idea/**"
 ];
 
 /**
@@ -52,16 +73,11 @@ export function findEnvFiles(startDir = process.cwd()) {
   /* --------------------------------
    * Subdirectories via glob
    * -------------------------------- */
-  const ignorePatterns = DEFAULT_IGNORES.map((dir) => {
-    if (dir.includes("*")) return dir;
-    return `**/${dir}/**`;
-  });
-
   const files = glob.globSync("**/.env", {
     cwd: startDir,
     absolute: true,
     nodir: true,
-    ignore: ignorePatterns
+    ignore: DEFAULT_IGNORES
   });
 
   for (const file of files) {

@@ -31,13 +31,27 @@ import https from "https";
 import os from "os";
 import path from "path";
 import * as utils from "./utils/index.cjs";
+import { findEnvFiles } from "./utils/findEnvFiles";
 
 const projectDir = process.cwd();
-const envPath = path.join(projectDir, ".env");
+let envPath = path.join(projectDir, ".env");
 const args = utils.getArgs();
 
+if (!fs.existsSync(envPath)) {
+  const envFiles = findEnvFiles(projectDir, (file) => {
+    // only pick file with GITHUB_TOKEN or ACCESS_TOKEN
+    const content = fs.readFileSync(file, "utf-8");
+    return /GITHUB_TOKEN|ACCESS_TOKEN/.test(content);
+  });
+  if (envFiles.length > 0) {
+    envPath = envFiles[0];
+  }
+}
+
 // Load the .env file using dotenv (ESM import)
-if (fs.existsSync(envPath)) dotenv.config({ path: envPath, quiet: true, override: true });
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath, quiet: true, override: true });
+}
 const ACCESS_TOKEN = process.env.GITHUB_TOKEN || process.env.ACCESS_TOKEN;
 
 // Show help if --help/-h is passed

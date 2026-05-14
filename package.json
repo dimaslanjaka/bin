@@ -185,6 +185,7 @@
     "print-directory-tree": "lib/print-directory-tree.cjs",
     "print-tree": "lib/print-directory-tree.cjs",
     "prod": "binaries/prod.cjs",
+    "py": "binaries/py.cjs",
     "remove-module": "lib/remove-module.cjs",
     "rmfind": "binaries/rmfind.cjs",
     "rmpath": "lib/rmpath.cjs",

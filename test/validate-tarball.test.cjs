@@ -146,6 +146,9 @@ function validateBinaries(packageManager) {
         stdio: "pipe",
         shell: true
       });
+      if (result.status !== 0) {
+        console.log(result);
+      }
       expect(result.error).toBeUndefined();
       expect(result.status).toBe(0);
 

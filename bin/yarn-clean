@@ -1,8 +1,32 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 CURRENT_FILE_PATH="$(realpath "$0")"
 echo "Current file path: $CURRENT_FILE_PATH"
 
-python "$SCRIPT_DIR/../bin/yarn-clean.py" "$@"
+CANDIDATES=(
+  "$SCRIPT_DIR/../bin/yarn-clean.py"
+  "$SCRIPT_DIR/../binaries/yarn-clean.py"
+)
+
+TARGET=""
+
+for f in "${CANDIDATES[@]}"; do
+  if [[ -f "$f" ]]; then
+    TARGET="$f"
+    break
+  fi
+done
+
+if [[ -z "$TARGET" ]]; then
+  echo "Error: yarn-clean.py not found in expected locations:" >&2
+  printf ' - %s\n' "${CANDIDATES[@]}" >&2
+  exit 1
+fi
+
+echo "Using script: $TARGET"
+
+python "$TARGET" "$@"

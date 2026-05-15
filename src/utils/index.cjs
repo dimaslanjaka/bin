@@ -107,7 +107,7 @@ function del(fullPath) {
       try {
         fs.rmdirSync(fullPath);
         console.log("deleted", fullPath);
-      } catch (e) {
+      } catch (_e) {
         // fallback to rmSync for older Node versions or non-empty dirs
         try {
           fs.rmSync(fullPath, { recursive: true, force: true, retryDelay: 7000 });
@@ -123,7 +123,7 @@ function del(fullPath) {
     try {
       fs.unlinkSync(fullPath);
       console.log("deleted", fullPath);
-    } catch (e) {
+    } catch (_e) {
       try {
         fs.rmSync(fullPath, { recursive: true, force: true, retryDelay: 7000 });
         console.log("deleted", fullPath);

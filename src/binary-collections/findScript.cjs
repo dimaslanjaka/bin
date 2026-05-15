@@ -39,7 +39,8 @@ function findScript(scriptName, searchDir = null) {
           path.join(searchDir, pkgJson.bin[scriptName]),
           path.join(process.cwd(), "node_modules/binary-collections", pkgJson.bin[scriptName]),
           path.join(__dirname, pkgJson.bin[scriptName]),
-          path.join(path.join(__dirname, ".."), pkgJson.bin[scriptName])
+          path.join(path.join(__dirname, ".."), pkgJson.bin[scriptName]),
+          path.join(path.join(__dirname, "../.."), pkgJson.bin[scriptName])
         ];
         const filtered = find.filter((file) => fs.existsSync(file));
         if (filtered.length > 0) {

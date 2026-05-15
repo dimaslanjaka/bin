@@ -53,6 +53,15 @@ function main() {
 
   const scriptName = positional[0];
   // console.log(`🔍 Looking for script: ${scriptName}`);
+  if (scriptName === "list") {
+    const listScript = require("./binary-collections/listScript.cjs");
+    const scripts = listScript();
+    console.log("📋 Available scripts:");
+    scripts.forEach((script) => {
+      console.log(`  - ${path.basename(script.name)} -> ${script.path}`);
+    });
+    process.exit(0);
+  }
 
   // Reconstruct all arguments except the script name
   // Include both positional arguments and flags

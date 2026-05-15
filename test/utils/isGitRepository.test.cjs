@@ -1,5 +1,3 @@
-/* eslint-env jest */
-
 const { repoDir, nonGitDir } = require("../env.cjs");
 const originalCwd = process.cwd();
 

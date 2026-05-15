@@ -1,4 +1,3 @@
-/* eslint-env jest */
 const { repoDir } = require("./env.cjs");
 const path = require("upath");
 

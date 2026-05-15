@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Run Jest while forwarding all arguments
+npx jest \
+  --runInBand \
+  --forceExit \
+  --testTimeout=120000 \
+  --testPathIgnorePatterns="\\.mjs$" \
+  --detectOpenHandles \
+  "$@"

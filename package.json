@@ -195,7 +195,7 @@
     "submodule-install": "lib/submodule-install.cjs",
     "submodule-remove": "lib/submodule-remove-cli.cjs",
     "submodule-token": "binaries/submodule-token.cjs",
-    "test-fail": "binaries/test-fail.cjs",
+    "test-cjs": "binaries/test-cjs.cjs",
     "undo-commit": "lib/git/undo-commit.cjs",
     "undo-last-commit": "lib/git/undo-commit.cjs",
     "undo-staged": "lib/git/undo-staged.cjs",

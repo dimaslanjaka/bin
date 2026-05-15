@@ -69,6 +69,11 @@ To make these tools available directly in your VSCode terminal, create or update
       "args": [],
       "icon": "terminal-cmd"
     },
+    "Short Command Prompt": {
+      "path": ["${env:windir}\\System32\\cmd.exe"],
+      "args": ["/k", "prompt $g"],
+      "icon": "terminal-cmd"
+    },
     "Git Bash": {
       "source": "Git Bash"
     },

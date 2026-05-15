@@ -79,6 +79,8 @@ Create `.vscode/settings.json` to add binary tools to your PATH:
 
 ## Available Tools
 
+List avaliable executable tools use `binary-collections list`
+
 ### Quick Reference
 
 | Category | Commands | Description |

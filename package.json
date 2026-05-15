@@ -1,6 +1,6 @@
 {
   "name": "binary-collections",
-  "version": "2.0.10",
+  "version": "2.0.11",
   "description": "Utility to clean any programming caches and more",
   "keywords": [
     "cache",
@@ -71,7 +71,7 @@
     "dotenv": "^17.4.2",
     "execa": "^9.6.1",
     "fs-extra": "^11.3.4",
-    "git-command-helper": "^2.1.0",
+    "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/refs/heads/pre-release/release/git-command-helper.tgz",
     "glob": "^13.0.6",
     "minimatch": "^10.2.5",
     "minimist": "^1.2.8",
@@ -140,8 +140,8 @@
   "packageManager": "yarn@4.9.2",
   "resolutions": {
     "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/80999ac7a7031a81e11ddb5fab0f8ba433041c98/release/cross-spawn.tgz",
-    "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/bb9d6c795b8d00f9d7debae8ce1810a05d9c9c65/release/git-command-helper.tgz",
-    "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/3605a27eb43ca84e4d25c885af87626ad33b1816/packages/sbg-utility/release/sbg-utility.tgz"
+    "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/0ec870a451241af4f7e16acee5474afe38918c77/release/git-command-helper.tgz",
+    "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/1c6327117ab66a6ac7bac6df2b5c4f1cd9ef2785/packages/sbg-utility/release/sbg-utility.tgz"
   },
   "bin": {
     "binary-collections": "lib/binary-collections.cjs",

@@ -61,6 +61,15 @@ To make these tools available directly in your VSCode terminal, create or update
       "source": "PowerShell",
       "icon": "terminal-powershell"
     },
+    "Short PowerShell": {
+      "source": "PowerShell",
+      "args": [
+        "-NoExit",
+        "-Command",
+        "function prompt { \"[$((Get-Item .).Name)]> \" }"
+      ],
+      "icon": "terminal-powershell"
+    },
     "Command Prompt": {
       "path": [
         "${env:windir}\\Sysnative\\cmd.exe",
@@ -70,8 +79,13 @@ To make these tools available directly in your VSCode terminal, create or update
       "icon": "terminal-cmd"
     },
     "Short Command Prompt": {
-      "path": ["${env:windir}\\System32\\cmd.exe"],
-      "args": ["/k", "prompt $g"],
+      "path": [
+        "${env:windir}\\System32\\cmd.exe"
+      ],
+      "args": [
+        "/k",
+        "prompt $p$_$g"
+      ],
       "icon": "terminal-cmd"
     },
     "Git Bash": {
@@ -79,7 +93,10 @@ To make these tools available directly in your VSCode terminal, create or update
     },
     "Cygwin": {
       "path": "C:\\cygwin64\\bin\\bash.exe",
-      "args": ["--login", "-i"],
+      "args": [
+        "--login",
+        "-i"
+      ],
       "env": {
         "CHERE_INVOKING": "1"
       }

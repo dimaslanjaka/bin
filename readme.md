@@ -49,10 +49,12 @@ To make these tools available directly in your VSCode terminal, create or update
 ```jsonc
 {
   "terminal.integrated.env.linux": {
-    "PATH": "${env:PATH}:${workspaceFolder}/node_modules/.bin:${workspaceFolder}/bin"
+    "PATH": "${env:PATH}:${workspaceFolder}/node_modules/.bin:${workspaceFolder}/bin",
+    "PUPPETEER_SKIP_DOWNLOAD": "true"
   },
   "terminal.integrated.env.windows": {
-    "PATH": "${env:PATH};${workspaceFolder}\\node_modules\\.bin;${workspaceFolder}\\bin"
+    "PATH": "${env:PATH};${workspaceFolder}\\node_modules\\.bin;${workspaceFolder}\\bin",
+    "PUPPETEER_SKIP_DOWNLOAD": "true"
   },
   "terminal.integrated.profiles.windows": {
     "PowerShell": {

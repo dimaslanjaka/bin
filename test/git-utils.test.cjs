@@ -1,4 +1,3 @@
-/* eslint-env jest */
 const { runGitCommand } = require("../src/git/utils.cjs");
 const { spawnSync } = require("child_process");
 

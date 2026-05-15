@@ -1,4 +1,3 @@
-/* eslint-env jest */
 const { execSync } = require("child_process");
 const env = require("./env.cjs");
 const path = require("upath");

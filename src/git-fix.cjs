@@ -9,7 +9,7 @@ const { normalizeLineEndings } = require("./git/normalize.cjs");
 const { getArgs } = require("./utils/index.cjs");
 const path = require("upath");
 
-require("dotenv").config({ path: path.join(process.cwd(), ".env") });
+require("dotenv").config({ path: path.join(process.cwd(), ".env"), quiet: true, override: true });
 
 function showHelp() {
   console.log("Git Fix Utility");

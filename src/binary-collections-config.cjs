@@ -14,7 +14,7 @@
 
 const path = require("path");
 
-require("dotenv").config({ path: path.join(process.cwd(), ".env"), quiet: true });
+require("dotenv").config({ path: path.join(process.cwd(), ".env"), quiet: true, override: true });
 
 /**
  * Get the base temporary directory path

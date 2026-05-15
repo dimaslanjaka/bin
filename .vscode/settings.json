@@ -48,7 +48,8 @@
     "electron-*.ts": "cross-env-shell NODE_ENV=development electron -r ts-node/register",
     "*.py": "python -u",
     "*.electron.js": "cross-env-shell NODE_ENV=development electron -r ts-node/register",
-    "*.test.{js,ts,cjs,mjs,jsx}": "npm test -- --testPathPatterns=$fileName"
+    "*.test.{js,ts,mjs,jsx}": "npm test -- --testPathPatterns=$fileName",
+    "*.test.cjs": "test-cjs --testPathPatterns=\"$fileName\""
   },
   "code-runner.executorMap": {
     "javascript": "node --no-warnings=ExperimentalWarning",

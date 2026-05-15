@@ -32,6 +32,7 @@ import os from "os";
 import path from "path";
 import * as utils from "./utils/index.cjs";
 import { findEnvFiles } from "./utils/findEnvFiles.js";
+import { parseGitHubUrl } from "git-command-helper";
 
 const projectDir = process.cwd();
 let envPath = path.join(projectDir, ".env");
@@ -213,36 +214,5 @@ export function replaceRawWithLatestHash(url, latestHash) {
   return `https://github.com/${owner}/${repo}/raw/${latestHash}/${path}`;
 }
 
-/**
- * Parse GitHub URLs and extract owner, repo, branch, and original URL.
- */
-export function parseGitHubUrl(url) {
-  const ghRepoRoot = /^https:\/\/github\.com\/([^/]+)\/([^/]+)\/?$/;
-  const ghTreeOrBlob = /^https:\/\/github\.com\/([^/]+)\/([^/]+)\/(tree|blob)\/([^/]+(?:\/[^/]+)*)/;
-  const ghRaw = /^https:\/\/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/([^/]+)(\/.+)?$/;
-  const ghDotComRaw = /^https:\/\/github\.com\/([^/]+)\/([^/]+)\/raw\/([^/]+)\/.+/;
-
-  let match;
-
-  if ((match = url.match(ghRaw))) {
-    const [, owner, repo, branch] = match;
-    return { owner, repo, branch, url };
-  }
-
-  if ((match = url.match(ghDotComRaw))) {
-    const [, owner, repo, branch] = match;
-    return { owner, repo, branch, url };
-  }
-
-  if ((match = url.match(ghTreeOrBlob))) {
-    const [, owner, repo, , branchPath] = match;
-    return { owner, repo, branch: branchPath, url };
-  }
-
-  if ((match = url.match(ghRepoRoot))) {
-    const [, owner, repo] = match;
-    return { owner, repo, url };
-  }
-
-  throw new Error(`Unsupported GitHub URL: ${url}`);
-}
+// Re-export parseGitHubUrl from git-command-helper for backward compatibility
+export { parseGitHubUrl };

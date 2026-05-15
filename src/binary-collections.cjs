@@ -147,6 +147,7 @@ function main() {
   }
 
   const scriptName = positional[0];
+  // console.log(`🔍 Looking for script: ${scriptName}`);
 
   // Reconstruct all arguments except the script name
   // Include both positional arguments and flags

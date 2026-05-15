@@ -4,7 +4,7 @@ import { execSync } from "child_process";
 import fs from "fs-extra";
 import path from "upath";
 import { fileURLToPath } from "url";
-import { getTempPath } from "./binary-collections-config.cjs";
+import { getTempPath } from "./binary-collections/config.cjs";
 import { runChatGpt } from "./utils/chatgpt.js";
 import { getArgs } from "./utils/index.cjs";
 

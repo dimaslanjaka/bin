@@ -3,43 +3,48 @@ A comprehensive toolkit of Node.js CLI utilities for streamlining development wo
 
 ## Features
 
-- 🧹 **Cleanup Tools**: Remove node_modules, yarn caches, gradle builds
-- 🔄 **Git Utilities**: Submodule management, repository purging, diff tools
-- 📦 **Build Tools**: NPM script runners, package management utilities
-- ⚡ **Development Helpers**: Process management, environment setup tools
+- 🧹 **Cleanup Tools**: Instantly remove `node_modules`, yarn caches, and gradle builds.
+- 🔄 **Git Utilities**: Manage submodules, purge repositories, and fix cross-platform encoding issues.
+- 📦 **Build Tools**: Enhanced NPM script runners and package resolution managers.
+- ⚡ **Development Helpers**: Process management, environment setup, and file system operations.
 
 ## Installation
 
-### Clone Repository
+### Option 1: NPM Package
+Install locally to your project or globally for system-wide access.
+
+```bash
+# Local installation
+npm install binary-collections
+
+# Global installation
+npm install binary-collections -g
+
+# Install from specific release archive
+npm install binary-collections@https://github.com/dimaslanjaka/bin/raw/master/releases/bin.tgz
+```
+
+### Option 2: Direct Execution
+Run without installing using `npx` or `yarn dlx`.
+
+```bash
+# Using Yarn Berry
+yarn dlx binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz <command-name>
+
+# Using NPX
+npx -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz <command-name>
+```
+
+### Option 3: Clone Repository
+For development or manual setup.
+
 ```bash
 git clone -b master https://github.com/dimaslanjaka/bin bin
 ```
 
-### NPM Installation
-```bash
-# Install locally
-npm install binary-collections
+## VSCode Integration
 
-# Install globally
-npm install binary-collections -g
-
-# Install from release archive
-npm install binary-collections@https://github.com/dimaslanjaka/bin/raw/master/releases/bin.tgz
-```
-
-### Direct run
-
-```bash
-# Yarn berry
-yarn dlx binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz <command-name>
-
-# NPX
-npx -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz <command-name>
-```
-
-## VSCode Setup
-
-Create `.vscode/settings.json` to add binary tools to your PATH:
+To make these tools available directly in your VSCode terminal, create or update `.vscode/settings.json`:
 
 ```jsonc
 {
@@ -79,7 +84,10 @@ Create `.vscode/settings.json` to add binary tools to your PATH:
 
 ## Available Tools
 
-List avaliable executable tools use `binary-collections list`
+To view a complete list of available binaries, run:
+```bash
+binary-collections list
+```
 
 ### Quick Reference
 
@@ -98,186 +106,184 @@ List avaliable executable tools use `binary-collections list`
 ### Git Tools
 
 #### Git Repository Purge
-Clean and optimize git repositories by pruning reflogs:
+Cleans and optimizes git repositories by pruning reflogs.
+
 ```bash
 git-purge
 ```
+
 ![Git purge screenshot](https://github.com/dimaslanjaka/bin/assets/12471057/2805c54e-28a7-491d-b381-de2593a854b3)
 
 #### Git Diff Utility
-Enhanced git diff functionality:
+Enhanced diff functionality for repository inspection.
+
 ```bash
 git-diff
 ```
 
 #### Git Fix Utility
-Comprehensive Git configuration fixer for cross-platform development (replaces `git-fix-encoding`):
+A comprehensive configuration fixer for cross-platform development (replaces `git-fix-encoding`). It is now non-interactive and argument-driven.
+
 ```bash
-git-fix                          # Apply all fixes
+git-fix                          # Apply all default fixes
 git-fix --lf-only                # Force LF line endings only
 git-fix --permissions            # Ignore file permissions only
 git-fix --normalize              # Normalize existing files only
-git-fix --user                   # Configure Git user from environment
+git-fix --user                   # Configure Git user from env vars
 git-fix --user NAME EMAIL        # Configure Git user with specific values
-git-fix --user --update-remote   # Also update remote URL to match user
-git-fix --user NAME EMAIL --update-remote  # Configure user and update remote URL
+git-fix --user --update-remote   # Configure user and update remote URL
 ```
-Features:
+
+**Features:**
 - Forces LF line endings (`core.autocrlf = false`)
 - Ignores file permission changes (`core.filemode = false`)
-- Sets pull strategy to false (prevents auto-rebase)
+- Sets pull strategy to prevent auto-rebase
 - Normalizes existing line endings
-- Creates/updates `.gitattributes` with proper line ending rules
-- Configures Git user from environment variables or CLI arguments
-- **Non-interactive:** All configuration is now argument-driven; no interactive prompts
-- `--update-remote` flag: Update remote URL to match the configured user (for HTTPS remotes)
+- Creates/updates `.gitattributes`
 
-User Configuration:
-- Environment variables: `GITHUB_USER`, `GITHUB_EMAIL`
-- CLI arguments take precedence over environment variables
-- Use `--update-remote` to update the remote URL with the configured user
-- Examples:
-  ```bash
-  git-fix --user "John Doe" "john@example.com"  # Use CLI args
-  git-fix --user --update-remote                 # Use env vars and update remote
-  git-fix --user "Jane" "jane@example.com" --update-remote  # CLI args and update remote
-  GITHUB_USER="Jane" GITHUB_EMAIL="jane@example.com" git-fix --user  # Use env vars
-  ```
+**User Configuration:**
+- Uses Environment variables: `GITHUB_USER`, `GITHUB_EMAIL` (if no args provided).
+- Use `--update-remote` to automatically update the remote URL to match the configured user (HTTPS remotes).
 
 #### Git Repository Size Reducer
-Reduce git repository size by cleaning up history:
+Reduces repository size by cleaning up history.
+
 ```bash
 git-reduce-size
 ```
 
 #### Submodule Management
-- **`submodule`** - General submodule operations
-- **`submodule-install`** - Install and setup submodules
-- **`submodule-remove`** - Remove git submodules with interactive selection
-- **`submodule-token`** - Manage submodule tokens
+Manage git submodules effortlessly.
+
+- **`submodule`**: General operations.
+- **`submodule-install`**: Install and setup submodules.
+- **`submodule-remove`**: Interactive removal of submodules.
+- **`submodule-token`**: Manage authentication tokens.
 
 ![Submodule remover screenshot](https://github.com/user-attachments/assets/659c2fa3-f12f-45cb-a66f-aed3807e0023)
 
+---
 
 ### NPM Script Runner
-
 **Binaries**: `nrs`, `run-s`, `run-series`, `npm-run-series`
 
-Run multiple npm scripts in series with pattern matching support.
+Execute multiple npm scripts in series using pattern matching.
 
 #### Options
-| Flag                | Description                                 |
-|---------------------|---------------------------------------------|
-| `--yarn`            | Use `yarn run <script-name>` instead of npm |
-| `--verbose`, `-v`   | Enable verbose output                       |
+| Flag | Description |
+| :--- | :--- |
+| `--yarn` | Use `yarn run` instead of `npm run`. |
+| `--verbose`, `-v` | Enable verbose logging. |
 
 #### Example
-Execute all scripts matching the pattern `namescript:**`:
+Define a script to run all tasks matching a pattern:
+
 ```json
 {
-  "name": "package-name",
-  "version": "0.0.0",
-  "private": true,
   "scripts": {
-    "namescript:xx": "echo xx",
-    "namescript:xxx": "echo xxx",
-    "namescript:xxxx": "echo xxxx",
-    "namescript:xxxxx": "echo xxxxx",
-    "namescript": "nrs --yarn=true --verbose=true \"namescript:**\""
-  },
-  "license": "ISC"
+    "build:app": "echo 'building app'",
+    "build:lib": "echo 'building lib'",
+    "build:all": "nrs --yarn --verbose \"build:**\""
+  }
 }
 ```
 
-### Package Management Tools
+---
+
+### Package Management
 
 #### Yarn Package Reinstaller
-Reinstall yarn packages with dependency type flags:
+Reinstall packages with specific dependency types.
+
 ```bash
 yarn-reinstall <packageName> [--dev|-D|--peer|-P|--optional|-O]
 ```
 
 #### Package Resolutions Manager
-Manage package resolutions in package.json (aliases: `pkg-resolutions-updater`, `pkg-res-updater`):
+Manage `resolutions` in `package.json` (Aliases: `pkg-resolutions-updater`, `pkg-res-updater`).
+
 ```bash
 pkg-resolutions-updater
-pkg-res-updater
 ```
+
+---
 
 ### Node.js Development Tools
 
-#### Node Modules Finder
-Find all node_modules directories in a project:
+#### Find Node Modules
+Locate all `node_modules` directories within a project.
+
 ```bash
 find-node-modules      # Library function
 find-node-modules-cli  # CLI tool
 find-nodemodules       # Alias
 ```
 
-#### Development Environment Helpers
-- **`dev`** - Development environment setup
-- **`prod`** - Production environment setup
-- **`empty`** - Empty utility tool
+#### Environment Helpers
+- **`dev`**: Setup development environment variables.
+- **`prod`**: Setup production environment variables.
+- **`empty`**: A no-op utility placeholder.
 
-### Process Management Tools
+---
 
-#### Process Killers
-Kill processes by name or pattern:
+### Process Management
+
+Terminate processes quickly by name or type.
+
 ```bash
 kill-process    # General process killer
 nodekill        # Kill Node.js processes
-javakill        # Kill Java processes (Windows)
+javakill        # Kill Java processes (Windows specific)
 del-ps          # Kill processes by command name
 ```
 
-#### File System Tools
-- **`rmfind`** - Find and remove files
-- **`rmpath`** - Remove from PATH
-- **`rmx`** - Remove executable files
+---
 
 ### Cleanup Tools
 
 #### GitHub Actions Cache Cleaner
-[See full documentation](./docs-src/clean-github-actions-caches.md).
+Remove old GitHub Actions caches to free up space.
+**Aliases**: `clean-github-actions-cache`, `clear-gh-caches`, etc.
+```bash
+clean-github-actions-caches
+```
+*[Full Documentation](./docs-src/clean-github-actions-caches.md)*
 
 #### Node Modules Cleaner
-Remove node_modules directories recursively:
+Recursively remove `node_modules` directories.
+
 ```bash
 del-nodemodules        # Primary command
-del-node-modules       # Alternative
-clean-nodemodule       # Legacy
-clean-nodemodules      # Legacy
+# Aliases: del-node-modules, clean-nodemodule, clean-nodemodules
 ```
+
 ![Node modules cleaner screenshot](https://github.com/dimaslanjaka/bin/assets/12471057/f03e5b51-1808-4e82-a474-0dd3c7eab5fe)
 
-#### Yarn Cache Cleaner
-Clear yarn cache directories:
+#### System Cache Cleaners
 ```bash
-del-yarncaches         # Primary command
-del-yarn-caches        # Alternative
+del-yarncaches    # Clear Yarn cache
+del-gradle        # Delete Gradle build folders
 ```
 
-#### Gradle Build Cleaner
-Delete gradle build folders:
-```bash
-del-gradle
-```
+#### Automation Tools
+- **Free ChatGPT automation tool**: *[See documentation](./docs-src/free-chatgpt.md)*
 
-#### Free ChatGPT automation tool
-
-[See full documentation](./docs-src/free-chatgpt.md)
+---
 
 ## Troubleshooting
 
 ### Submodule Installation Issues
-If you encounter the following error:
+
+**Error:**
 ```log
 fatal: 'origin/<branch>' is not a commit and a branch '<branch>' cannot be created from it
 fatal: unable to checkout submodule '<folder>/<submodule>'
 ```
-**Solution**: Delete `.git/modules` directory before running `submodule-install`.
 
-#### Complete Submodule Setup Example
+**Solution:**
+Delete the `.git/modules` directory before running `submodule-install`.
+
+**Complete Reset & Install:**
 ```bash
 echo "Initializing submodules..."
 git submodule init
@@ -292,25 +298,22 @@ npx --yes rimraf .git/modules
 npx --yes binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz submodule-install
 ```
 
-## Binary List Generation & Source Code (Development)
+## Development
 
-The list of available binaries and utilities is auto-generated by the build script ([`build.mjs`](./build.mjs)).
-- All CLI tools and binaries are collected from the `bin/`, `lib/`, and other relevant folders.
-- The build process updates the `bin` field in `package.json` to reflect all available executables.
-- Source code for utilities is located in the `src/` folder.
+### Binary List Generation
+The list of available binaries is auto-generated by [`build.mjs`](./build.mjs). This script scans `bin/`, `lib/`, and updates the `bin` field in `package.json`.
 
-To update the binary list, run:
+To update the binary list:
 ```bash
 yarn run build
 # or
 node build.mjs
 ```
-This scans the project and updates `package.json` with all available binaries. The list may change as files are added or removed.
 
-See also:
-- [Binary executables](https://github.com/dimaslanjaka/bin/tree/master/bin)
-- [Library modules](https://github.com/dimaslanjaka/bin/tree/master/lib)
-- [Package configuration](https://github.com/dimaslanjaka/bin/blob/master/package.json)
+### Project Structure
+- **Source Code**: Located in the `src/` folder.
+- **Binaries**: Executable scripts located in `bin/`.
+- **Libraries**: Reusable modules in `lib/`.
 
 ## Contributing
 
@@ -318,4 +321,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the terms specified in the LICENSE file.
+This project is licensed under the terms specified in the [LICENSE](./LICENSE) file.

@@ -34,10 +34,10 @@ npm install binary-collections@https://github.com/dimaslanjaka/bin/raw/master/re
 yarn dlx binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz <command-name>
 
 # NPX
-npx binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz <command-name>
+npx -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz <command-name>
 ```
 
-## VS Code Setup
+## VSCode Setup
 
 Create `.vscode/settings.json` to add binary tools to your PATH:
 
@@ -81,17 +81,17 @@ Create `.vscode/settings.json` to add binary tools to your PATH:
 
 ### Quick Reference
 
-| Category         | Commands                                                                 | Description                                      |
-|------------------|-------------------------------------------------------------------------|--------------------------------------------------|
-| **Git**          | `git-purge`, `git-diff`, `git-fix`, `git-reduce-size`                   | Git repository management and optimization        |
-| **Submodules**   | `submodule`, `submodule-install`, `submodule-remove`, `submodule-token` | Git submodule operations                         |
-| **NPM Scripts**  | `nrs`, `run-s`, `run-series`, `npm-run-series`                          | Run npm scripts in series with pattern matching   |
-| **Package Mgmt** | `yarn-reinstall`, `pkg-resolutions-updater`, `pkg-res-updater`          | Yarn/package resolutions management utilities     |
-| **Node.js Dev**  | `find-node-modules`, `find-nodemodules`, `dev`, `prod`, `empty`         | Node.js development helpers                      |
-| **Process Mgmt** | `kill-process`, `nodekill`, `javakill`, `del-ps`                        | Process management and termination               |
-| **File System**  | `rmfind`, `rmpath`, `rmx`, `print-tree`, `dir-tree`                     | File system operations                           |
-| **Cleanup**      | `del-nodemodules`, `del-yarncaches`, `del-gradle`                       | Cache and build directory cleanup                |
-| **GitHub Actions**| `clean-github-actions-caches`, `clean-github-actions-cache`, `clear-github-actions-cache`, `clear-github-actions-caches`, `clear-gh-caches` | Remove old GitHub Actions caches, keep only latest |
+| Category | Commands | Description |
+|---|---|---|
+| **Git** | `git-purge`, `git-diff`, `git-fix`, `git-reduce-size` | Git repository management and optimization |
+| **Submodules** | `submodule`, `submodule-install`, `submodule-remove`, `submodule-token` | Git submodule operations |
+| **NPM Scripts** | `nrs`, `run-s`, `run-series`, `npm-run-series` | Run npm scripts in series with pattern matching |
+| **Package Mgmt** | `yarn-reinstall`, `pkg-resolutions-updater`, `pkg-res-updater` | Yarn/package resolutions management utilities |
+| **Node.js Dev** | `find-node-modules`, `find-nodemodules`, `dev`, `prod`, `empty` | Node.js development helpers |
+| **Process Mgmt** | `kill-process`, `nodekill`, `javakill`, `del-ps` | Process management and termination |
+| **File System** | `rmfind`, `rmpath`, `rmx`, `print-tree`, `dir-tree` | File system operations |
+| **Cleanup** | `del-nodemodules`, `del-yarncaches`, `del-gradle` | Cache and build directory cleanup |
+| **GitHub Actions** | `clean-github-actions-caches`, `clean-github-actions-cache`, `clear-github-actions-cache`, `clear-github-actions-caches`, `clear-gh-caches` | Remove old GitHub Actions caches, keep only latest |
 
 ---
 #### Binary List Generation & Source Code

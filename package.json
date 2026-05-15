@@ -140,8 +140,8 @@
   "packageManager": "yarn@4.9.2",
   "resolutions": {
     "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/80999ac7a7031a81e11ddb5fab0f8ba433041c98/release/cross-spawn.tgz",
-    "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/0ec870a451241af4f7e16acee5474afe38918c77/release/git-command-helper.tgz",
-    "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/1c6327117ab66a6ac7bac6df2b5c4f1cd9ef2785/packages/sbg-utility/release/sbg-utility.tgz"
+    "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/cb096c1f021d88679cbfd3cf55a426aed64f1b94/release/git-command-helper.tgz",
+    "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/3f586d10a71bbe2fba8464021031c4dc27759e3b/packages/sbg-utility/release/sbg-utility.tgz"
   },
   "bin": {
     "binary-collections": "lib/binary-collections.cjs",

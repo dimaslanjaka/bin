@@ -113,7 +113,7 @@ import {
   console.log("\n📌 Summary:");
   if (changed) {
     try {
-      fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "");
+      fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
       console.log(`✅ package.json updated successfully`);
     } catch (e) {
       console.error(ansiColors.red(`Failed to write package.json: ${e.message}`));

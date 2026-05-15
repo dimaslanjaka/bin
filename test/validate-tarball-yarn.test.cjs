@@ -42,23 +42,6 @@ describe("Test binary-collections tarball", () => {
     }
   });
 
-  describe(`should install binary-collections from tarball (${tarballPath}) using npm`, () => {
-    beforeAll(() => {
-      prepareInstallation("npm");
-      const result = spawnSync("npm", ["install", "--ignore-scripts", `binary-collections@${tarballPath}`], {
-        cwd: repoDir,
-        stdio: "pipe",
-        shell: true
-      });
-      if (result.error) throw result.error;
-      if (result.status !== 0) throw new Error(`npm install failed with code ${result.status}`);
-      expect(fs.existsSync(pkgDir)).toBe(true);
-      expect(fs.existsSync(path.join(pkgDir, "package.json"))).toBe(true);
-      checkBinLinks("-npm", tarballPath);
-    });
-    validateBinaries("npm");
-  });
-
   describe(`should install binary-collections from tarball (${tarballPath}) using yarn`, () => {
     beforeAll(() => {
       prepareInstallation("yarn");

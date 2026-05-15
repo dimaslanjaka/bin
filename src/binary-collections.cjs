@@ -139,7 +139,7 @@ function executeScript(scriptPath, args) {
 function main() {
   const args = getArgs();
   const positional = args._ || [];
-  console.log(`🔍 Parsed arguments: ${JSON.stringify(args)}`);
+  // console.log(`🔍 Parsed arguments: ${JSON.stringify(args)}`);
 
   // Show help if no script name is provided (covers both `bc` and `bc -h` cases)
   if (positional.length === 0) {

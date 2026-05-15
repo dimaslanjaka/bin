@@ -69,3 +69,4 @@ function findScript(scriptName, searchDir = null) {
 }
 
 module.exports = findScript;
+module.exports.default = findScript;

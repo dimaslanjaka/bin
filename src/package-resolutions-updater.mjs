@@ -31,7 +31,7 @@ import https from "https";
 import os from "os";
 import path from "path";
 import * as utils from "./utils/index.cjs";
-import { findEnvFiles } from "./utils/findEnvFiles";
+import { findEnvFiles } from "./utils/findEnvFiles.js";
 
 const projectDir = process.cwd();
 let envPath = path.join(projectDir, ".env");

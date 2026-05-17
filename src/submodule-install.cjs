@@ -116,6 +116,12 @@ for (const line of submoduleList) {
 
   const GIT_MODULES = path.join(RELATIVE_MODULE_PATH, ".gitmodules");
 
+  // Ensure .gitmodules exists and is not empty before proceeding, otherwise skip to avoid errors
+  if (!fs.existsSync(GIT_MODULES) || fs.statSync(GIT_MODULES).size === 0) {
+    console.log(".gitmodules not found or empty. Skipping submodule processing.");
+    process.exit(0);
+  }
+
   if (ACCESS_TOKEN) {
     let URL_WITH_TOKEN;
     let repoInfo;

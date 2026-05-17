@@ -7,6 +7,7 @@ import { fileURLToPath } from "url";
 import { getTempPath } from "./binary-collections/config.cjs";
 import { runChatGpt } from "./utils/chatgpt.js";
 import { getArgs } from "./utils/index.cjs";
+import ansiColors from "ansi-colors";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -117,7 +118,7 @@ async function mainGitDiff() {
   if (args["staged-only"] || args.s || args.S) {
     runGitDiff(
       "git --no-pager diff --staged",
-      `Full staged diff saved to "${DIFF_OUTPUT_RELATIVE}"`,
+      `Full staged diff saved to "${ansiColors.green(DIFF_OUTPUT_RELATIVE)}"`,
       "Failed to save staged diff"
     );
   } else {
@@ -126,13 +127,13 @@ async function mainGitDiff() {
     if (!file) {
       runGitDiff(
         "git --no-pager diff",
-        `Full staged diff saved to "${DIFF_OUTPUT_RELATIVE}"`,
+        `Full staged diff saved to "${ansiColors.green(DIFF_OUTPUT_RELATIVE)}"`,
         "Failed to save all diff's"
       );
     } else {
       runGitDiff(
         `git --no-pager diff --cached -- "${file}"`,
-        `Staged diff of "${file}" saved to "${DIFF_OUTPUT_RELATIVE}"`,
+        `Staged diff of "${file}" saved to "${ansiColors.green(DIFF_OUTPUT_RELATIVE)}"`,
         `Failed to generate diff for "${file}"`
       );
     }

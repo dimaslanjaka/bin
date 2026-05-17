@@ -196,6 +196,7 @@
     "submodule-remove": "lib/submodule-remove-cli.cjs",
     "submodule-token": "binaries/submodule-token.cjs",
     "test-cjs": "binaries/test-cjs.cjs",
+    "test-esm": "binaries/test-esm.cjs",
     "undo-commit": "lib/git/undo-commit.cjs",
     "undo-last-commit": "lib/git/undo-commit.cjs",
     "undo-staged": "lib/git/undo-staged.cjs",

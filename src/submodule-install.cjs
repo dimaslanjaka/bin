@@ -117,9 +117,13 @@ for (const line of submoduleList) {
   const GIT_MODULES = path.join(RELATIVE_MODULE_PATH, ".gitmodules");
 
   // Ensure .gitmodules exists and is not empty before proceeding, otherwise skip to avoid errors
-  if (!fs.existsSync(GIT_MODULES) || fs.statSync(GIT_MODULES).size === 0) {
-    console.log(".gitmodules not found or empty. Skipping submodule processing.");
-    process.exit(0);
+  if (!fs.existsSync(GIT_MODULES)) {
+    console.log(`No .gitmodules found in ${RELATIVE_MODULE_PATH}. Skipping submodule processing for this module.`);
+    continue;
+  }
+  if (fs.statSync(GIT_MODULES).size === 0) {
+    console.log(`.gitmodules in ${RELATIVE_MODULE_PATH} is empty. Skipping submodule processing for this module.`);
+    continue;
   }
 
   if (ACCESS_TOKEN) {

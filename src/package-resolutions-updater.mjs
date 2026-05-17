@@ -207,11 +207,32 @@ export async function getLatestCommitAcrossBranches(owner, repo) {
  * Replace the branch or commit in a GitHub raw URL with the latest hash.
  */
 export function replaceRawWithLatestHash(url, latestHash) {
-  const match = url.match(/^https:\/\/github\.com\/([^/]+)\/([^/]+)\/raw\/([^/]+)\/(.+)$/);
-  if (!match) throw new Error("Invalid GitHub raw URL");
+  const parsed = parseGitHubUrl(url);
 
-  const [, owner, repo, _oldHash, path] = match;
-  return `https://github.com/${owner}/${repo}/raw/${latestHash}/${path}`;
+  if (!parsed || !parsed.owner || !parsed.repo || !parsed.branch) {
+    throw new Error("Invalid GitHub raw URL");
+  }
+
+  const branchPrefix = `${parsed.branch}/`;
+  const rawPrefix = parsed.host === "github.com" ? `raw/${branchPrefix}` : branchPrefix;
+  const refsPrefix = `refs/heads/${branchPrefix}`;
+  const path = parsed.path.startsWith(rawPrefix)
+    ? parsed.path.slice(rawPrefix.length)
+    : parsed.path.startsWith(refsPrefix)
+      ? parsed.path.slice(refsPrefix.length)
+      : parsed.path.startsWith(branchPrefix)
+        ? parsed.path.slice(branchPrefix.length)
+        : parsed.path;
+
+  if (parsed.host === "github.com") {
+    return `https://github.com/${parsed.owner}/${parsed.repo}/raw/${latestHash}/${path}`;
+  }
+
+  if (parsed.host === "raw.githubusercontent.com") {
+    return `https://raw.githubusercontent.com/${parsed.owner}/${parsed.repo}/${latestHash}/${path}`;
+  }
+
+  throw new Error("Invalid GitHub raw URL");
 }
 
 // Re-export parseGitHubUrl from git-command-helper for backward compatibility

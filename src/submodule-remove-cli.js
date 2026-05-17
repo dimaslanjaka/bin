@@ -11,8 +11,8 @@ if (!submodulePath) {
 }
 
 if (!fs.existsSync(path.resolve(submodulePath))) {
-  console.error(`Error: The path "${submodulePath}" does not exist.`);
-  process.exit(1);
+  console.warn(`Error: The path "${submodulePath}" does not exist, continue deinitialization and cleanup steps.`);
+  // process.exit(1);
 }
 
 (async () => {

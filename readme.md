@@ -49,14 +49,25 @@ To make these tools available directly in your VSCode terminal, create or update
 ```jsonc
 {
   "terminal.integrated.env.linux": {
-    "PATH": "${env:PATH}:${workspaceFolder}/node_modules/.bin:${workspaceFolder}/bin"
+    "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:${workspaceFolder}/bin:${workspaceFolder}/node_modules/.bin:${workspaceFolder}/vendor/bin",
+    "PUPPETEER_SKIP_DOWNLOAD": "true"
   },
   "terminal.integrated.env.windows": {
-    "PATH": "${env:PATH};${workspaceFolder}\\node_modules\\.bin;${workspaceFolder}\\bin"
+    "PATH": "${env:LOCALAPPDATA}\\nvm;C:\\nvm4w\\nodejs;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\usr\\bin;${env:PATH};${workspaceFolder}\\node_modules\\.bin;${workspaceFolder}\\bin;${workspaceFolder}\\vendor\\bin;C:\\laragon\\bin\\mysql\\mysql-8.4.3-winx64\\bin;C:\\Users\\Dell\\AppData\\Local\\Programs\\Ollama",
+    "PUPPETEER_SKIP_DOWNLOAD": "true"
   },
   "terminal.integrated.profiles.windows": {
     "PowerShell": {
       "source": "PowerShell",
+      "icon": "terminal-powershell"
+    },
+    "Short PowerShell": {
+      "source": "PowerShell",
+      "args": [
+        "-NoExit",
+        "-Command",
+        "function prompt { \"[$((Get-Item .).Name)]> \" }"
+      ],
       "icon": "terminal-powershell"
     },
     "Command Prompt": {
@@ -67,12 +78,25 @@ To make these tools available directly in your VSCode terminal, create or update
       "args": [],
       "icon": "terminal-cmd"
     },
+    "Short Command Prompt": {
+      "path": [
+        "${env:windir}\\System32\\cmd.exe"
+      ],
+      "args": [
+        "/k",
+        "prompt $p$_$g"
+      ],
+      "icon": "terminal-cmd"
+    },
     "Git Bash": {
       "source": "Git Bash"
     },
     "Cygwin": {
       "path": "C:\\cygwin64\\bin\\bash.exe",
-      "args": ["--login", "-i"],
+      "args": [
+        "--login",
+        "-i"
+      ],
       "env": {
         "CHERE_INVOKING": "1"
       }

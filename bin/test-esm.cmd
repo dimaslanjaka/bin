@@ -12,14 +12,11 @@ if defined GITLAB_CI (
     set "CI_ARG=--ci"
 )
 
-:: Run the specific Jest test file while ignoring .mjs files.
-:: Use caret (^) for line continuation in Windows CMD.
-npx -y jest ^
+node --experimental-vm-modules node_modules/jest/bin/jest.js ^
   --runInBand ^
   --forceExit ^
   --testTimeout=120000 ^
-  --testPathIgnorePatterns="\\.mjs$" ^
-  --detectOpenHandles ^
+  --testPathIgnorePatterns="\\.(ts|js|cjs)$" ^
   %CI_ARG% ^
   %*
 

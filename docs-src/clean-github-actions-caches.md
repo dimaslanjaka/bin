@@ -12,6 +12,16 @@ npx --yes binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/
 yarn dlx binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz clean-github-actions-caches
 ```
 
+### Aliases
+
+This command is available under several aliases (all invoke the same CLI):
+
+- `clean-github-actions-cache`
+- `clear-github-actions-cache`
+- `clear-github-actions-caches`
+- `clear-gh-caches`
+
+
 ### Features
 - Authenticates using `ACCESS_TOKEN` or `GITHUB_TOKEN` from your `.env` file
 - Groups caches by prefix and deletes all but the latest for each group

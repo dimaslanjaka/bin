@@ -109,5 +109,5 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
-          node lib/clean-github-actions-caches.cjs
+          node lib/clean-github-actions-caches-cli.cjs
         shell: bash

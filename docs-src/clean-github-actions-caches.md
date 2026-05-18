@@ -23,4 +23,4 @@ yarn dlx binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/m
 2. Ensure you have access to the repository's cache management
 
 ### Source
-See [`src/clean-github-actions-caches.cjs`](../src/clean-github-actions-caches.cjs)
+See [`src/clean-github-actions-caches.cjs`](../src/clean-github-actions-caches.cjs) & [`src/clean-github-actions-caches-cli.cjs`](../src/clean-github-actions-caches-cli.cjs)

@@ -266,7 +266,7 @@ del-ps          # Kill processes by command name
 ### Cleanup Tools
 
 #### GitHub Actions Cache Cleaner
-Remove old GitHub Actions caches to free up space.
+Remove old GitHub Actions caches and leaving last one to free up space.
 **Aliases**: `clean-github-actions-cache`, `clear-gh-caches`, etc.
 ```bash
 clean-github-actions-caches

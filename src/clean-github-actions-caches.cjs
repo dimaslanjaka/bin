@@ -1,18 +1,8 @@
 const axios = require("axios");
 const { parseGitRemotes } = require("./utils/index.cjs");
-const path = require("upath");
-const fs = require("fs");
-const projectDir = process.cwd();
-const envPath = path.join(projectDir, ".env");
+const { findEnvWithToken } = require("./utils/findEnvFiles.cjs");
 
-// Load the .env file using dotenv
-if (fs.existsSync(envPath)) {
-  require("dotenv").config({ path: envPath, quiet: true });
-} else {
-  console.warn(`.env file not found at ${envPath}`);
-}
-
-require("dotenv").config({ path: path.join(process.cwd(), ".env"), quiet: true });
+require("dotenv").config({ path: findEnvWithToken(), quiet: true, overwrite: true });
 
 // delete caches leaving single last cache based on creation date
 const ACCESS_TOKEN = process.env.GITHUB_TOKEN || process.env.ACCESS_TOKEN;

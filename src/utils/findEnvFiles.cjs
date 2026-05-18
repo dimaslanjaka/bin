@@ -1,6 +1,6 @@
-import fs from "node:fs";
-import path from "node:path";
-import * as glob from "glob";
+const fs = require("node:fs");
+const path = require("node:path");
+const glob = require("glob");
 
 const DEFAULT_IGNORES = [
   "**/node_modules/**",
@@ -38,15 +38,23 @@ const DEFAULT_IGNORES = [
 ];
 
 /**
- * Find .env files.
+ * Find all `.env*` files from the current directory tree
+ * and parent directories.
  *
- * @param {string} startDir
- * @param {(file:string)=>boolean} [filter]
- * @returns {string[]}
+ * @param {string} [startDir=process.cwd()] Starting directory.
+ * @param {(file: string) => boolean} [filter] Optional filter callback.
+ * @returns {string[]} Normalized absolute file paths.
  */
-export function findEnvFiles(startDir = process.cwd(), filter) {
+function findEnvFiles(startDir = process.cwd(), filter) {
+  /** @type {Set<string>} */
   const found = new Set();
 
+  /**
+   * Add a file if it passes validation.
+   *
+   * @param {string} file
+   * @returns {void}
+   */
   function addFile(file) {
     const normalized = path.normalize(file);
 
@@ -94,3 +102,34 @@ export function findEnvFiles(startDir = process.cwd(), filter) {
 
   return [...found];
 }
+
+/**
+ * Find the first `.env*` file containing a token variable.
+ *
+ * @param {string} [startDir=process.cwd()] Starting directory.
+ * @param {string} [tokenName="GITHUB_TOKEN"] Environment variable name.
+ * @returns {string | undefined} Matching file path.
+ */
+function findEnvWithToken(startDir = process.cwd(), tokenName = "GITHUB_TOKEN") {
+  const envFiles = findEnvFiles(startDir);
+
+  return envFiles.find((file) => {
+    try {
+      const content = fs.readFileSync(file, "utf-8");
+      const regex = new RegExp(`^\\s*${tokenName}\\s*=`, "m");
+
+      return regex.test(content);
+    } catch (err) {
+      console.warn(`Failed to read ${file}: ${err instanceof Error ? err.message : String(err)}`);
+
+      return false;
+    }
+  });
+}
+
+module.exports = {
+  DEFAULT_IGNORES,
+  findEnvFiles,
+  findEnvWithToken,
+  default: findEnvFiles
+};

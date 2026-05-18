@@ -31,7 +31,7 @@ import https from "https";
 import os from "os";
 import path from "path";
 import * as utils from "./utils/index.cjs";
-import { findEnvFiles } from "./utils/findEnvFiles.js";
+import { findEnvFiles } from "./utils/findEnvFiles.cjs";
 import { parseGitHubUrl } from "git-command-helper";
 
 const projectDir = process.cwd();

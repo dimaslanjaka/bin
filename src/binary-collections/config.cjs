@@ -13,8 +13,9 @@
  */
 
 const path = require("path");
+const { findEnvWithToken } = require("../utils/findEnvFiles.cjs");
 
-require("dotenv").config({ path: path.join(process.cwd(), ".env"), quiet: true, override: true });
+require("dotenv").config({ path: findEnvWithToken(), quiet: true, overwrite: true });
 
 /**
  * Get the base temporary directory path

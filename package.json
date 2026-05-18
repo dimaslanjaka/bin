@@ -141,20 +141,20 @@
   "resolutions": {
     "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/80999ac7a7031a81e11ddb5fab0f8ba433041c98/release/cross-spawn.tgz",
     "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/cb096c1f021d88679cbfd3cf55a426aed64f1b94/release/git-command-helper.tgz",
-    "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/81bcb31c4f4fe0018889ea7e3f3bb03d0910d617/packages/sbg-utility/release/sbg-utility.tgz"
+    "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/730e8b6626d246ff36a059e312e775e10028cbed/packages/sbg-utility/release/sbg-utility.tgz"
   },
   "bin": {
     "binary-collections": "lib/binary-collections.cjs",
     "binary-executor": "binaries/binary-executor.cjs",
     "changelog": "lib/changelog.cjs",
     "chatgpt": "lib/free-chatgpt.cjs",
-    "clean-github-actions-cache": "lib/clean-github-actions-caches.cjs",
-    "clean-github-actions-caches": "lib/clean-github-actions-caches.cjs",
+    "clean-github-actions-cache": "lib/clean-github-actions-caches-cli.cjs",
+    "clean-github-actions-caches": "lib/clean-github-actions-caches-cli.cjs",
     "clean-nodemodule": "binaries/clean-nodemodule.cjs",
     "clean-nodemodules": "binaries/clean-nodemodules.cjs",
-    "clear-gh-caches": "lib/clean-github-actions-caches.cjs",
-    "clear-github-actions-cache": "lib/clean-github-actions-caches.cjs",
-    "clear-github-actions-caches": "lib/clean-github-actions-caches.cjs",
+    "clear-gh-caches": "lib/clean-github-actions-caches-cli.cjs",
+    "clear-github-actions-cache": "lib/clean-github-actions-caches-cli.cjs",
+    "clear-github-actions-caches": "lib/clean-github-actions-caches-cli.cjs",
     "del-gradle": "lib/del-gradle.cjs",
     "del-node-modules": "lib/del-node-modules.cjs",
     "del-nodemodules": "lib/del-node-modules.cjs",

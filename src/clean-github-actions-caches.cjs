@@ -1,8 +1,12 @@
 const axios = require("axios");
-const { parseGitRemotes } = require("./utils/index.cjs");
+const minimist = require("minimist");
 const { findEnvWithToken } = require("./utils/findEnvFiles.cjs");
 
-require("dotenv").config({ path: findEnvWithToken(), quiet: true, overwrite: true });
+require("dotenv").config({
+  path: findEnvWithToken(),
+  quiet: true,
+  overwrite: true
+});
 
 // delete caches leaving single last cache based on creation date
 const ACCESS_TOKEN = process.env.GITHUB_TOKEN || process.env.ACCESS_TOKEN;
@@ -14,10 +18,54 @@ if (!ACCESS_TOKEN) {
 }
 
 /**
+ * Print CLI help message.
+ *
+ * @returns {void}
+ */
+function printHelp() {
+  console.log(`
+GitHub Actions Cache Utilities
+
+Usage:
+  clean-github-actions-caches [options]
+
+Options:
+  -h, --help           Show this help message
+  -r, --repo <repo>    GitHub repository (owner/repo)
+
+Environment Variables:
+  ACCESS_TOKEN         GitHub access token
+  GITHUB_TOKEN         GitHub access token
+
+Examples:
+  clean-github-actions-caches --repo owner/repository
+  clean-github-actions-caches -r octocat/hello-world
+`);
+}
+
+/**
+ * Parsed CLI arguments.
+ */
+const argv = minimist(process.argv.slice(2), {
+  alias: {
+    h: "help",
+    r: "repo"
+  },
+  string: ["repo"],
+  boolean: ["help"]
+});
+
+if (argv.help) {
+  printHelp();
+  process.exit(0);
+}
+
+/**
  * Deletes a GitHub Actions cache.
+ *
  * @param {string} GH_REPO - The GitHub repository in the format "owner/repo".
- * @param {string} cacheId - The ID of the cache to delete.
- * @returns {Promise} - A promise that resolves on success and rejects on error.
+ * @param {string|number} cacheId - The ID of the cache to delete.
+ * @returns {Promise<any>} Promise resolving with GitHub API response.
  */
 function deleteGitHubActionsCache(GH_REPO, cacheId) {
   return new Promise((resolve, reject) => {
@@ -37,18 +85,20 @@ function deleteGitHubActionsCache(GH_REPO, cacheId) {
       })
       .then((response) => {
         console.log(`Cache (${cacheId}) deleted successfully`, response.data);
-        resolve(response.data); // Resolve with the response data
+        resolve(response.data);
       })
       .catch((error) => {
         console.error("Error deleting cache:", error.response?.data || error.message || "Unknown error");
-        reject(error); // Reject with the error
+
+        reject(error);
       });
   });
 }
 
 /**
- * list github actions caches
- * @param {string} GH_REPO
+ * List GitHub Actions caches grouped by cache key prefix.
+ *
+ * @param {string} GH_REPO GitHub repository in format `owner/repo`.
  * @returns {Promise<Record<string, Record<string, any>[]>>}
  */
 function get_caches(GH_REPO) {
@@ -67,19 +117,24 @@ function get_caches(GH_REPO) {
          * @type {Record<string, any>[]}
          */
         const data = response.data.actions_caches;
-        // resolve(response.data);
+
         /**
-         * extract the prefix from the key
+         * Extract cache prefix from cache key.
+         *
          * @param {string} key
-         * @returns
+         * @returns {string}
          */
         const getPrefix = (key) => {
           const split = key.split(/[-_]/);
-          if (split.length == 3) {
+
+          if (split.length === 3) {
             return `${split[0]}-${split[1]}`;
-          } else if (split.length > 3) {
+          }
+
+          if (split.length > 3) {
             return `${split[0]}-${split[1]}-${split[2]}`;
           }
+
           return split[0];
         };
 
@@ -104,57 +159,16 @@ function get_caches(GH_REPO) {
           {}
         );
 
-        // Convert the grouped object into an array of arrays
-        // const result = Object.values(grouped);
         resolve(grouped);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
-        reject(error); // Reject the promise with the error
+        reject(error);
       });
   });
 }
 
-/**
- * Deletes old GitHub Actions caches for the current repository (origin remote),
- * keeping only the most recent cache for each prefix (based on creation date).
- * Retrieves caches, groups by prefix, sorts by creation date, and deletes all but the latest.
- */
-(async () => {
-  try {
-    const remotes = await parseGitRemotes();
-    const GH_REPO = remotes.origin;
-    const caches = await get_caches(GH_REPO);
-
-    for (const key in caches) {
-      if (Object.hasOwnProperty.call(caches, key)) {
-        const items = caches[key]
-          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-          .map((item) => ({
-            ...item,
-            human_readable_date: new Date(item.created_at).toLocaleString()
-          }));
-
-        if (items.length > 1) {
-          const ids = items.map((o) => o.id);
-          ids.shift(); // keep the most recent cache
-          if (ids.length > 0) {
-            for (const id of ids) {
-              try {
-                await deleteGitHubActionsCache(GH_REPO, id);
-              } catch (err) {
-                console.error(`Error deleting cache ${id}:`, err);
-              }
-            }
-          } else {
-            console.log(`cache prefix ${key} no cache left`);
-          }
-        } else {
-          console.log(`cache prefix ${key} only have 1 cache`);
-        }
-      }
-    }
-  } catch (e) {
-    console.error(`Error: ${e}`);
-  }
-})();
+module.exports = {
+  deleteGitHubActionsCache,
+  get_caches
+};

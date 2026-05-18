@@ -24,22 +24,45 @@ if (!ACCESS_TOKEN) {
  */
 function printHelp() {
   console.log(`
-GitHub Actions Cache Utilities
+GitHub Actions Cache Cleaner
+
+Description:
+  Removes outdated GitHub Actions caches for a repository, keeping only the newest
+  cache for each cache-key prefix. Authenticates via ACCESS_TOKEN or GITHUB_TOKEN
+  from your environment or .env file.
 
 Usage:
   clean-github-actions-caches [options]
 
 Options:
   -h, --help           Show this help message
-  -r, --repo <repo>    GitHub repository (owner/repo)
+  -r, --repo <repo>    GitHub repository (owner/repo). If omitted, the tool will
+                       attempt to infer the repository from the current working
+                       directory's git remotes.
 
 Environment Variables:
-  ACCESS_TOKEN         GitHub access token
-  GITHUB_TOKEN         GitHub access token
+  ACCESS_TOKEN         GitHub access token (preferred)
+  GITHUB_TOKEN         GitHub access token (fallback)
+
+Behavior & Safety:
+  - Groups caches by a derived prefix from the cache key and keeps the most
+    recently created cache for each group.
+  - Deletes only caches older than the latest per prefix to reduce risk of
+    removing needed artifacts.
 
 Examples:
-  clean-github-actions-caches --repo owner/repository
-  clean-github-actions-caches -r octocat/hello-world
+  # Run against a specific repo (owner/repo)
+  clean-github-actions-caches --repo octocat/hello-world
+
+  # Run via npx without installing
+  npx -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz clean-github-actions-caches --repo owner/repo
+
+  # Run via yarn dlx
+  yarn dlx binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz clean-github-actions-caches
+
+Notes:
+  - Ensure ACCESS_TOKEN or GITHUB_TOKEN is set and has permissions to manage Actions caches.
+  - Intended for repository maintainers with appropriate permissions.
 `);
 }
 

@@ -1,67 +1,60 @@
-import { FlatCompat } from "@eslint/eslintrc";
 import js from "@eslint/js";
-import tsParser from "@typescript-eslint/parser";
+import prettierConfig from "eslint-config-prettier";
+import prettierPlugin from "eslint-plugin-prettier";
+import fs from "fs-extra";
 import globals from "globals";
-import fs from "node:fs";
-import path from "node:path";
+import jsonc from "jsonc-parser";
 import { fileURLToPath } from "node:url";
+import tseslint from "typescript-eslint";
+import path from "upath";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all
-});
+const prettierConfigJson = jsonc.parse(fs.readFileSync(path.join(__dirname, "./.prettierrc.json"), "utf-8"));
 
-// Read the Prettier configuration from the JSON file
-const prettierConfig = JSON.parse(fs.readFileSync(new URL("./.prettierrc.json", import.meta.url), "utf-8"));
+const baseLanguageOptions = {
+  ecmaVersion: 2020,
+  sourceType: "module"
+};
+
+const prettierRule = {
+  "prettier/prettier": ["error", prettierConfigJson]
+};
 
 export default [
   {
-    ignores: [
-      "**/*.md",
-      "**/tmp/**/*",
-      "**/*.html",
-      "**/*.py",
-      "**/*.txt",
-      "**/app/**/*",
-      "**/dist/**/*",
-      "**/lib/**/*",
-      "!**/.*.{js,cjs,mjs}"
-    ]
+    ignores: ["**/node_modules/**", "**/dist/**"]
   },
 
-  ...compat.extends(
-    "eslint:recommended",
-    "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended"
-  ),
+  js.configs.recommended,
 
+  /**
+   * ---------------- TS ONLY ----------------
+   */
   {
-    linterOptions: {
-      reportUnusedDisableDirectives: true
-    },
-
+    files: ["**/*.{ts,cts,mts}"],
     languageOptions: {
+      ...baseLanguageOptions,
+      parser: tseslint.parser,
       globals: {
-        ...globals.browser,
-        ...globals.amd,
-        ...globals.node,
-        ...globals.jest,
-        $: "readonly",
-        jQuery: "readonly",
-        adsbygoogle: "writable"
-      },
-      parser: tsParser,
-      ecmaVersion: 2020,
-      sourceType: "module"
+        ...globals.jest, // Jest testing framework globals
+        ...globals.browser, // Browser global variables
+        ...globals.amd, // AMD module globals
+        ...globals.node, // Node.js global variables
+        $: "readonly", // jQuery object
+        jQuery: "readonly", // jQuery object
+        adsbygoogle: "writable", // Google Ads
+        hexo: "readonly" // Hexo static site generator object
+      }
     },
-
+    plugins: {
+      "@typescript-eslint": tseslint.plugin,
+      prettier: prettierPlugin
+    },
     rules: {
-      "prettier/prettier": ["error", prettierConfig],
+      ...tseslint.configs.recommended.rules,
+      ...prettierRule,
 
       "@typescript-eslint/explicit-function-return-type": "off",
       "no-unused-vars": "off",
@@ -90,14 +83,90 @@ export default [
     }
   },
 
+  /**
+   * ---------------- JS + CJS ----------------
+   */
   {
-    files: ["**/*.js", "**/*.cjs"],
+    files: ["**/*.{js,cjs}"],
+    languageOptions: {
+      ...baseLanguageOptions,
+      globals: {
+        ...globals.jest, // Jest testing framework globals
+        ...globals.browser, // Browser global variables
+        ...globals.amd, // AMD module globals
+        ...globals.node, // Node.js global variables
+        $: "readonly", // jQuery object
+        jQuery: "readonly", // jQuery object
+        adsbygoogle: "writable", // Google Ads
+        hexo: "readonly" // Hexo static site generator object
+      }
+    },
+    plugins: {
+      prettier: prettierPlugin
+    },
     rules: {
-      "@typescript-eslint/no-var-requires": "off",
-      "@typescript-eslint/no-require-imports": "off"
+      ...prettierRule,
+
+      "no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_"
+        }
+      ],
+
+      "arrow-body-style": "off",
+      "prefer-arrow-callback": "off"
     }
   },
 
+  /**
+   * ---------------- MJS (ESM strict) ----------------
+   */
+  {
+    files: ["**/*.mjs"],
+    languageOptions: {
+      ...baseLanguageOptions,
+      globals: {
+        ...globals.jest, // Jest testing framework globals
+        ...globals.browser, // Browser global variables
+        ...globals.amd, // AMD module globals
+        ...globals.node, // Node.js global variables
+        $: "readonly", // jQuery object
+        jQuery: "readonly", // jQuery object
+        adsbygoogle: "writable", // Google Ads
+        hexo: "readonly" // Hexo static site generator object
+      }
+    },
+    plugins: {
+      prettier: prettierPlugin
+    },
+    rules: {
+      ...prettierRule,
+
+      "no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_"
+        }
+      ],
+
+      "arrow-body-style": "off",
+      "prefer-arrow-callback": "off",
+
+      // ESM restriction
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: 'CallExpression[callee.name="require"]',
+          message: "require() is not allowed in ESM (.mjs). Use import instead."
+        }
+      ]
+    }
+  },
   // ✅ Add Jest globals only for test files
   {
     files: ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)", "**/*.(spec|test).cjs"],
@@ -106,5 +175,6 @@ export default [
         ...globals.jest
       }
     }
-  }
+  },
+  prettierConfig
 ];

@@ -39,7 +39,11 @@ const defaultBin = {
   "undo-last-commit": "lib/git/undo-commit.cjs",
   "git-undo-commit": "lib/git/undo-commit.cjs",
   "undo-staged": "lib/git/undo-staged.cjs",
-  "git-undo-staged": "lib/git/undo-staged.cjs"
+  "git-undo-staged": "lib/git/undo-staged.cjs",
+  "rm-node-modules": "lib/rm-node-module-cli.cjs",
+  "rm-node-module": "lib/rm-node-module-cli.cjs",
+  "remove-node-modules": "lib/rm-node-module-cli.cjs",
+  "remove-node-module": "lib/rm-node-module-cli.cjs"
 };
 
 // Build binary mapping from lib/*.cjs and bin/*

@@ -281,6 +281,22 @@ del-nodemodules        # Primary command
 # Aliases: del-node-modules, clean-nodemodule, clean-nodemodules
 ```
 
+Additional tool: `rm-node-modules` — a faster alternative for very large
+projects. It removes `node_modules` subfolders by first-letter in parallel,
+which can speed up deletion on filesystems with many packages.
+
+Usage examples:
+
+```bash
+# Run from the project root
+node src/rm-node-module-cli.cjs
+npx binary-collections rm-node-modules
+yarn run rm-node-modules
+```
+
+Note: On Windows this requires a Unix-compatible shell in `PATH` (for
+example, Git Bash or WSL).
+
 ![Node modules cleaner screenshot](https://github.com/dimaslanjaka/bin/assets/12471057/f03e5b51-1808-4e82-a474-0dd3c7eab5fe)
 
 #### System Cache Cleaners

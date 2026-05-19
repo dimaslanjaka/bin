@@ -36,12 +36,11 @@ Description:
   process.exit(0);
 }
 
-const rootDir = process.cwd();
 const cachePath = path.join(os.tmpdir(), "rm-node-modules-cache.json");
 
 const createdScripts = fs.existsSync(cachePath) ? JSON.parse(fs.readFileSync(cachePath, "utf-8")) : [];
 
-async function main() {
+async function cleanUp(rootDir) {
   const filename = `${path.basename(__filename, path.extname(__filename))}-${process.pid}.sh`;
   const scriptPath = path.join(rootDir, filename);
 
@@ -49,22 +48,28 @@ async function main() {
 
   createdScripts.push(scriptPath);
   fs.writeFileSync(cachePath, JSON.stringify(createdScripts, null, 2));
-
-  return runBash(scriptPath, {
-    cwd: rootDir,
-    stdio: "inherit"
-  })
-    .catch((e) => {
-      console.error(`Error executing cleanup script (${scriptPath}):`, e && e.stack ? e.stack : e);
-    })
-    .finally(() => {
-      // Clean up created scripts
-      for (const script of createdScripts) {
-        if (fs.existsSync(script)) {
+  try {
+    const result = await runBash(scriptPath, {
+      cwd: rootDir,
+      stdio: "inherit"
+    });
+    return result;
+  } catch (e) {
+    console.error(`Error executing cleanup script (${scriptPath}):`, e);
+    throw e;
+  } finally {
+    // Clean up created scripts
+    for (const script of createdScripts) {
+      if (fs.existsSync(script)) {
+        try {
           fs.unlinkSync(script);
+        } catch (unlinkErr) {
+          // Log but do not mask the original error
+          console.error(`Failed to remove temporary script ${script}:`, unlinkErr);
         }
       }
-    });
+    }
+  }
 }
 
-main();
+cleanUp(process.cwd());

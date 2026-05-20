@@ -166,6 +166,7 @@ for (const [key, value] of Object.entries(bin)) {
       fs.writeFileSync(filePath, `#!/usr/bin/env node\n${content}`);
       shebangAdded = true;
     }
+    fs.chmodSync(filePath, 0o755);
   }
   console.log(
     `  ${color.blueBright(key)}: ${color.yellow(value)} ${shebangAdded ? color.greenBright("(shebang added)") : ""}`

@@ -1,13 +1,12 @@
-const path = require("path");
-const fs = require("fs");
-const os = require("os");
+const path = require("upath");
+const fs = require("fs-extra");
 const minimist = require("minimist");
-
-const { runBash } = require("./utils/runBash.cjs");
-const { bashScript } = require("./rm-node-modules.cjs");
+const glob = require("glob");
+const ansiColors = require("ansi-colors");
+const { cleanUp } = require("./rm-node-modules.cjs");
 
 const argv = minimist(process.argv.slice(2), {
-  boolean: ["h", "help"],
+  boolean: ["h", "help", "force"],
   alias: {
     h: "help"
   }
@@ -22,54 +21,60 @@ Usage:
 
 Examples:
   node src/rm-node-module-cli.cjs
+  node src/rm-node-module-cli.cjs --force
   npx binary-collections rm-node-modules
+  npx binary-collections rm-node-modules --force
 
 Options:
   -h, --help     Show this help message
+  --force        Actually delete node_modules (default is dry-run mode)
 
 Description:
   Removes node_modules subfolders by first-letter in parallel to speed up
-  deletions. The script writes a temporary shell script and executes it; the
+  deletions. By default runs in dry-run mode (shows what would be deleted).
+  Pass --force to actually perform deletion.
+  The script writes a temporary shell script and executes it; the
   temporary script is removed after completion. On Windows, this requires a
   Unix-compatible shell in PATH (e.g., Git Bash or WSL).
 `);
   process.exit(0);
 }
 
-const cachePath = path.join(os.tmpdir(), "rm-node-modules-cache.json");
+async function main() {
+  if (!argv.workspace) {
+    await cleanUp(process.cwd(), { dryRun: !argv.force });
+    return;
+  }
 
-const createdScripts = fs.existsSync(cachePath) ? JSON.parse(fs.readFileSync(cachePath, "utf-8")) : [];
+  const pkgJsonPath = path.resolve(process.cwd(), argv.workspace, "package.json");
+  if (!fs.existsSync(pkgJsonPath)) {
+    console.error(`Error: package.json not found in workspace directory: ${ansiColors.red(argv.workspace)}`);
+    process.exitCode = 1;
+    return;
+  }
 
-async function cleanUp(rootDir) {
-  const filename = `${path.basename(__filename, path.extname(__filename))}-${process.pid}.sh`;
-  const scriptPath = path.join(rootDir, filename);
-
-  fs.writeFileSync(scriptPath, bashScript, { mode: 0o755 });
-
-  createdScripts.push(scriptPath);
-  fs.writeFileSync(cachePath, JSON.stringify(createdScripts, null, 2));
-  try {
-    const result = await runBash(scriptPath, {
-      cwd: rootDir,
-      stdio: "inherit"
+  /** @type {string[]} */
+  const workspaces = (JSON.parse(fs.readFileSync(pkgJsonPath, "utf-8")).workspaces || []).flatMap((workspace) => {
+    return glob.sync(workspace, {
+      cwd: process.cwd(),
+      absolute: true,
+      ignore: ["**/node_modules/**", "**/dist/**", "**/build/**"]
     });
-    return result;
-  } catch (e) {
-    console.error(`Error executing cleanup script (${scriptPath}):`, e);
-    throw e;
-  } finally {
-    // Clean up created scripts
-    for (const script of createdScripts) {
-      if (fs.existsSync(script)) {
-        try {
-          fs.unlinkSync(script);
-        } catch (unlinkErr) {
-          // Log but do not mask the original error
-          console.error(`Failed to remove temporary script ${script}:`, unlinkErr);
-        }
-      }
+  });
+
+  for (const workspacePath of workspaces) {
+    if (fs.existsSync(path.join(workspacePath, "package.json"))) {
+      console.log(`Cleaning node_modules in workspace: ${ansiColors.cyan(workspacePath)}`);
+      await cleanUp(workspacePath, { dryRun: !argv.force });
+    } else {
+      console.warn(
+        `Warning: No package.json found in workspace path: ${ansiColors.yellow(workspacePath)}, skipping...`
+      );
     }
   }
 }
 
-cleanUp(process.cwd());
+main().catch((e) => {
+  console.error(ansiColors.red(e instanceof Error ? e.stack || e.message : String(e)));
+  process.exitCode = 1;
+});

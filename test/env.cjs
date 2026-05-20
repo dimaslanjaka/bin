@@ -19,10 +19,14 @@ if (!fs.existsSync(nonGitDir)) {
 module.exports.nonGitDir = nonGitDir;
 
 if (!fs.existsSync(path.join(repoDir, ".git"))) {
-  const result = spawnSync("git", ["clone", "https://github.com/dimaslanjaka/test-repo.git", repoDir], {
-    stdio: "inherit",
-    shell: true
-  });
+  const result = spawnSync(
+    "git",
+    ["clone", "--single-branch", "--branch", "test", "https://github.com/dimaslanjaka/test-repo.git", repoDir],
+    {
+      stdio: "inherit",
+      shell: true
+    }
+  );
   if (!result || typeof result.status !== "number" || result.status !== 0) {
     throw new Error(
       `git clone failed with code ${result && typeof result.status === "number" ? result.status : "unknown"}`

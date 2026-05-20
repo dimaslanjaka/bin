@@ -29,4 +29,4 @@ fi
 
 echo "Using script: $TARGET"
 
-python "$TARGET" "$@"
+"$SCRIPT_DIR/py" "$TARGET" "$@"

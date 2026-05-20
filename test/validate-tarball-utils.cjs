@@ -40,7 +40,7 @@ function prepareInstallation(type) {
     fs.renameSync(npmLockFileBackup, npmLockFile);
   }
 
-  // Remove main directories
+  // Remove binary-collections and .bin from node_modules to ensure a clean slate for installation
   ["binary-collections", ".bin"].forEach((dir) => {
     const target = path.join(nodeModules, dir);
     if (fs.existsSync(target)) fs.removeSync(target);

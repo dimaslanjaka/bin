@@ -7,7 +7,7 @@ const envPath = path.join(__dirname, "../.env");
 
 if (fs.existsSync(envPath)) dotenv.config({ path: envPath, override: true, quiet: true });
 
-const originalCwd = process.cwd();
+const originalCwd = path.resolve(__dirname, "..");
 module.exports.originalCwd = originalCwd;
 const repoDir = path.join(__dirname, "../tmp/test-repo");
 module.exports.repoDir = repoDir;
@@ -18,21 +18,24 @@ if (!fs.existsSync(nonGitDir)) {
 }
 module.exports.nonGitDir = nonGitDir;
 
-if (!fs.existsSync(path.join(repoDir, ".git"))) {
-  const result = spawnSync(
-    "git",
-    ["clone", "--single-branch", "--branch", "test", "https://github.com/dimaslanjaka/test-repo.git", repoDir],
-    {
-      stdio: "inherit",
-      shell: true
-    }
-  );
-  if (!result || typeof result.status !== "number" || result.status !== 0) {
-    throw new Error(
-      `git clone failed with code ${result && typeof result.status === "number" ? result.status : "unknown"}`
+function ensureRepoExists() {
+  if (!fs.existsSync(path.join(repoDir, ".git"))) {
+    const result = spawnSync(
+      "git",
+      ["clone", "--single-branch", "--branch", "test", "https://github.com/dimaslanjaka/test-repo.git", repoDir],
+      {
+        stdio: "inherit",
+        shell: true
+      }
     );
+    if (!result || typeof result.status !== "number" || result.status !== 0) {
+      throw new Error(
+        `git clone failed with code ${result && typeof result.status === "number" ? result.status : "unknown"}`
+      );
+    }
   }
 }
+module.exports.ensureRepoExists = ensureRepoExists;
 
 /**
  * Ensure yarn project is initialized in the test repo directory.
@@ -41,32 +44,54 @@ if (!fs.existsSync(path.join(repoDir, ".git"))) {
 function ensureYarnProject() {
   const pkgJson = path.join(repoDir, "package.json");
   const yarnLock = path.join(repoDir, "yarn.lock");
-  const yarnLockBak = path.join(repoDir, "yarn.lock.bak");
-  if (!fs.existsSync(pkgJson) && !fs.existsSync(yarnLock)) {
-    // Initialize yarn project if package.json does not exist
-    const result = spawnSync("yarn", ["init", "-y"], { cwd: repoDir, stdio: "inherit", shell: true });
-    if (!result || typeof result.status !== "number" || result.status !== 0) {
-      throw new Error(
-        `yarn init failed with code ${result && typeof result.status === "number" ? result.status : "unknown"}`
-      );
+  const yarnLockBak = path.join(repoDir, "yarn-lock.bak");
+
+  const hasPkg = fs.existsSync(pkgJson);
+  const hasLock = fs.existsSync(yarnLock);
+
+  // no project at all → init yarn
+  if (!hasPkg && !hasLock) {
+    const result = spawnSync("yarn", ["init", "-y"], {
+      cwd: repoDir,
+      stdio: "inherit",
+      shell: true
+    });
+
+    if (result?.status !== 0) {
+      throw new Error(`yarn init failed with code ${result?.status ?? "unknown"}`);
     }
-  } else if (fs.existsSync(pkgJson) && !fs.existsSync(yarnLock)) {
+
+    return;
+  }
+
+  // Override package.json
+  const pkgContent = JSON.parse(fs.readFileSync(pkgJson, "utf8"));
+  pkgContent.dependencies = {
+    jquery: "^3.6.0",
+    lodash: "^4.17.21"
+  };
+  pkgContent.devDependencies = {
+    "binary-collections": "*"
+  };
+  fs.writeFileSync(pkgJson, JSON.stringify(pkgContent, null, 2), "utf8");
+
+  // package.json exists but lockfile missing → restore or create
+  if (hasPkg && !hasLock) {
     if (fs.existsSync(yarnLockBak)) {
-      // Restore yarn.lock from backup if it exists
       fs.renameSync(yarnLockBak, yarnLock);
     } else {
-      // Create an empty yarn.lock if no backup exists
       fs.writeFileSync(yarnLock, "");
     }
   }
 }
+
 module.exports.ensureYarnProject = ensureYarnProject;
 
-const TGZ_PATH = path.resolve(__dirname, "../releases/bin.tgz");
 function installYarnPackage() {
+  const TGZ_PATH = path.resolve(__dirname, "../releases/bin.tgz");
   const TEST_REPO = repoDir;
   if (!fs.existsSync(TGZ_PATH)) {
-    throw new Error(`tgz file not found: ${TGZ_PATH}`);
+    throw new Error(`tgz file not found: ${TGZ_PATH}. Please run "yarn build" before testing.`);
   }
   const result = spawnSync("yarn", ["add", `binary-collections@${TGZ_PATH}`], {
     cwd: TEST_REPO,

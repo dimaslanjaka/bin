@@ -84,10 +84,10 @@ export default [
   },
 
   /**
-   * ---------------- JS + CJS ----------------
+   * CJS lenient mode: Allow CommonJS syntax and features, and provide globals for both Node.js and browser environments. This is for files that are intended to be used in a CommonJS context, or where strict ESM syntax is not required.
    */
   {
-    files: ["**/*.{js,cjs}"],
+    files: ["**/*.cjs"],
     languageOptions: {
       ...baseLanguageOptions,
       globals: {
@@ -122,10 +122,19 @@ export default [
   },
 
   /**
-   * ---------------- MJS (ESM strict) ----------------
+   * ESM strict mode: Enforce ESM syntax and features, and disallow CommonJS patterns like require()
    */
   {
-    files: ["**/*.mjs"],
+    files: ["**/*.mjs", "**/*.js"],
+    parser: "@babel/eslint-parser",
+    parserOptions: {
+      // Prevents needing a separate Babel config file
+      requireConfigFile: false,
+      babelOptions: {
+        // Ensure the plugin is enabled
+        plugins: ["@babel/plugin-syntax-import-assertions"]
+      }
+    },
     languageOptions: {
       ...baseLanguageOptions,
       globals: {

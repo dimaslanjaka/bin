@@ -3,14 +3,49 @@ import { build } from "tsup";
 import pkgJson from "./package.json" with { type: "json" };
 
 // Packages that should be bundled
-const bundledPackages = ["p-limit", "deepmerge-ts", "hexo-is", "is-stream", "markdown-it", "node-cache"];
+const bundledPackages = [
+  "p-limit",
+  "deepmerge-ts",
+  "hexo-is",
+  "is-stream",
+  "markdown-it",
+  "node-cache",
+  "is-file-stream",
+  "strip-ansi",
+  "ansi-regex",
+];
 
-const externalDeps = [...Object.keys(pkgJson.dependencies), ...Object.keys(pkgJson.devDependencies)].filter(
-  (pkgName) => !bundledPackages.includes(pkgName)
+/**
+ * Native uniq replacement for lodash.uniq
+ */
+function uniq(arr) {
+  return Array.from(new Set(arr));
+}
+
+const externalDeps = uniq(
+  Object.keys(pkgJson.dependencies ?? {})
+    .concat(Object.keys(pkgJson.devDependencies ?? {}))
+    .concat([
+      "hexo",
+      "warehouse",
+      "hexo-util",
+      "canvas",
+      "jsdom",
+      "mime-db",
+      "sbg-utility",
+      "through2",
+      "gulp",
+      "bluebird",
+    ])
+).filter(
+  (pkgName, idx, arr) =>
+    !bundledPackages.includes(pkgName) && arr.indexOf(pkgName) === idx
 );
 
 // Remove any possible tsup shims from the external array
-const external = externalDeps.filter((dep) => !path.toUnix(dep).includes("/tsup/assets/"));
+const external = externalDeps.filter(
+  (dep) => !path.toUnix(dep).includes("/tsup/assets/")
+);
 
 /**
  * @type {import("tsup").Options}
@@ -23,11 +58,10 @@ const baseOption = {
   shims: true,
   // Explicitly exclude tsup shims from being marked as external
   external,
-  // splitting: false,
   tsconfig: "tsconfig.build.json",
   minify: false,
   removeNodeProtocol: true,
-  skipNodeModulesBundle: true
+  skipNodeModulesBundle: true,
 };
 
 build({
@@ -36,23 +70,20 @@ build({
   banner(ctx) {
     if (ctx.format === "esm") {
       return {
-        js: `import { createRequire } from 'module'; const require = createRequire(import.meta.url);`
+        js: `import { createRequire } from 'module'; const require = createRequire(import.meta.url);`,
       };
     }
   },
   outExtension({ format }) {
     switch (format) {
-      case "cjs": {
+      case "cjs":
         return { js: ".cjs", dts: ".d.cts" };
-      }
-      case "esm": {
+      case "esm":
         return { js: ".mjs", dts: ".d.mts" };
-      }
-      default: {
+      default:
         return { js: ".js", dts: ".d.ts" };
-      }
     }
-  }
+  },
 }).catch((err) => {
   console.error("Build failed:", err);
   process.exit(1);

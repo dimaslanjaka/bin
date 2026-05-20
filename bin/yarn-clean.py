@@ -9,6 +9,15 @@ import glob
 from typing import Union
 
 
+# -------------------------
+# IGNORE RULES
+# -------------------------
+IGNORE_DIR_NAMES = {".git", "tmp", "dist", "build", "out", "coverage", ".cache"}
+
+
+# -------------------------
+# DELETE HELPERS
+# -------------------------
 def delete_dir(path: Path) -> tuple[str, Path]:
     shutil.rmtree(path, ignore_errors=True)
     return ("dir", path)
@@ -19,6 +28,9 @@ def delete_file(path: Path) -> tuple[str, Path]:
     return ("file", path)
 
 
+# -------------------------
+# CLEAN FUNCTION
+# -------------------------
 def clean(base_dir: Union[str, Path]) -> None:
     root = Path(base_dir).resolve()
 
@@ -27,14 +39,20 @@ def clean(base_dir: Union[str, Path]) -> None:
 
     print(f"Scanning: {root}")
 
-    # Collect targets
     for current_root, dirs, files in os.walk(root, topdown=True):
         current = Path(current_root)
 
+        # -------------------------
+        # IGNORE DIRECTORIES
+        # -------------------------
+        dirs[:] = [
+            d for d in dirs
+            if d not in IGNORE_DIR_NAMES and not d.startswith(".deploy_")
+        ]
+
+        # Skip node_modules scanning deeper
         if "node_modules" in dirs:
             node_modules_dirs.append(current / "node_modules")
-
-            # Prevent recursive scan into node_modules
             dirs.remove("node_modules")
 
         if "yarn.lock" in files:
@@ -71,15 +89,13 @@ def clean(base_dir: Union[str, Path]) -> None:
     print(f"Deleted yarn.lock:   {deleted_files}")
 
 
+# -------------------------
+# WORKSPACE COLLECTOR
+# -------------------------
 def collect_workspace_dirs(
     start_root: Union[str, Path],
     include_start_root: bool = False,
 ) -> list[Path]:
-    """Return workspace package directories sorted by longest path first.
-
-    This walks workspace globs declared in each package.json it finds,
-    recursively, stopping at directories already visited to avoid cycles.
-    """
     visited = set()
     results = set()
 
@@ -120,7 +136,7 @@ def collect_workspace_dirs(
             for m in matches:
                 p = Path(m)
 
-                # Skip symlinked package directories; do not follow them
+                # skip symlinks
                 if p.is_symlink():
                     continue
 
@@ -129,20 +145,22 @@ def collect_workspace_dirs(
                 if p_res.is_dir() and p_res not in visited:
                     stack.append(p_res)
 
-    return sorted(
-        results,
-        key=lambda p: (len(p.parts), str(p)),
-        reverse=True,
-    )
+    return sorted(results, key=lambda p: (len(p.parts), str(p)), reverse=True)
 
 
+# -------------------------
+# MAIN
+# -------------------------
 if __name__ == "__main__":
     workspace_dirs = collect_workspace_dirs(Path("."))
+
     for d in workspace_dirs:
         if Path(d / "node_modules").is_dir() or (d / "yarn.lock").is_file():
             print(f"Cleaning workspace package: {d}")
             clean(d)
         else:
             print(f"Skipping workspace package (no node_modules or yarn.lock): {d}")
+
+    # root cleanup
     shutil.rmtree(Path(".") / "node_modules", ignore_errors=True)
     (Path(".") / "yarn.lock").unlink(missing_ok=True)

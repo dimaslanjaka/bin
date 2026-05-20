@@ -50,8 +50,17 @@ describe("Test binary-collections tarball", () => {
         stdio: "pipe",
         shell: true
       });
-      if (result.error) throw result.error;
-      if (result.status !== 0) throw new Error(`npm install failed with code ${result.status}`);
+      if (result.error) {
+        console.log(
+          `NPM install failed with error:\n${result.error}\n${result.stdout.toString()}\n${result.stderr.toString()}`
+        );
+      }
+      if (result.status !== 0) {
+        console.log(
+          `NPM install failed with status ${result.status}:\n${result.stdout.toString()}\n${result.stderr.toString()}`
+        );
+      }
+      expect(result.status).toBe(0);
       expect(fs.existsSync(pkgDir)).toBe(true);
       expect(fs.existsSync(path.join(pkgDir, "package.json"))).toBe(true);
       checkBinLinks("-npm", tarballPath);

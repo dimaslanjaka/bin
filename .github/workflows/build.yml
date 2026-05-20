@@ -98,6 +98,33 @@ jobs:
         run: npm run build
       - name: 📦 Pack project
         run: npm run pack
+
+
+      - name: Fix permissions to PATH bins
+        shell: bash
+        run: |
+          BIN_DIRS=(
+            "${{ github.workspace }}/node_modules/.bin"
+            "${{ github.workspace }}/vendor/bin"
+            "${{ github.workspace }}/.venv/bin"
+            "${{ github.workspace }}/venv/bin"
+            "${{ github.workspace }}/bin"
+            "${{ github.workspace }}/binaries"
+          )
+
+          for dir in "${BIN_DIRS[@]}"; do
+            if [ -d "$dir" ]; then
+              echo "$dir" >> "$GITHUB_PATH"
+
+              # Fix permissions
+              chmod -R +x "$dir"
+
+              echo "Added: $dir"
+            else
+              echo "Skipped missing dir: $dir"
+            fi
+          done
+
       - name: 🧪 Run CJS tests with coverage
         run: npm run test --coverage=true --detectOpenHandles
       - name: 🧪 Run ESM tests with coverage

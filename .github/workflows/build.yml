@@ -81,7 +81,7 @@ jobs:
       - name: 🧪 Run CJS tests with coverage
         run: npm run test --coverage=true --detectOpenHandles
       - name: 🧪 Run ESM tests with coverage
-        run: npm run test:esm --coverage=true --detectOpenHandles
+        run: npm run test-esm --coverage=true --detectOpenHandles
       - name: 🚀 Push tarball changes
         if: ${{ success() && !contains(github.event.head_commit.message, 'update build from CI') }}
         run: |

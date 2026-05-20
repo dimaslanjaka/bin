@@ -6,6 +6,8 @@
     }
   },
   "compilerOptions": {
+    "module": "es2015",
+    "moduleResolution": "bundler",
     "strict": true,
     "allowJs": true,
     "checkJs": false,

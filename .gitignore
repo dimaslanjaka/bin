@@ -10,7 +10,7 @@ node_modules
 releases/*
 !releases/bin.tgz
 !releases/bin.tar.gz
-*.log
+**/*.log
 .env
 *.tsbuildinfo
 **/.cache/**
@@ -20,3 +20,4 @@ releases/*
 __*
 /binaries
 /docs
+/*.txt

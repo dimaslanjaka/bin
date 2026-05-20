@@ -1,4 +1,5 @@
 import js from "@eslint/js";
+import babelParser from "@babel/eslint-parser";
 import prettierConfig from "eslint-config-prettier";
 import prettierPlugin from "eslint-plugin-prettier";
 import fs from "fs-extra";
@@ -126,17 +127,17 @@ export default [
    */
   {
     files: ["**/*.mjs", "**/*.js"],
-    parser: "@babel/eslint-parser",
-    parserOptions: {
-      // Prevents needing a separate Babel config file
-      requireConfigFile: false,
-      babelOptions: {
-        // Ensure the plugin is enabled
-        plugins: ["@babel/plugin-syntax-import-assertions"]
-      }
-    },
     languageOptions: {
       ...baseLanguageOptions,
+      parser: babelParser,
+      parserOptions: {
+        // Prevents needing a separate Babel config file
+        requireConfigFile: false,
+        babelOptions: {
+          // Ensure the plugin is enabled
+          plugins: ["@babel/plugin-syntax-import-assertions"]
+        }
+      },
       globals: {
         ...globals.jest, // Jest testing framework globals
         ...globals.browser, // Browser global variables

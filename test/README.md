@@ -66,10 +66,10 @@ yarn test git-user-config.test.js
 yarn test git-fix-integration.test.js
 
 # Run with coverage
-yarn test:coverage
+yarn test-coverage
 
 # Run in watch mode
-yarn test:watch
+yarn test-watch
 ```
 
 ## Test Coverage

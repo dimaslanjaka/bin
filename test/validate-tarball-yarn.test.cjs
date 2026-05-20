@@ -52,8 +52,16 @@ describe("Test binary-collections tarball", () => {
         stdio: "pipe",
         shell: true
       });
-      if (result.error) throw result.error;
-      if (result.status !== 0) throw new Error(`yarn add failed with code ${result.status}`);
+      if (result.error) {
+        console.log(
+          `Yarn add failed with error:\n${result.error}\n${result.stdout.toString()}\n${result.stderr.toString()}`
+        );
+      }
+      if (result.status !== 0) {
+        console.log(`Yarn add failed with output:\n${result.stdout.toString()}\n${result.stderr.toString()}`);
+      }
+      expect(result.error).toBeUndefined();
+      expect(result.status).toBe(0);
       expect(fs.existsSync(pkgDir)).toBe(true);
       expect(fs.existsSync(path.join(pkgDir, "package.json"))).toBe(true);
       checkBinLinks("-yarn", tarballPath);

@@ -55,13 +55,27 @@ rm -rf "$1" &
 
 # vowels=( a i u e o A I U E O )
 vowels=( a i u e o A I U E O 0 1 2 3 4 5 6 7 8 9 _ - . )
+
+max_jobs=4   # set the maximum number of concurrent jobs
+
 for letter in {{a..z},{A..Z}}; do
     for vowel in "${vowels[@]}"; do
+
       toBeDeleted=( "$1/.${letter}*" "$1/@${letter}*" "$1/${letter}*" "$1/@${letter}${vowel}*" "$1/.${letter}${vowel}*" "$1/${letter}${vowel}*" )
+
       shuffled=( $(shuf -e "${toBeDeleted[@]}") )
+
       for fpath in "${shuffled[@]}"; do
+
         if [ -d "$1" ]; then
+
+          # wait for a slot to be free if we have reached the maximum number of concurrent jobs
+          while (( $(jobs -rp | wc -l) >= max_jobs )); do
+            wait -n
+          done
+
           rm -rf $fpath && echo "removed $fpath" || echo "cannot delete $fpath" &
+
         fi
       done
     done

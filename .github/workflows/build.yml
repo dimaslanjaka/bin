@@ -28,12 +28,18 @@ jobs:
           repository: dimaslanjaka/test-repo
           path: tmp/test-repo
           token: "${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}"
-      - name: ⬇️ Checkout submodules
-        env:
-          ACCESS_TOKEN: "${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}"
-        run: |
-          git submodule update --init --recursive
-          bash bin/submodule-install
+      - name: ⬇️ Checkout packages/git-command-helper
+        uses: actions/checkout@v6
+        with:
+          repository: dimaslanjaka/git-command-helper
+          path: packages/git-command-helper
+          token: "${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}"
+      - name: ⬇️ Checkout packages/cross-spawn
+        uses: actions/checkout@v6
+        with:
+          repository: dimaslanjaka/node-cross-spawn
+          path: packages/cross-spawn
+          token: "${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}"
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v6
         with:

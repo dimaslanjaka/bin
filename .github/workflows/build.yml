@@ -28,12 +28,14 @@ jobs:
           repository: dimaslanjaka/test-repo
           path: tmp/test-repo
           token: "${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}"
+          branch: private
       - name: ⬇️ Checkout packages/git-command-helper
         uses: actions/checkout@v6
         with:
           repository: dimaslanjaka/git-command-helper
           path: packages/git-command-helper
           token: "${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}"
+          branch: pre-release
       - name: ⬇️ Checkout packages/cross-spawn
         uses: actions/checkout@v6
         with:

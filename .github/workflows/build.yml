@@ -50,6 +50,7 @@ jobs:
             **/*.bak
             **/test/**
             **/test-project
+            **/dist
           key: ${{ runner.os }}-${{ hashFiles('**/package.json', '.github') }}
           restore-keys: |
             ${{ runner.os }}-${{ hashFiles('**/package.json', '.github') }}

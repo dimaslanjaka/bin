@@ -28,6 +28,7 @@ jobs:
           repository: dimaslanjaka/test-repo
           path: tmp/test-repo
           token: "${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}"
+          ref: test
       - name: ⬇️ Checkout packages/git-command-helper
         uses: actions/checkout@v6
         with:

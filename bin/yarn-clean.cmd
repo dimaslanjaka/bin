@@ -27,4 +27,4 @@ if "%TARGET%"=="" (
 echo Using script: %TARGET%
 
 REM Run Python script with all arguments
-python "%TARGET%" %*
+"%SCRIPT_DIR%py.cmd" "%TARGET%" %*

@@ -1,20 +1,24 @@
 #!/usr/bin/env node
 
+import ansiColors from "ansi-colors";
 import { execSync } from "child_process";
 import fs from "fs-extra";
+import { md5, writefile } from "sbg-utility";
 import path from "upath";
 import { fileURLToPath } from "url";
 import { getTempPath } from "./binary-collections/config.cjs";
 import { runChatGpt } from "./utils/chatgpt.js";
 import { getArgs } from "./utils/index.cjs";
-import ansiColors from "ansi-colors";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const args = getArgs();
+const positional = args._ || [];
 
 // Output path using centralized temp directory configuration
-const DIFF_OUTPUT = getTempPath("git-diff.txt");
-const GPT_DIFF_OUTPUT = getTempPath("gpt-question.txt");
+const FILENAME = md5((positional[0] || "default") + JSON.stringify(args));
+const DIFF_OUTPUT = getTempPath(`git-diff/${FILENAME}.txt`);
+const GPT_DIFF_OUTPUT = getTempPath(`gpt-question/${FILENAME}.txt`);
 const CACHE_DIR = path.dirname(DIFF_OUTPUT);
 
 // Relative paths for display in logs
@@ -22,9 +26,7 @@ const DIFF_OUTPUT_RELATIVE = path.relative(process.cwd(), DIFF_OUTPUT);
 const GPT_DIFF_OUTPUT_RELATIVE = path.relative(process.cwd(), GPT_DIFF_OUTPUT);
 
 // Ensure output directory exists
-if (!fs.existsSync(CACHE_DIR)) {
-  fs.mkdirSync(CACHE_DIR, { recursive: true });
-}
+fs.ensureDirSync(CACHE_DIR, { mode: 0o755 });
 
 function showHelp() {
   console.log("\u{1F4DD} Git Diff Helper");
@@ -80,13 +82,13 @@ function runGitDiff(command, successMessage, errorMessage) {
     // If result is empty, inform user but don't treat as error
     if (!result || result.trim() === "") {
       console.log(`ℹ️ [i] No changes found for the specified criteria`);
-      fs.writeFileSync(DIFF_OUTPUT, "# No changes found\n");
+      writefile(DIFF_OUTPUT, "# No changes found\n");
       console.log(`✅ Empty diff saved to "${DIFF_OUTPUT_RELATIVE}"`);
       return;
     }
 
-    fs.writeFileSync(DIFF_OUTPUT, result);
-    fs.writeFileSync(
+    writefile(DIFF_OUTPUT, result);
+    writefile(
       GPT_DIFF_OUTPUT,
       `Hello, ChatGPT!\nCan you create a conventional commit message by diff content below:\n\n\`\`\`${result}\n\`\`\`\n\nGive me result as codeblock with language "text" only.\n\nThank you!`
     );
@@ -107,9 +109,6 @@ function runGitDiff(command, successMessage, errorMessage) {
 }
 
 async function mainGitDiff() {
-  const args = getArgs();
-  const positional = args._ || [];
-
   // Show help if no arguments or --help/-h is passed
   if (args.help || args.h) {
     showHelp();

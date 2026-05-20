@@ -2,3 +2,7 @@
 	path = packages/git-command-helper
 	url = https://github.com/dimaslanjaka/git-command-helper
 	branch = pre-release
+[submodule "packages/cross-spawn"]
+	path = packages/cross-spawn
+	url = https://github.com/dimaslanjaka/node-cross-spawn.git
+	branch = private

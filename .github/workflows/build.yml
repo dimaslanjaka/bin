@@ -28,6 +28,12 @@ jobs:
           repository: dimaslanjaka/test-repo
           path: tmp/test-repo
           token: "${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}"
+      - name: ⬇️ Checkout submodules
+        env:
+          ACCESS_TOKEN: "${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}"
+        run: |
+          git submodule update --init --recursive
+          bash bin/submodule-install
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v6
         with:

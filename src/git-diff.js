@@ -34,6 +34,9 @@ function showHelp() {
   console.log("  \u{1F4C2} git-diff FILE             Show staged diff of specified file");
   console.log("  \u{1F4C2} git-diff --staged-only    Show staged diff of all files");
   console.log("  \u{1F4C2} git-diff -s | -S          Same as --staged-only");
+  console.log("  \u{1F4C2} git-diff --unstaged FILE  Show unstaged diff of specified file");
+  console.log("  \u{1F4C2} git-diff --unstaged       Show unstaged diff of all files");
+  console.log("  \u{1F4C2} git-diff -u               Same as --unstaged");
   console.log("  \u{1F4C2} git-diff --ai             Run ChatGPT automation for commit message");
   console.log("  \u{1F4C2} git-diff --help | -h      Show this help message");
   console.log("");
@@ -81,7 +84,7 @@ function runGitDiff(command, successMessage, errorMessage) {
 
     // If result is empty, inform user but don't treat as error
     if (!result || result.trim() === "") {
-      console.log(`ℹ️ [i] No changes found for the specified criteria`);
+      console.log(`ℹ️  [i] No changes found for the specified criteria`);
       writefile(DIFF_OUTPUT, "# No changes found\n");
       console.log(`✅ Empty diff saved to "${DIFF_OUTPUT_RELATIVE}"`);
       return;
@@ -108,11 +111,40 @@ function runGitDiff(command, successMessage, errorMessage) {
   }
 }
 
+/**
+ * Checks whether a file has changes for a specific git diff mode.
+ *
+ * Uses `git diff --quiet` semantics:
+ * - exit code 0: no changes
+ * - exit code 1: changes exist
+ *
+ * @param {string} file - Target file path
+ * @param {"staged" | "unstaged"} mode - Diff mode to check
+ * @returns {boolean} True when changes exist for the given mode
+ */
+function fileHasChanges(file, mode) {
+  const command = mode === "staged" ? `git diff --cached --quiet -- "${file}"` : `git diff --quiet -- "${file}"`;
+
+  try {
+    execSync(command, { stdio: "ignore" });
+    return false;
+  } catch (error) {
+    if (error.status === 1) {
+      return true;
+    }
+
+    throw error;
+  }
+}
+
 async function mainGitDiff() {
   // Show help if no arguments or --help/-h is passed
   if (args.help || args.h) {
     showHelp();
   }
+
+  const useUnstaged = args.unstaged || args.u;
+  const fileFromFlag = typeof args.unstaged === "string" ? args.unstaged : typeof args.u === "string" ? args.u : null;
 
   if (args["staged-only"] || args.s || args.S) {
     runGitDiff(
@@ -122,18 +154,28 @@ async function mainGitDiff() {
     );
   } else {
     // Handle specific file diff
-    const file = positional[0];
+    const file = positional[0] || fileFromFlag;
     if (!file) {
+      const fullDiffModeLabel = useUnstaged ? "unstaged" : "unstaged";
       runGitDiff(
         "git --no-pager diff",
-        `Full staged diff saved to "${ansiColors.green(DIFF_OUTPUT_RELATIVE)}"`,
+        `Full ${fullDiffModeLabel} diff saved to "${ansiColors.green(DIFF_OUTPUT_RELATIVE)}"`,
         "Failed to save all diff's"
       );
     } else {
+      let fileDiffMode = useUnstaged ? "unstaged" : "staged";
+
+      // Default behavior for file target: prefer staged changes, then fall back to unstaged.
+      if (!useUnstaged && !fileHasChanges(file, "staged") && fileHasChanges(file, "unstaged")) {
+        fileDiffMode = "unstaged";
+      }
+
       runGitDiff(
-        `git --no-pager diff --cached -- "${file}"`,
-        `Staged diff of "${file}" saved to "${ansiColors.green(DIFF_OUTPUT_RELATIVE)}"`,
-        `Failed to generate diff for "${file}"`
+        fileDiffMode === "unstaged" ? `git --no-pager diff -- "${file}"` : `git --no-pager diff --cached -- "${file}"`,
+        `${fileDiffMode[0].toUpperCase() + fileDiffMode.slice(1)} diff of "${file}" saved to "${ansiColors.green(
+          DIFF_OUTPUT_RELATIVE
+        )}"`,
+        `Failed to generate ${fileDiffMode} diff for "${file}"`
       );
     }
   }

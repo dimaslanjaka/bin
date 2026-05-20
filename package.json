@@ -43,13 +43,13 @@
     "requirements.txt"
   ],
   "scripts": {
-    "build": "tsc -b tsconfig.build.json && npm run build-tsup && npm run postbuild",
+    "build": "tsc -b tsconfig.build.json && npm run build-tsup && npm run build-exports",
     "build-packages": "yarn workspaces foreach --worktree --exclude=binary-collections --no-private run build",
     "build-rollup": "rollup -c rollup.config.js",
     "build-tsup": "node build.tsup.js",
     "clean": "rimraf lib tmp/dist binaries",
     "pack": "node packer.cjs --yarn --filename=bin",
-    "postbuild": "node -r ts-node/register -r dotenv/config build.exports.mjs && yarn run pack",
+    "build-exports": "node -r ts-node/register -r dotenv/config build.exports.mjs",
     "prepare": "husky",
     "test": "test-cjs",
     "test:coverage": "npm test --coverage --detectOpenHandles",

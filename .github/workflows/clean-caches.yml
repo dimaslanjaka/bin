@@ -43,28 +43,13 @@ jobs:
         with:
           node-version: 20.x
 
-      # - name: Update Submodules
-      #   run: |
-      #     echo "init submodules"
-      #     git submodule init
-      #     git submodule foreach "git submodule init"
-      #     echo "sync submodules"
-      #     git submodule sync
-      #     git submodule foreach "git submodule sync"
-      #     echo "update submodules"
-      #     npm install -g rimraf binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz
-      #     npx rimraf .git/modules
-      #     npx submodule-install
-      #     git lfs track "*.rar"
-      #   shell: bash
-
       - name: Get pip cache dir
         id: pip-cache
         run: echo "pip_cache_dir=$(pip cache dir)" >> $GITHUB_ENV
 
       - name: Setup Cache
         id: cache
-        uses: actions/cache/restore@v5
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cache/pip
@@ -93,6 +78,19 @@ jobs:
             ${{ runner.os }}-node-${{ hashFiles('package.json') }}
             ${{ runner.os }}-node-
             ${{ runner.os }}-
+
+      - name: Update Submodules
+        run: |
+          echo "init submodules"
+          git submodule init
+          git submodule foreach "git submodule init"
+          echo "sync submodules"
+          git submodule sync
+          git submodule foreach "git submodule sync"
+          echo "update submodules"
+          npx -y rimraf .git/modules
+          npx -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz submodule-install
+        shell: bash
 
       - name: Install Dependencies
         if: steps.cache.outputs.cache-hit != 'true'

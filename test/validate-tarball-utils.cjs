@@ -1,7 +1,7 @@
 /**
  * Utility functions for validate-tarball tests.
  */
-const { repoDir } = require("./env.cjs");
+const { repoDir, ensureRepoExists } = require("./env.cjs");
 const path = require("upath");
 const fs = require("fs-extra");
 const { writefile } = require("sbg-utility");
@@ -17,6 +17,31 @@ const nodeModules = path.join(repoDir, "node_modules");
 const mainPkg = require(path.resolve(__dirname, "../package.json"));
 const binEntries = mainPkg.bin ? (typeof mainPkg.bin === "string" ? [mainPkg.bin] : Object.keys(mainPkg.bin)) : [];
 
+const { spawnSync } = require("child_process");
+
+/**
+ * Run `yarn build` and `yarn run pack` in the workspace directory.
+ * Keeps output quiet but throws on failure.
+ *
+ * @param {string} workspaceDir
+ */
+function buildAndPack(workspaceDir) {
+  // Build
+  const build = spawnSync("yarn", ["build"], { cwd: workspaceDir, stdio: "pipe", shell: true });
+  if (build.error || build.status !== 0) {
+    const out = (build.stdout || Buffer.from("")).toString();
+    const err = (build.stderr || Buffer.from("")).toString();
+    throw new Error(`yarn build failed:\n${out}\n${err}`);
+  }
+
+  // Pack
+  const pack = spawnSync("yarn", ["run", "pack"], { cwd: workspaceDir, stdio: "pipe", shell: true });
+  if (pack.error || pack.status !== 0) {
+    const out = (pack.stdout || Buffer.from("")).toString();
+    const err = (pack.stderr || Buffer.from("")).toString();
+    throw new Error(`yarn run pack failed:\n${out}\n${err}`);
+  }
+}
 /**
  * Prepare the installation environment for a given package manager.
  * Mirrors the original implementation from validate-tarball.test.cjs.
@@ -24,13 +49,15 @@ const binEntries = mainPkg.bin ? (typeof mainPkg.bin === "string" ? [mainPkg.bin
  * @param {string} type - "npm" or "yarn"
  */
 function prepareInstallation(type) {
+  ensureRepoExists();
+
   // Backup lock files if not already backed up
-  [
+  for (const { file, backup } of [
     { file: npmLockFile, backup: npmLockFileBackup },
     { file: yarnLockFile, backup: yarnLockFileBackup }
-  ].forEach(({ file, backup }) => {
+  ]) {
     if (fs.existsSync(file) && !fs.existsSync(backup)) fs.renameSync(file, backup);
-  });
+  }
 
   // Restore only the relevant lock file for the install type
   if (type === "yarn" && fs.existsSync(yarnLockFileBackup)) {
@@ -41,10 +68,26 @@ function prepareInstallation(type) {
   }
 
   // Remove binary-collections and .bin from node_modules to ensure a clean slate for installation
-  ["binary-collections", ".bin"].forEach((dir) => {
+  for (const dir of ["binary-collections", ".bin"]) {
     const target = path.join(nodeModules, dir);
     if (fs.existsSync(target)) fs.removeSync(target);
-  });
+    expect(fs.existsSync(target)).toBe(false);
+  }
+
+  // Ensure the test project has a package.json (initialize if missing)
+  const pkgJson = path.join(repoDir, "package.json");
+  if (!fs.existsSync(pkgJson)) {
+    spawnSync("npm", ["init", "-y"], { cwd: repoDir, stdio: "ignore", shell: true });
+  }
+
+  const pkgObj = JSON.parse(fs.readFileSync(pkgJson, "utf8"));
+  const projectObj = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../package.json"), "utf8"));
+  pkgObj.resolutions = Object.assign(pkgObj.resolutions || {}, projectObj.resolutions);
+  pkgObj.dependencies = {};
+  pkgObj.devDependencies = {
+    "binary-collections": `file:${path.resolve(__dirname, "../releases/bin.tgz")}`
+  };
+  fs.writeFileSync(pkgJson, JSON.stringify(pkgObj, null, 2));
 }
 
 /**
@@ -74,6 +117,61 @@ function checkBinLinks(id, tarball) {
   }
 }
 
+/**
+ * Validate that installed package exposes the expected `bin` entries and
+ * that running both the direct script and the `binary-collections` proxy
+ * works for each named command.
+ *
+ * @param {string} packageManager - human friendly name like "npm" or "yarn"
+ */
+function validateBinaries(packageManager) {
+  const pkgJson = `${repoDir}/node_modules/binary-collections/package.json`;
+  const checks = [
+    { cmd: "git-diff", args: ["--help"] },
+    { cmd: "pkg-resolutions-updater", args: ["--help"] },
+    { cmd: "submodule-install", args: ["--help"] },
+    { cmd: "kill-night-crows", args: ["--help"] }
+  ];
+
+  for (const { cmd, args } of checks) {
+    it(`[${packageManager}] should run ${cmd} command`, () => {
+      if (!fs.existsSync(pkgJson)) {
+        throw new Error(`Package.json not found at ${pkgJson}`);
+      }
+      const pkg = require(pkgJson);
+
+      expect(pkg).toHaveProperty("bin");
+      expect(pkg.bin).toHaveProperty(cmd);
+      expect(typeof pkg.bin[cmd]).toBe("string");
+
+      const actualBinPath = path.resolve(repoDir, "node_modules/binary-collections", pkg.bin[cmd]);
+      expect(fs.existsSync(actualBinPath)).toBe(true);
+
+      const result = spawnSync("node", [actualBinPath, ...args], {
+        cwd: repoDir,
+        stdio: "pipe",
+        shell: true
+      });
+      if (result.status !== 0) {
+        console.log(result);
+      }
+      expect(result.error).toBeUndefined();
+      expect(result.status).toBe(0);
+
+      // Proxy (binary-collections commandName)
+      const proxyPath = path.resolve(repoDir, "node_modules/binary-collections/lib/binary-collections.cjs");
+      expect(fs.existsSync(proxyPath)).toBe(true);
+      const resultProxy = spawnSync("node", [proxyPath, cmd, ...args], {
+        cwd: repoDir,
+        stdio: "pipe",
+        shell: true
+      });
+      expect(resultProxy.error).toBeUndefined();
+      expect(resultProxy.status).toBe(0);
+    });
+  }
+}
+
 module.exports = {
   prepareInstallation,
   npmLockFile,
@@ -82,5 +180,7 @@ module.exports = {
   yarnLockFileBackup,
   nodeModules,
   checkBinLinks,
-  binEntries
+  binEntries,
+  buildAndPack,
+  validateBinaries
 };

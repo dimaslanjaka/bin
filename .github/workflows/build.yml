@@ -99,7 +99,6 @@ jobs:
       - name: 📦 Pack project
         run: npm run pack
 
-
       - name: Fix permissions to PATH bins
         shell: bash
         run: |
@@ -126,9 +125,9 @@ jobs:
           done
 
       - name: 🧪 Run CJS tests with coverage
-        run: npm run test --coverage=true --detectOpenHandles
+        run: bash bin/test-cjs --coverage=true --detectOpenHandles
       - name: 🧪 Run ESM tests with coverage
-        run: npm run test-esm --coverage=true --detectOpenHandles
+        run: bash bin/test-esm --coverage=true --detectOpenHandles
       - name: 🚀 Push tarball changes
         if: ${{ success() && !contains(github.event.head_commit.message, 'update build from CI') }}
         run: |

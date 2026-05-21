@@ -73,16 +73,15 @@ jobs:
             ./venv/
             ${{ env.pip_cache_dir }}
             ${{ env.NUITKA_CACHE_DIR }}
-            *.lock
-            *.txt
-            package-lock.json
+            **/*.lock
+            **/*.txt
+            **/package-lock.json
             assets/proxies/
             vendor/
             ${{ env.USERPROFILE }}\AppData\Local\Nuitka\Nuitka/Cache
             $HOME/AppData/Local/Nuitka/Nuitka/Cache
             config/
             .cache/
-            working.json
           key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
           restore-keys: |
             ${{ runner.os }}-node-${{ hashFiles('package.json') }}

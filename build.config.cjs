@@ -51,6 +51,7 @@ const defaultBin = {
  * @returns {Object.<string,string>} Mapping of binary name to file path (unix-style)
  */
 function generateMapping() {
+  const fnName = generateMapping.name;
   // Build binary mapping from lib/*.cjs and bin/*
   const binBuilder = {};
   const libs = glob
@@ -88,7 +89,7 @@ function generateMapping() {
     } else {
       // If local bin exists, log and use lib/*.cjs
       console.log(
-        `[${arguments.callee.name}] ${color.yellow(filename)} contains local bin: [${color.blueBright(bins.join(", "))}] use ${color.greenBright(file)} instead`
+        `[${fnName}] ${color.yellow(filename)} contains local bin: [${color.blueBright(bins.join(", "))}] use ${color.greenBright(file)} instead`
       );
       binBuilder[filename] = file;
     }
@@ -103,12 +104,12 @@ function generateMapping() {
     if (!binBuilder[filename]) {
       if (filename.includes("-cli")) {
         console.warn(
-          `[${arguments.callee.name}] ${color.yellowBright("Warning:")} Binary for ${color.yellow(filename)} (CLI) already has another binary assigned for ${color.yellow(filename.replace("-cli", ""))}. Skipping ${color.yellow(filename)}.`
+          `[${fnName}] ${color.yellowBright("Warning:")} Binary for ${color.yellow(filename)} (CLI) already has another binary assigned for ${color.yellow(filename.replace("-cli", ""))}. Skipping ${color.yellow(filename)}.`
         );
         continue;
       }
       console.warn(
-        `[${arguments.callee.name}] ${color.redBright("Warning:")} No binary assigned for ${color.yellow(filename)}. Please check the lib/ and bin/ directories.`
+        `[${fnName}] ${color.redBright("Warning:")} No binary assigned for ${color.yellow(filename)}. Please check the lib/ and bin/ directories.`
       );
       continue;
     }
@@ -116,12 +117,10 @@ function generateMapping() {
     // Convert to unix-style path for consistent logging
     binBuilder[filename] = path.toUnix(binBuilder[filename]);
 
-    console.log(
-      `[${arguments.callee.name}] Processed ${color.cyan(filename)}: assigned ${color.greenBright(binBuilder[filename])}`
-    );
+    console.log(`[${fnName}] Processed ${color.cyan(filename)}: assigned ${color.greenBright(binBuilder[filename])}`);
   }
 
-  console.log(`[${arguments.callee.name}] Final binary mapping:`, binBuilder);
+  console.log(`[${fnName}] Final binary mapping:`, binBuilder);
   return binBuilder;
 }
 

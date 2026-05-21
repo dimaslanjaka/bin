@@ -217,7 +217,10 @@ async function writeQuestion(page, question) {
 async function clickSubmitButton(page) {
   console.log("Attempting to click the submit button...");
   try {
-    const userMessageCountBefore = await page.$$eval('[data-message-author-role="user"]', (elements) => elements.length);
+    const userMessageCountBefore = await page.$$eval(
+      '[data-message-author-role="user"]',
+      (elements) => elements.length
+    );
 
     const waitForSubmit = async (timeout = 5000) => {
       try {
@@ -235,21 +238,26 @@ async function clickSubmitButton(page) {
       }
     };
 
-    await page.waitForFunction(() => {
-      const candidates = [
-        document.querySelector('[data-testid="fruitjuice-send-button"]'),
-        document.querySelector('#composer-submit-button'),
-        document.querySelector('[data-testid="send-button"]')
-      ].filter(Boolean);
+    await page
+      .waitForFunction(
+        () => {
+          const candidates = [
+            document.querySelector('[data-testid="fruitjuice-send-button"]'),
+            document.querySelector("#composer-submit-button"),
+            document.querySelector('[data-testid="send-button"]')
+          ].filter(Boolean);
 
-      return candidates.some((button) => {
-        const isDisabled = button.disabled || button.getAttribute("aria-disabled") === "true";
-        const isVisible = button.offsetParent !== null;
-        return !isDisabled && isVisible;
+          return candidates.some((button) => {
+            const isDisabled = button.disabled || button.getAttribute("aria-disabled") === "true";
+            const isVisible = button.offsetParent !== null;
+            return !isDisabled && isVisible;
+          });
+        },
+        { timeout: 5000 }
+      )
+      .catch(() => {
+        // Continue to diagnostics below even if no enabled button was found within timeout.
       });
-    }, { timeout: 5000 }).catch(() => {
-      // Continue to diagnostics below even if no enabled button was found within timeout.
-    });
 
     const buttonDetails = await page.evaluate(() => {
       const selectors = [
@@ -261,9 +269,7 @@ async function clickSubmitButton(page) {
       const details = selectors.map((selector) => {
         const el = document.querySelector(selector);
         const exists = Boolean(el);
-        const disabled = exists
-          ? Boolean(el.disabled || el.getAttribute("aria-disabled") === "true")
-          : null;
+        const disabled = exists ? Boolean(el.disabled || el.getAttribute("aria-disabled") === "true") : null;
         const visible = exists ? el.offsetParent !== null : null;
         return { selector, exists, disabled, visible };
       });
@@ -643,7 +649,6 @@ export async function runChatGpt(chatgptOptions = {}) {
       }
     }
   }
-
 
   try {
     const url = "https://chat.openai.com";

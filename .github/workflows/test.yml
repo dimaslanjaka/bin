@@ -1,11 +1,11 @@
-# .github/workflows/build.yml
+# .github/workflows/test.yml
 
-# This workflow builds and packs the package
+# This workflow runs tests only
 
-name: Node.js Package Build
+name: Node.js Package Test
 
 concurrency:
-  group: build-${{ github.ref }}
+  group: test-${{ github.ref }}
   cancel-in-progress: true
 
 on:
@@ -15,7 +15,7 @@ on:
       - "**/release*"
 
 jobs:
-  build:
+  test:
     if: ${{ !contains(join(github.event.commits.*.added, ' '), '.tgz') && !contains(join(github.event.commits.*.modified, ' '), '.tgz') && !contains(join(github.event.commits.*.removed, ' '), '.tgz') }}
     runs-on: ubuntu-latest
 
@@ -100,41 +100,8 @@ jobs:
       - name: 📦 Install dependencies
         run: yarn install
 
-      - name: 🧹 Clean project
-        run: npm run clean
+      - name: 🧪 Run CJS tests with coverage
+        run: bash bin/test-cjs --coverage=true --detectOpenHandles
 
-      - name: 🛠️ Build project
-        run: npm run build
-
-      - name: 📦 Pack project
-        run: npm run pack
-
-      - name: 🚀 Push tarball changes
-        if: ${{ success() && !contains(github.event.head_commit.message, 'update build from CI') }}
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add releases
-
-          # Check if there are staged changes in releases/
-          if [ "$(git status --porcelain releases | wc -l)" -gt "0" ]; then
-            # Get current commit hash (the tarball commit)
-            CURRENT_COMMIT_HASH=$(git rev-parse HEAD)
-
-            # Get the previous commit hash that touched src/ (excluding the current one)
-            SRC_COMMIT_HASH=$(git log --pretty=format:"%h" src | grep -v "$CURRENT_COMMIT_HASH" | head -n 1)
-
-            # If no matching commit found, exit safely
-            if [ -z "$SRC_COMMIT_HASH" ]; then
-              echo "❌ No previous commit found in 'src/' before the current tarball commit."
-              exit 1
-            fi
-
-            # Amend the current commit message to include the src commit reference
-            NEW_MESSAGE="chore(tarball): update tarball artifacts from CI build based on src at $SRC_COMMIT_HASH"
-            git commit -m "$NEW_MESSAGE"
-            git push
-          else
-            echo "✅ No changes to release. Skipping push."
-          fi
+      - name: 🧪 Run ESM tests with coverage
+        run: bash bin/test-esm --coverage=true --detectOpenHandles

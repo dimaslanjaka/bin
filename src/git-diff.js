@@ -180,6 +180,11 @@ async function mainGitDiff() {
     }
   }
 
+  // Generate command prompt for opencode CLI
+  console.log(
+    `🤖 OpenCode Prompt:\n  Generate conventional commit message prompt by reading diff file "${ansiColors.green(DIFF_OUTPUT)}"\n`
+  );
+
   // Generate commit message prompt from ChatGPT (only if --ai is specified)
   if (args.ai) {
     try {

@@ -57,7 +57,6 @@ jobs:
             **/node_modules
             **/tmp/**
             **/*.bak
-            **/test/**
             **/test-project
             **/dist
           key: ${{ runner.os }}-${{ hashFiles('**/package.json', '.github') }}

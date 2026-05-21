@@ -33,6 +33,7 @@ import path from "path";
 import * as utils from "./utils/index.cjs";
 import { findEnvFiles } from "./utils/findEnvFiles.cjs";
 import { parseGitHubUrl } from "git-command-helper";
+import axios from "axios";
 
 const projectDir = process.cwd();
 let envPath = path.join(projectDir, ".env");
@@ -237,3 +238,94 @@ export function replaceRawWithLatestHash(url, latestHash) {
 
 // Re-export parseGitHubUrl from git-command-helper for backward compatibility
 export { parseGitHubUrl };
+
+/**
+ * Resolve all package resolution updates.
+ * Pure logic function for Jest testing.
+ */
+export async function resolvePackageResolutionUpdates(resolutions, specialPackageOverrides = []) {
+  const updates = [];
+
+  for (const [currentPkgName, url] of Object.entries(resolutions || {})) {
+    // Validate if URL is a GitHub URL
+    let repo;
+
+    try {
+      repo = parseGitHubUrl(url);
+    } catch (error) {
+      updates.push({
+        skipped: true,
+        currentPkgName,
+        url,
+        error
+      });
+
+      continue;
+    }
+
+    try {
+      const override = specialPackageOverrides.find((p) => p.pkg === currentPkgName);
+
+      const latest = override
+        ? await getLatestCommit(override.owner, override.repo, override.branch)
+        : await getLatestCommitAcrossBranches(repo.owner, repo.repo);
+
+      const new_url = replaceRawWithLatestHash(url, latest.sha);
+
+      // verify the new URL is can be accessed
+      await axios
+        .head(new_url, {
+          headers: {
+            "User-Agent": selectedUserAgent,
+            Accept: "application/vnd.github.v3+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+            ...(ACCESS_TOKEN ? { Authorization: `token ${ACCESS_TOKEN}` } : {})
+          }
+        })
+        .then((response) => {
+          if (response.status < 200 || response.status >= 300) {
+            updates.push({
+              failed: true,
+              currentPkgName,
+              url,
+              new_url,
+              repo,
+              latest,
+              error: new Error(`New URL is not accessible, status code: ${response.status}`)
+            });
+            return;
+          }
+          updates.push({
+            currentPkgName,
+            url,
+            new_url,
+            repo,
+            latest
+          });
+        })
+        .catch((e) => {
+          // If the new URL is not accessible, we consider it a failure instead of updating to a broken URL
+          updates.push({
+            failed: true,
+            currentPkgName,
+            url,
+            new_url,
+            repo,
+            latest,
+            error: new Error(`New URL is not accessible: ${e.message}`)
+          });
+          return null; // prevent further processing
+        });
+    } catch (error) {
+      updates.push({
+        failed: true,
+        currentPkgName,
+        url,
+        repo,
+        error
+      });
+    }
+  }
+
+  return updates;
+}

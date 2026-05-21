@@ -32,7 +32,7 @@ module.exports = {
 function run(cmd, args, opts = {}) {
   const result = spawnSync(cmd, args, {
     stdio: "pipe",
-    shell: false,
+    shell: os.platform() === "win32",
     ...opts
   });
 
@@ -107,7 +107,7 @@ function installTarball(packageManager = "yarn") {
   }
 
   const managers = {
-    yarn: ["yarn", ["add", TGZ_PATH]],
+    yarn: ["yarn", ["add", `binary-collections@file:${TGZ_PATH}`]],
     npm: ["npm", ["install", TGZ_PATH]]
   };
 

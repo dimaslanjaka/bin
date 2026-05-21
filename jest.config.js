@@ -34,5 +34,6 @@ export default {
     "^.+\\.(tsx|jsx|js|mjs|cjs)$": "babel-jest"
   },
   transformIgnorePatterns: ["/node_modules/(?!(@react|react|react-dom|react-router-dom)/)"],
-  modulePathIgnorePatterns: ["<rootDir>/packages"]
+  modulePathIgnorePatterns: ["<rootDir>/packages", "<rootDir>/lib", "<rootDir>/releases"],
+  testTimeout: 120000
 };

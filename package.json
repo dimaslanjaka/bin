@@ -127,8 +127,6 @@
     "ts-jest": "^29.4.9",
     "ts-node": "^10.9.2",
     "tsup": "^8.5.1",
-    "typedoc": "^0.28.19",
-    "typedoc-plugin-ga": "^1.1.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "8.59.3"
   },

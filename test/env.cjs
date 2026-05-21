@@ -87,25 +87,44 @@ function ensureYarnProject() {
 
 module.exports.ensureYarnProject = ensureYarnProject;
 
-function installYarnPackage() {
+function installTarball(packageManager = "yarn") {
   const TGZ_PATH = path.resolve(__dirname, "../releases/bin.tgz");
   const TEST_REPO = repoDir;
+
   if (!fs.existsSync(TGZ_PATH)) {
     throw new Error(`tgz file not found: ${TGZ_PATH}. Please run "yarn build" before testing.`);
   }
-  const result = spawnSync("yarn", ["add", `binary-collections@${TGZ_PATH}`], {
+
+  const managers = {
+    yarn: {
+      cmd: "yarn",
+      args: ["add", TGZ_PATH]
+    },
+    npm: {
+      cmd: "npm",
+      args: ["install", TGZ_PATH]
+    }
+  };
+
+  const selected = managers[packageManager];
+
+  if (!selected) {
+    throw new Error(`Unsupported package manager: ${packageManager}`);
+  }
+
+  const result = spawnSync(selected.cmd, selected.args, {
     cwd: TEST_REPO,
-    stdio: "inherit",
-    shell: true
+    stdio: "pipe", // capture output for better error reporting
+    shell: false
   });
-  if (!result || typeof result.status !== "number" || result.status !== 0) {
-    const stdout = result && typeof result.stdout !== "undefined" ? result.stdout.toString() : "";
-    const stderr = result && typeof result.stderr !== "undefined" ? result.stderr.toString() : "";
+
+  if (result.status !== 0) {
+    const stdout = result.stdout ? result.stdout.toString() : "";
+    const stderr = result.stderr ? result.stderr.toString() : "";
+
     throw new Error(
-      `yarn add failed with code ${result && typeof result.status === "number" ? result.status : "unknown"}\n` +
-        `stdout: ${stdout}\n` +
-        `stderr: ${stderr}`
+      `${packageManager} install failed with code ${result.status}\n` + `stdout: ${stdout}\n` + `stderr: ${stderr}`
     );
   }
 }
-module.exports.installYarnPackage = installYarnPackage;
+module.exports.installTarball = installTarball;

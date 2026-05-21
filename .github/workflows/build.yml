@@ -13,6 +13,7 @@ on:
     paths-ignore:
       - "**/*.tgz"
       - "**/release*"
+      - ".github/workflows/clean-caches.yml"
 
 jobs:
   build:

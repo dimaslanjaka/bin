@@ -1,0 +1,128 @@
+const color = require("ansi-colors");
+const glob = require("glob");
+const path = require("upath");
+
+/** Define default binary mappings for package.json "bin" field */
+const defaultBin = {
+  "binary-collections": "lib/binary-collections.cjs",
+  nrs: "lib/npm-run-series.cjs",
+  "run-s": "lib/npm-run-series.cjs",
+  "run-series": "lib/npm-run-series.cjs",
+  "npm-run-series": "lib/npm-run-series.cjs",
+  "del-nodemodules": "lib/del-node-modules.cjs",
+  "del-yarncaches": "lib/del-yarn-caches.cjs",
+  "del-ps": "lib/del-ps.cjs",
+  "del-gradle": "lib/del-gradle.cjs",
+  "git-purge": "lib/git-purge.cjs",
+  "git-fix": "lib/git-fix.cjs",
+  "print-tree": "lib/print-directory-tree.cjs",
+  "dir-tree": "lib/print-directory-tree.cjs",
+  "pkg-resolutions-updater": "lib/package-resolutions-updater-cli.cjs",
+  "pkg-res-updater": "lib/package-resolutions-updater-cli.cjs",
+  "git-diff": "lib/git-diff.cjs",
+  "clean-github-actions-caches": "lib/clean-github-actions-caches-cli.cjs",
+  "clean-github-actions-cache": "lib/clean-github-actions-caches-cli.cjs",
+  "clear-github-actions-cache": "lib/clean-github-actions-caches-cli.cjs",
+  "clear-github-actions-caches": "lib/clean-github-actions-caches-cli.cjs",
+  "clear-gh-caches": "lib/clean-github-actions-caches-cli.cjs",
+  "submodule-install": "lib/submodule-install.cjs",
+  chatgpt: "lib/free-chatgpt.cjs",
+  "free-chatgpt": "lib/free-chatgpt.cjs",
+  "undo-commit": "lib/git/undo-commit.cjs",
+  "undo-last-commit": "lib/git/undo-commit.cjs",
+  "git-undo-commit": "lib/git/undo-commit.cjs",
+  "undo-staged": "lib/git/undo-staged.cjs",
+  "git-undo-staged": "lib/git/undo-staged.cjs",
+  "rm-node-modules": "lib/rm-node-module-cli.cjs",
+  "rm-node-module": "lib/rm-node-module-cli.cjs",
+  "remove-node-modules": "lib/rm-node-module-cli.cjs",
+  "remove-node-module": "lib/rm-node-module-cli.cjs",
+  "yarn-install": "lib/yarn-per-branch-lock-installer.cjs",
+  "y-install": "lib/yarn-per-branch-lock-installer.cjs"
+};
+
+/**
+ * Generate mapping for package.json "bin" from `lib/*.cjs` and `bin/*`.
+ *
+ * Scans `lib` for `.cjs` modules and attempts to match corresponding entries
+ * in `bin/`. If a name exists in `defaultBin` that mapping is used. Paths
+ * are normalized to unix-style using `upath.toUnix` for consistent output.
+ *
+ * @returns {Object.<string,string>} Mapping of binary name to file path (unix-style)
+ */
+function generateMapping() {
+  // Build binary mapping from lib/*.cjs and bin/*
+  const binBuilder = {};
+  const libs = glob
+    .globSync("lib/*.cjs", {
+      cwd: __dirname,
+      nodir: true,
+      ignore: [
+        "**/*.d.{ts,mts,cts}",
+        "**/*.txt",
+        "**/*.d.*",
+        "**/chunk*",
+        "**/build.*",
+        "**/{ps,git}/**",
+        "**/index.*",
+        "**/*.config.*",
+        "**/utils.*",
+        "**/*-config.*"
+      ]
+    })
+    .map((file) => {
+      // For each lib/*.cjs, find matching bin/*
+      const filename = path.basename(file, path.extname(file));
+      const bins = glob.globSync(`bin/${filename}*`, { cwd: __dirname, nodir: true });
+      return { file, filename, bins };
+    });
+
+  // Assign binaries to binBuilder, preferring defaultBin if present
+  for (const { file, filename, bins } of libs) {
+    if (defaultBin[filename]) {
+      binBuilder[filename] = defaultBin[filename];
+      continue;
+    }
+    if (bins.length === 0) {
+      binBuilder[filename] = file;
+    } else {
+      // If local bin exists, log and use lib/*.cjs
+      console.log(
+        `[${arguments.callee.name}] ${color.yellow(filename)} contains local bin: [${color.blueBright(bins.join(", "))}] use ${color.greenBright(file)} instead`
+      );
+      binBuilder[filename] = file;
+    }
+    // capture *-cli* file
+    if (filename.includes("-cli")) {
+      binBuilder[filename.replace("-cli", "")] = file; // Update binBuilder with CLI file
+      if (filename in binBuilder) {
+        delete binBuilder[filename]; // Remove from binBuilder if it exists
+      }
+    }
+
+    if (!binBuilder[filename]) {
+      if (filename.includes("-cli")) {
+        console.warn(
+          `[${arguments.callee.name}] ${color.yellowBright("Warning:")} Binary for ${color.yellow(filename)} (CLI) already has another binary assigned for ${color.yellow(filename.replace("-cli", ""))}. Skipping ${color.yellow(filename)}.`
+        );
+        continue;
+      }
+      console.warn(
+        `[${arguments.callee.name}] ${color.redBright("Warning:")} No binary assigned for ${color.yellow(filename)}. Please check the lib/ and bin/ directories.`
+      );
+      continue;
+    }
+
+    // Convert to unix-style path for consistent logging
+    binBuilder[filename] = path.toUnix(binBuilder[filename]);
+
+    console.log(
+      `[${arguments.callee.name}] Processed ${color.cyan(filename)}: assigned ${color.greenBright(binBuilder[filename])}`
+    );
+  }
+
+  console.log(`[${arguments.callee.name}] Final binary mapping:`, binBuilder);
+  return binBuilder;
+}
+
+module.exports = { defaultBin, generateMapping };

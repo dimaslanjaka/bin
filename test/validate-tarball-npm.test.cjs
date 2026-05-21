@@ -33,7 +33,7 @@ describe("Test binary-collections tarball", () => {
       { file: npmLockFile, backup: npmLockFileBackup },
       { file: yarnLockFile, backup: yarnLockFileBackup }
     ]) {
-      if (fs.existsSync(file)) fs.moveSync(file, backup);
+      if (fs.existsSync(file)) fs.moveSync(file, backup, { overwrite: true });
     }
     // Build the workspace and create the tarball to install
     buildAndPack(workspaceDir);

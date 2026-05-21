@@ -43,7 +43,8 @@ const defaultBin = {
   "rm-node-modules": "lib/rm-node-module-cli.cjs",
   "rm-node-module": "lib/rm-node-module-cli.cjs",
   "remove-node-modules": "lib/rm-node-module-cli.cjs",
-  "remove-node-module": "lib/rm-node-module-cli.cjs"
+  "remove-node-module": "lib/rm-node-module-cli.cjs",
+  "yarn-install": "lib/yarn-per-branch-lock-installer.cjs"
 };
 
 // Build binary mapping from lib/*.cjs and bin/*

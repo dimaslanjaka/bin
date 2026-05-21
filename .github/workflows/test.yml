@@ -9,14 +9,15 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  push:
-    paths-ignore:
-      - "**/*.tgz"
-      - "**/release*"
+  workflow_run:
+    workflows:
+      - Node.js Package Build
+    types:
+      - completed
 
 jobs:
   test:
-    if: ${{ !contains(join(github.event.commits.*.added, ' '), '.tgz') && !contains(join(github.event.commits.*.modified, ' '), '.tgz') && !contains(join(github.event.commits.*.removed, ' '), '.tgz') }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:

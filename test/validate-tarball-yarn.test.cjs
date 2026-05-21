@@ -4,10 +4,6 @@ const fs = require("fs-extra");
 const path = require("upath");
 const {
   prepareInstallation,
-  npmLockFile,
-  yarnLockFile,
-  npmLockFileBackup,
-  yarnLockFileBackup,
   nodeModules,
   checkBinLinks,
   buildAndPack,
@@ -29,12 +25,6 @@ describe("Test binary-collections tarball", () => {
     for (const dir of [pkgDir]) {
       if (fs.existsSync(dir)) fs.removeSync(dir);
     }
-    for (const { file, backup } of [
-      { file: npmLockFile, backup: npmLockFileBackup },
-      { file: yarnLockFile, backup: yarnLockFileBackup }
-    ]) {
-      if (fs.existsSync(file)) fs.moveSync(file, backup, { overwrite: true });
-    }
     // Build the workspace and create the tarball to install
     buildAndPack(workspaceDir);
     // Prepare environment
@@ -42,8 +32,6 @@ describe("Test binary-collections tarball", () => {
   });
 
   it(`should install binary-collections from tarball (${tarballPath}) using yarn`, () => {
-    // Create empty yarn.lock (yarn may require a lockfile to operate predictably)
-    fs.writeFileSync(yarnLockFile, "");
     // Install the packaged tarball via yarn
     const result = spawnSync("yarn", ["add", `binary-collections@${tarballPath}`, "--mode=skip-build"], {
       cwd: repoDir,

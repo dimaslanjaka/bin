@@ -3,44 +3,65 @@ const fs = require("fs-extra");
 const { spawnSync } = require("child_process");
 const os = require("os");
 const dotenv = require("dotenv");
-const envPath = path.join(__dirname, "../.env");
 
-if (fs.existsSync(envPath)) dotenv.config({ path: envPath, override: true, quiet: true });
+const envPath = path.join(__dirname, "../.env");
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath, override: true, quiet: true });
+}
 
 const originalCwd = path.resolve(__dirname, "..");
-module.exports.originalCwd = originalCwd;
 const repoDir = path.join(__dirname, "../tmp/test-repo");
-module.exports.repoDir = repoDir;
-process.cwd = () => repoDir;
 const nonGitDir = path.join(os.tmpdir(), "non-git-dir");
-if (!fs.existsSync(nonGitDir)) {
-  fs.mkdirSync(nonGitDir, { recursive: true });
-}
-module.exports.nonGitDir = nonGitDir;
 
-function ensureRepoExists() {
-  if (!fs.existsSync(path.join(repoDir, ".git"))) {
-    const result = spawnSync(
-      "git",
-      ["clone", "--single-branch", "--branch", "test", "https://github.com/dimaslanjaka/test-repo.git", repoDir],
-      {
-        stdio: "inherit",
-        shell: true
-      }
-    );
-    if (!result || typeof result.status !== "number" || result.status !== 0) {
-      throw new Error(
-        `git clone failed with code ${result && typeof result.status === "number" ? result.status : "unknown"}`
-      );
-    }
-  }
-}
-module.exports.ensureRepoExists = ensureRepoExists;
+fs.ensureDirSync(nonGitDir);
+
+// ⚠️ avoid overwriting global process.cwd (breaks libs/tests unpredictably)
+// instead expose helper
+const getCwd = () => repoDir;
+
+module.exports = {
+  originalCwd,
+  repoDir,
+  nonGitDir,
+  getCwd
+};
 
 /**
- * Ensure yarn project is initialized in the test repo directory.
- * If package.json exists but yarn.lock does not, restore yarn.lock from backup or create empty.
+ * shared runner to remove duplication
  */
+function run(cmd, args, opts = {}) {
+  const result = spawnSync(cmd, args, {
+    stdio: "pipe",
+    shell: false,
+    ...opts
+  });
+
+  if (result.status !== 0) {
+    throw new Error(
+      `${cmd} failed with code ${result.status}\n` +
+        `stdout: ${result.stdout?.toString() || ""}\n` +
+        `stderr: ${result.stderr?.toString() || ""}`
+    );
+  }
+
+  return result;
+}
+
+function ensureRepoExists() {
+  const gitDir = path.join(repoDir, ".git");
+
+  if (fs.existsSync(gitDir)) return;
+
+  run(
+    "git",
+    ["clone", "--single-branch", "--branch", "test", "https://github.com/dimaslanjaka/test-repo.git", repoDir],
+    {
+      stdio: "inherit",
+      shell: false
+    }
+  );
+}
+
 function ensureYarnProject() {
   const pkgJson = path.join(repoDir, "package.json");
   const yarnLock = path.join(repoDir, "yarn.lock");
@@ -49,34 +70,27 @@ function ensureYarnProject() {
   const hasPkg = fs.existsSync(pkgJson);
   const hasLock = fs.existsSync(yarnLock);
 
-  // no project at all → init yarn
   if (!hasPkg && !hasLock) {
-    const result = spawnSync("yarn", ["init", "-y"], {
-      cwd: repoDir,
-      stdio: "inherit",
-      shell: true
-    });
-
-    if (result?.status !== 0) {
-      throw new Error(`yarn init failed with code ${result?.status ?? "unknown"}`);
-    }
-
+    run("yarn", ["init", "-y"], { cwd: repoDir });
     return;
   }
 
-  // Override package.json
-  const pkgContent = JSON.parse(fs.readFileSync(pkgJson, "utf8"));
-  pkgContent.dependencies = {
+  if (!hasPkg) return;
+
+  const pkg = fs.readJSONSync(pkgJson);
+
+  pkg.dependencies = {
     jquery: "^3.6.0",
     lodash: "^4.17.21"
   };
-  pkgContent.devDependencies = {
+
+  pkg.devDependencies = {
     "binary-collections": "*"
   };
-  fs.writeFileSync(pkgJson, JSON.stringify(pkgContent, null, 2), "utf8");
 
-  // package.json exists but lockfile missing → restore or create
-  if (hasPkg && !hasLock) {
+  fs.writeJSONSync(pkgJson, pkg, { spaces: 2 });
+
+  if (!hasLock) {
     if (fs.existsSync(yarnLockBak)) {
       fs.renameSync(yarnLockBak, yarnLock);
     } else {
@@ -85,25 +99,16 @@ function ensureYarnProject() {
   }
 }
 
-module.exports.ensureYarnProject = ensureYarnProject;
-
 function installTarball(packageManager = "yarn") {
   const TGZ_PATH = path.resolve(__dirname, "../releases/bin.tgz");
-  const TEST_REPO = repoDir;
 
   if (!fs.existsSync(TGZ_PATH)) {
-    throw new Error(`tgz file not found: ${TGZ_PATH}. Please run "yarn build" before testing.`);
+    throw new Error(`tgz file not found: ${TGZ_PATH}. Run "yarn build" first.`);
   }
 
   const managers = {
-    yarn: {
-      cmd: "yarn",
-      args: ["add", TGZ_PATH]
-    },
-    npm: {
-      cmd: "npm",
-      args: ["install", TGZ_PATH]
-    }
+    yarn: ["yarn", ["add", TGZ_PATH]],
+    npm: ["npm", ["install", TGZ_PATH]]
   };
 
   const selected = managers[packageManager];
@@ -112,19 +117,11 @@ function installTarball(packageManager = "yarn") {
     throw new Error(`Unsupported package manager: ${packageManager}`);
   }
 
-  const result = spawnSync(selected.cmd, selected.args, {
-    cwd: TEST_REPO,
-    stdio: "pipe", // capture output for better error reporting
-    shell: false
-  });
+  const [cmd, args] = selected;
 
-  if (result.status !== 0) {
-    const stdout = result.stdout ? result.stdout.toString() : "";
-    const stderr = result.stderr ? result.stderr.toString() : "";
-
-    throw new Error(
-      `${packageManager} install failed with code ${result.status}\n` + `stdout: ${stdout}\n` + `stderr: ${stderr}`
-    );
-  }
+  return run(cmd, args, { cwd: repoDir });
 }
+
+module.exports.ensureRepoExists = ensureRepoExists;
+module.exports.ensureYarnProject = ensureYarnProject;
 module.exports.installTarball = installTarball;

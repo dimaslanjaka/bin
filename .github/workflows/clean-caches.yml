@@ -3,11 +3,12 @@ name: Clean GitHub Actions Cache
 on:
   schedule:
     - cron: "0 */12 * * *" # Schedule every 12 hours
-  push:
-    branches:
-      - master
-    paths-ignore:
-      - "**/*.tgz"
+  workflow_run:
+    workflows:
+      - Node.js Package Build
+      - Node.js Package Test
+    types:
+      - completed
   workflow_dispatch:
   workflow_call:
     secrets:

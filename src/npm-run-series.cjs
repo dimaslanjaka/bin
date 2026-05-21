@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const { spawnSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const { Minimatch } = require("minimatch");
@@ -11,8 +12,26 @@ const packagejson = path.join(cwd, "package.json");
 const verbose = args["v"] || args["verbose"];
 const usingYarn = args["yarn"];
 
+function runCommand(command, commandArgs) {
+  const result = spawnSync(command, commandArgs, {
+    cwd,
+    shell: true,
+    stdio: "inherit"
+  });
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  if (result.status !== 0) {
+    process.exitCode = result.status ?? 1;
+    return false;
+  }
+
+  return true;
+}
+
 (async function npmRunSeries() {
-  const { execa } = await import("execa");
   if (fs.existsSync(packagejson)) {
     /**
      * @type {import('../package.json')}
@@ -32,10 +51,9 @@ const usingYarn = args["yarn"];
             const match = matcher.match(scriptName);
             if (verbose) console.log({ pattern, scriptName, match });
             if (match === true) {
-              await execa(usingYarn ? "yarn" : "npm", ["run", scriptName], {
-                cwd,
-                stdio: "inherit"
-              });
+              const command = usingYarn ? "yarn" : "npm";
+              const completed = runCommand(command, ["run", scriptName]);
+              if (!completed) return;
             }
           }
         }

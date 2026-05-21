@@ -55,6 +55,7 @@ function showHelp() {
  * @param {string} command - The git command to execute (e.g., "git --no-pager diff --staged")
  * @param {string} successMessage - Message to display when the command executes successfully
  * @param {string} errorMessage - Message to display when the command fails
+ * @returns {boolean} True when diff content exists, false when no changes were found
  *
  * @throws {Error} Exits the process with code 1 if the git command fails
  *
@@ -87,7 +88,7 @@ function runGitDiff(command, successMessage, errorMessage) {
       console.log(`ℹ️  [i] No changes found for the specified criteria`);
       writefile(DIFF_OUTPUT, "# No changes found\n");
       console.log(`✅ Empty diff saved to "${DIFF_OUTPUT_RELATIVE}"`);
-      return;
+      return false;
     }
 
     writefile(DIFF_OUTPUT, result);
@@ -97,6 +98,7 @@ function runGitDiff(command, successMessage, errorMessage) {
     );
     console.log(`✅ ${successMessage}`);
     console.log(`💾 GPT diff prompt saved to "${GPT_DIFF_OUTPUT_RELATIVE}"`);
+    return true;
   } catch (error) {
     console.error(`❌ ${errorMessage}`);
     console.error(`📝 Command: ${command}`);
@@ -146,8 +148,10 @@ async function mainGitDiff() {
   const useUnstaged = args.unstaged || args.u;
   const fileFromFlag = typeof args.unstaged === "string" ? args.unstaged : typeof args.u === "string" ? args.u : null;
 
+  let hasDiff = false;
+
   if (args["staged-only"] || args.s || args.S) {
-    runGitDiff(
+    hasDiff = runGitDiff(
       "git --no-pager diff --staged",
       `Full staged diff saved to "${ansiColors.green(DIFF_OUTPUT_RELATIVE)}"`,
       "Failed to save staged diff"
@@ -157,7 +161,7 @@ async function mainGitDiff() {
     const file = positional[0] || fileFromFlag;
     if (!file) {
       const fullDiffModeLabel = useUnstaged ? "unstaged" : "unstaged";
-      runGitDiff(
+      hasDiff = runGitDiff(
         "git --no-pager diff",
         `Full ${fullDiffModeLabel} diff saved to "${ansiColors.green(DIFF_OUTPUT_RELATIVE)}"`,
         "Failed to save all diff's"
@@ -170,7 +174,7 @@ async function mainGitDiff() {
         fileDiffMode = "unstaged";
       }
 
-      runGitDiff(
+      hasDiff = runGitDiff(
         fileDiffMode === "unstaged" ? `git --no-pager diff -- "${file}"` : `git --no-pager diff --cached -- "${file}"`,
         `${fileDiffMode[0].toUpperCase() + fileDiffMode.slice(1)} diff of "${file}" saved to "${ansiColors.green(
           DIFF_OUTPUT_RELATIVE
@@ -180,10 +184,23 @@ async function mainGitDiff() {
     }
   }
 
-  // Generate command prompt for opencode CLI
-  console.log(
-    `🤖 OpenCode Prompt:\n  Generate conventional commit message prompt by reading diff file "${ansiColors.green(DIFF_OUTPUT)}"\n`
-  );
+  if (hasDiff) {
+    // Generate command prompt for opencode CLI
+    const opencodePrompt = [
+      "",
+      "🤖 OpenCode Prompt Helper",
+      "────────────────────────",
+      "",
+      "📄 App Prompt:",
+      `   Generate a conventional commit message from diff file: ${ansiColors.green(DIFF_OUTPUT)}`,
+      "",
+      "💻 CLI Command:",
+      `   opencode run "Generate a conventional commit message from diff file ${DIFF_OUTPUT}"`,
+      ""
+    ];
+
+    console.log(opencodePrompt.join("\n"));
+  }
 
   // Generate commit message prompt from ChatGPT (only if --ai is specified)
   if (args.ai) {

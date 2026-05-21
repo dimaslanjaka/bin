@@ -1,7 +1,5 @@
-# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
-# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
-
 name: Node.js Package Build
+
 concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: true
@@ -16,12 +14,14 @@ jobs:
   build:
     if: ${{ !contains(join(github.event.commits.*.added, ' '), '.tgz') && !contains(join(github.event.commits.*.modified, ' '), '.tgz') && !contains(join(github.event.commits.*.removed, ' '), '.tgz') }}
     runs-on: ubuntu-latest
+
     steps:
       - name: ⬇️ Checkout main repository
         uses: actions/checkout@v6
         with:
           ref: master
           token: "${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}"
+
       - name: ⬇️ Checkout test-repo
         uses: actions/checkout@v6
         with:
@@ -29,6 +29,7 @@ jobs:
           path: tmp/test-repo
           token: "${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}"
           ref: test
+
       - name: ⬇️ Checkout packages/git-command-helper
         uses: actions/checkout@v6
         with:
@@ -36,6 +37,7 @@ jobs:
           path: packages/git-command-helper
           token: "${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}"
           ref: pre-release
+
       - name: ⬇️ Checkout packages/cross-spawn
         uses: actions/checkout@v6
         with:
@@ -43,10 +45,12 @@ jobs:
           path: packages/cross-spawn
           token: "${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}"
           ref: private
+
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 22
+
       - uses: actions/cache@v5
         id: cache
         name: 📚 Init cache
@@ -79,10 +83,7 @@ jobs:
           for dir in "${BIN_DIRS[@]}"; do
             if [ -d "$dir" ]; then
               echo "$dir" >> "$GITHUB_PATH"
-
-              # Fix permissions
               chmod -R +x "$dir"
-
               echo "Added: $dir"
             else
               echo "Skipped missing dir: $dir"
@@ -91,14 +92,76 @@ jobs:
 
       - name: 📦 Install dependencies
         run: yarn install
+
       - name: 🧹 Clean project
         run: npm run clean
+
       - name: 🛠️ Build project
         run: npm run build
+
       - name: 📦 Pack project
         run: npm run pack
 
-      - name: Fix permissions to PATH bins
+      - name: 📤 Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            dist
+            releases
+            node_modules
+            package.json
+            yarn.lock
+
+      - name: 🚀 Push tarball changes
+        if: ${{ success() && !contains(github.event.head_commit.message, 'update build from CI') }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add releases
+
+          if [ "$(git status --porcelain releases | wc -l)" -gt "0" ]; then
+            CURRENT_COMMIT_HASH=$(git rev-parse HEAD)
+
+            SRC_COMMIT_HASH=$(git log --pretty=format:"%h" src | grep -v "$CURRENT_COMMIT_HASH" | head -n 1)
+
+            if [ -z "$SRC_COMMIT_HASH" ]; then
+              echo "❌ No previous commit found in 'src/' before the current tarball commit."
+              exit 1
+            fi
+
+            NEW_MESSAGE="chore(tarball): update tarball artifacts from CI build based on src at $SRC_COMMIT_HASH"
+
+            git commit -m "$NEW_MESSAGE"
+            git push
+          else
+            echo "✅ No changes to release. Skipping push."
+          fi
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v6
+        with:
+          ref: master
+          token: "${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}"
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: 📥 Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: .
+
+      - name: Add custom bins to PATH
         shell: bash
         run: |
           BIN_DIRS=(
@@ -113,10 +176,7 @@ jobs:
           for dir in "${BIN_DIRS[@]}"; do
             if [ -d "$dir" ]; then
               echo "$dir" >> "$GITHUB_PATH"
-
-              # Fix permissions
               chmod -R +x "$dir"
-
               echo "Added: $dir"
             else
               echo "Skipped missing dir: $dir"
@@ -125,34 +185,6 @@ jobs:
 
       - name: 🧪 Run CJS tests with coverage
         run: bash bin/test-cjs --coverage=true --detectOpenHandles
+
       - name: 🧪 Run ESM tests with coverage
         run: bash bin/test-esm --coverage=true --detectOpenHandles
-      - name: 🚀 Push tarball changes
-        if: ${{ success() && !contains(github.event.head_commit.message, 'update build from CI') }}
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add releases
-
-          # Check if there are staged changes in releases/
-          if [ "$(git status --porcelain releases | wc -l)" -gt "0" ]; then
-            # Get current commit hash (the tarball commit)
-            CURRENT_COMMIT_HASH=$(git rev-parse HEAD)
-
-            # Get the previous commit hash that touched src/ (excluding the current one)
-            SRC_COMMIT_HASH=$(git log --pretty=format:"%h" src | grep -v "$CURRENT_COMMIT_HASH" | head -n 1)
-
-            # If no matching commit found, exit safely
-            if [ -z "$SRC_COMMIT_HASH" ]; then
-              echo "❌ No previous commit found in 'src/' before the current tarball commit."
-              exit 1
-            fi
-
-            # Amend the current commit message to include the src commit reference
-            NEW_MESSAGE="chore(tarball): update tarball artifacts from CI build based on src at $SRC_COMMIT_HASH"
-            git commit -m "$NEW_MESSAGE"
-            git push
-          else
-            echo "✅ No changes to release. Skipping push."
-          fi

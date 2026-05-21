@@ -1,8 +1,6 @@
 name: Clean GitHub Actions Cache
 
 on:
-  schedule:
-    - cron: "0 */12 * * *" # Schedule every 12 hours
   workflow_run:
     workflows:
       - Node.js Package Build

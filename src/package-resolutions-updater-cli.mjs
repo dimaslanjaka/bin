@@ -65,7 +65,7 @@ import { resolvePackageResolutionUpdates } from "./package-resolutions-updater.m
     return;
   }
 
-  console.log(`Processing ${entries.length} resolution(s)...`);
+  console.log(`⚙️  Processing ${entries.length} resolution(s)...`);
 
   const updates = await resolvePackageResolutionUpdates(pkg.resolutions, specialPackageOverrides);
 
@@ -80,6 +80,8 @@ import { resolvePackageResolutionUpdates } from "./package-resolutions-updater.m
       console.log(`❌ Failed to process ${ansiColors.red(update.currentPkgName)}: ${update.error.message}`);
     }
   }
+  // Add a separator before the summary
+  console.log("");
 
   if (validUpdates.length === 0) {
     console.log(ansiColors.yellow("No GitHub URLs were processed"));
@@ -94,9 +96,7 @@ import { resolvePackageResolutionUpdates } from "./package-resolutions-updater.m
   for (const { currentPkgName, url, new_url, repo, latest } of validUpdates) {
     if (url !== new_url) {
       console.log(`${ansiColors.cyan(currentPkgName)}:`);
-
       console.log("  from:", url.replace(repo.branch, ansiColors.red(repo.branch)));
-
       console.log("    to:", new_url.replace(latest.sha, ansiColors.green(latest.sha)));
 
       pkg.resolutions[currentPkgName] = new_url;

@@ -13,6 +13,10 @@ on:
       ACCESS_TOKEN:
         required: true
 
+concurrency:
+  group: clean-cache
+  cancel-in-progress: true
+
 jobs:
   clean-cache:
     # if: contains(github.repository, 'php-proxy-hunter')

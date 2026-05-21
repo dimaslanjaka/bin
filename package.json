@@ -207,7 +207,9 @@
     "undo-commit": "lib/git/undo-commit.cjs",
     "undo-last-commit": "lib/git/undo-commit.cjs",
     "undo-staged": "lib/git/undo-staged.cjs",
+    "y-install": "lib/yarn-per-branch-lock-installer.cjs",
     "yarn-clean": "binaries/yarn-clean.cjs",
+    "yarn-install": "lib/yarn-per-branch-lock-installer.cjs",
     "yarn-per-branch-lock-installer": "lib/yarn-per-branch-lock-installer.cjs",
     "yarn-reinstall": "lib/yarn-reinstall.cjs"
   }

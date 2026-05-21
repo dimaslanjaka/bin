@@ -82,9 +82,9 @@ jobs:
             $HOME/AppData/Local/Nuitka/Nuitka/Cache
             config/
             .cache/
-          key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package.json', '**/requirements*.txt', '.github') }}
           restore-keys: |
-            ${{ runner.os }}-node-${{ hashFiles('package.json') }}
+            ${{ runner.os }}-node-${{ hashFiles('**/package.json', '**/requirements*.txt', '.github') }}
             ${{ runner.os }}-node-
             ${{ runner.os }}-
 

@@ -7,7 +7,9 @@ on:
       - Node.js Package Test
     types:
       - completed
+
   workflow_dispatch:
+
   workflow_call:
     secrets:
       ACCESS_TOKEN:
@@ -21,37 +23,41 @@ jobs:
   clean-cache:
     # if: contains(github.repository, 'php-proxy-hunter')
     runs-on: windows-latest
+
     env:
       PIP_CACHE_DIR: "${{ github.workspace }}/project/tmp/pip"
       NUITKA_CACHE_DIR: "${{ github.workspace }}/project/tmp/nuitka-cache"
-      NODE_OPTIONS: "--max_old_space_size=4096" #8192 4096 --expose-gc
+      NODE_OPTIONS: "--max_old_space_size=4096"
       YARN_ENABLE_IMMUTABLE_INSTALLS: false
       ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
       GH_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
       YARN_CHECKSUM_BEHAVIOR: update
 
     steps:
-      - uses: actions/checkout@v6
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v6
         with:
           # repository: "dimaslanjaka/php-proxy-hunter"
           # ref: master
           token: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
           # lfs: true
 
-      - uses: actions/setup-python@v6
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
           architecture: "x64"
 
-      - uses: actions/setup-node@v6
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v6
         with:
           node-version: 20.x
 
-      - name: Get pip cache dir
+      - name: 📦 Get pip Cache Directory
         id: pip-cache
         run: echo "pip_cache_dir=$(pip cache dir)" >> $GITHUB_ENV
 
-      - name: Setup Cache
+      - name: 🗄️ Setup Cache
         id: cache
         uses: actions/cache@v5
         with:
@@ -72,7 +78,7 @@ jobs:
             package-lock.json
             assets/proxies/
             vendor/
-            ${{ env.USERPROFILE }}\AppData\Local\Nuitka\Nuitka\Cache
+            ${{ env.USERPROFILE }}\AppData\Local\Nuitka\Nuitka/Cache
             $HOME/AppData/Local/Nuitka/Nuitka/Cache
             config/
             .cache/
@@ -83,30 +89,32 @@ jobs:
             ${{ runner.os }}-node-
             ${{ runner.os }}-
 
-      - name: Update Submodules
+      - name: 🔄 Update Submodules
         run: |
           echo "init submodules"
           git submodule init
           git submodule foreach "git submodule init"
+
           echo "sync submodules"
           git submodule sync
           git submodule foreach "git submodule sync"
+
           echo "update submodules"
           npx -y rimraf .git/modules
           npx -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz submodule-install
         shell: bash
 
-      - name: Install Dependencies
+      - name: 📥 Install Dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           corepack enable
           yarn install
 
-      - name: Build Project
+      - name: 🏗️ Build Project
         run: |
           yarn build
 
-      - name: Clean github actions cache
+      - name: 🧹 Clean GitHub Actions Cache ${{ github.event.workflow_run.head_sha }}
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
         run: |

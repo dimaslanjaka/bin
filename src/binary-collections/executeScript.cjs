@@ -8,7 +8,7 @@ const { spawn } = require("child_process");
  * @returns {void} Exits the process when the script execution completes
  */
 function executeScript(scriptPath, args) {
-  console.log(`🔧 Executing script: ${scriptPath} args: ${args.join(" ")}`);
+  console.log(`🔧 Executing script: ${scriptPath} args: ${args.join(" ")}\n`);
   const child = spawn("node", [scriptPath, ...args], {
     stdio: "inherit",
     shell: true

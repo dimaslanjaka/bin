@@ -8,7 +8,7 @@ describe("git-fix utility - summary messages", () => {
   beforeAll(() => {
     // Prepare test repo and install CLI
     env.ensureYarnProject();
-    env.installYarnPackage();
+    env.installTarball();
   });
 
   beforeEach(() => {

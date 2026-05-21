@@ -90,8 +90,6 @@ jobs:
             **/*.pyc
             **/tmp/**
             **/*.bak
-            **/test-project
-            **/dist
             .cache/
           key: ${{ runner.os }}-${{ hashFiles('**/package.json', '**/requirements*.txt', '.github') }}
           restore-keys: |

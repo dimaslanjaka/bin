@@ -37,9 +37,8 @@
     "binaries",
     "lib",
     "package.json",
-    "docs-src/**/*.md",
     "readme.md",
-    ".puppeterrc.*",
+    ".puppeterrc.cjs",
     "requirements.txt"
   ],
   "scripts": {

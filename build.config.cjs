@@ -38,7 +38,13 @@ const defaultBin = {
   "remove-node-modules": "lib/rm-node-module-cli.cjs",
   "remove-node-module": "lib/rm-node-module-cli.cjs",
   "yarn-install": "lib/yarn-per-branch-lock-installer.cjs",
-  "y-install": "lib/yarn-per-branch-lock-installer.cjs"
+  "y-install": "lib/yarn-per-branch-lock-installer.cjs",
+  copy: "lib/file/copy-cli.cjs",
+  move: "lib/file/move-cli.cjs",
+  "node-copy": "lib/file/copy-cli.cjs",
+  "node-move": "lib/file/move-cli.cjs",
+  "copy-file": "lib/file/copy-cli.cjs",
+  "move-file": "lib/file/move-cli.cjs"
 };
 
 /**

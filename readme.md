@@ -146,186 +146,22 @@ binary-collections list
 | **Cleanup** | `del-nodemodules`, `del-yarncaches`, `del-gradle` | Cache and build directory cleanup |
 | **GitHub Actions** | `clean-github-actions-caches`, `clean-github-actions-cache`, `clear-github-actions-cache`, `clear-github-actions-caches`, `clear-gh-caches` | Remove old GitHub Actions caches, keep only latest |
 
-### Git Tools
+### Command Documentation
 
-#### Git Repository Purge
-Cleans and optimizes git repositories by pruning reflogs.
+Detailed documentation for each command is available in [`docs-src/`](./docs-src/):
 
-```bash
-git-purge
-```
-
-![Git purge screenshot](https://github.com/dimaslanjaka/bin/assets/12471057/2805c54e-28a7-491d-b381-de2593a854b3)
-
-#### Git Diff Utility
-Enhanced diff functionality for repository inspection.
-
-```bash
-git-diff
-```
-
-#### Git Fix Utility
-A comprehensive configuration fixer for cross-platform development (replaces `git-fix-encoding`). It is now non-interactive and argument-driven.
-
-```bash
-git-fix                          # Apply all default fixes
-git-fix --lf-only                # Force LF line endings only
-git-fix --permissions            # Ignore file permissions only
-git-fix --normalize              # Normalize existing files only
-git-fix --user                   # Configure Git user from env vars
-git-fix --user NAME EMAIL        # Configure Git user with specific values
-git-fix --user --update-remote   # Configure user and update remote URL
-```
-
-**Features:**
-- Forces LF line endings (`core.autocrlf = false`)
-- Ignores file permission changes (`core.filemode = false`)
-- Sets pull strategy to prevent auto-rebase
-- Normalizes existing line endings
-- Creates/updates `.gitattributes`
-
-**User Configuration:**
-- Uses Environment variables: `GITHUB_USER`, `GITHUB_EMAIL` (if no args provided).
-- Use `--update-remote` to automatically update the remote URL to match the configured user (HTTPS remotes).
-
-#### Git Repository Size Reducer
-Reduces repository size by cleaning up history.
-
-```bash
-git-reduce-size
-```
-
-#### Submodule Management
-Manage git submodules effortlessly.
-
-- **`submodule`**: General operations.
-- **`submodule-install`**: Install and setup submodules.
-- **`submodule-remove`**: Interactive removal of submodules.
-- **`submodule-token`**: Manage authentication tokens.
-
-![Submodule remover screenshot](https://github.com/user-attachments/assets/659c2fa3-f12f-45cb-a66f-aed3807e0023)
-
----
-
-### NPM Script Runner
-**Binaries**: `nrs`, `run-s`, `run-series`, `npm-run-series`
-
-Execute multiple npm scripts in series using pattern matching.
-
-#### Options
-| Flag | Description |
-| :--- | :--- |
-| `--yarn` | Use `yarn run` instead of `npm run`. |
-| `--verbose`, `-v` | Enable verbose logging. |
-
-#### Example
-Define a script to run all tasks matching a pattern:
-
-```json
-{
-  "scripts": {
-    "build:app": "echo 'building app'",
-    "build:lib": "echo 'building lib'",
-    "build:all": "nrs --yarn --verbose \"build:**\""
-  }
-}
-```
-
----
-
-### Package Management
-
-#### Yarn Package Reinstaller
-Reinstall packages with specific dependency types.
-
-```bash
-yarn-reinstall <packageName> [--dev|-D|--peer|-P|--optional|-O]
-```
-
-#### Package Resolutions Manager
-Manage `resolutions` in `package.json` (Aliases: `pkg-resolutions-updater`, `pkg-res-updater`).
-
-```bash
-pkg-resolutions-updater
-```
-
----
-
-### Node.js Development Tools
-
-#### Find Node Modules
-Locate all `node_modules` directories within a project.
-
-```bash
-find-node-modules      # Library function
-find-node-modules-cli  # CLI tool
-find-nodemodules       # Alias
-```
-
-#### Environment Helpers
-- **`dev`**: Setup development environment variables.
-- **`prod`**: Setup production environment variables.
-- **`empty`**: A no-op utility placeholder.
-
----
-
-### Process Management
-
-Terminate processes quickly by name or type.
-
-```bash
-kill-process    # General process killer
-nodekill        # Kill Node.js processes
-javakill        # Kill Java processes (Windows specific)
-del-ps          # Kill processes by command name
-```
-
----
-
-### Cleanup Tools
-
-#### GitHub Actions Cache Cleaner
-Remove old GitHub Actions caches and leaving last one to free up space.
-**Aliases**: `clean-github-actions-cache`, `clear-gh-caches`, etc.
-```bash
-clean-github-actions-caches
-```
-*[Full Documentation](./docs-src/clean-github-actions-caches.md)*
-
-#### Node Modules Cleaner
-Recursively remove `node_modules` directories.
-
-```bash
-del-nodemodules        # Primary command
-# Aliases: del-node-modules, clean-nodemodule, clean-nodemodules
-```
-
-Additional tool: `rm-node-modules` — a faster alternative for very large
-projects. It removes `node_modules` subfolders by first-letter in parallel,
-which can speed up deletion on filesystems with many packages.
-
-Usage examples:
-
-```bash
-# Run from the project root
-node src/rm-node-module-cli.cjs
-npx binary-collections rm-node-modules
-yarn run rm-node-modules
-```
-
-Note: On Windows this requires a Unix-compatible shell in `PATH` (for
-example, Git Bash or WSL).
-
-![Node modules cleaner screenshot](https://github.com/dimaslanjaka/bin/assets/12471057/f03e5b51-1808-4e82-a474-0dd3c7eab5fe)
-
-#### System Cache Cleaners
-```bash
-del-yarncaches    # Clear Yarn cache
-del-gradle        # Delete Gradle build folders
-```
-
-#### Automation Tools
-- **Free ChatGPT automation tool**: *[See documentation](./docs-src/free-chatgpt.md)*
+| Category | Link |
+|---|---|
+| **Git** | [`git-purge.md`](./docs-src/git-purge.md), [`git-diff.md`](./docs-src/git-diff.md), [`git-fix.md`](./docs-src/git-fix.md), [`git-reduce-size.md`](./docs-src/git-reduce-size.md), [`git-undo.md`](./docs-src/git-undo.md) |
+| **Submodules** | [`submodule-install.md`](./docs-src/submodule-install.md), [`submodule-remove.md`](./docs-src/submodule-remove.md), [`submodule-token.md`](./docs-src/submodule-token.md) |
+| **NPM Scripts** | [`npm-run-series.md`](./docs-src/npm-run-series.md) |
+| **Package Mgmt** | [`yarn-reinstall.md`](./docs-src/yarn-reinstall.md), [`yarn-install.md`](./docs-src/yarn-install.md), [`yarn-clean.md`](./docs-src/yarn-clean.md), [`package-resolutions-updater.md`](./docs-src/package-resolutions-updater.md) |
+| **Node.js Dev** | [`find-node-modules.md`](./docs-src/find-node-modules.md), [`env-helpers.md`](./docs-src/env-helpers.md) |
+| **Process Mgmt** | [`del-ps.md`](./docs-src/del-ps.md), [`kill-night-crows.md`](./docs-src/kill-night-crows.md) |
+| **File System** | [`copy-move-file.md`](./docs-src/copy-move-file.md), [`rmpath.md`](./docs-src/rmpath.md), [`rmfind-rmx.md`](./docs-src/rmfind-rmx.md), [`print-directory-tree.md`](./docs-src/print-directory-tree.md), [`remove-module.md`](./docs-src/remove-module.md) |
+| **Cleanup** | [`del-node-modules.md`](./docs-src/del-node-modules.md), [`rm-node-modules.md`](./docs-src/rm-node-modules.md), [`del-yarn-caches.md`](./docs-src/del-yarn-caches.md), [`del-gradle.md`](./docs-src/del-gradle.md) |
+| **GitHub Actions** | [`clean-github-actions-caches.md`](./docs-src/clean-github-actions-caches.md) |
+| **Other** | [`binary-collections.md`](./docs-src/binary-collections.md), [`changelog.md`](./docs-src/changelog.md), [`php-cs-fixer-staged.md`](./docs-src/php-cs-fixer-staged.md), [`py.md`](./docs-src/py.md), [`free-chatgpt.md`](./docs-src/free-chatgpt.md), [`test-runners.md`](./docs-src/test-runners.md) |
 
 ---
 

@@ -8,5 +8,6 @@ export async function move(src, dest) {
   if (!path.resolve(src)) {
     throw new Error(`Source path is not resolved: ${src}`);
   }
+  await fs.ensureDir(path.dirname(dest));
   await fs.move(src, dest, { overwrite: true });
 }

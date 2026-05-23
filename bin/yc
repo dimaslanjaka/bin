@@ -1,0 +1,29 @@
+#!/bin/bash
+set -u
+
+cwd="$(pwd)"
+max_jobs=4
+
+cleanup_letter() {
+  local letter="$1"
+
+  rm -rf "${cwd}/node_modules/${letter}"*
+  rm -rf "${cwd}/node_modules/@types/${letter}"*
+  rm -rf "${cwd}/node_modules/@${letter}"*
+}
+
+export -f cleanup_letter
+export cwd
+
+for letter in $(printf "%s\n" {a..z} | shuf); do
+  cleanup_letter "$letter" &
+
+  while (( $(jobs -r | wc -l) >= max_jobs )); do
+    wait -n
+  done
+done
+
+wait
+
+rm -rf "${cwd}/node_modules"
+echo "Done. node_modules fully removed."

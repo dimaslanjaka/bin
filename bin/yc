@@ -3,27 +3,93 @@ set -u
 
 cwd="$(pwd)"
 max_jobs=4
+log_file="${cwd}/cleanup.log"
+fail_file="${cwd}/cleanup.failed.log"
+
+# reset logs
+: > "$log_file"
+: > "$fail_file"
+
+timestamp() {
+  date "+%Y-%m-%d %H:%M:%S"
+}
+
+log() {
+  echo "[$(timestamp)] $*" | tee -a "$log_file"
+}
 
 cleanup_letter() {
   local letter="$1"
 
-  rm -rf "${cwd}/node_modules/${letter}"*
-  rm -rf "${cwd}/node_modules/@types/${letter}"*
-  rm -rf "${cwd}/node_modules/@${letter}"*
+  shopt -s nullglob
+
+  local targets=(
+    "${cwd}/node_modules/${letter}"*
+    "${cwd}/node_modules/@types/${letter}"*
+    "${cwd}/node_modules/@${letter}"*
+  )
+
+  local removed_any=0
+
+  for path in "${targets[@]}"; do
+    if rm -rf "$path"; then
+      log "SUCCESS remove: $path"
+      removed_any=1
+    else
+      log "FAIL remove: $path"
+      echo "$path" >> "$fail_file"
+    fi
+  done
+
+  if (( removed_any == 0 )); then
+    log "SKIP: no matches for letter '${letter}'"
+  fi
 }
 
 export -f cleanup_letter
-export cwd
+export -f log
+export -f timestamp
+export cwd log_file fail_file
+
+log "Starting cleanup in $cwd/node_modules ..."
+
+running=0
 
 for letter in $(printf "%s\n" {a..z} | shuf); do
   cleanup_letter "$letter" &
 
-  while (( $(jobs -r | wc -l) >= max_jobs )); do
+  ((running++))
+
+  if (( running >= max_jobs )); then
     wait -n
-  done
+    ((running--))
+  fi
 done
 
 wait
 
-rm -rf "${cwd}/node_modules"
-echo "Done. node_modules fully removed."
+log "Letter cleanup done. Running final node_modules removal..."
+
+# final cleanup
+if rm -rf "${cwd}/node_modules"; then
+  log "SUCCESS: removed full node_modules"
+else
+  log "FAIL: failed to remove full node_modules"
+  echo "${cwd}/node_modules" >> "$fail_file"
+fi
+
+log "DONE."
+
+# summary report
+echo ""
+echo "================ SUMMARY ================"
+echo "Log file: $log_file"
+
+if [[ -s "$fail_file" ]]; then
+  echo "Some failures occurred:"
+  cat "$fail_file"
+else
+  echo "No failures detected."
+fi
+
+echo "========================================"

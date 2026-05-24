@@ -16,6 +16,22 @@ const argv = minimist(process.argv.slice(2), {
   }
 });
 
+// -------------------------
+// helper: safe exit code
+// -------------------------
+function getExitCode() {
+  const code = argv['exit-code'];
+
+  if (code === undefined) return 1;
+
+  const num = Number(code);
+
+  return Number.isNaN(num) ? 1 : num;
+}
+
+// -------------------------
+// help
+// -------------------------
 if (argv.help) {
   console.log(`
 Usage:
@@ -23,7 +39,7 @@ Usage:
 
 Options:
   -h, --help            Show help
-  --exit-code=<code>   Exit code when file not found or invalid (default: 1)
+  --exit-code=<code>    Exit code when file not found or invalid (default: 1)
 
 Examples:
   node run.js test.php
@@ -44,20 +60,29 @@ Supported extensions:
   process.exit(0);
 }
 
+// -------------------------
+// validate input
+// -------------------------
 const filename = argv._[0];
 
 if (!filename) {
   console.error('No file specified. Use --help for usage.');
-  process.exit(Number(argv['exit-code']) || 1);
+  process.exit(getExitCode());
 }
 
 const filepath = path.resolve(filename);
 
+// -------------------------
+// file existence check
+// -------------------------
 if (!fs.existsSync(filepath)) {
   console.error(`File not found: ${filepath}`);
-  process.exit(Number(argv['exit-code']) || 1);
+  process.exit(getExitCode());
 }
 
+// -------------------------
+// executor map
+// -------------------------
 const ext = path.extname(filepath).toLowerCase();
 
 const executors = {
@@ -78,6 +103,9 @@ if (!executor) {
   process.exit(1);
 }
 
+// -------------------------
+// spawn config
+// -------------------------
 let command = executor;
 let args = [filepath];
 
@@ -90,6 +118,9 @@ const child = spawn(command, args, {
   shell: process.platform === 'win32'
 });
 
+// -------------------------
+// exit handling
+// -------------------------
 child.on('exit', (code) => {
   process.exit(code ?? 0);
 });

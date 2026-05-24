@@ -49,9 +49,6 @@
   "code-runner.runInTerminal": true,
   "code-runner.saveAllFilesBeforeRun": true,
   "code-runner.executorMapByGlob": {
-    "electron-*.ts": "cross-env-shell NODE_ENV=development electron -r ts-node/register",
-    "*.py": "python -u",
-    "*.electron.js": "cross-env-shell NODE_ENV=development electron -r ts-node/register",
     "*.test.{js,ts,jsx}": "npm test -- --testPathPatterns=$fileName",
     "*.test.cjs": "test-cjs --testPathPatterns=\"$fileName\"",
     "*.test.mjs": "test-esm --testPathPatterns=\"$fileName\""
@@ -197,5 +194,10 @@
   "eslint.codeActionsOnSave.mode": "all",
   "eslint.lintTask.enable": false,
   "eslint.onIgnoredFiles": "off",
-  "eslint.run": "onSave"
+  "eslint.run": "onSave",
+  "python.analysis.extraPaths": ["c:\\Users\\Dell\\.vscode\\extensions\\continue.continue-0.0.412-win32-x64"],
+  "python.autoComplete.extraPaths": ["c:\\Users\\Dell\\.vscode\\extensions\\continue.continue-0.0.412-win32-x64"],
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  }
 }

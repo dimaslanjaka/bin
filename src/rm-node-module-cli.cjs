@@ -1,14 +1,14 @@
-const path = require("upath");
-const fs = require("fs-extra");
-const minimist = require("minimist");
-const glob = require("glob");
-const ansiColors = require("ansi-colors");
-const { cleanUp } = require("./rm-node-modules.cjs");
+const path = require('upath');
+const fs = require('fs-extra');
+const minimist = require('minimist');
+const glob = require('glob');
+const ansiColors = require('ansi-colors');
+const { cleanUp } = require('./rm-node-modules.cjs');
 
 const argv = minimist(process.argv.slice(2), {
-  boolean: ["h", "help", "force"],
+  boolean: ['h', 'help', 'force'],
   alias: {
-    h: "help"
+    h: 'help'
   }
 });
 
@@ -46,7 +46,7 @@ async function main() {
     return;
   }
 
-  const pkgJsonPath = path.resolve(process.cwd(), argv.workspace, "package.json");
+  const pkgJsonPath = path.resolve(process.cwd(), argv.workspace, 'package.json');
   if (!fs.existsSync(pkgJsonPath)) {
     console.error(`Error: package.json not found in workspace directory: ${ansiColors.red(argv.workspace)}`);
     process.exitCode = 1;
@@ -54,16 +54,16 @@ async function main() {
   }
 
   /** @type {string[]} */
-  const workspaces = (JSON.parse(fs.readFileSync(pkgJsonPath, "utf-8")).workspaces || []).flatMap((workspace) => {
+  const workspaces = (JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8')).workspaces || []).flatMap((workspace) => {
     return glob.sync(workspace, {
       cwd: process.cwd(),
       absolute: true,
-      ignore: ["**/node_modules/**", "**/dist/**", "**/build/**"]
+      ignore: ['**/node_modules/**', '**/dist/**', '**/build/**']
     });
   });
 
   for (const workspacePath of workspaces) {
-    if (fs.existsSync(path.join(workspacePath, "package.json"))) {
+    if (fs.existsSync(path.join(workspacePath, 'package.json'))) {
       console.log(`Cleaning node_modules in workspace: ${ansiColors.cyan(workspacePath)}`);
       await cleanUp(workspacePath, { dryRun: !argv.force });
     } else {

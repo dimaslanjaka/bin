@@ -1,4 +1,4 @@
-import https from "node:https";
+import https from 'node:https';
 
 /**
  * Check whether a GitHub token is valid.
@@ -7,20 +7,20 @@ import https from "node:https";
  * @returns {Promise<boolean>}
  */
 export async function isGitHubTokenValid(token) {
-  if (!token || typeof token !== "string") {
+  if (!token || typeof token !== 'string') {
     return false;
   }
 
   return new Promise((resolve) => {
     const req = https.request(
       {
-        hostname: "api.github.com",
-        path: "/user",
-        method: "GET",
+        hostname: 'api.github.com',
+        path: '/user',
+        method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,
-          "User-Agent": "github-token-validator",
-          Accept: "application/vnd.github+json"
+          'User-Agent': 'github-token-validator',
+          Accept: 'application/vnd.github+json'
         }
       },
       (res) => {
@@ -32,7 +32,7 @@ export async function isGitHubTokenValid(token) {
       }
     );
 
-    req.on("error", () => resolve(false));
+    req.on('error', () => resolve(false));
     req.end();
   });
 }

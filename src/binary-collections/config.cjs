@@ -12,10 +12,10 @@
  * const myTempPath = getTempPath('my-module', 'output.txt');
  */
 
-const path = require("path");
-const { findEnvWithToken } = require("../utils/findEnvFiles.cjs");
+const path = require('path');
+const { findEnvWithToken } = require('../utils/findEnvFiles.cjs');
 
-require("dotenv").config({ path: findEnvWithToken(), quiet: true, overwrite: true });
+require('dotenv').config({ path: findEnvWithToken(), quiet: true, overwrite: true });
 
 /**
  * Get the base temporary directory path
@@ -23,7 +23,7 @@ require("dotenv").config({ path: findEnvWithToken(), quiet: true, overwrite: tru
  * @returns {string} The base temporary directory path
  */
 function getTempDir() {
-  return process.env.TEMP_DIR || path.join(process.cwd(), "tmp");
+  return process.env.TEMP_DIR || path.join(process.cwd(), 'tmp');
 }
 
 /**

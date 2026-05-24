@@ -1,17 +1,17 @@
-import babel from "@rollup/plugin-babel";
-import commonjs from "@rollup/plugin-commonjs";
-import json from "@rollup/plugin-json";
-import { nodeResolve } from "@rollup/plugin-node-resolve";
-import color from "ansi-colors";
-import path from "upath";
-import pkgJson from "./package.json" with { type: "json" };
-import * as glob from "glob";
-import fs from "fs";
+import babel from '@rollup/plugin-babel';
+import commonjs from '@rollup/plugin-commonjs';
+import json from '@rollup/plugin-json';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import color from 'ansi-colors';
+import path from 'upath';
+import pkgJson from './package.json' with { type: 'json' };
+import * as glob from 'glob';
+import fs from 'fs';
 
 const { dependencies = {}, devDependencies = {} } = pkgJson;
 
 // Packages that should be bundled (from tsup config)
-const bundledPackages = ["p-limit", "deepmerge-ts", "hexo-is", "is-stream", "markdown-it", "node-cache"];
+const bundledPackages = ['p-limit', 'deepmerge-ts', 'hexo-is', 'is-stream', 'markdown-it', 'node-cache'];
 
 const externalPackages = [...Object.keys(dependencies), ...Object.keys(devDependencies)].filter((pkgName) => {
   return !bundledPackages.includes(pkgName);
@@ -27,27 +27,27 @@ const externalPackages = [...Object.keys(dependencies), ...Object.keys(devDepend
  */
 function entryFileNamesWithExt(ext) {
   // Ensure the extension does not start with a dot
-  if (ext.startsWith(".")) {
+  if (ext.startsWith('.')) {
     ext = ext.slice(1);
   }
   return function ({ facadeModuleId }) {
     facadeModuleId = path.toUnix(facadeModuleId);
-    if (!facadeModuleId.includes("node_modules")) {
+    if (!facadeModuleId.includes('node_modules')) {
       return `[name].${ext}`;
     }
     // Find the first occurrence of 'node_modules' and slice from there
-    const nodeModulesIdx = facadeModuleId.indexOf("node_modules");
+    const nodeModulesIdx = facadeModuleId.indexOf('node_modules');
     let rel = facadeModuleId.slice(nodeModulesIdx);
-    rel = rel.replace("node_modules", "dependencies");
+    rel = rel.replace('node_modules', 'dependencies');
     // Remove extension using upath.extname
     rel = rel.slice(0, -path.extname(rel).length) + `.${ext}`;
     // Remove any null bytes (\x00) that may be present (Rollup sometimes injects these)
-    rel = rel.replace(/\0/g, "");
+    rel = rel.replace(/\0/g, '');
     // Remove any leading slashes
-    rel = rel.replace(/^\/\/+/, "");
+    rel = rel.replace(/^\/\/+/, '');
 
     fs.appendFileSync(
-      "tmp/rollup.log",
+      'tmp/rollup.log',
       `entryFileNamesWithExt:\n  [facadeModuleId] ${facadeModuleId}\n  [rel] ${rel}\n`
     );
     return rel;
@@ -65,16 +65,16 @@ function entryFileNamesWithExt(ext) {
 function chunkFileNamesWithExt(ext) {
   return function ({ name }) {
     // For node_modules chunks, place in dependencies folder
-    if (name && name.includes("node_modules")) {
-      const nodeModulesIdx = name.indexOf("node_modules");
+    if (name && name.includes('node_modules')) {
+      const nodeModulesIdx = name.indexOf('node_modules');
       let rel = name.slice(nodeModulesIdx);
-      rel = rel.replace("node_modules", "dependencies");
+      rel = rel.replace('node_modules', 'dependencies');
       // Remove extension using upath.extname
       rel = rel.slice(0, -path.extname(rel).length);
       // Remove any null bytes (\x00) that may be present
-      rel = rel.replace(/\0/g, "");
+      rel = rel.replace(/\0/g, '');
       // Remove any leading slashes
-      rel = rel.replace(/^\/\/+/, "");
+      rel = rel.replace(/^\/\/+/, '');
       return `${rel}-[hash].${ext}`;
     }
     // For local chunks, keep the default pattern
@@ -97,16 +97,16 @@ function externalPackagesFilter(source, importer, isResolved) {
     const nm = /node_modules[\\/]+([^\\/]+)(?:[\\/]+([^\\/]+))?/.exec(source);
     if (nm) {
       // Scoped package
-      if (nm[1].startsWith("@") && nm[2]) {
-        return nm[1] + "/" + nm[2];
+      if (nm[1].startsWith('@') && nm[2]) {
+        return nm[1] + '/' + nm[2];
       }
       return nm[1];
     }
     // Handle bare imports
-    if (source.startsWith("@")) {
-      return source.split("/").slice(0, 2).join("/");
+    if (source.startsWith('@')) {
+      return source.split('/').slice(0, 2).join('/');
     }
-    return source.split("/")[0];
+    return source.split('/')[0];
   }
 
   const pkgName = getPackageNameFromSource(source);
@@ -115,16 +115,16 @@ function externalPackagesFilter(source, importer, isResolved) {
 
   if (bundledPackages.some((pkg) => source.includes(pkg))) {
     // Helper to color booleans
-    const boolColor = (val) => (val ? color.green("true") : color.red("false"));
+    const boolColor = (val) => (val ? color.green('true') : color.red('false'));
     const treeLog = [
-      color.bold(color.cyan("externalFilter")),
-      `\t├─ ${color.cyan("source:")}     ${color.yellow(source)}`,
-      `\t├─ ${color.cyan("pkgName:")}    ${color.yellow(pkgName)}`,
-      `\t├─ ${color.cyan("external:")}   ${boolColor(isExternal)}`,
-      `\t├─ ${color.cyan("bundled:")}    ${boolColor(isBundled)}`,
-      `\t├─ ${color.cyan("importer:")}   ${color.yellow((importer || "-").replace(process.cwd(), "").replace(/^\//, ""))}`,
-      `\t└─ ${color.cyan("isResolved:")} ${boolColor(isResolved)}`
-    ].join("\n");
+      color.bold(color.cyan('externalFilter')),
+      `\t├─ ${color.cyan('source:')}     ${color.yellow(source)}`,
+      `\t├─ ${color.cyan('pkgName:')}    ${color.yellow(pkgName)}`,
+      `\t├─ ${color.cyan('external:')}   ${boolColor(isExternal)}`,
+      `\t├─ ${color.cyan('bundled:')}    ${boolColor(isBundled)}`,
+      `\t├─ ${color.cyan('importer:')}   ${color.yellow((importer || '-').replace(process.cwd(), '').replace(/^\//, ''))}`,
+      `\t└─ ${color.cyan('isResolved:')} ${boolColor(isResolved)}`
+    ].join('\n');
     console.log(treeLog);
   }
 
@@ -137,7 +137,7 @@ function externalPackagesFilter(source, importer, isResolved) {
  * @type {import('rollup').RollupOptions[]}
  */
 const configs = [];
-const inputs = glob.sync("src/**/*", { nodir: true });
+const inputs = glob.sync('src/**/*', { nodir: true });
 
 for (let input of inputs) {
   input = path.toUnix(input);
@@ -148,22 +148,22 @@ for (let input of inputs) {
     input,
     output: [
       {
-        format: "esm",
-        dir: "lib",
-        entryFileNames: entryFileNamesWithExt("mjs"),
-        entryChunkFileNames: chunkFileNamesWithExt("mjs")
+        format: 'esm',
+        dir: 'lib',
+        entryFileNames: entryFileNamesWithExt('mjs'),
+        entryChunkFileNames: chunkFileNamesWithExt('mjs')
       },
       {
-        format: "cjs",
-        dir: "lib",
-        entryFileNames: entryFileNamesWithExt("cjs"),
-        entryChunkFileNames: chunkFileNamesWithExt("cjs")
+        format: 'cjs',
+        dir: 'lib',
+        entryFileNames: entryFileNamesWithExt('cjs'),
+        entryChunkFileNames: chunkFileNamesWithExt('cjs')
       }
     ],
     external: externalPackagesFilter,
     plugins: [
       nodeResolve({
-        extensions: [".js", ".ts", ".cjs", ".mjs", ".json", ".node"],
+        extensions: ['.js', '.ts', '.cjs', '.mjs', '.json', '.node'],
         preferBuiltins: true
       }),
       commonjs({
@@ -174,19 +174,19 @@ for (let input of inputs) {
   };
 
   // Add Babel plugin for TypeScript files
-  if (input.endsWith(".ts")) {
+  if (input.endsWith('.ts')) {
     rollupConfig.plugins.push(
       babel({
-        babelHelpers: "bundled",
-        extensions: [".js", ".ts", ".cjs", ".mjs"],
-        exclude: "**/node_modules/**",
+        babelHelpers: 'bundled',
+        extensions: ['.js', '.ts', '.cjs', '.mjs'],
+        exclude: '**/node_modules/**',
         presets: [
-          "@babel/preset-typescript",
+          '@babel/preset-typescript',
           [
-            "@babel/preset-env",
+            '@babel/preset-env',
             {
               targets: {
-                node: "14"
+                node: '14'
               }
             }
           ]

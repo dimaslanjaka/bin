@@ -1,5 +1,5 @@
-const { get_caches, deleteGitHubActionsCache } = require("./clean-github-actions-caches.cjs");
-const { parseGitRemotes } = require("./utils/index.cjs");
+const { get_caches, deleteGitHubActionsCache } = require('./clean-github-actions-caches.cjs');
+const { parseGitRemotes } = require('./utils/index.cjs');
 
 /**
  * Deletes old GitHub Actions caches for the current repository (origin remote),

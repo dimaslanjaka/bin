@@ -1,14 +1,14 @@
-const fs = require("fs");
-const path = require("path");
-const { EOL } = require("os");
-const { getArgs } = require("./utils/index.cjs");
-const spawn = require("child_process").spawn;
+const fs = require('fs');
+const path = require('path');
+const { EOL } = require('os');
+const { getArgs } = require('./utils/index.cjs');
+const spawn = require('child_process').spawn;
 
-const pkgPath = path.join(process.cwd(), "package.json");
+const pkgPath = path.join(process.cwd(), 'package.json');
 if (!fs.existsSync(pkgPath)) {
   throw new Error(`package.json not found at ${pkgPath}`);
 }
-const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
 
 const args = getArgs();
 
@@ -42,21 +42,21 @@ function showHelp() {
  */
 const gitExec = (command) =>
   new Promise((resolve, reject) => {
-    const thread = spawn("git", command, { stdio: ["inherit", "pipe", "pipe"] });
+    const thread = spawn('git', command, { stdio: ['inherit', 'pipe', 'pipe'] });
     const stdOut = [];
     const stdErr = [];
 
-    thread.stdout.on("data", (data) => {
-      stdOut.push(data.toString("utf8"));
+    thread.stdout.on('data', (data) => {
+      stdOut.push(data.toString('utf8'));
     });
 
-    thread.stderr.on("data", (data) => {
-      stdErr.push(data.toString("utf8"));
+    thread.stderr.on('data', (data) => {
+      stdErr.push(data.toString('utf8'));
     });
 
-    thread.on("close", () => {
+    thread.on('close', () => {
       if (stdErr.length) {
-        reject(stdErr.join(""));
+        reject(stdErr.join(''));
         return;
       }
       resolve(stdOut.join());
@@ -89,48 +89,48 @@ function extractVersions(str) {
 // Now includes author and committer name/email in the log format
 (async () => {
   const log = await gitExec([
-    "log",
-    "--reverse",
+    'log',
+    '--reverse',
     `--pretty=format:"=!=%h !|! %ad !|! %an !|! %cn !|! %s !|! %B !|! %d=!="`,
     `--date=format:"%Y-%m-%d %H:%M:%S"`
   ]);
   let markdown = `## CHANGELOG of ${pkg.name}\n\n`;
-  const repo = await gitExec(["remote", "get-url", "origin"]);
-  const repoUrl = repo.trim().replace(/\.git$/, "");
+  const repo = await gitExec(['remote', 'get-url', 'origin']);
+  const repoUrl = repo.trim().replace(/\.git$/, '');
   console.log(`Repository URL: ${repoUrl}`);
 
   const matches = [...log.matchAll(/=!=(.*?)(?:=!=|=!=,)/gs)];
   const results = matches.map((m) => m[1].trim());
   /** @type {Record<string, string[]>} */
   const versionsCommits = {};
-  let currentVersionCommit = "";
+  let currentVersionCommit = '';
   for (const str of results) {
-    const splitx = str.split("!|!").map((s) => s.trim());
+    const splitx = str.split('!|!').map((s) => s.trim());
     // Now splitx: [hash, date, authorName, committerName, summary, message, ref]
     const o = {
-      hash: splitx[0] ? splitx[0] : "",
-      date: splitx[1] ? splitx[1].replace(/^"|"$/g, "") : "",
-      authorName: splitx[2] ? splitx[2] : "",
-      committerName: splitx[3] ? splitx[3] : "",
-      summary: splitx[4] ? splitx[4] : "",
-      message: splitx[5] ? splitx[5] : "",
-      ref: splitx[6] ? splitx[6] : ""
+      hash: splitx[0] ? splitx[0] : '',
+      date: splitx[1] ? splitx[1].replace(/^"|"$/g, '') : '',
+      authorName: splitx[2] ? splitx[2] : '',
+      committerName: splitx[3] ? splitx[3] : '',
+      summary: splitx[4] ? splitx[4] : '',
+      message: splitx[5] ? splitx[5] : '',
+      ref: splitx[6] ? splitx[6] : ''
     };
     let isBumped =
       /chore\(bump\)|chore: release/i.test(o.summary) || /release/i.test(o.summary) || /tag: v/i.test(o.summary);
-    if (o.summary.trim().startsWith("v")) {
+    if (o.summary.trim().startsWith('v')) {
       isBumped = true; // Treat any commit starting with 'v' as a version bump
     }
     if (/^\d+\.\d+\.\d+$/.test(o.summary.trim())) {
       isBumped = true; // Treat commits with version format as version bumps
     }
-    if (o.summary.trim().startsWith("fix:")) {
+    if (o.summary.trim().startsWith('fix:')) {
       isBumped = false; // Do not treat 'fix:' commits as version bumps
     }
     if (isBumped && !extractVersions(o.summary).length > 0) isBumped = false; // Ensure we have a version in the summary
     if (o.hash && o.date && o.message) {
       // Skip commits by dependabot[bot]
-      if (o.authorName === "dependabot[bot]") {
+      if (o.authorName === 'dependabot[bot]') {
         continue;
       }
       // Skip commits by regex
@@ -146,13 +146,13 @@ function extractVersions(str) {
         continue;
       }
       if (/initial commit/i.test(o.message)) {
-        versionsCommits["0.0.0"] = [];
-        currentVersionCommit = "0.0.0";
+        versionsCommits['0.0.0'] = [];
+        currentVersionCommit = '0.0.0';
         continue;
       }
       if (isBumped) {
         console.log(`Detected version bump: ${o.summary}`);
-        const v = extractVersions(o.message).join(", ");
+        const v = extractVersions(o.message).join(', ');
         versionsCommits[v] = [];
         currentVersionCommit = v;
       } else {
@@ -160,7 +160,7 @@ function extractVersions(str) {
           throw new Error(`No current version commit set for message: ${o.message} (hash: ${o.hash})`);
         }
         // Remove all trailing quotes, spaces, and commas from message
-        const cleanMsg = o.message.replace(/["'\s,]+$/g, "");
+        const cleanMsg = o.message.replace(/["'\s,]+$/g, '');
         // Overwrite previous entry if message is duplicated (keep latest hash)
         const commitsArr = versionsCommits[currentVersionCommit];
         // Find index of previous entry with the same message (message is now on the line after the metadata)
@@ -168,9 +168,9 @@ function extractVersions(str) {
           // Extract the message part (after the first empty line)
           const parts = entry.split(/\r?\n/);
           // Find the first non-empty line after the metadata line
-          let msgLine = "";
+          let msgLine = '';
           for (let i = 1; i < parts.length; i++) {
-            if (parts[i].trim() !== "") {
+            if (parts[i].trim() !== '') {
               msgLine = parts[i].trim();
               break;
             }
@@ -179,7 +179,7 @@ function extractVersions(str) {
         });
         // Add changelog entry without author/committer info
         let newEntry;
-        if (cleanMsg.includes("\n")) {
+        if (cleanMsg.includes('\n')) {
           // Multiline message: put message on new line
           newEntry = `- [ _${o.date}_ ] [${o.hash}](<${repoUrl}/commit/${o.hash}>)` + EOL + EOL + `${cleanMsg}`;
         } else {
@@ -198,8 +198,8 @@ function extractVersions(str) {
 
   // Iterate versionsCommits in reverse order
   const versions = Object.keys(versionsCommits).sort((a, b) => {
-    const aParts = a.split(".").map(Number);
-    const bParts = b.split(".").map(Number);
+    const aParts = a.split('.').map(Number);
+    const bParts = b.split('.').map(Number);
     for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
       const aPart = aParts[i] || 0; // Default to 0 if part is missing
       const bPart = bParts[i] || 0; // Default to 0 if part is missing
@@ -215,7 +215,7 @@ function extractVersions(str) {
       markdown += versionsCommits[version]
         .map((str) => {
           const lines = str.trim().split(/\r?\n/);
-          return [lines[0], ...lines.slice(1).map((line) => "    " + line)].join(EOL);
+          return [lines[0], ...lines.slice(1).map((line) => '    ' + line)].join(EOL);
         })
         .join(EOL);
     } else {
@@ -224,9 +224,9 @@ function extractVersions(str) {
     }
   }
 
-  fs.mkdirSync(path.join(__dirname, "tmp"), { recursive: true });
-  fs.writeFileSync(path.join(__dirname, "tmp/original.md"), log);
-  fs.writeFileSync(path.join(__dirname, "CHANGELOG.md"), markdown);
+  fs.mkdirSync(path.join(__dirname, 'tmp'), { recursive: true });
+  fs.writeFileSync(path.join(__dirname, 'tmp/original.md'), log);
+  fs.writeFileSync(path.join(__dirname, 'CHANGELOG.md'), markdown);
   console.log(`Original log written to tmp/original.md`);
   console.log(`Changelog updated successfully. You can find it at CHANGELOG.md`);
 })();

@@ -1,4 +1,4 @@
-const { execSync, spawnSync } = require("child_process");
+const { execSync, spawnSync } = require('child_process');
 /**
  * Execute a git command with proper error handling and logging
  * @param {string[]} args - Git command arguments
@@ -8,7 +8,7 @@ const { execSync, spawnSync } = require("child_process");
 function runGitCommand(args, description) {
   try {
     console.log(`[i] ${description}`);
-    const result = spawnSync("git", args, { encoding: "utf-8" });
+    const result = spawnSync('git', args, { encoding: 'utf-8' });
     if (result.status !== 0) {
       console.error(`[✗] Failed: ${description}`);
       console.error(`Error: ${result.stderr || result.stdout}`);
@@ -29,9 +29,9 @@ function runGitCommand(args, description) {
  * @returns {boolean} - True if in a git repository, false otherwise
  */
 function isGitRepository(cwd) {
-  const dir = typeof cwd === "string" ? cwd : process.cwd();
+  const dir = typeof cwd === 'string' ? cwd : process.cwd();
   try {
-    execSync("git rev-parse --git-dir", { stdio: "pipe", cwd: dir });
+    execSync('git rev-parse --git-dir', { stdio: 'pipe', cwd: dir });
     return true;
   } catch {
     return false;
@@ -47,7 +47,7 @@ function isGitRepository(cwd) {
 function runGitCommandOutput(args, description) {
   try {
     console.log(`[i] ${description}`);
-    const result = spawnSync("git", args, { encoding: "utf-8" });
+    const result = spawnSync('git', args, { encoding: 'utf-8' });
     if (result.status !== 0) {
       console.error(`[✗] Failed: ${description}`);
       console.error(`Error: ${result.stderr || result.stdout}`);

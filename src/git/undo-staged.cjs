@@ -1,9 +1,9 @@
-const { runGitCommand } = require("./utils.cjs");
+const { runGitCommand } = require('./utils.cjs');
 
 function undoStagedChanges() {
-  console.log("\n=== Undoing Staged Changes ===");
+  console.log('\n=== Undoing Staged Changes ===');
 
-  runGitCommand(["reset", "HEAD", "."], "Undo staged changes");
+  runGitCommand(['reset', 'HEAD', '.'], 'Undo staged changes');
 }
 
 module.exports = {

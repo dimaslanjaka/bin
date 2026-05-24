@@ -1,15 +1,15 @@
-const fs = require("fs");
+const fs = require('fs');
 const fsp = fs.promises;
-const path = require("path");
-const os = require("os");
-const minimist = require("minimist");
+const path = require('path');
+const os = require('os');
+const minimist = require('minimist');
 
 // ----------------------
 // CLI
 // ----------------------
 const argv = minimist(process.argv.slice(2), {
-  boolean: ["force", "help"],
-  alias: { h: "help", f: "force", c: "concurrent" },
+  boolean: ['force', 'help'],
+  alias: { h: 'help', f: 'force', c: 'concurrent' },
   default: { force: false, concurrent: 2 }
 });
 
@@ -27,9 +27,9 @@ const CONCURRENCY = Math.max(1, Number(argv.concurrent || argv.c || defaultConcu
 // ----------------------
 // CONSTANTS
 // ----------------------
-const customChars = "@.";
-const vowels = "aeiouAEIOU";
-const alnum = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+const customChars = '@.';
+const vowels = 'aeiouAEIOU';
+const alnum = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 const combined = alnum + vowels + customChars;
 
 const ROOT = process.cwd();
@@ -47,20 +47,20 @@ async function isSymlinkAsync(p) {
 
 async function removeAsync(target) {
   if (await isSymlinkAsync(target)) {
-    console.log("Skipping symlink", target);
+    console.log('Skipping symlink', target);
     return;
   }
 
   if (DRY_RUN) {
-    console.log("Would remove", target);
+    console.log('Would remove', target);
     return;
   }
 
   try {
     await fsp.rm(target, { recursive: true, force: true });
-    console.log("Deleting", target);
+    console.log('Deleting', target);
   } catch (e) {
-    console.error("Failed:", target, e.message);
+    console.error('Failed:', target, e.message);
   }
 }
 
@@ -114,12 +114,12 @@ function walk(dir, callback, { skipNodeModulesChildren = false } = {}) {
     if (entry.isSymbolicLink()) continue;
 
     // skip inside node_modules/*
-    if (skipNodeModulesChildren && dir.includes("node_modules")) continue;
+    if (skipNodeModulesChildren && dir.includes('node_modules')) continue;
 
     callback(fullPath, entry);
 
     if (entry.isDirectory()) {
-      if (skipNodeModulesChildren && entry.name === "node_modules") {
+      if (skipNodeModulesChildren && entry.name === 'node_modules') {
         continue;
       }
       walk(fullPath, callback, { skipNodeModulesChildren });
@@ -131,7 +131,7 @@ function walk(dir, callback, { skipNodeModulesChildren = false } = {}) {
 // NODE_MODULES HANDLER
 // ----------------------
 async function processNodeModules(dir) {
-  console.log("Found:", dir);
+  console.log('Found:', dir);
 
   let items;
   try {
@@ -149,7 +149,7 @@ async function processNodeModules(dir) {
 
     // 🚫 skip symlinks entirely (Dirent gives this cheaply)
     if (entry.isSymbolicLink && entry.isSymbolicLink()) {
-      console.log("Skipping symlink", target);
+      console.log('Skipping symlink', target);
       return;
     }
 
@@ -170,7 +170,7 @@ async function main() {
 
   // find node_modules
   walk(ROOT, (fullPath, entry) => {
-    if (entry.isDirectory() && entry.name === "node_modules") {
+    if (entry.isDirectory() && entry.name === 'node_modules') {
       nodeModulesDirs.push(fullPath);
     }
   });
@@ -191,19 +191,19 @@ async function main() {
     ROOT,
     (fullPath, entry) => {
       const base = path.basename(fullPath);
-      if (base === "package-lock.json") packageLocks.push(fullPath);
-      if (base === "yarn.lock") yarnLocks.push(fullPath);
-      if (entry.isDirectory() && fullPath.endsWith(path.join(".yarn", "cache"))) yarnCaches.push(fullPath);
+      if (base === 'package-lock.json') packageLocks.push(fullPath);
+      if (base === 'yarn.lock') yarnLocks.push(fullPath);
+      if (entry.isDirectory() && fullPath.endsWith(path.join('.yarn', 'cache'))) yarnCaches.push(fullPath);
     },
     { skipNodeModulesChildren: true }
   );
 
   if (DRY_RUN) {
-    console.log("Would remove package-lock.json files:");
+    console.log('Would remove package-lock.json files:');
     for (const p of packageLocks) console.log(p);
-    console.log("Would remove yarn.lock files:");
+    console.log('Would remove yarn.lock files:');
     for (const p of yarnLocks) console.log(p);
-    console.log("Would remove .yarn/cache directories:");
+    console.log('Would remove .yarn/cache directories:');
     for (const p of yarnCaches) console.log(p);
   } else {
     const allTasks = [];

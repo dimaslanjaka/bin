@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-const path = require("upath");
-const { getArgs } = require("./utils/index.cjs");
-const findScript = require("./binary-collections/findScript.cjs");
-const executeScript = require("./binary-collections/executeScript.cjs");
+const path = require('upath');
+const { getArgs } = require('./utils/index.cjs');
+const findScript = require('./binary-collections/findScript.cjs');
+const executeScript = require('./binary-collections/executeScript.cjs');
 
 /**
  * Main binary-collections script that dynamically finds and executes other scripts
@@ -17,21 +17,21 @@ const executeScript = require("./binary-collections/executeScript.cjs");
  * @returns {void} Exits the process after displaying help
  */
 function showHelp() {
-  console.log("🚀 Binary Collections - Dynamic Script Runner");
-  console.log("═══════════════════════════════════════════════");
-  console.log("");
-  console.log("📋 Usage: npx binary-collections <script-name> [...args]");
-  console.log("");
-  console.log("✨ Examples:");
-  console.log("  📊 npx binary-collections git-diff -s");
-  console.log("  🧹 npx binary-collections del-node-modules");
-  console.log("  🔍 npx binary-collections find-node-modules --help");
-  console.log("");
+  console.log('🚀 Binary Collections - Dynamic Script Runner');
+  console.log('═══════════════════════════════════════════════');
+  console.log('');
+  console.log('📋 Usage: npx binary-collections <script-name> [...args]');
+  console.log('');
+  console.log('✨ Examples:');
+  console.log('  📊 npx binary-collections git-diff -s');
+  console.log('  🧹 npx binary-collections del-node-modules');
+  console.log('  🔍 npx binary-collections find-node-modules --help');
+  console.log('');
   console.log("ℹ️  This tool will search for <script-name>.{cjs,js,mjs} in the script's directory");
-  console.log("   and execute it with the provided arguments.");
-  console.log("");
-  console.log("⚙️  Options:");
-  console.log("  --help, -h    Show this help message");
+  console.log('   and execute it with the provided arguments.');
+  console.log('');
+  console.log('⚙️  Options:');
+  console.log('  --help, -h    Show this help message');
   process.exit(0);
 }
 
@@ -53,10 +53,10 @@ function main() {
 
   const scriptName = positional[0];
   // console.log(`🔍 Looking for script: ${scriptName}`);
-  if (scriptName === "list") {
-    const listScript = require("./binary-collections/listScript.cjs");
+  if (scriptName === 'list') {
+    const listScript = require('./binary-collections/listScript.cjs');
     const scripts = listScript();
-    console.log("📋 Available scripts:");
+    console.log('📋 Available scripts:');
     scripts.forEach((script) => {
       console.log(`  - ${path.basename(script.name)} -> ${script.path}`);
     });
@@ -72,9 +72,9 @@ function main() {
 
   // Add flag arguments back
   Object.keys(args).forEach((key) => {
-    if (key !== "_") {
+    if (key !== '_') {
       const value = args[key];
-      if (typeof value === "boolean" && value) {
+      if (typeof value === 'boolean' && value) {
         // Add boolean flags like -s, --help, -h
         scriptArgs.push(key.length === 1 ? `-${key}` : `--${key}`);
       } else if (value !== true && value !== false) {
@@ -91,8 +91,8 @@ function main() {
   if (!scriptPath) {
     console.error(`❌ Error: Script "${scriptName}" not found.`);
     console.error(`🔍 Searched for: ${scriptName}.{cjs,js,mjs} in ${__dirname}`);
-    console.error("");
-    console.error("📝 Available extensions: .cjs, .js, .mjs");
+    console.error('');
+    console.error('📝 Available extensions: .cjs, .js, .mjs');
     process.exit(1);
   }
 
@@ -103,13 +103,13 @@ function main() {
 }
 
 // Handle uncaught exceptions
-process.on("uncaughtException", (error) => {
-  console.error("💥 Uncaught Exception:", error.message);
+process.on('uncaughtException', (error) => {
+  console.error('💥 Uncaught Exception:', error.message);
   process.exit(1);
 });
 
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("⚠️  Unhandled Rejection at:", promise, "reason:", reason);
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('⚠️  Unhandled Rejection at:', promise, 'reason:', reason);
   process.exit(1);
 });
 

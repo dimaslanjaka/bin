@@ -1,12 +1,12 @@
-import fs from "fs-extra";
-import minimist from "minimist";
-import path from "upath";
-import removeSubmodule from "./submodule-remove.cjs";
+import fs from 'fs-extra';
+import minimist from 'minimist';
+import path from 'upath';
+import removeSubmodule from './submodule-remove.cjs';
 
 const args = minimist(process.argv.slice(2));
 const submodulePath = args._[0];
 if (!submodulePath) {
-  console.error("Usage: node submodule-remove.cjs <submodule-path>");
+  console.error('Usage: node submodule-remove.cjs <submodule-path>');
   process.exit(1);
 }
 

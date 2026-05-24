@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
-const { execSync, spawnSync } = require("child_process");
-const fs = require("fs-extra");
-const minimist = require("minimist");
+const { execSync, spawnSync } = require('child_process');
+const fs = require('fs-extra');
+const minimist = require('minimist');
 
 function run(cmd, opts = {}) {
   try {
     return execSync(cmd, {
-      encoding: "utf8",
-      stdio: "pipe",
+      encoding: 'utf8',
+      stdio: 'pipe',
       ...opts
     }).trim();
   } catch (err) {
@@ -18,20 +18,20 @@ function run(cmd, opts = {}) {
 }
 
 function getBranchName() {
-  return run("git rev-parse --abbrev-ref HEAD");
+  return run('git rev-parse --abbrev-ref HEAD');
 }
 
 function safeBranchName(name) {
-  return name.replace(/[\\/]/g, "-");
+  return name.replace(/[\\/]/g, '-');
 }
 
 function findYarn() {
   try {
-    const paths = run(process.platform === "win32" ? "where yarn" : "which yarn")
+    const paths = run(process.platform === 'win32' ? 'where yarn' : 'which yarn')
       .split(/\r?\n/)
       .filter(Boolean);
 
-    if (process.platform === "win32") {
+    if (process.platform === 'win32') {
       return paths.find((p) => /\.cmd$/i.test(p)) || paths[0] || null;
     }
 
@@ -43,12 +43,12 @@ function findYarn() {
 
 function runYarn(yarnPath, args) {
   const result =
-    process.platform === "win32"
-      ? spawnSync("cmd.exe", ["/d", "/s", "/c", yarnPath, ...args], {
-          stdio: "inherit"
+    process.platform === 'win32'
+      ? spawnSync('cmd.exe', ['/d', '/s', '/c', yarnPath, ...args], {
+          stdio: 'inherit'
         })
       : spawnSync(yarnPath, args, {
-          stdio: "inherit"
+          stdio: 'inherit'
         });
 
   if (result.error) {
@@ -75,9 +75,9 @@ Examples:
 
 function main() {
   const argv = minimist(process.argv.slice(2), {
-    boolean: ["help"],
+    boolean: ['help'],
     alias: {
-      h: "help"
+      h: 'help'
     }
   });
 
@@ -90,13 +90,13 @@ function main() {
 
   const branch = safeBranchName(getBranchName());
 
-  const yarnLock = "yarn.lock";
+  const yarnLock = 'yarn.lock';
   const branchLock = `yarn.${branch}.lock`;
 
   const yarnPath = findYarn();
 
   if (!yarnPath) {
-    console.error("Error: Yarn not found in PATH.");
+    console.error('Error: Yarn not found in PATH.');
     process.exit(1);
   }
 
@@ -112,9 +112,9 @@ function main() {
   }
 
   // Run yarn
-  const args = packages.length ? ["up", ...packages] : ["install"];
+  const args = packages.length ? ['up', ...packages] : ['install'];
 
-  console.log(`Running: yarn ${args.join(" ")}`);
+  console.log(`Running: yarn ${args.join(' ')}`);
 
   runYarn(yarnPath, args);
 

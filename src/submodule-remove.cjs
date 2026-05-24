@@ -1,9 +1,9 @@
-const { spawnAsync } = require("cross-spawn");
-const path = require("upath");
-const fs = require("fs-extra");
-const dotenv = require("dotenv");
+const { spawnAsync } = require('cross-spawn');
+const path = require('upath');
+const fs = require('fs-extra');
+const dotenv = require('dotenv');
 
-const envPath = path.resolve(process.cwd(), ".env");
+const envPath = path.resolve(process.cwd(), '.env');
 if (fs.existsSync(envPath)) {
   dotenv.config({ path: envPath, override: true, quiet: true });
 }
@@ -11,20 +11,20 @@ if (fs.existsSync(envPath)) {
 async function removeSubmodule(submodulePath) {
   // Deinitialize the submodule
   try {
-    await spawnAsync("git", ["submodule", "deinit", "-f", submodulePath], { stdio: "inherit" });
+    await spawnAsync('git', ['submodule', 'deinit', '-f', submodulePath], { stdio: 'inherit' });
   } catch (error) {
     console.warn(`Warning: Could not deinitialize submodule "${submodulePath}". It may not exist.`);
     console.warn(error.message);
   }
   // Remove the submodule entry from .git/config
   try {
-    await spawnAsync("git", ["config", "--remove-section", `submodule.${submodulePath}`], { stdio: "inherit" });
+    await spawnAsync('git', ['config', '--remove-section', `submodule.${submodulePath}`], { stdio: 'inherit' });
   } catch (error) {
     console.warn(`Warning: Could not remove git config section for submodule "${submodulePath}". It may not exist.`);
     console.warn(error.message);
   }
   // Remove the submodule from .git/modules
-  const gitModulesPath = path.resolve(".git", "modules", submodulePath);
+  const gitModulesPath = path.resolve('.git', 'modules', submodulePath);
   if (fs.existsSync(gitModulesPath)) {
     fs.rmSync(gitModulesPath, { recursive: true, force: true });
     console.log(`Removed .git/modules entry for submodule "${submodulePath}".`);
@@ -32,14 +32,14 @@ async function removeSubmodule(submodulePath) {
     console.warn(`Warning: The path "${gitModulesPath}" does not exist. Skipping removal of .git/modules entry.`);
   }
   // Remove the submodule from the .gitmodules file
-  const gitmodulesPath = path.resolve(".gitmodules");
+  const gitmodulesPath = path.resolve('.gitmodules');
   if (fs.existsSync(gitmodulesPath)) {
-    let gitmodulesContent = fs.readFileSync(gitmodulesPath, "utf-8");
+    let gitmodulesContent = fs.readFileSync(gitmodulesPath, 'utf-8');
     const submoduleSectionRegex = new RegExp(
-      `\\[submodule "${submodulePath.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")}"]([\\s\\S]*?)(?=\\[|$)`,
-      "g"
+      `\\[submodule "${submodulePath.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}"]([\\s\\S]*?)(?=\\[|$)`,
+      'g'
     );
-    gitmodulesContent = gitmodulesContent.replace(submoduleSectionRegex, "").trim();
+    gitmodulesContent = gitmodulesContent.replace(submoduleSectionRegex, '').trim();
     fs.writeFileSync(gitmodulesPath, gitmodulesContent);
     console.log(`Removed submodule "${submodulePath}" from .gitmodules.`);
   } else {

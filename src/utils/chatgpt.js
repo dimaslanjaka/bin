@@ -1,10 +1,10 @@
-import fs from "fs-extra";
-import puppeteer from "puppeteer-extra";
-import StealthPlugin from "puppeteer-extra-plugin-stealth";
-import path from "upath";
+import fs from 'fs-extra';
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import path from 'upath';
 
-const COOKIE_DIR = path.join(process.cwd(), "tmp", "cookies");
-const DEFAULT_COOKIE_PATH = path.join(COOKIE_DIR, "cookies.json");
+const COOKIE_DIR = path.join(process.cwd(), 'tmp', 'cookies');
+const DEFAULT_COOKIE_PATH = path.join(COOKIE_DIR, 'cookies.json');
 const NAVIGATION_TIMEOUT_MS = 90000;
 const NETWORK_IDLE_TIMEOUT_MS = 15000;
 const MAX_INLINE_QUESTION_FILE_BYTES = 2 * 1024;
@@ -18,7 +18,7 @@ fs.ensureDirSync(COOKIE_DIR);
  * @returns {Promise<void>} Resolves when the page is at least DOM-ready.
  */
 async function gotoWithFallback(page, url) {
-  await page.goto(url, { waitUntil: "domcontentloaded", timeout: NAVIGATION_TIMEOUT_MS });
+  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: NAVIGATION_TIMEOUT_MS });
 
   // Best effort: settle initial bursty requests without hard-failing on persistent streams.
   try {
@@ -123,7 +123,7 @@ async function navigatePage(page, url) {
       await new Promise((r) => setTimeout(r, 200)); // poll every 200ms
     }
 
-    throw new Error("DOM did not stabilize within timeout");
+    throw new Error('DOM did not stabilize within timeout');
   };
 
   return { waitForDomIdle };
@@ -162,48 +162,48 @@ async function _restoreCookies(page, cookieFilePath = DEFAULT_COOKIE_PATH) {
  * @returns {Promise<void>} Resolves when the question is written.
  */
 async function writeQuestion(page, question) {
-  const promptTextarea = await page.waitForSelector("#prompt-textarea", { timeout: 30000 });
+  const promptTextarea = await page.waitForSelector('#prompt-textarea', { timeout: 30000 });
   if (!promptTextarea) {
     console.log(
-      "Cannot find the prompt input on the webpage. Please check whether you have access to chat.openai.com without logging in via your browser."
+      'Cannot find the prompt input on the webpage. Please check whether you have access to chat.openai.com without logging in via your browser.'
     );
     return;
   }
 
   // Inject the full prompt instantly and emit input-like events so the UI reacts.
   await page.evaluate((text) => {
-    const promptEl = document.querySelector("#prompt-textarea");
+    const promptEl = document.querySelector('#prompt-textarea');
     if (!promptEl) {
       return;
     }
 
     promptEl.focus();
-    promptEl.innerHTML = "";
+    promptEl.innerHTML = '';
 
-    const lines = String(text).split("\n");
+    const lines = String(text).split('\n');
     for (const line of lines) {
-      const p = document.createElement("p");
+      const p = document.createElement('p');
       p.textContent = line;
       promptEl.appendChild(p);
     }
 
-    promptEl.dispatchEvent(new InputEvent("beforeinput", { bubbles: true, inputType: "insertFromPaste", data: text }));
-    promptEl.dispatchEvent(new InputEvent("input", { bubbles: true, inputType: "insertFromPaste", data: text }));
-    promptEl.dispatchEvent(new Event("change", { bubbles: true }));
+    promptEl.dispatchEvent(new InputEvent('beforeinput', { bubbles: true, inputType: 'insertFromPaste', data: text }));
+    promptEl.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertFromPaste', data: text }));
+    promptEl.dispatchEvent(new Event('change', { bubbles: true }));
   }, question);
 
   // If the app state did not pick up the DOM injection, use keyboard insertion as a reliable fallback.
   const hasPromptText = await page.evaluate(() => {
-    const promptEl = document.querySelector("#prompt-textarea");
+    const promptEl = document.querySelector('#prompt-textarea');
     return Boolean(promptEl && promptEl.textContent && promptEl.textContent.trim().length > 0);
   });
 
   if (!hasPromptText) {
-    console.log("Prompt state not updated by DOM injection. Falling back to keyboard insertText.");
+    console.log('Prompt state not updated by DOM injection. Falling back to keyboard insertText.');
     await promptTextarea.click({ clickCount: 1 });
-    await page.keyboard.down("Control");
-    await page.keyboard.press("KeyA");
-    await page.keyboard.up("Control");
+    await page.keyboard.down('Control');
+    await page.keyboard.press('KeyA');
+    await page.keyboard.up('Control');
     await page.keyboard.insertText(question);
   }
 }
@@ -215,7 +215,7 @@ async function writeQuestion(page, question) {
  * @returns {Promise<boolean>} Resolves to true when submission is detected, otherwise false.
  */
 async function clickSubmitButton(page) {
-  console.log("Attempting to click the submit button...");
+  console.log('Attempting to click the submit button...');
   try {
     const userMessageCountBefore = await page.$$eval(
       '[data-message-author-role="user"]',
@@ -243,12 +243,12 @@ async function clickSubmitButton(page) {
         () => {
           const candidates = [
             document.querySelector('[data-testid="fruitjuice-send-button"]'),
-            document.querySelector("#composer-submit-button"),
+            document.querySelector('#composer-submit-button'),
             document.querySelector('[data-testid="send-button"]')
           ].filter(Boolean);
 
           return candidates.some((button) => {
-            const isDisabled = button.disabled || button.getAttribute("aria-disabled") === "true";
+            const isDisabled = button.disabled || button.getAttribute('aria-disabled') === 'true';
             const isVisible = button.offsetParent !== null;
             return !isDisabled && isVisible;
           });
@@ -262,14 +262,14 @@ async function clickSubmitButton(page) {
     const buttonDetails = await page.evaluate(() => {
       const selectors = [
         '[data-testid="fruitjuice-send-button"]',
-        "#composer-submit-button",
+        '#composer-submit-button',
         '[data-testid="send-button"]'
       ];
 
       const details = selectors.map((selector) => {
         const el = document.querySelector(selector);
         const exists = Boolean(el);
-        const disabled = exists ? Boolean(el.disabled || el.getAttribute("aria-disabled") === "true") : null;
+        const disabled = exists ? Boolean(el.disabled || el.getAttribute('aria-disabled') === 'true') : null;
         const visible = exists ? el.offsetParent !== null : null;
         return { selector, exists, disabled, visible };
       });
@@ -286,7 +286,7 @@ async function clickSubmitButton(page) {
       console.log(`Clicked submit button selector: ${selectedSelector}`);
 
       if (await waitForSubmit(5000)) {
-        console.log("Submission detected after selector click.");
+        console.log('Submission detected after selector click.');
         return true;
       }
 
@@ -304,33 +304,33 @@ async function clickSubmitButton(page) {
       if (forcedClickWorked) {
         console.log(`Forced DOM click on selector: ${selectedSelector}`);
         if (await waitForSubmit(5000)) {
-          console.log("Submission detected after forced DOM click.");
+          console.log('Submission detected after forced DOM click.');
           return true;
         }
       }
     }
 
-    console.log("Submit button path did not submit. Trying Enter key fallback on prompt.");
-    await page.focus("#prompt-textarea");
-    await page.keyboard.press("Enter");
+    console.log('Submit button path did not submit. Trying Enter key fallback on prompt.');
+    await page.focus('#prompt-textarea');
+    await page.keyboard.press('Enter');
     if (await waitForSubmit(5000)) {
-      console.log("Submission detected after Enter key fallback.");
+      console.log('Submission detected after Enter key fallback.');
       return true;
     }
 
     // Final fallback: submit the nearest composer form.
     const didRequestSubmit = await page.evaluate(() => {
-      const prompt = document.querySelector("#prompt-textarea");
+      const prompt = document.querySelector('#prompt-textarea');
       if (!prompt) {
         return false;
       }
 
-      const form = prompt.closest("form");
+      const form = prompt.closest('form');
       if (!form) {
         return false;
       }
 
-      if (typeof form.requestSubmit === "function") {
+      if (typeof form.requestSubmit === 'function') {
         form.requestSubmit();
       } else {
         form.submit();
@@ -339,14 +339,14 @@ async function clickSubmitButton(page) {
     });
 
     if (didRequestSubmit) {
-      console.log("Triggered form submit fallback.");
+      console.log('Triggered form submit fallback.');
       if (await waitForSubmit(5000)) {
-        console.log("Submission detected after form submit fallback.");
+        console.log('Submission detected after form submit fallback.');
         return true;
       }
     }
 
-    console.log("Failed to submit prompt after all strategies.");
+    console.log('Failed to submit prompt after all strategies.');
     return false;
   } catch (e) {
     console.log(`Failed to click the send button: ${e}`);
@@ -382,16 +382,16 @@ async function waitForInitialResponse(page, timeout = 30000) {
     const currentMessageCount = assistantMessages.length;
     if (currentMessageCount > messageCount) {
       const lastMessage = assistantMessages[assistantMessages.length - 1];
-      const isThinking = await lastMessage.$(".result-thinking");
+      const isThinking = await lastMessage.$('.result-thinking');
       if (!isThinking) {
-        lastMessageId = await page.evaluate((element) => element.getAttribute("data-message-id"), lastMessage);
+        lastMessageId = await page.evaluate((element) => element.getAttribute('data-message-id'), lastMessage);
         messageCount = currentMessageCount;
         return;
       }
     }
     await sleep(100);
   }
-  console.log("Timed out waiting for the initial response.");
+  console.log('Timed out waiting for the initial response.');
 }
 
 /**
@@ -401,15 +401,15 @@ async function waitForInitialResponse(page, timeout = 30000) {
  * @param {string} [outputFile] - Path to save the response. Defaults to tmp/response.txt.
  * @returns {Promise<void>} Resolves when streaming is complete.
  */
-async function handleStreamingResponse(page, outputFile = path.join(process.cwd(), "tmp/response.txt")) {
-  let previousText = "";
-  let completeResponse = "";
+async function handleStreamingResponse(page, outputFile = path.join(process.cwd(), 'tmp/response.txt')) {
+  let previousText = '';
+  let completeResponse = '';
   let newContentDetected = false;
   while (!newContentDetected) {
     const assistantMessages = await page.$$('[data-message-author-role="assistant"]');
     if (assistantMessages.length > 0) {
       const lastMessage = assistantMessages[assistantMessages.length - 1];
-      const currentMessageId = await page.evaluate((element) => element.getAttribute("data-message-id"), lastMessage);
+      const currentMessageId = await page.evaluate((element) => element.getAttribute('data-message-id'), lastMessage);
       if (currentMessageId === lastMessageId) {
         const currentText = await page.evaluate((element) => element.textContent, lastMessage);
         console.log(`Current text: ${currentText}`);
@@ -421,7 +421,7 @@ async function handleStreamingResponse(page, outputFile = path.join(process.cwd(
           }
         }
         previousText = currentText;
-        const isStreaming = await lastMessage.$(".result-streaming");
+        const isStreaming = await lastMessage.$('.result-streaming');
         if (!isStreaming) {
           newContentDetected = true;
         }
@@ -434,7 +434,7 @@ async function handleStreamingResponse(page, outputFile = path.join(process.cwd(
 
   if (!is_streaming) {
     console.log(completeResponse.trim());
-    console.log("\n\n");
+    console.log('\n\n');
     fs.ensureDirSync(path.dirname(outputFile));
     fs.writeFileSync(outputFile, completeResponse.trim());
     console.log(`Response saved to ${outputFile}`);
@@ -465,8 +465,8 @@ async function isLoggedIn(page) {
  * @returns {Promise<import("puppeteer-extra").Browser>} The created browser instance.
  */
 async function createBrowser(browserOptions = {}) {
-  const windowsChromeExecutable = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
-  const hasWindowsChrome = process.platform === "win32" && fs.existsSync(windowsChromeExecutable);
+  const windowsChromeExecutable = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+  const hasWindowsChrome = process.platform === 'win32' && fs.existsSync(windowsChromeExecutable);
 
   /**
    * @type {Parameters<import("puppeteer-extra").VanillaPuppeteer["launch"]>[0]}
@@ -474,22 +474,22 @@ async function createBrowser(browserOptions = {}) {
   const defaultOptions = {
     headless: false,
     defaultViewport: null,
-    userDataDir: path.join(process.cwd(), "tmp/puppeteer-profile"),
+    userDataDir: path.join(process.cwd(), 'tmp/puppeteer-profile'),
     // Windows-specific options to handle browser launch issues
     args: [
-      "--start-maximized",
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-accelerated-2d-canvas",
-      "--no-first-run",
-      "--no-zygote",
-      "--disable-gpu",
-      "--disable-background-timer-throttling",
-      "--disable-backgrounding-occluded-windows",
-      "--disable-renderer-backgrounding"
+      '--start-maximized',
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--no-first-run',
+      '--no-zygote',
+      '--disable-gpu',
+      '--disable-background-timer-throttling',
+      '--disable-backgrounding-occluded-windows',
+      '--disable-renderer-backgrounding'
     ],
-    ignoreDefaultArgs: ["--disable-extensions"],
+    ignoreDefaultArgs: ['--disable-extensions'],
     ...(hasWindowsChrome && {
       // Prefer local Chrome installation when present on Windows.
       executablePath: windowsChromeExecutable
@@ -499,14 +499,14 @@ async function createBrowser(browserOptions = {}) {
   try {
     return await puppeteer.use(StealthPlugin()).launch({ ...defaultOptions, ...browserOptions });
   } catch (_error) {
-    console.error("Failed to launch browser with default options. Trying fallback options...");
+    console.error('Failed to launch browser with default options. Trying fallback options...');
 
     // Fallback: Try with minimal options
     try {
       return await puppeteer.use(StealthPlugin()).launch({
         headless: browserOptions.headless || false,
         defaultViewport: null,
-        args: ["--start-maximized", "--no-sandbox", "--disable-setuid-sandbox"],
+        args: ['--start-maximized', '--no-sandbox', '--disable-setuid-sandbox'],
         ignoreDefaultArgs: false,
         ...(hasWindowsChrome && {
           executablePath: windowsChromeExecutable
@@ -514,11 +514,11 @@ async function createBrowser(browserOptions = {}) {
         ...browserOptions
       });
     } catch (fallbackError) {
-      console.error("Browser launch failed completely. Common solutions:");
-      console.error("1. Install Google Chrome if not installed");
-      console.error("2. Update Node.js to the latest version");
-      console.error("3. Try running: npm install puppeteer --force");
-      console.error("4. Check if antivirus is blocking browser launch");
+      console.error('Browser launch failed completely. Common solutions:');
+      console.error('1. Install Google Chrome if not installed');
+      console.error('2. Update Node.js to the latest version');
+      console.error('3. Try running: npm install puppeteer --force');
+      console.error('4. Check if antivirus is blocking browser launch');
       throw new Error(`Browser launch failed: ${fallbackError.message}`);
     }
   }
@@ -533,7 +533,7 @@ async function loginToChatGpt() {
   const browser = await createBrowser({ headless: false });
   const page = (await browser.pages()).length > 0 ? (await browser.pages())[0] : await browser.newPage();
 
-  const url = "https://chat.openai.com";
+  const url = 'https://chat.openai.com';
   const navigate = await navigatePage(page, url);
 
   // Wait for page to fully load before checking login status
@@ -545,18 +545,18 @@ async function loginToChatGpt() {
   });
 
   if (loginButtonExists) {
-    console.log("Login button found, clicking to log in...");
+    console.log('Login button found, clicking to log in...');
     await page.click('[data-testid="login-button"]');
     // Wait for the login process to complete without requiring full network idleness.
-    await page.waitForNavigation({ waitUntil: "domcontentloaded", timeout: NAVIGATION_TIMEOUT_MS });
+    await page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: NAVIGATION_TIMEOUT_MS });
     try {
       await page.waitForNetworkIdle({ idleTime: 1000, timeout: NETWORK_IDLE_TIMEOUT_MS });
     } catch {
       // Ignore: authentication pages can keep background connections active.
     }
-    console.log("Login process completed.");
+    console.log('Login process completed.');
   } else {
-    console.log("No login required - user appears to be already logged in.");
+    console.log('No login required - user appears to be already logged in.');
   }
 }
 
@@ -590,7 +590,7 @@ export async function runChatGpt(chatgptOptions = {}) {
   const questionFile = chatgptOptions.questionFile;
   let question = chatgptOptions.question;
   let shouldUploadQuestionFile = Boolean(questionFile);
-  const responseFile = chatgptOptions.responseFile || path.join(process.cwd(), "tmp", "response.txt");
+  const responseFile = chatgptOptions.responseFile || path.join(process.cwd(), 'tmp', 'response.txt');
 
   // Validate input parameters
   const noInputProvided = !question && !questionFile;
@@ -598,7 +598,7 @@ export async function runChatGpt(chatgptOptions = {}) {
   const questionFileIsEmpty = questionFile && questionFile.trim().length === 0;
 
   if (noInputProvided || questionIsEmpty || questionFileIsEmpty) {
-    throw new Error("You must provide a question or a question file.");
+    throw new Error('You must provide a question or a question file.');
   }
 
   // For small files, send content as plain text to avoid file-upload login requirements.
@@ -609,10 +609,10 @@ export async function runChatGpt(chatgptOptions = {}) {
 
     const questionFileStats = fs.statSync(questionFile);
     if (questionFileStats.size <= MAX_INLINE_QUESTION_FILE_BYTES) {
-      question = fs.readFileSync(questionFile, "utf8").trim();
+      question = fs.readFileSync(questionFile, 'utf8').trim();
 
       if (!question) {
-        throw new Error("Question file is empty.");
+        throw new Error('Question file is empty.');
       }
 
       shouldUploadQuestionFile = false;
@@ -626,12 +626,12 @@ export async function runChatGpt(chatgptOptions = {}) {
   try {
     browser = await createBrowser({ headless });
   } catch (error) {
-    console.error("Error running ChatGPT:", error);
-    console.error("\nTroubleshooting steps:");
-    console.error("1. Make sure Google Chrome is installed");
-    console.error("2. Try running: yarn add puppeteer --force");
-    console.error("3. Check if your antivirus is blocking the browser");
-    console.error("4. Close any running Chrome instances and try again");
+    console.error('Error running ChatGPT:', error);
+    console.error('\nTroubleshooting steps:');
+    console.error('1. Make sure Google Chrome is installed');
+    console.error('2. Try running: yarn add puppeteer --force');
+    console.error('3. Check if your antivirus is blocking the browser');
+    console.error('4. Close any running Chrome instances and try again');
     throw error;
   }
 
@@ -651,7 +651,7 @@ export async function runChatGpt(chatgptOptions = {}) {
   }
 
   try {
-    const url = "https://chat.openai.com";
+    const url = 'https://chat.openai.com';
     const navigate = await navigatePage(page, url);
 
     // Check temporary chat - wait for page to load and try to click temporary chat button
@@ -661,10 +661,10 @@ export async function runChatGpt(chatgptOptions = {}) {
       const tempChatButton = await page.$('button[aria-label="Turn on temporary chat"]');
       if (tempChatButton) {
         await page.evaluate((el) => el.click(), tempChatButton);
-        console.log("Successfully clicked temporary chat button");
+        console.log('Successfully clicked temporary chat button');
         await navigate.waitForDomIdle(1000, 10000);
       } else {
-        console.log("Temporary chat button not found, proceeding without it.");
+        console.log('Temporary chat button not found, proceeding without it.');
       }
     } catch (error) {
       console.log(`Failed to click temporary chat button: ${error.message}`);
@@ -675,7 +675,7 @@ export async function runChatGpt(chatgptOptions = {}) {
       // Submit the question
       const didSubmit = await clickSubmitButton(page);
       if (!didSubmit) {
-        throw new Error("Prompt was not submitted. The composer button may be disabled or blocked.");
+        throw new Error('Prompt was not submitted. The composer button may be disabled or blocked.');
       }
       await navigate.waitForDomIdle(1000, 30000); // Wait for DOM to stabilize
 
@@ -693,10 +693,10 @@ export async function runChatGpt(chatgptOptions = {}) {
       // Check if logged in
       const isUserLoggedIn = await isLoggedIn(page);
 
-      console.log(`Login status: ${isUserLoggedIn ? "Logged in" : "Not logged in"}`);
+      console.log(`Login status: ${isUserLoggedIn ? 'Logged in' : 'Not logged in'}`);
       if (!isUserLoggedIn) {
         console.log(
-          "Not logged in. Please log in to ChatGPT in the browser window, then close it and run the command again."
+          'Not logged in. Please log in to ChatGPT in the browser window, then close it and run the command again.'
         );
         return loginToChatGpt();
       }
@@ -714,7 +714,7 @@ export async function runChatGpt(chatgptOptions = {}) {
         let clicked = false;
         for (const item of menuItems) {
           const text = await page.evaluate((el) => el.innerText, item);
-          if (text && text.includes("Add photos") && text.includes("files")) {
+          if (text && text.includes('Add photos') && text.includes('files')) {
             await item.hover();
             clicked = true;
             break;
@@ -737,12 +737,12 @@ export async function runChatGpt(chatgptOptions = {}) {
 
             // Wait for the file to be processed
             await navigate.waitForDomIdle(2000, 15000);
-            console.log("File uploaded successfully");
+            console.log('File uploaded successfully');
 
             // Optionally submit after file upload
             const didSubmit = await clickSubmitButton(page);
             if (!didSubmit) {
-              throw new Error("Prompt was not submitted after file upload.");
+              throw new Error('Prompt was not submitted after file upload.');
             }
             await navigate.waitForDomIdle(1000, 30000);
 
@@ -750,7 +750,7 @@ export async function runChatGpt(chatgptOptions = {}) {
             await waitForInitialResponse(page);
             await handleStreamingResponse(page, responseFile);
           } else {
-            console.log("Could not find file input element");
+            console.log('Could not find file input element');
           }
         } catch (error) {
           console.log(`Error uploading file: ${error.message}`);

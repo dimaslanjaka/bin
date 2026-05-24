@@ -1,8 +1,8 @@
-const axios = require("axios");
-const minimist = require("minimist");
-const { findEnvWithToken } = require("./utils/findEnvFiles.cjs");
+const axios = require('axios');
+const minimist = require('minimist');
+const { findEnvWithToken } = require('./utils/findEnvFiles.cjs');
 
-require("dotenv").config({
+require('dotenv').config({
   path: findEnvWithToken(),
   quiet: true,
   overwrite: true
@@ -13,7 +13,7 @@ const ACCESS_TOKEN = process.env.GITHUB_TOKEN || process.env.ACCESS_TOKEN;
 
 if (!ACCESS_TOKEN) {
   throw new Error(
-    "Access token is not provided. Please set ACCESS_TOKEN or GITHUB_TOKEN in your environment variables."
+    'Access token is not provided. Please set ACCESS_TOKEN or GITHUB_TOKEN in your environment variables.'
   );
 }
 
@@ -71,11 +71,11 @@ Notes:
  */
 const argv = minimist(process.argv.slice(2), {
   alias: {
-    h: "help",
-    r: "repo"
+    h: 'help',
+    r: 'repo'
   },
-  string: ["repo"],
-  boolean: ["help"]
+  string: ['repo'],
+  boolean: ['help']
 });
 
 if (argv.help) {
@@ -96,14 +96,14 @@ function deleteGitHubActionsCache(GH_REPO, cacheId) {
     const token = ACCESS_TOKEN;
 
     if (!token) {
-      return reject(new Error("Access token is not provided"));
+      return reject(new Error('Access token is not provided'));
     }
 
     axios
       .delete(url, {
         headers: {
           Authorization: `token ${token}`,
-          Accept: "application/vnd.github.v3+json"
+          Accept: 'application/vnd.github.v3+json'
         }
       })
       .then((response) => {
@@ -111,7 +111,7 @@ function deleteGitHubActionsCache(GH_REPO, cacheId) {
         resolve(response.data);
       })
       .catch((error) => {
-        console.error("Error deleting cache:", error.response?.data || error.message || "Unknown error");
+        console.error('Error deleting cache:', error.response?.data || error.message || 'Unknown error');
 
         reject(error);
       });
@@ -131,7 +131,7 @@ function get_caches(GH_REPO) {
     axios
       .get(url, {
         headers: {
-          Accept: "application/vnd.github.v3+json",
+          Accept: 'application/vnd.github.v3+json',
           Authorization: `token ${ACCESS_TOKEN}`
         }
       })
@@ -185,7 +185,7 @@ function get_caches(GH_REPO) {
         resolve(grouped);
       })
       .catch((error) => {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
         reject(error);
       });
   });

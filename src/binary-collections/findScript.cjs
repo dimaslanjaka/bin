@@ -1,7 +1,7 @@
-const { glob } = require("glob");
-const path = require("upath");
-const fs = require("fs-extra");
-const pkgJson = require("../../package.json");
+const { glob } = require('glob');
+const path = require('upath');
+const fs = require('fs-extra');
+const pkgJson = require('../../package.json');
 
 /**
  * Searches for a script file by name in the specified directory
@@ -11,7 +11,7 @@ const pkgJson = require("../../package.json");
  * @returns {string|undefined} The absolute path to the found script file, or undefined if not found
  */
 function findScript(scriptName, searchDir = null) {
-  if (!searchDir) searchDir = path.join(__dirname, "..");
+  if (!searchDir) searchDir = path.join(__dirname, '..');
   let result;
 
   // Define ignore patterns for library config and utils
@@ -37,10 +37,10 @@ function findScript(scriptName, searchDir = null) {
       if (pkgJson.bin[scriptName]) {
         const find = [
           path.join(searchDir, pkgJson.bin[scriptName]),
-          path.join(process.cwd(), "node_modules/binary-collections", pkgJson.bin[scriptName]),
+          path.join(process.cwd(), 'node_modules/binary-collections', pkgJson.bin[scriptName]),
           path.join(__dirname, pkgJson.bin[scriptName]),
-          path.join(path.join(__dirname, ".."), pkgJson.bin[scriptName]),
-          path.join(path.join(__dirname, "../.."), pkgJson.bin[scriptName])
+          path.join(path.join(__dirname, '..'), pkgJson.bin[scriptName]),
+          path.join(path.join(__dirname, '../..'), pkgJson.bin[scriptName])
         ];
         const filtered = find.filter((file) => fs.existsSync(file));
         if (filtered.length > 0) {
@@ -56,7 +56,7 @@ function findScript(scriptName, searchDir = null) {
   }
 
   // Find *-cli* file if exists
-  if (result && !result.includes("-cli")) {
+  if (result && !result.includes('-cli')) {
     const ext = path.extname(result);
     const filename = path.basename(result, ext);
     const cliFile = path.join(path.dirname(result), `${filename}-cli${ext}`);

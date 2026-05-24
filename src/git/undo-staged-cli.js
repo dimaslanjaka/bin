@@ -1,3 +1,3 @@
-import { undoStagedChanges } from "./undo-staged.cjs";
+import { undoStagedChanges } from './undo-staged.cjs';
 
 undoStagedChanges();

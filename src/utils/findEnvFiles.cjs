@@ -1,40 +1,40 @@
-const fs = require("node:fs");
-const path = require("node:path");
-const glob = require("glob");
+const fs = require('node:fs');
+const path = require('node:path');
+const glob = require('glob');
 
 const DEFAULT_IGNORES = [
-  "**/node_modules/**",
-  "**/.git/**",
-  "**/.yarn/**",
-  "**/.pnpm/**",
-  "**/dist/**",
-  "**/build/**",
-  "**/coverage/**",
-  "**/vendor/**",
-  "**/tmp/**",
-  "**/.cache/**",
-  "**/assets/**",
-  "**/logs/**",
-  "**/output/**",
-  "**/public/**",
-  "**/static/**",
-  "**/temp/**",
-  "**/backup/**",
-  "**/backups/**",
-  "**/examples/**",
-  "**/docs/**",
-  "**/tests/**",
-  "**/__tests__/**",
-  "**/spec/**",
-  "**/__specs__/**",
-  "**/scripts/**",
-  "**/bin/**",
-  "**/hooks/**",
-  "**/config/**",
-  "**/configs/**",
-  "**/settings/**",
-  "**/.vscode/**",
-  "**/.idea/**"
+  '**/node_modules/**',
+  '**/.git/**',
+  '**/.yarn/**',
+  '**/.pnpm/**',
+  '**/dist/**',
+  '**/build/**',
+  '**/coverage/**',
+  '**/vendor/**',
+  '**/tmp/**',
+  '**/.cache/**',
+  '**/assets/**',
+  '**/logs/**',
+  '**/output/**',
+  '**/public/**',
+  '**/static/**',
+  '**/temp/**',
+  '**/backup/**',
+  '**/backups/**',
+  '**/examples/**',
+  '**/docs/**',
+  '**/tests/**',
+  '**/__tests__/**',
+  '**/spec/**',
+  '**/__specs__/**',
+  '**/scripts/**',
+  '**/bin/**',
+  '**/hooks/**',
+  '**/config/**',
+  '**/configs/**',
+  '**/settings/**',
+  '**/.vscode/**',
+  '**/.idea/**'
 ];
 
 /**
@@ -58,7 +58,7 @@ function findEnvFiles(startDir = process.cwd(), filter) {
   function addFile(file) {
     const normalized = path.normalize(file);
 
-    if (typeof filter === "function" && !filter(normalized)) {
+    if (typeof filter === 'function' && !filter(normalized)) {
       return;
     }
 
@@ -71,7 +71,7 @@ function findEnvFiles(startDir = process.cwd(), filter) {
   let current = path.resolve(startDir);
 
   while (true) {
-    const envPath = path.join(current, ".env");
+    const envPath = path.join(current, '.env');
 
     if (fs.existsSync(envPath)) {
       addFile(envPath);
@@ -89,7 +89,7 @@ function findEnvFiles(startDir = process.cwd(), filter) {
   /* --------------------------------
    * Subdirectories via glob
    * -------------------------------- */
-  const files = glob.globSync("**/.env*", {
+  const files = glob.globSync('**/.env*', {
     cwd: startDir,
     absolute: true,
     nodir: true,
@@ -110,13 +110,13 @@ function findEnvFiles(startDir = process.cwd(), filter) {
  * @param {string} [tokenName="GITHUB_TOKEN"] Environment variable name.
  * @returns {string | undefined} Matching file path.
  */
-function findEnvWithToken(startDir = process.cwd(), tokenName = "GITHUB_TOKEN") {
+function findEnvWithToken(startDir = process.cwd(), tokenName = 'GITHUB_TOKEN') {
   const envFiles = findEnvFiles(startDir);
 
   return envFiles.find((file) => {
     try {
-      const content = fs.readFileSync(file, "utf-8");
-      const regex = new RegExp(`^\\s*${tokenName}\\s*=`, "m");
+      const content = fs.readFileSync(file, 'utf-8');
+      const regex = new RegExp(`^\\s*${tokenName}\\s*=`, 'm');
 
       return regex.test(content);
     } catch (err) {

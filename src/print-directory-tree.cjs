@@ -1,14 +1,14 @@
-const fs = require("fs").promises;
-const path = require("path");
-const crypto = require("crypto");
-const { execSync } = require("child_process");
-const glob = require("glob");
-const { getArgs } = require("./utils/index.cjs");
-const sbgUtil = require("sbg-utility");
-const dotenv = require("dotenv");
+const fs = require('fs').promises;
+const path = require('path');
+const crypto = require('crypto');
+const { execSync } = require('child_process');
+const glob = require('glob');
+const { getArgs } = require('./utils/index.cjs');
+const sbgUtil = require('sbg-utility');
+const dotenv = require('dotenv');
 
 const projectDir = process.cwd();
-const envPath = path.join(projectDir, ".env");
+const envPath = path.join(projectDir, '.env');
 
 // Load the .env file using dotenv (ESM import)
 if (fs.existsSync(envPath)) dotenv.config({ path: envPath, quiet: true, override: true });
@@ -19,7 +19,7 @@ const argv = getArgs();
 // Main logic wrapped in an async function
 async function main() {
   // Determine output file from CLI args
-  let relativeOutputFile = "tmp/directory-structure.txt";
+  let relativeOutputFile = 'tmp/directory-structure.txt';
   if (argv.output || argv.o) {
     relativeOutputFile = argv.output || argv.o;
   }
@@ -29,7 +29,7 @@ async function main() {
     : path.join(projectDir, relativeOutputFile);
 
   // Create or clear the hash file
-  sbgUtil.writefile(outputFile, "");
+  sbgUtil.writefile(outputFile, '');
 
   /**
    * List of file extensions to include
@@ -38,34 +38,34 @@ async function main() {
   let extensions = [];
   if (argv.ext) {
     extensions = argv.ext
-      .split(",")
-      .map((e) => e.trim().replace(/^\./, ""))
+      .split(',')
+      .map((e) => e.trim().replace(/^\./, ''))
       .filter(Boolean);
   }
 
   // Directories to exclude
   let excludeDirs = [
-    "node_modules",
-    "vendor",
-    "venv",
-    ".venv",
-    ".git",
-    ".hg",
-    ".svn",
-    ".idea",
-    ".vscode",
-    "dist",
-    "build",
-    "out",
-    "coverage",
-    ".DS_Store"
+    'node_modules',
+    'vendor',
+    'venv',
+    '.venv',
+    '.git',
+    '.hg',
+    '.svn',
+    '.idea',
+    '.vscode',
+    'dist',
+    'build',
+    'out',
+    'coverage',
+    '.DS_Store'
   ];
   if (argv.exclude) {
     const userExcludes = argv.exclude
-      .split(",")
+      .split(',')
       .map((d) => d.trim())
       .filter(Boolean);
-    if (argv["override-exclude"] || argv.we) {
+    if (argv['override-exclude'] || argv.we) {
       // Override the default excludes with user-provided ones
       excludeDirs = userExcludes;
     } else {
@@ -91,27 +91,27 @@ async function main() {
     if (processedFiles.has(file)) return;
     processedFiles.add(file);
     let relativePath = path.relative(projectDir, file);
-    relativePath = relativePath.split(path.sep).join("/");
+    relativePath = relativePath.split(path.sep).join('/');
     try {
       const stats = await fs.stat(file);
       const pseudoHash = `${stats.size}-${stats.mtimeMs}`;
-      const hash = crypto.createHash("sha256").update(pseudoHash).digest("hex");
+      const hash = crypto.createHash('sha256').update(pseudoHash).digest('hex');
       hashArray.push(`${relativePath} ${hash.slice(0, 8)}`);
     } catch (err) {
-      console.error(`Error processing file: ${file}`, err instanceof Error ? err.message : "<unknown error>");
-      if (err && err.code === "ENOENT") {
+      console.error(`Error processing file: ${file}`, err instanceof Error ? err.message : '<unknown error>');
+      if (err && err.code === 'ENOENT') {
         hashArray.push(`${relativePath} <file not found>`);
       } else {
-        hashArray.push(`${relativePath} <error: ${err && err.code ? `code ${err.code}` : "unknown"}>`);
+        hashArray.push(`${relativePath} <error: ${err && err.code ? `code ${err.code}` : 'unknown'}>`);
       }
     }
   }
 
   // Collect all files to process (extensions + special files)
   const initialFiles = [
-    path.join(projectDir, "package.json"),
-    path.join(projectDir, "composer.json"),
-    path.join(projectDir, "requirements.txt")
+    path.join(projectDir, 'package.json'),
+    path.join(projectDir, 'composer.json'),
+    path.join(projectDir, 'requirements.txt')
   ];
   let patterns = [];
   if (argv.pattern) {
@@ -121,11 +121,11 @@ async function main() {
       patterns = [argv.pattern.trim()];
     }
   } else if (extensions.length === 0) {
-    patterns = ["**/*.*"];
+    patterns = ['**/*.*'];
   } else {
     patterns = extensions.map((ext) => `**/*.${ext}`);
   }
-  const globFiles = glob.sync(patterns.length === 1 ? patterns[0] : `{${patterns.join(",")}}`, {
+  const globFiles = glob.sync(patterns.length === 1 ? patterns[0] : `{${patterns.join(',')}}`, {
     cwd: projectDir,
     ignore: ignorePatterns,
     absolute: true,
@@ -150,9 +150,9 @@ async function main() {
     // Map file paths to hashes for quick lookup
     const hashMap = {};
     for (const entry of hashArray) {
-      const [filePath, hash] = entry.split(" ");
+      const [filePath, hash] = entry.split(' ');
       hashMap[filePath] = hash;
-      const parts = filePath.split("/");
+      const parts = filePath.split('/');
       let current = tree;
       for (let i = 0; i < parts.length; i++) {
         const part = parts[i];
@@ -172,32 +172,32 @@ async function main() {
      * @param {string} parentPath - The path to the current node.
      * @returns {string[]} Array of lines representing the tree structure.
      */
-    function printNode(node, prefix = "", parentPath = "") {
+    function printNode(node, prefix = '', parentPath = '') {
       const keys = Object.keys(node).sort();
       let lines = [];
       keys.forEach((key, idx) => {
         const isLast = idx === keys.length - 1;
-        const branch = isLast ? "└── " : "├── ";
-        const currentPath = parentPath ? parentPath + "/" + key : key;
+        const branch = isLast ? '└── ' : '├── ';
+        const currentPath = parentPath ? parentPath + '/' + key : key;
         if (node[key] === null) {
           // file: show hash
-          lines.push(prefix + branch + key + " [" + (hashMap[currentPath] || "") + "]");
+          lines.push(prefix + branch + key + ' [' + (hashMap[currentPath] || '') + ']');
         } else {
-          lines.push(prefix + branch + key + "/");
-          lines = lines.concat(printNode(node[key], prefix + (isLast ? "    " : "│   "), currentPath));
+          lines.push(prefix + branch + key + '/');
+          lines = lines.concat(printNode(node[key], prefix + (isLast ? '    ' : '│   '), currentPath));
         }
       });
       return lines;
     }
-    return printNode(tree, "", "").join("\n");
+    return printNode(tree, '', '').join('\n');
   }
 
   // Write directory/file tree to the output file (hashes are included in the tree)
   const fileTreeString = getFileTreeString(hashArray);
-  await fs.writeFile(outputFile, fileTreeString + "\n", "utf-8");
+  await fs.writeFile(outputFile, fileTreeString + '\n', 'utf-8');
 
   // Add the hash file to the commit if --git-add is present
-  if (argv["git-add"]) {
+  if (argv['git-add']) {
     execSync(`git add ${relativeOutputFile}`);
     console.log(`Directory tree written to ${relativeOutputFile} and staged for git.`);
   } else {

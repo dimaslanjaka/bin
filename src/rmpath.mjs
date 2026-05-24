@@ -1,19 +1,19 @@
 // Fast huge folder deleter for Node.js
 // Usage: node rmpath.js <file-or-folder-path>
 
-import dotenv from "dotenv";
-import fs from "fs-extra";
-import * as glob from "glob";
-import path from "upath";
-import { fileURLToPath, pathToFileURL } from "url";
-import { getArgs } from "./utils/index.cjs";
+import dotenv from 'dotenv';
+import fs from 'fs-extra';
+import * as glob from 'glob';
+import path from 'upath';
+import { fileURLToPath, pathToFileURL } from 'url';
+import { getArgs } from './utils/index.cjs';
 
 // Polyfill __filename and __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load .env if present
-const dotenvPath = path.resolve(process.cwd(), ".env");
+const dotenvPath = path.resolve(process.cwd(), '.env');
 if (fs.existsSync(dotenvPath)) {
   dotenv.config({ path: dotenvPath, override: true, quiet: true });
 }
@@ -29,7 +29,7 @@ export function resolveDeletePatterns(targetPath) {
     return;
   }
 
-  const vowels = ["a", "i", "u", "e", "o", "A", "I", "U", "E", "O"];
+  const vowels = ['a', 'i', 'u', 'e', 'o', 'A', 'I', 'U', 'E', 'O'];
   const letters = [];
   for (let i = 97; i <= 122; i++) letters.push(String.fromCharCode(i)); // a-z
   for (let i = 65; i <= 90; i++) letters.push(String.fromCharCode(i)); // A-Z
@@ -86,7 +86,7 @@ export async function deleteMainScript(targetPath) {
 let isMain = false;
 try {
   // CommonJS
-  if (typeof require !== "undefined" && typeof module !== "undefined" && require.main === module) {
+  if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.main === module) {
     isMain = true;
   }
 } catch (_e) {
@@ -103,13 +103,13 @@ try {
 }
 
 if (isMain) {
-  console.log("Invoked from CLI");
+  console.log('Invoked from CLI');
   if (positional.length === 0) {
-    console.error("You need to provide a file or folder path");
+    console.error('You need to provide a file or folder path');
     process.exit(1);
   } else {
     deleteMainScript(positional[0]);
   }
 } else {
-  console.log("Not invoked from CLI");
+  console.log('Not invoked from CLI');
 }

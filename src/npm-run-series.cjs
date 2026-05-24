@@ -1,22 +1,22 @@
 #!/usr/bin/env node
 
-const { spawnSync } = require("child_process");
-const fs = require("fs");
-const path = require("path");
-const { Minimatch } = require("minimatch");
-const { getArgs } = require("./utils/index.cjs");
+const { spawnSync } = require('child_process');
+const fs = require('fs');
+const path = require('path');
+const { Minimatch } = require('minimatch');
+const { getArgs } = require('./utils/index.cjs');
 
 const args = getArgs();
 const cwd = process.cwd();
-const packagejson = path.join(cwd, "package.json");
-const verbose = args["v"] || args["verbose"];
-const usingYarn = args["yarn"];
+const packagejson = path.join(cwd, 'package.json');
+const verbose = args['v'] || args['verbose'];
+const usingYarn = args['yarn'];
 
 function runCommand(command, commandArgs) {
   const result = spawnSync(command, commandArgs, {
     cwd,
     shell: true,
-    stdio: "inherit"
+    stdio: 'inherit'
   });
 
   if (result.error) {
@@ -36,10 +36,10 @@ function runCommand(command, commandArgs) {
     /**
      * @type {import('../package.json')}
      */
-    const parse = JSON.parse(fs.readFileSync(packagejson, "utf-8"));
+    const parse = JSON.parse(fs.readFileSync(packagejson, 'utf-8'));
 
-    if (parse !== null && typeof parse === "object") {
-      if ("scripts" in parse) {
+    if (parse !== null && typeof parse === 'object') {
+      if ('scripts' in parse) {
         const patterns = args._;
         const scripts = parse.scripts;
         const scriptNames = Object.keys(scripts);
@@ -51,8 +51,8 @@ function runCommand(command, commandArgs) {
             const match = matcher.match(scriptName);
             if (verbose) console.log({ pattern, scriptName, match });
             if (match === true) {
-              const command = usingYarn ? "yarn" : "npm";
-              const completed = runCommand(command, ["run", scriptName]);
+              const command = usingYarn ? 'yarn' : 'npm';
+              const completed = runCommand(command, ['run', scriptName]);
               if (!completed) return;
             }
           }

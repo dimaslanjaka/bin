@@ -1,5 +1,5 @@
-import minimist from "minimist";
-import { copy } from "./copy.mjs";
+import minimist from 'minimist';
+import { copy } from './copy.mjs';
 
 function showHelp(exitCode = 0) {
   console.log(
@@ -21,9 +21,9 @@ Examples:
 
 async function main() {
   const args = minimist(process.argv.slice(2), {
-    boolean: ["help", "h"],
+    boolean: ['help', 'h'],
     alias: {
-      h: "help"
+      h: 'help'
     }
   });
 
@@ -34,7 +34,7 @@ async function main() {
   const [src, dest] = args._;
 
   if (!src || !dest) {
-    console.error("Error: missing required arguments.\n");
+    console.error('Error: missing required arguments.\n');
     showHelp(1);
   }
 

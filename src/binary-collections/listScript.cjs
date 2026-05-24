@@ -1,6 +1,6 @@
-const pkgJson = require("../../package.json");
-const path = require("upath");
-const fs = require("fs-extra");
+const pkgJson = require('../../package.json');
+const path = require('upath');
+const fs = require('fs-extra');
 
 /**
  * Locates binary scripts defined in package.json and verifies their existence on the filesystem.
@@ -20,9 +20,9 @@ function listScript(verbose = false) {
       console.log(`🔍 Finding script "${scriptName}" -> "${pkgJson.bin[scriptName]}"`);
     }
     const searchDirs = [
-      path.join(__dirname, ".."),
-      path.join(__dirname, "../.."),
-      path.join(process.cwd(), "node_modules/binary-collections"),
+      path.join(__dirname, '..'),
+      path.join(__dirname, '../..'),
+      path.join(process.cwd(), 'node_modules/binary-collections'),
       __dirname
     ];
     let scriptPath;

@@ -1,6 +1,6 @@
-import { Configuration, Project } from "@yarnpkg/core";
-import path from "upath";
-import fs from "fs-extra";
+import { Configuration, Project } from '@yarnpkg/core';
+import path from 'upath';
+import fs from 'fs-extra';
 
 export async function findWorkspaceRootYC(cwd = process.cwd()) {
   const configuration = await Configuration.find(cwd, null);
@@ -19,16 +19,16 @@ export function findYarnWorkspaceRootFS(cwd = process.cwd()) {
   let current = path.resolve(cwd);
 
   while (true) {
-    const pkgPath = path.join(current, "package.json");
+    const pkgPath = path.join(current, 'package.json');
 
     if (fs.existsSync(pkgPath)) {
       try {
-        const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+        const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
 
         if (
           pkg.workspaces ||
-          fs.existsSync(path.join(current, "yarn.lock")) ||
-          fs.existsSync(path.join(current, ".yarn"))
+          fs.existsSync(path.join(current, 'yarn.lock')) ||
+          fs.existsSync(path.join(current, '.yarn'))
         ) {
           return current;
         }

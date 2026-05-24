@@ -1,4 +1,4 @@
-const fs = require("fs");
+const fs = require('fs');
 
 /**
  * Parse existing .gitattributes file into structured rules
@@ -12,16 +12,16 @@ function parseGitAttributes(gitattributesPath) {
     return rules;
   }
 
-  const content = fs.readFileSync(gitattributesPath, "utf8");
-  const lines = content.split("\n");
+  const content = fs.readFileSync(gitattributesPath, 'utf8');
+  const lines = content.split('\n');
 
   lines.forEach((line, index) => {
     const trimmedLine = line.trim();
 
     // Skip empty lines and comments
-    if (!trimmedLine || trimmedLine.startsWith("#")) {
+    if (!trimmedLine || trimmedLine.startsWith('#')) {
       rules.push({
-        type: trimmedLine.startsWith("#") ? "comment" : "empty",
+        type: trimmedLine.startsWith('#') ? 'comment' : 'empty',
         content: line,
         lineNumber: index + 1
       });
@@ -32,10 +32,10 @@ function parseGitAttributes(gitattributesPath) {
     const parts = trimmedLine.split(/\s+/);
     if (parts.length >= 2) {
       const pattern = parts[0];
-      const attributes = parts.slice(1).join(" ");
+      const attributes = parts.slice(1).join(' ');
 
       rules.push({
-        type: "rule",
+        type: 'rule',
         pattern,
         attributes,
         content: line,
@@ -44,7 +44,7 @@ function parseGitAttributes(gitattributesPath) {
     } else {
       // Invalid line, keep as-is
       rules.push({
-        type: "invalid",
+        type: 'invalid',
         content: line,
         lineNumber: index + 1
       });
@@ -67,12 +67,12 @@ function patternsConflict(pattern1, pattern2) {
   }
 
   // Universal pattern conflicts with everything
-  if (pattern1 === "*" || pattern2 === "*") {
+  if (pattern1 === '*' || pattern2 === '*') {
     return pattern1 !== pattern2;
   }
 
   // Simple glob overlap detection
-  const normalize = (p) => p.replace(/\{[^}]+\}/g, "*").replace(/\*+/g, "*");
+  const normalize = (p) => p.replace(/\{[^}]+\}/g, '*').replace(/\*+/g, '*');
   const norm1 = normalize(pattern1);
   const norm2 = normalize(pattern2);
 
@@ -90,7 +90,7 @@ function mergeGitAttributeRules(existingRules, desiredRules) {
   if (existingRules.length === 0) {
     // If no existing rules, just add all desired rules in order
     mergedRules = desiredRules.map((desired, idx) => ({
-      type: "rule",
+      type: 'rule',
       pattern: desired.pattern,
       attributes: desired.attributes,
       content: `${desired.pattern} ${desired.attributes}`,
@@ -100,7 +100,7 @@ function mergeGitAttributeRules(existingRules, desiredRules) {
     return {
       mergedRules,
       conflicts: [],
-      changes: desiredRules.map((rule) => ({ action: "added", pattern: rule.pattern, attributes: rule.attributes }))
+      changes: desiredRules.map((rule) => ({ action: 'added', pattern: rule.pattern, attributes: rule.attributes }))
     };
   } else {
     mergedRules = [...existingRules];
@@ -110,7 +110,7 @@ function mergeGitAttributeRules(existingRules, desiredRules) {
 
   desiredRules.forEach((desired) => {
     // Look for an exact pattern match in existing rules
-    const existingIdx = mergedRules.findIndex((r) => r.type === "rule" && r.pattern === desired.pattern);
+    const existingIdx = mergedRules.findIndex((r) => r.type === 'rule' && r.pattern === desired.pattern);
     if (existingIdx !== -1) {
       const existing = mergedRules[existingIdx];
       if (existing.attributes === desired.attributes) {
@@ -119,12 +119,12 @@ function mergeGitAttributeRules(existingRules, desiredRules) {
           pattern: desired.pattern,
           existing: existing.attributes,
           proposed: desired.attributes,
-          action: "kept existing (identical)"
+          action: 'kept existing (identical)'
         });
       } else if (desired.priority > (existing.priority || 0)) {
         // Replace with higher priority rule
         mergedRules[existingIdx] = {
-          type: "rule",
+          type: 'rule',
           pattern: desired.pattern,
           attributes: desired.attributes,
           content: `${desired.pattern} ${desired.attributes}`,
@@ -135,10 +135,10 @@ function mergeGitAttributeRules(existingRules, desiredRules) {
           pattern: desired.pattern,
           existing: existing.attributes,
           proposed: desired.attributes,
-          action: "replaced (higher priority)"
+          action: 'replaced (higher priority)'
         });
         changes.push({
-          action: "replaced",
+          action: 'replaced',
           pattern: desired.pattern,
           attributes: desired.attributes,
           oldAttributes: existing.attributes
@@ -149,13 +149,13 @@ function mergeGitAttributeRules(existingRules, desiredRules) {
           pattern: desired.pattern,
           existing: existing.attributes,
           proposed: desired.attributes,
-          action: "kept existing (lower priority)"
+          action: 'kept existing (lower priority)'
         });
       }
     } else {
       // No exact pattern match, add new rule
       mergedRules.push({
-        type: "rule",
+        type: 'rule',
         pattern: desired.pattern,
         attributes: desired.attributes,
         content: `${desired.pattern} ${desired.attributes}`,
@@ -163,7 +163,7 @@ function mergeGitAttributeRules(existingRules, desiredRules) {
         added: true
       });
       changes.push({
-        action: "added",
+        action: 'added',
         pattern: desired.pattern,
         attributes: desired.attributes
       });
@@ -182,12 +182,12 @@ function formatGitAttributes(rules) {
   return (
     rules
       .map((rule) => {
-        if (rule.type === "rule") {
+        if (rule.type === 'rule') {
           return `${rule.pattern} ${rule.attributes}`;
         }
         return rule.content;
       })
-      .join("\n") + "\n"
+      .join('\n') + '\n'
   );
 }
 
@@ -219,7 +219,7 @@ function updateGitAttributes(gitattributesPath, desiredRules) {
       changes,
       message: success
         ? `Updated .gitattributes with ${changes.length} changes`
-        : "No changes needed - all rules already present"
+        : 'No changes needed - all rules already present'
     };
   } catch (error) {
     return {

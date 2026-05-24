@@ -1,50 +1,50 @@
-const color = require("ansi-colors");
-const glob = require("glob");
-const path = require("upath");
+const color = require('ansi-colors');
+const glob = require('glob');
+const path = require('upath');
 
 /** Define default binary mappings for package.json "bin" field */
 const defaultBin = {
-  "binary-collections": "lib/binary-collections.cjs",
-  nrs: "lib/npm-run-series.cjs",
-  "run-s": "lib/npm-run-series.cjs",
-  "run-series": "lib/npm-run-series.cjs",
-  "npm-run-series": "lib/npm-run-series.cjs",
-  "del-nodemodules": "lib/del-node-modules.cjs",
-  "del-yarncaches": "lib/del-yarn-caches.cjs",
-  "del-ps": "lib/del-ps.cjs",
-  "del-gradle": "lib/del-gradle.cjs",
-  "git-purge": "lib/git-purge.cjs",
-  "git-fix": "lib/git-fix.cjs",
-  "print-tree": "lib/print-directory-tree.cjs",
-  "dir-tree": "lib/print-directory-tree.cjs",
-  "pkg-resolutions-updater": "lib/package-resolutions-updater-cli.cjs",
-  "pkg-res-updater": "lib/package-resolutions-updater-cli.cjs",
-  "git-diff": "lib/git-diff.cjs",
-  "clean-github-actions-caches": "lib/clean-github-actions-caches-cli.cjs",
-  "clean-github-actions-cache": "lib/clean-github-actions-caches-cli.cjs",
-  "clear-github-actions-cache": "lib/clean-github-actions-caches-cli.cjs",
-  "clear-github-actions-caches": "lib/clean-github-actions-caches-cli.cjs",
-  "clear-gh-caches": "lib/clean-github-actions-caches-cli.cjs",
-  "submodule-install": "lib/submodule-install.cjs",
-  chatgpt: "lib/free-chatgpt.cjs",
-  "free-chatgpt": "lib/free-chatgpt.cjs",
-  "undo-commit": "lib/git/undo-commit.cjs",
-  "undo-last-commit": "lib/git/undo-commit.cjs",
-  "git-undo-commit": "lib/git/undo-commit.cjs",
-  "undo-staged": "lib/git/undo-staged.cjs",
-  "git-undo-staged": "lib/git/undo-staged.cjs",
-  "rm-node-modules": "lib/rm-node-module-cli.cjs",
-  "rm-node-module": "lib/rm-node-module-cli.cjs",
-  "remove-node-modules": "lib/rm-node-module-cli.cjs",
-  "remove-node-module": "lib/rm-node-module-cli.cjs",
-  "yarn-install": "lib/yarn-per-branch-lock-installer.cjs",
-  "y-install": "lib/yarn-per-branch-lock-installer.cjs",
-  copy: "lib/file/copy-cli.cjs",
-  move: "lib/file/move-cli.cjs",
-  "node-copy": "lib/file/copy-cli.cjs",
-  "node-move": "lib/file/move-cli.cjs",
-  "copy-file": "lib/file/copy-cli.cjs",
-  "move-file": "lib/file/move-cli.cjs"
+  'binary-collections': 'lib/binary-collections.cjs',
+  nrs: 'lib/npm-run-series.cjs',
+  'run-s': 'lib/npm-run-series.cjs',
+  'run-series': 'lib/npm-run-series.cjs',
+  'npm-run-series': 'lib/npm-run-series.cjs',
+  'del-nodemodules': 'lib/del-node-modules.cjs',
+  'del-yarncaches': 'lib/del-yarn-caches.cjs',
+  'del-ps': 'lib/del-ps.cjs',
+  'del-gradle': 'lib/del-gradle.cjs',
+  'git-purge': 'lib/git-purge.cjs',
+  'git-fix': 'lib/git-fix.cjs',
+  'print-tree': 'lib/print-directory-tree.cjs',
+  'dir-tree': 'lib/print-directory-tree.cjs',
+  'pkg-resolutions-updater': 'lib/package-resolutions-updater-cli.cjs',
+  'pkg-res-updater': 'lib/package-resolutions-updater-cli.cjs',
+  'git-diff': 'lib/git-diff.cjs',
+  'clean-github-actions-caches': 'lib/clean-github-actions-caches-cli.cjs',
+  'clean-github-actions-cache': 'lib/clean-github-actions-caches-cli.cjs',
+  'clear-github-actions-cache': 'lib/clean-github-actions-caches-cli.cjs',
+  'clear-github-actions-caches': 'lib/clean-github-actions-caches-cli.cjs',
+  'clear-gh-caches': 'lib/clean-github-actions-caches-cli.cjs',
+  'submodule-install': 'lib/submodule-install.cjs',
+  chatgpt: 'lib/free-chatgpt.cjs',
+  'free-chatgpt': 'lib/free-chatgpt.cjs',
+  'undo-commit': 'lib/git/undo-commit.cjs',
+  'undo-last-commit': 'lib/git/undo-commit.cjs',
+  'git-undo-commit': 'lib/git/undo-commit.cjs',
+  'undo-staged': 'lib/git/undo-staged.cjs',
+  'git-undo-staged': 'lib/git/undo-staged.cjs',
+  'rm-node-modules': 'lib/rm-node-module-cli.cjs',
+  'rm-node-module': 'lib/rm-node-module-cli.cjs',
+  'remove-node-modules': 'lib/rm-node-module-cli.cjs',
+  'remove-node-module': 'lib/rm-node-module-cli.cjs',
+  'yarn-install': 'lib/yarn-per-branch-lock-installer.cjs',
+  'y-install': 'lib/yarn-per-branch-lock-installer.cjs',
+  copy: 'lib/file/copy-cli.cjs',
+  move: 'lib/file/move-cli.cjs',
+  'node-copy': 'lib/file/copy-cli.cjs',
+  'node-move': 'lib/file/move-cli.cjs',
+  'copy-file': 'lib/file/copy-cli.cjs',
+  'move-file': 'lib/file/move-cli.cjs'
 };
 
 /**
@@ -61,20 +61,20 @@ function generateMapping() {
   // Build binary mapping from lib/*.cjs and bin/*
   const binBuilder = {};
   const libs = glob
-    .globSync("lib/*.cjs", {
+    .globSync('lib/*.cjs', {
       cwd: __dirname,
       nodir: true,
       ignore: [
-        "**/*.d.{ts,mts,cts}",
-        "**/*.txt",
-        "**/*.d.*",
-        "**/chunk*",
-        "**/build.*",
-        "**/{ps,git}/**",
-        "**/index.*",
-        "**/*.config.*",
-        "**/utils.*",
-        "**/*-config.*"
+        '**/*.d.{ts,mts,cts}',
+        '**/*.txt',
+        '**/*.d.*',
+        '**/chunk*',
+        '**/build.*',
+        '**/{ps,git}/**',
+        '**/index.*',
+        '**/*.config.*',
+        '**/utils.*',
+        '**/*-config.*'
       ]
     })
     .map((file) => {
@@ -95,27 +95,27 @@ function generateMapping() {
     } else {
       // If local bin exists, log and use lib/*.cjs
       console.log(
-        `[${fnName}] ${color.yellow(filename)} contains local bin: [${color.blueBright(bins.join(", "))}] use ${color.greenBright(file)} instead`
+        `[${fnName}] ${color.yellow(filename)} contains local bin: [${color.blueBright(bins.join(', '))}] use ${color.greenBright(file)} instead`
       );
       binBuilder[filename] = file;
     }
     // capture *-cli* file
-    if (filename.includes("-cli")) {
-      binBuilder[filename.replace("-cli", "")] = file; // Update binBuilder with CLI file
+    if (filename.includes('-cli')) {
+      binBuilder[filename.replace('-cli', '')] = file; // Update binBuilder with CLI file
       if (filename in binBuilder) {
         delete binBuilder[filename]; // Remove from binBuilder if it exists
       }
     }
 
     if (!binBuilder[filename]) {
-      if (filename.includes("-cli")) {
+      if (filename.includes('-cli')) {
         console.warn(
-          `[${fnName}] ${color.yellowBright("Warning:")} Binary for ${color.yellow(filename)} (CLI) already has another binary assigned for ${color.yellow(filename.replace("-cli", ""))}. Skipping ${color.yellow(filename)}.`
+          `[${fnName}] ${color.yellowBright('Warning:')} Binary for ${color.yellow(filename)} (CLI) already has another binary assigned for ${color.yellow(filename.replace('-cli', ''))}. Skipping ${color.yellow(filename)}.`
         );
         continue;
       }
       console.warn(
-        `[${fnName}] ${color.redBright("Warning:")} No binary assigned for ${color.yellow(filename)}. Please check the lib/ and bin/ directories.`
+        `[${fnName}] ${color.redBright('Warning:')} No binary assigned for ${color.yellow(filename)}. Please check the lib/ and bin/ directories.`
       );
       continue;
     }

@@ -170,6 +170,7 @@
     "kill-process": "binaries/kill-process.cjs",
     "move": "lib/file/move-cli.cjs",
     "move-file": "lib/file/move-cli.cjs",
+    "node-cache-cleaner": "lib/node-cache-cleaner-cli.cjs",
     "node-copy": "lib/file/copy-cli.cjs",
     "node-exec": "lib/node-executor.cjs",
     "node-executor": "lib/node-executor.cjs",

@@ -1,4 +1,4 @@
-const { spawn } = require("child_process");
+const { spawn } = require('child_process');
 
 /**
  * Executes a script file using Node.js with the provided arguments
@@ -8,18 +8,18 @@ const { spawn } = require("child_process");
  * @returns {void} Exits the process when the script execution completes
  */
 function executeScript(scriptPath, args) {
-  console.log(`🔧 Executing script: ${scriptPath} args: ${args.join(" ")}\n`);
-  const child = spawn("node", [scriptPath, ...args], {
-    stdio: "inherit",
+  console.log(`🔧 Executing script: ${scriptPath} args: ${args.join(' ')}\n`);
+  const child = spawn('node', [scriptPath, ...args], {
+    stdio: 'inherit',
     shell: true
   });
 
-  child.on("error", (error) => {
+  child.on('error', (error) => {
     console.error(`❌ Error executing script: ${error.message}`);
     process.exit(1);
   });
 
-  child.on("close", (code) => {
+  child.on('close', (code) => {
     process.exit(code);
   });
 }

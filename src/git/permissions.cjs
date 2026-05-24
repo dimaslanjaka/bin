@@ -1,4 +1,4 @@
-const { runGitCommand } = require("./utils.cjs");
+const { runGitCommand } = require('./utils.cjs');
 
 /**
  * Configure git to ignore file permission changes
@@ -6,10 +6,10 @@ const { runGitCommand } = require("./utils.cjs");
  * - Sets diff.ignoreSubmodules = dirty
  */
 function ignoreFilePermissions() {
-  console.log("\n=== Configuring File Permissions ===");
+  console.log('\n=== Configuring File Permissions ===');
 
-  runGitCommand(["config", "core.filemode", "false"], "Ignore file permission changes");
-  runGitCommand(["config", "diff.ignoreSubmodules", "dirty"], "Ignore submodule permission changes");
+  runGitCommand(['config', 'core.filemode', 'false'], 'Ignore file permission changes');
+  runGitCommand(['config', 'diff.ignoreSubmodules', 'dirty'], 'Ignore submodule permission changes');
 }
 
 module.exports = {

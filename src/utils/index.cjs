@@ -1,9 +1,9 @@
-const fs = require("fs");
-const path = require("upath");
-const argv = require("minimist")(process.argv.slice(2));
-const { exec } = require("child_process");
-const { URL } = require("url");
-const { promisify } = require("util");
+const fs = require('fs');
+const path = require('upath');
+const argv = require('minimist')(process.argv.slice(2));
+const { exec } = require('child_process');
+const { URL } = require('url');
+const { promisify } = require('util');
 
 /**
  * Promisified version of Node.js exec function for async shell command execution.
@@ -14,38 +14,38 @@ const execAsync = promisify(exec);
 async function parseGitRemotes() {
   try {
     // Run the `git remote -v` command
-    const { stdout } = await execAsync("git remote -v");
+    const { stdout } = await execAsync('git remote -v');
     // Split the output into lines
-    const lines = stdout.split("\n");
+    const lines = stdout.split('\n');
     // Object to hold the remotes
     const remotes = {};
     // Process each line
     lines.forEach((line) => {
-      const [name, url] = line.split("\t");
+      const [name, url] = line.split('\t');
       if (name && url) {
-        const [repoUrl] = url.split(" ");
+        const [repoUrl] = url.split(' ');
         try {
           // Parse the URL
           const parsedUrl = new URL(repoUrl);
           // Extract the path from the URL
-          const pathParts = parsedUrl.pathname.split("/").filter(Boolean);
+          const pathParts = parsedUrl.pathname.split('/').filter(Boolean);
           // Check if the URL is from GitHub and has the username/repo format
-          if (parsedUrl.hostname === "github.com" && pathParts.length === 2) {
+          if (parsedUrl.hostname === 'github.com' && pathParts.length === 2) {
             // Remove the `.git` suffix if present
-            let repoPath = pathParts.join("/");
-            if (repoPath.endsWith(".git")) {
+            let repoPath = pathParts.join('/');
+            if (repoPath.endsWith('.git')) {
               repoPath = repoPath.slice(0, -4); // Remove the `.git` suffix
             }
             remotes[name] = repoPath;
           }
         } catch (e) {
-          console.error("URL Parsing Error:", e.message);
+          console.error('URL Parsing Error:', e.message);
         }
       }
     });
     return remotes;
   } catch (error) {
-    console.error("Error:", error.message);
+    console.error('Error:', error.message);
     return {};
   }
 }
@@ -59,7 +59,7 @@ module.exports.parseGitRemotes = parseGitRemotes;
  * @returns {string} Normalized path with drive letter case preserved.
  */
 function joinPathPreserveDriveLetter(...segments) {
-  let fullPath = require("path").join(...segments);
+  let fullPath = require('path').join(...segments);
   // Check if the path starts with a drive letter (e.g., C:\)
   if (/^[a-z]:\\/.test(fullPath)) {
     // Convert the drive letter to uppercase
@@ -90,9 +90,9 @@ function del(fullPath) {
     if (stat.isSymbolicLink()) {
       try {
         fs.unlinkSync(fullPath);
-        console.log("deleted symlink", fullPath);
+        console.log('deleted symlink', fullPath);
       } catch (e) {
-        console.log("failed delete symlink", fullPath, e && e.message);
+        console.log('failed delete symlink', fullPath, e && e.message);
       }
       return;
     }
@@ -106,14 +106,14 @@ function del(fullPath) {
       // remove the now-empty directory
       try {
         fs.rmdirSync(fullPath);
-        console.log("deleted", fullPath);
+        console.log('deleted', fullPath);
       } catch (_e) {
         // fallback to rmSync for older Node versions or non-empty dirs
         try {
           fs.rmSync(fullPath, { recursive: true, force: true, retryDelay: 7000 });
-          console.log("deleted", fullPath);
+          console.log('deleted', fullPath);
         } catch (ee) {
-          console.log("failed delete", fullPath, ee && ee.message);
+          console.log('failed delete', fullPath, ee && ee.message);
         }
       }
       return;
@@ -122,17 +122,17 @@ function del(fullPath) {
     // File or other: remove
     try {
       fs.unlinkSync(fullPath);
-      console.log("deleted", fullPath);
+      console.log('deleted', fullPath);
     } catch (_e) {
       try {
         fs.rmSync(fullPath, { recursive: true, force: true, retryDelay: 7000 });
-        console.log("deleted", fullPath);
+        console.log('deleted', fullPath);
       } catch (ee) {
-        console.log("failed delete", fullPath, ee && ee.message);
+        console.log('failed delete', fullPath, ee && ee.message);
       }
     }
   } catch (err) {
-    console.log("failed delete", fullPath, err && err.message);
+    console.log('failed delete', fullPath, err && err.message);
   }
 }
 module.exports.del = del;
@@ -142,7 +142,7 @@ module.exports.del = del;
  * @param {glob.Glob} globStream Glob stream object.
  */
 function delStream(globStream) {
-  globStream.stream().on("data", (result) => {
+  globStream.stream().on('data', (result) => {
     const fullPath = path.resolve(process.cwd(), result);
     try {
       if (fs.existsSync(fullPath)) {
@@ -151,9 +151,9 @@ function delStream(globStream) {
           // remove the symlink only
           try {
             fs.unlinkSync(fullPath);
-            console.log("deleted symlink", fullPath);
+            console.log('deleted symlink', fullPath);
           } catch (e) {
-            console.log("failed delete symlink", fullPath, e && e.message);
+            console.log('failed delete symlink', fullPath, e && e.message);
           }
           return;
         }
@@ -166,7 +166,7 @@ function delStream(globStream) {
       }
       del(fullPath);
     } catch (err) {
-      console.log("failed processing", fullPath, err && err.message);
+      console.log('failed processing', fullPath, err && err.message);
     }
   });
 }
@@ -182,9 +182,9 @@ function getFileTreeString(hashArray) {
   // Map file paths to hashes for quick lookup
   const hashMap = {};
   for (const entry of hashArray) {
-    const [filePath, hash] = entry.split(" ");
+    const [filePath, hash] = entry.split(' ');
     hashMap[filePath] = hash;
-    const parts = filePath.split("/");
+    const parts = filePath.split('/');
     let current = tree;
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i];
@@ -196,23 +196,23 @@ function getFileTreeString(hashArray) {
       }
     }
   }
-  function printNode(node, prefix = "", parentPath = "") {
+  function printNode(node, prefix = '', parentPath = '') {
     const keys = Object.keys(node).sort();
     let lines = [];
     keys.forEach((key, idx) => {
       const isLast = idx === keys.length - 1;
-      const branch = isLast ? "└── " : "├── ";
-      const currentPath = parentPath ? parentPath + "/" + key : key;
+      const branch = isLast ? '└── ' : '├── ';
+      const currentPath = parentPath ? parentPath + '/' + key : key;
       if (node[key] === null) {
-        lines.push(prefix + branch + key + " [" + (hashMap[currentPath] || "") + "]");
+        lines.push(prefix + branch + key + ' [' + (hashMap[currentPath] || '') + ']');
       } else {
-        lines.push(prefix + branch + key + "/");
-        lines = lines.concat(printNode(node[key], prefix + (isLast ? "    " : "│   "), currentPath));
+        lines.push(prefix + branch + key + '/');
+        lines = lines.concat(printNode(node[key], prefix + (isLast ? '    ' : '│   '), currentPath));
       }
     });
     return lines;
   }
-  return printNode(tree, "", "").join("\n");
+  return printNode(tree, '', '').join('\n');
 }
 module.exports.getFileTreeString = getFileTreeString;
 

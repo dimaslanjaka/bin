@@ -1,8 +1,8 @@
-const fs = require("fs-extra");
-const path = require("upath");
-const ansiColors = require("ansi-colors");
-const child_process = require("child_process");
-const os = require("os");
+const fs = require('fs-extra');
+const path = require('upath');
+const ansiColors = require('ansi-colors');
+const child_process = require('child_process');
+const os = require('os');
 
 /**
  * Generate bash script for node_modules cleanup
@@ -20,7 +20,7 @@ set -u
 
 cwd="$(pwd)"
 max_jobs=4
-DRY_RUN=${dryRun ? "true" : "false"}
+DRY_RUN=${dryRun ? 'true' : 'false'}
 
 cleanup_letter() {
   local letter="$1"
@@ -103,7 +103,7 @@ fi
  */
 async function cleanUp(rootDir, options = {}) {
   const { dryRun = true } = options;
-  const nodeModulesDir = path.join(rootDir, "node_modules");
+  const nodeModulesDir = path.join(rootDir, 'node_modules');
   // Use the generated bash script to perform the cleanup so that behavior is
   // consistent with the CLI script generation and parallel deletion logic.
   const script = generateBashScript({ dryRun });
@@ -114,7 +114,7 @@ async function cleanUp(rootDir, options = {}) {
   const scriptPath = path.join(tmpDir, name);
 
   try {
-    fs.writeFileSync(scriptPath, script, { encoding: "utf8" });
+    fs.writeFileSync(scriptPath, script, { encoding: 'utf8' });
     try {
       fs.chmodSync(scriptPath, 0o755);
     } catch {
@@ -122,10 +122,10 @@ async function cleanUp(rootDir, options = {}) {
     }
 
     // execute with `bash` so the script semantics are preserved
-    const result = child_process.spawnSync("bash", [scriptPath], {
+    const result = child_process.spawnSync('bash', [scriptPath], {
       cwd: rootDir,
       env: process.env,
-      encoding: "utf8",
+      encoding: 'utf8',
       shell: false
     });
 
@@ -142,19 +142,19 @@ async function cleanUp(rootDir, options = {}) {
         );
         console.log(`Cleaning ${ansiColors.cyan(nodeModulesDir)}...`);
         fs.rmSync(nodeModulesDir, { recursive: true, force: true });
-        console.log(`Removed: ${ansiColors.green("node_modules (final cleanup)")}`);
-        console.log("Done cleaning node_modules.");
+        console.log(`Removed: ${ansiColors.green('node_modules (final cleanup)')}`);
+        console.log('Done cleaning node_modules.');
         return {
           code: 0,
-          stdout: result.stdout || "",
-          stderr: (result.stderr || "") + `\n${result.error.stack || result.error.message}`
+          stdout: result.stdout || '',
+          stderr: (result.stderr || '') + `\n${result.error.stack || result.error.message}`
         };
       } catch (e) {
-        return { code: 1, stdout: result.stdout || "", stderr: (result.stderr || "") + `\n${e.stack || e.message}` };
+        return { code: 1, stdout: result.stdout || '', stderr: (result.stderr || '') + `\n${e.stack || e.message}` };
       }
     }
 
-    return { code: result.status ?? 0, stdout: result.stdout ?? "", stderr: result.stderr ?? "" };
+    return { code: result.status ?? 0, stdout: result.stdout ?? '', stderr: result.stderr ?? '' };
   } finally {
     try {
       if (fs.existsSync(scriptPath)) fs.unlinkSync(scriptPath);

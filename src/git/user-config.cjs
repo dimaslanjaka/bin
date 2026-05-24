@@ -1,8 +1,8 @@
-const gch = require("git-command-helper");
-const { runGitCommand, runGitCommandOutput } = require("./utils.cjs");
-const { getArgs } = require("../utils/index.cjs");
+const gch = require('git-command-helper');
+const { runGitCommand, runGitCommandOutput } = require('./utils.cjs');
+const { getArgs } = require('../utils/index.cjs');
 
-require("dotenv").config({ path: require("path").join(process.cwd(), ".env"), quiet: true });
+require('dotenv').config({ path: require('path').join(process.cwd(), '.env'), quiet: true });
 
 /**
  * Configure Git user from CLI arguments or environment variables
@@ -12,7 +12,7 @@ require("dotenv").config({ path: require("path").join(process.cwd(), ".env"), qu
  * @param {boolean} [options.updateRemote] - If true, update remote URL without prompt
  */
 function configureGitUser(cliUser = null, cliEmail = null, options = {}) {
-  console.log("\n=== Configuring Git User ===");
+  console.log('\n=== Configuring Git User ===');
 
   // Determine user and email with CLI args taking precedence
   let username, email;
@@ -20,45 +20,45 @@ function configureGitUser(cliUser = null, cliEmail = null, options = {}) {
   if (cliUser && cliEmail) {
     username = cliUser.trim();
     email = cliEmail.trim();
-    console.log("[i] Using CLI-provided user configuration");
+    console.log('[i] Using CLI-provided user configuration');
   } else {
     username = process.env.GITHUB_USER ? process.env.GITHUB_USER.trim() : undefined;
     email = process.env.GITHUB_EMAIL ? process.env.GITHUB_EMAIL.trim() : undefined;
     if (username || email) {
-      console.log("[i] Using environment variable user configuration");
+      console.log('[i] Using environment variable user configuration');
     }
   }
 
   if (!username && !email) {
-    console.log("[i] No Git user configuration needed (no CLI args or environment variables set)");
+    console.log('[i] No Git user configuration needed (no CLI args or environment variables set)');
     return;
   }
 
   if (username) {
-    const success = runGitCommand(["config", "user.name", username], `Set Git username to "${username}"`);
+    const success = runGitCommand(['config', 'user.name', username], `Set Git username to "${username}"`);
     if (!success) {
-      console.log("[i] Failed to set Git username, but continuing...");
+      console.log('[i] Failed to set Git username, but continuing...');
     }
   } else {
-    console.log("[i] No username provided, skipping username configuration");
+    console.log('[i] No username provided, skipping username configuration');
   }
 
   if (email) {
-    const success = runGitCommand(["config", "user.email", email], `Set Git email to "${email}"`);
+    const success = runGitCommand(['config', 'user.email', email], `Set Git email to "${email}"`);
     if (!success) {
-      console.log("[i] Failed to set Git email, but continuing...");
+      console.log('[i] Failed to set Git email, but continuing...');
     }
   } else {
-    console.log("[i] No email provided, skipping email configuration");
+    console.log('[i] No email provided, skipping email configuration');
   }
 
   if (username || email) {
-    console.log("[✓] Git user configuration completed");
+    console.log('[✓] Git user configuration completed');
   }
 
   if (username) {
     // Ask user to modify the origin remote URL if it doesn't match the username
-    const remoteUrl = runGitCommandOutput(["remote", "get-url", "origin"], "Fetching remote URL for verification");
+    const remoteUrl = runGitCommandOutput(['remote', 'get-url', 'origin'], 'Fetching remote URL for verification');
     if (remoteUrl) {
       console.log(`[i] Remote URL: ${remoteUrl}`);
       const parsedUrl = gch.parseGitHubUrl(remoteUrl);
@@ -70,7 +70,7 @@ function configureGitUser(cliUser = null, cliEmail = null, options = {}) {
         console.warn(`[!] Example: git remote set-url origin https://github.com/${username}/<repo>.git\n`);
         // Check for --update-remote CLI argument or options.updateRemote
         const args = getArgs();
-        const updateRemote = options.updateRemote || args["update-remote"] === true;
+        const updateRemote = options.updateRemote || args['update-remote'] === true;
         if (updateRemote) {
           // Only update the username in the URL, not the repo path
           let newUrl = remoteUrl;
@@ -85,7 +85,7 @@ function configureGitUser(cliUser = null, cliEmail = null, options = {}) {
             return;
           }
           if (newUrl !== remoteUrl) {
-            const updated = runGitCommand(["remote", "set-url", "origin", newUrl], `Set origin to ${newUrl}`);
+            const updated = runGitCommand(['remote', 'set-url', 'origin', newUrl], `Set origin to ${newUrl}`);
             if (updated) {
               console.log(`[✓] Remote URL updated to: ${newUrl}`);
             } else {

@@ -1,5 +1,5 @@
-import fs from "fs-extra";
-import path from "upath";
+import fs from 'fs-extra';
+import path from 'upath';
 
 export async function move(src, dest) {
   if (!(await fs.pathExists(src))) {

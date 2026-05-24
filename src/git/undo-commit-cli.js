@@ -1,3 +1,3 @@
-import { undoLastCommit } from "./undo-commit.cjs";
+import { undoLastCommit } from './undo-commit.cjs';
 
 undoLastCommit();

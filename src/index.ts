@@ -1,3 +1,3 @@
-import { findNodeModules } from "./find-node-modules.cjs";
+import { findNodeModules } from './find-node-modules.cjs';
 
 export { findNodeModules };

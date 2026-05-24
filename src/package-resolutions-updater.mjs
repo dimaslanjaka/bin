@@ -25,24 +25,24 @@
  * - Helps achieve deterministic builds in monorepos or projects with internal GitHub packages.
  */
 
-import * as dotenv from "dotenv";
-import fs from "fs";
-import https from "https";
-import os from "os";
-import path from "path";
-import * as utils from "./utils/index.cjs";
-import { findEnvFiles } from "./utils/findEnvFiles.cjs";
-import { parseGitHubUrl } from "git-command-helper";
-import axios from "axios";
+import * as dotenv from 'dotenv';
+import fs from 'fs';
+import https from 'https';
+import os from 'os';
+import path from 'path';
+import * as utils from './utils/index.cjs';
+import { findEnvFiles } from './utils/findEnvFiles.cjs';
+import { parseGitHubUrl } from 'git-command-helper';
+import axios from 'axios';
 
 const projectDir = process.cwd();
-let envPath = path.join(projectDir, ".env");
+let envPath = path.join(projectDir, '.env');
 const args = utils.getArgs();
 
 if (!fs.existsSync(envPath)) {
   const envFiles = findEnvFiles(projectDir, (file) => {
     // only pick file with GITHUB_TOKEN or ACCESS_TOKEN
-    const content = fs.readFileSync(file, "utf-8");
+    const content = fs.readFileSync(file, 'utf-8');
     return /GITHUB_TOKEN|ACCESS_TOKEN/.test(content);
   });
   if (envFiles.length > 0) {
@@ -80,28 +80,28 @@ Examples:\n  node src/package-resolutions-updater.mjs\n  node src/package-resolu
 
 // --- Use a random User-Agent for GitHub API requests ---
 const GITHUB_USER_AGENTS = [
-  "octokit-rest.js/19.0.7",
-  "GitHub CLI/2.40.0",
-  "Mozilla/5.0 (compatible; GitHubCopilot/1.0)",
-  "PostmanRuntime/7.32.3",
-  "binary-collections-resolver/1.0 (+https://github.com/dimaslanjaka/bin)"
+  'octokit-rest.js/19.0.7',
+  'GitHub CLI/2.40.0',
+  'Mozilla/5.0 (compatible; GitHubCopilot/1.0)',
+  'PostmanRuntime/7.32.3',
+  'binary-collections-resolver/1.0 (+https://github.com/dimaslanjaka/bin)'
 ];
 
 // --- User-Agent persistence in system temp folder ---
-const userAgentDir = path.join(os.tmpdir(), "nodejs");
-const userAgentFile = path.join(userAgentDir, "useragent.txt");
+const userAgentDir = path.join(os.tmpdir(), 'nodejs');
+const userAgentFile = path.join(userAgentDir, 'useragent.txt');
 let selectedUserAgent;
 try {
   if (!fs.existsSync(userAgentDir)) fs.mkdirSync(userAgentDir, { recursive: true });
   if (fs.existsSync(userAgentFile)) {
-    const fileAgent = fs.readFileSync(userAgentFile, "utf-8").trim();
+    const fileAgent = fs.readFileSync(userAgentFile, 'utf-8').trim();
     if (GITHUB_USER_AGENTS.includes(fileAgent)) {
       selectedUserAgent = fileAgent;
     }
   }
   if (!selectedUserAgent) {
     selectedUserAgent = GITHUB_USER_AGENTS[Math.floor(Math.random() * GITHUB_USER_AGENTS.length)];
-    fs.writeFileSync(userAgentFile, selectedUserAgent, "utf-8");
+    fs.writeFileSync(userAgentFile, selectedUserAgent, 'utf-8');
   }
 } catch (_e) {
   // fallback to random if any error
@@ -115,22 +115,22 @@ try {
  */
 export function fetchJson(url) {
   const headers = {
-    "User-Agent": selectedUserAgent,
-    Accept: "application/vnd.github.v3+json",
-    "X-GitHub-Api-Version": "2022-11-28",
+    'User-Agent': selectedUserAgent,
+    Accept: 'application/vnd.github.v3+json',
+    'X-GitHub-Api-Version': '2022-11-28',
     ...(ACCESS_TOKEN ? { Authorization: `token ${ACCESS_TOKEN}` } : {})
   };
   return new Promise((resolve, reject) => {
     https
       .get(url, { headers }, (res) => {
-        let data = "";
-        res.on("data", (chunk) => (data += chunk));
-        res.on("end", () => {
+        let data = '';
+        res.on('data', (chunk) => (data += chunk));
+        res.on('end', () => {
           try {
             const json = JSON.parse(data);
             if (res.statusCode < 200 || res.statusCode >= 300) {
               return reject(
-                new Error(`GitHub API Error ${res.statusCode}: ${json.message || "Unknown error"}\nURL: ${url}`)
+                new Error(`GitHub API Error ${res.statusCode}: ${json.message || 'Unknown error'}\nURL: ${url}`)
               );
             }
             resolve(json);
@@ -139,14 +139,14 @@ export function fetchJson(url) {
           }
         });
       })
-      .on("error", reject);
+      .on('error', reject);
   });
 }
 
 /**
  * Get latest commit SHA from a specific branch.
  */
-export async function getLatestCommit(owner, repo, branch = "main") {
+export async function getLatestCommit(owner, repo, branch = 'main') {
   const url = `https://api.github.com/repos/${owner}/${repo}/commits/${branch}`;
   const json = await fetchJson(url);
 
@@ -178,7 +178,7 @@ export async function getLatestCommitAcrossBranches(owner, repo) {
       const commitSha = commit?.sha;
       if (!commitSha) {
         console.warn(`No commit SHA for '${owner}/${repo}' branch: ${name}`);
-        return { branch: name, sha: "", date: new Date(0) };
+        return { branch: name, sha: '', date: new Date(0) };
       }
 
       try {
@@ -211,11 +211,11 @@ export function replaceRawWithLatestHash(url, latestHash) {
   const parsed = parseGitHubUrl(url);
 
   if (!parsed || !parsed.owner || !parsed.repo || !parsed.branch) {
-    throw new Error("Invalid GitHub raw URL");
+    throw new Error('Invalid GitHub raw URL');
   }
 
   const branchPrefix = `${parsed.branch}/`;
-  const rawPrefix = parsed.host === "github.com" ? `raw/${branchPrefix}` : branchPrefix;
+  const rawPrefix = parsed.host === 'github.com' ? `raw/${branchPrefix}` : branchPrefix;
   const refsPrefix = `refs/heads/${branchPrefix}`;
   const path = parsed.path.startsWith(rawPrefix)
     ? parsed.path.slice(rawPrefix.length)
@@ -225,15 +225,15 @@ export function replaceRawWithLatestHash(url, latestHash) {
         ? parsed.path.slice(branchPrefix.length)
         : parsed.path;
 
-  if (parsed.host === "github.com") {
+  if (parsed.host === 'github.com') {
     return `https://github.com/${parsed.owner}/${parsed.repo}/raw/${latestHash}/${path}`;
   }
 
-  if (parsed.host === "raw.githubusercontent.com") {
+  if (parsed.host === 'raw.githubusercontent.com') {
     return `https://raw.githubusercontent.com/${parsed.owner}/${parsed.repo}/${latestHash}/${path}`;
   }
 
-  throw new Error("Invalid GitHub raw URL");
+  throw new Error('Invalid GitHub raw URL');
 }
 
 // Re-export parseGitHubUrl from git-command-helper for backward compatibility
@@ -276,9 +276,9 @@ export async function resolvePackageResolutionUpdates(resolutions, specialPackag
       await axios
         .head(new_url, {
           headers: {
-            "User-Agent": selectedUserAgent,
-            Accept: "application/vnd.github.v3+json",
-            "X-GitHub-Api-Version": "2022-11-28",
+            'User-Agent': selectedUserAgent,
+            Accept: 'application/vnd.github.v3+json',
+            'X-GitHub-Api-Version': '2022-11-28',
             ...(ACCESS_TOKEN ? { Authorization: `token ${ACCESS_TOKEN}` } : {})
           }
         })

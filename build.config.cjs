@@ -44,7 +44,11 @@ const defaultBin = {
   'node-copy': 'lib/file/copy-cli.cjs',
   'node-move': 'lib/file/move-cli.cjs',
   'copy-file': 'lib/file/copy-cli.cjs',
-  'move-file': 'lib/file/move-cli.cjs'
+  'move-file': 'lib/file/move-cli.cjs',
+  'node-exec': 'lib/node-executor.cjs',
+  'exec-node': 'lib/node-executor.cjs',
+  'execute-node': 'lib/node-executor.cjs',
+  'node-executor': 'lib/node-executor.cjs'
 };
 
 /**

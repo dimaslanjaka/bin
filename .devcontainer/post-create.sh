@@ -2,53 +2,36 @@
 set -euo pipefail
 
 echo ""
-echo "=== Runtime Versions ==="
+echo "=== Versions ==="
 
-printf "Node   : "
 node -v
-
-printf "npm    : "
-npm -v
-
-printf "PHP    : "
+yarn -v || true
 php -v | head -n 1
-
-printf "Python : "
-python --version
+python3.11 --version
 
 echo ""
-echo "=== Enable Corepack ==="
+echo "=== Corepack ==="
 
 corepack enable
-
-echo ""
-echo "=== Activate Yarn Berry ==="
-
-# Use latest stable Yarn Berry
 corepack prepare yarn@stable --activate
 
-printf "Yarn   : "
-yarn -v
-
 echo ""
-echo "=== Install Global Node Tools ==="
-
-npm install -g pnpm
-
-echo ""
-echo "=== Project Setup ==="
+echo "=== Yarn Berry ==="
 
 if [ -f package.json ]; then
   yarn install
 fi
 
+echo ""
+echo "=== Composer ==="
+
 if [ -f composer.json ]; then
   composer install
 fi
 
+echo ""
+echo "=== Python ==="
+
 if [ -f requirements.txt ]; then
   pip install -r requirements.txt
 fi
-
-echo ""
-echo "=== Done ==="

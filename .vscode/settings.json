@@ -44,6 +44,24 @@
   },
   "editor.formatOnPaste": false,
   "editor.formatOnSave": false,
+  "[markdown]": {
+    "editor.unicodeHighlight.ambiguousCharacters": false,
+    "editor.unicodeHighlight.invisibleCharacters": false,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": {
+      "comments": "off",
+      "strings": "off",
+      "other": "off"
+    },
+    "editor.formatOnSave": false,
+    "editor.formatOnPaste": false,
+    "editor.codeActionsOnSave": {
+      "source.sort.json": "never",
+      "source.organizeLinkDefinitions": "never"
+    },
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "code-runner.clearPreviousOutput": true,
   "code-runner.ignoreSelection": true,
   "code-runner.runInTerminal": true,

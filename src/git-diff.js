@@ -29,19 +29,19 @@ const GPT_DIFF_OUTPUT_RELATIVE = path.relative(process.cwd(), GPT_DIFF_OUTPUT);
 fs.ensureDirSync(CACHE_DIR, { mode: 0o755 });
 
 function showHelp() {
-  console.log('\u{1F4DD} Git Diff Helper');
-  console.log('\u{1F4C4} Usage:');
-  console.log('  \u{1F4C2} git-diff FILE             Show staged diff of specified file');
-  console.log('  \u{1F4C2} git-diff --staged-only    Show staged diff of all files');
-  console.log('  \u{1F4C2} git-diff -s | -S          Same as --staged-only');
-  console.log('  \u{1F4C2} git-diff --unstaged FILE  Show unstaged diff of specified file');
-  console.log('  \u{1F4C2} git-diff --unstaged       Show unstaged diff of all files');
-  console.log('  \u{1F4C2} git-diff -u               Same as --unstaged');
-  console.log('  \u{1F4C2} git-diff --ai             Run ChatGPT automation for commit message');
-  console.log('  \u{1F4C2} git-diff --help | -h      Show this help message');
+  console.log('📋 Git Diff Helper');
+  console.log('Usage:');
+  console.log('  git-diff FILE             Show staged diff of specified file');
+  console.log('  git-diff --staged-only    Show staged diff of all files');
+  console.log('  git-diff -s | -S          Same as --staged-only');
+  console.log('  git-diff --unstaged FILE  Show unstaged diff of specified file');
+  console.log('  git-diff --unstaged       Show unstaged diff of all files');
+  console.log('  git-diff -u               Same as --unstaged');
+  console.log('  git-diff --ai             Run ChatGPT automation for commit message');
+  console.log('  git-diff --help | -h      Show this help message');
   console.log('');
-  console.log(`\u{1F4BE} Output is saved to: ${DIFF_OUTPUT_RELATIVE}`);
-  console.log(`\u{1F916} GPT prompt is saved to: ${GPT_DIFF_OUTPUT_RELATIVE}`);
+  console.log(`💾 Output is saved to: ${DIFF_OUTPUT_RELATIVE}`);
+  console.log(`🤖 GPT prompt is saved to: ${GPT_DIFF_OUTPUT_RELATIVE}`);
   process.exit(0);
 }
 
@@ -77,7 +77,7 @@ function showHelp() {
  */
 function runGitDiff(command, successMessage, errorMessage) {
   try {
-    console.log(`🔍 [i] Running command: ${command}`);
+    console.log(`ℹ️  Running command: ${command}`);
     const result = execSync(command, {
       encoding: 'utf8',
       maxBuffer: 1024 * 1024 * 10 // 10MB buffer to handle large diffs
@@ -85,7 +85,7 @@ function runGitDiff(command, successMessage, errorMessage) {
 
     // If result is empty, inform user but don't treat as error
     if (!result || result.trim() === '') {
-      console.log(`ℹ️  [i] No changes found for the specified criteria`);
+      console.log(`ℹ️  No changes found for the specified criteria`);
       writefile(DIFF_OUTPUT, '# No changes found\n');
       console.log(`✅ Empty diff saved to "${DIFF_OUTPUT_RELATIVE}"`);
       return false;
@@ -94,19 +94,19 @@ function runGitDiff(command, successMessage, errorMessage) {
     writefile(DIFF_OUTPUT, result);
     writefile(
       GPT_DIFF_OUTPUT,
-      `Hello, ChatGPT!\nCan you create a conventional commit message by diff content below:\n\n\`\`\`${result}\n\`\`\`\n\nGive me result as codeblock with language "text" only.\n\nThank you!`
+      `Hello!\nCan you create a conventional commit message by diff content below:\n\n\`\`\`${result}\n\`\`\`\n\nGive me result as codeblock with language "text" only.\n\nThank you!`
     );
     console.log(`✅ ${successMessage}`);
     console.log(`💾 GPT diff prompt saved to "${ansiColors.green(GPT_DIFF_OUTPUT_RELATIVE)}"`);
     return true;
   } catch (error) {
     console.error(`❌ ${errorMessage}`);
-    console.error(`📝 Command: ${command}`);
-    console.error(`⚠️ Error: ${error.message}`);
+    console.error(`❌ Command: ${command}`);
+    console.error(`❌ Error: ${error.message}`);
 
     // Check if it's a git-related error
     if (error.message.includes('not a git repository')) {
-      console.error('🚧 Make sure you are in a git repository');
+      console.error('❌ Make sure you are in a git repository');
     }
 
     process.exit(1);
@@ -114,16 +114,60 @@ function runGitDiff(command, successMessage, errorMessage) {
 }
 
 /**
- * Checks whether a file has changes for a specific git diff mode.
+ * Generates diff-formatted output for untracked files.
+ * Uses `git ls-files --others --exclude-standard` to find untracked files,
+ * then creates synthetic git diff entries for each.
  *
- * Uses `git diff --quiet` semantics:
- * - exit code 0: no changes
- * - exit code 1: changes exist
- *
- * @param {string} file - Target file path
- * @param {"staged" | "unstaged"} mode - Diff mode to check
- * @returns {boolean} True when changes exist for the given mode
+ * @returns {string} Formatted diff content for untracked files, or empty string if none
  */
+function getUntrackedDiff() {
+  try {
+    const untrackedStr = execSync('git ls-files --others --exclude-standard', {
+      encoding: 'utf8',
+      maxBuffer: 1024 * 1024 * 10
+    }).trim();
+    if (!untrackedStr) return '';
+    const untrackedFiles = untrackedStr.split('\n').filter(function (f) {
+      return f;
+    });
+    if (untrackedFiles.length === 0) return '';
+
+    var result = '\n# Untracked files:\n';
+    for (var i = 0; i < untrackedFiles.length; i++) {
+      var file = untrackedFiles[i];
+      if (!fs.existsSync(file)) continue;
+      var stat = fs.statSync(file);
+      if (!stat.isFile()) continue;
+
+      var content;
+      try {
+        content = fs.readFileSync(file, 'utf8');
+      } catch (_a) {
+        continue; // skip binary files
+      }
+
+      var lines = content.split('\n');
+      // Remove trailing empty line from split
+      if (lines.length > 0 && lines[lines.length - 1] === '') {
+        lines.pop();
+      }
+
+      result += 'diff --git a/' + file + ' b/' + file + '\n';
+      result += 'new file mode 100644\n';
+      result += 'index 0000000..0000000\n';
+      result += '--- /dev/null\n';
+      result += '+++ b/' + file + '\n';
+      result += '@@ -0,0 +1,' + (lines.length || 0) + ' @@\n';
+      for (var j = 0; j < lines.length; j++) {
+        result += '+' + lines[j] + '\n';
+      }
+    }
+    return result;
+  } catch (_b) {
+    return '';
+  }
+}
+
 function fileHasChanges(file, mode) {
   const command = mode === 'staged' ? `git diff --cached --quiet -- "${file}"` : `git diff --quiet -- "${file}"`;
 
@@ -166,6 +210,24 @@ async function mainGitDiff() {
         `Full ${fullDiffModeLabel} diff saved to "${ansiColors.green(DIFF_OUTPUT_RELATIVE)}"`,
         "Failed to save all diff's"
       );
+      // Save untracked file diffs to separate file
+      const untrackedDiff = getUntrackedDiff();
+      if (untrackedDiff) {
+        const UNTRACKED_DIFF_OUTPUT = getTempPath(`git-diff/untracked-${FILENAME}.txt`);
+        const UNTRACKED_GPT_DIFF_OUTPUT = getTempPath(`git-diff/gpt-untracked-${FILENAME}.txt`);
+        const UNTRACKED_DIFF_OUTPUT_RELATIVE = path.relative(process.cwd(), UNTRACKED_DIFF_OUTPUT);
+
+        writefile(UNTRACKED_DIFF_OUTPUT, untrackedDiff);
+        writefile(
+          UNTRACKED_GPT_DIFF_OUTPUT,
+          `Hello!\nCan you create a conventional commit message by diff content below:\n\n\`\`\`${untrackedDiff}\n\`\`\`\n\nGive me result as codeblock with language "text" only.\n\nThank you!`
+        );
+        console.log(`✅ Untracked file diff saved to "${ansiColors.green(UNTRACKED_DIFF_OUTPUT_RELATIVE)}"`);
+        console.log(
+          `💾 AI diff prompt saved to "${ansiColors.green(path.relative(process.cwd(), UNTRACKED_GPT_DIFF_OUTPUT))}"`
+        );
+        hasDiff = true;
+      }
     } else {
       let fileDiffMode = useUnstaged ? 'unstaged' : 'staged';
 
@@ -202,7 +264,7 @@ async function mainGitDiff() {
     const opencodePromptPath = getTempPath(`git-diff/opencode-${FILENAME}.txt`);
     writefile(opencodePromptPath, opencodePrompt.join('\n'));
 
-    console.log(`💡 OpenCode prompt saved to "${ansiColors.green(path.relative(process.cwd(), opencodePromptPath))}"`);
+    console.log(`✅ OpenCode prompt saved to "${ansiColors.green(path.relative(process.cwd(), opencodePromptPath))}"`);
   }
 
   // Generate commit message prompt from ChatGPT (only if --ai is specified)
@@ -214,7 +276,7 @@ async function mainGitDiff() {
       console.error('💡 Try running with visible browser mode or check if Chrome is installed');
     }
   } else {
-    console.log('💡 Tip: Use --ai flag to generate commit message with ChatGPT');
+    console.log('💡 Use --ai flag to generate commit message with ChatGPT');
   }
 }
 

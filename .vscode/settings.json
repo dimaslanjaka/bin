@@ -122,7 +122,7 @@
       "source.organizeImports": "never",
       "source.fixAll": "never"
     },
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "vscode.json-language-features"
   },
   "[html]": {
     "editor.suggest.insertMode": "replace",

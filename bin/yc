@@ -4,6 +4,27 @@ set -u
 cwd="$(pwd)"
 max_jobs=4
 
+usage() {
+  cat <<EOF
+Usage: $(basename "$0") [options]
+
+Options:
+  -h, --help     Show this help message
+
+Description:
+  Clean node_modules directories grouped by letter (a-z) in parallel.
+
+Environment:
+  max_jobs       Maximum parallel jobs (default: 4)
+EOF
+}
+
+for arg in "$@"; do
+  case "$arg" in
+    -h|--help) usage; exit 0 ;;
+  esac
+done
+
 # colors
 GREEN='\033[0;32m'
 RED='\033[0;31m'

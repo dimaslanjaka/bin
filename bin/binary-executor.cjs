@@ -12,9 +12,9 @@
  * - fs:
  *   Used to check whether files exist.
  */
-const { spawnSync } = require("child_process");
-const path = require("path");
-const fs = require("fs");
+const { spawnSync } = require('child_process');
+const path = require('path');
+const fs = require('fs');
 
 /**
  * __dirname
@@ -49,7 +49,7 @@ const base = path.basename(__filename, path.extname(__filename));
  *   .sh
  *   executable file without extension
  */
-const candidates = process.platform === "win32" ? [".cmd", ".bat", ".ps1", ".vbs"] : [".sh", ""];
+const candidates = process.platform === 'win32' ? ['.cmd', '.bat', '.ps1', '.vbs'] : ['.sh', ''];
 
 /**
  * Search for the first matching script
@@ -72,10 +72,29 @@ let found = null;
 
 for (const ext of candidates) {
   const script = path.join(binDir, base + ext);
-
-  if (fs.existsSync(script)) {
+  const exists = fs.existsSync(script);
+  // console.log(`Checking for ${script}: ${exists ? 'found' : 'not found'}`);
+  if (exists) {
     found = script;
     break;
+  }
+}
+
+/**
+ * If no matching script was found,
+ * try check if `bash` is available and if so, check for a .sh script.
+ */
+if (!found) {
+  try {
+    spawnSync('bash', ['--version'], { stdio: 'ignore' });
+    const bashScript = [path.join(binDir, base), path.join(binDir, base + '.sh')].find((script) =>
+      fs.existsSync(script)
+    );
+    if (bashScript) {
+      found = bashScript;
+    }
+  } catch {
+    // bash is not available, do nothing
   }
 }
 
@@ -92,8 +111,9 @@ if (!found) {
  * Detect special script types
  * that require a shell/interpreter.
  */
-const isPs1 = found.endsWith(".ps1");
-const isCmd = found.endsWith(".cmd");
+const isPs1 = found.endsWith('.ps1');
+const isCmd = found.endsWith('.cmd');
+const isUnixShell = found.endsWith('.sh') || path.extname(found) === '';
 
 /**
  * cmd
@@ -124,9 +144,9 @@ let cmd, args;
  *   Forward all user-provided command-line arguments.
  */
 if (isPs1) {
-  cmd = "powershell.exe";
+  cmd = 'powershell.exe';
 
-  args = ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", found, ...process.argv.slice(2)];
+  args = ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', found, ...process.argv.slice(2)];
 
   /**
    * CMD batch files:
@@ -137,9 +157,9 @@ if (isPs1) {
    *   "execute command and terminate"
    */
 } else if (isCmd) {
-  cmd = "cmd.exe";
+  cmd = 'cmd.exe';
 
-  args = ["/c", found, ...process.argv.slice(2)];
+  args = ['/c', found, ...process.argv.slice(2)];
 
   /**
    * Other scripts:
@@ -150,10 +170,32 @@ if (isPs1) {
    *
    * These can be executed directly.
    */
+} else if (isUnixShell) {
+  // Capture shebang scripts (no extension) and .sh scripts
+  const shebang = fs.readFileSync(found, 'utf8').split('\n')[0].trim();
+  const interpreter = shebang.startsWith('#!')
+    ? shebang
+        .slice(2)
+        .trim()
+        .replace(/^\/usr\/bin\/env\s+/, '')
+        .replace(/^\/bin\/env\s+/, '')
+        .replace(/^\/usr\/bin\//, '')
+        .replace(/^\/bin\//, '')
+    : null;
+
+  if (interpreter) {
+    cmd = interpreter;
+    args = [found, ...process.argv.slice(2)];
+  } else {
+    cmd = found;
+    args = process.argv.slice(2);
+  }
 } else {
   cmd = found;
   args = process.argv.slice(2);
 }
+
+console.log(`Executing: ${cmd} ${args.join(' ')}`);
 
 /**
  * Execute the selected script synchronously.
@@ -165,7 +207,7 @@ if (isPs1) {
  * spawnSync waits until the child process exits.
  */
 const result = spawnSync(cmd, args, {
-  stdio: "inherit"
+  stdio: 'inherit'
 });
 
 /**

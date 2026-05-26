@@ -1,5 +1,4 @@
-/**
- *
+/*
  * 1, define the edge ( begin and end ) of every title field
  * 2, parse all the lines except the title line, get all the connected-domains
  * 3, group all the connected-domains vertically overlapped.
@@ -10,9 +9,8 @@ import ConnectedDomain from './connected-domain';
 var EMPTY_EX = /\s/;
 
 /**
- * The output sting of cmd to parse
- * @param output
- * @returns {Array}
+ * @param {string} output
+ * @returns {Array<Object>}
  */
 export function parse(output) {
   // Split into lines
@@ -195,11 +193,10 @@ export function parse(output) {
 }
 
 /**
- * Test if two bounding overlapped vertically
- * @param begin1
- * @param end1
- * @param begin2
- * @param end2
+ * @param {number} begin1
+ * @param {number} end1
+ * @param {number} begin2
+ * @param {number} end2
  * @returns {boolean}
  */
 function overlap(begin1, end1, begin2, end2) {
@@ -211,12 +208,8 @@ function overlap(begin1, end1, begin2, end2) {
 }
 
 /**
- * transform a string value into array. It's not just split(), but also to consider some chunk that wrapped with `"`, like below:
- *      "C:\Program Files\Google\Chrome\Application\chrome.exe" --type=renderer --lang=zh-CN, `C:\Program Files\Google\Chrome\Application\chrome.exe` should be treated as a whole,
- *      also, be careful don't be mislead by format like `--name="neekey"`, even more complicated: `--name="Neekey Ni"`
- * so, `"C:\Program Files\Internet Explorer\iexplore.exe" --name="Jack Neekey"` should split into:
- *  - C:\Program Files\Internet Explorer\iexplore.exe  // without `"`
- *  - --name="Jack Neekey"                             // with `"`
+ * @param {string} value
+ * @returns {string[]}
  */
 function splitValue(value) {
   var match = value.match(/"/g);

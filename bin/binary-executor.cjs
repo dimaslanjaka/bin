@@ -15,6 +15,7 @@
 const { spawnSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
+const which = require('which');
 
 /**
  * __dirname
@@ -184,7 +185,8 @@ if (isPs1) {
     : null;
 
   if (interpreter) {
-    cmd = interpreter;
+    const resolvedOrNull = which.sync(interpreter, { nothrow: true });
+    cmd = resolvedOrNull || interpreter;
     args = [found, ...process.argv.slice(2)];
   } else {
     cmd = found;
@@ -195,7 +197,14 @@ if (isPs1) {
   args = process.argv.slice(2);
 }
 
-console.log(`Executing: ${cmd} ${args.join(' ')}`);
+console.log(
+  `Executing: ${path.isAbsolute(cmd) ? path.relative(process.cwd(), cmd) : cmd} ${args
+    .map((f) => {
+      if (path.isAbsolute(f)) return path.relative(process.cwd(), f);
+      return f;
+    })
+    .join(' ')}`
+);
 
 /**
  * Execute the selected script synchronously.

@@ -3,7 +3,7 @@
     "DEBUG_PKG": "1",
     "ESLINT_USE_FLAT_CONFIG": "true",
     "NUITKA_CACHE_DIR": "${workspaceFolder}/tmp/nuitka-cache",
-    "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:${workspaceFolder}/bin:${workspaceFolder}/node_modules/.bin:${workspaceFolder}/vendor/bin:${workspaceFolder}/binaries",
+    "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:${workspaceFolder}/bin:${workspaceFolder}/node_modules/.bin:${workspaceFolder}/vendor/bin",
     "PHP_CS_FIXER_IGNORE_ENV": "1",
     "PUPPETEER_SKIP_DOWNLOAD": "true"
   },
@@ -11,7 +11,7 @@
     "DEBUG_PKG": "1",
     "ESLINT_USE_FLAT_CONFIG": "true",
     "NUITKA_CACHE_DIR": "${workspaceFolder}\\tmp\\nuitka-cache",
-    "PATH": "${env:LOCALAPPDATA}\\nvm;C:\\nvm4w\\nodejs;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\usr\\bin;${env:PATH};${workspaceFolder}\\node_modules\\.bin;${workspaceFolder}\\bin;${workspaceFolder}\\vendor\\bin;C:\\laragon\\bin\\mysql\\mysql-8.4.3-winx64\\bin;C:\\Users\\Dell\\AppData\\Local\\Programs\\Ollama;${workspaceFolder}\\binaries",
+    "PATH": "${env:LOCALAPPDATA}\\nvm;C:\\nvm4w\\nodejs;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\usr\\bin;${env:PATH};${workspaceFolder}\\node_modules\\.bin;${workspaceFolder}\\bin;${workspaceFolder}\\vendor\\bin;C:\\laragon\\bin\\mysql\\mysql-8.4.3-winx64\\bin;C:\\Users\\Dell\\AppData\\Local\\Programs\\Ollama",
     "PHP_CS_FIXER_IGNORE_ENV": "1",
     "PUPPETEER_SKIP_DOWNLOAD": "true"
   },
@@ -34,13 +34,30 @@
       "env": {
         "CHERE_INVOKING": "1"
       }
+    },
+    "Short PowerShell": {
+      "source": "PowerShell",
+      "args": ["-NoExit", "-Command", "function prompt { \"[$((Get-Item .).Name)]> \" }"],
+      "icon": "terminal-powershell"
+    },
+    "Short Command Prompt": {
+      "path": ["${env:windir}\\System32\\cmd.exe"],
+      "args": ["/k", "prompt $p$_$g"],
+      "icon": "terminal-cmd"
     }
   },
   "terminal.integrated.defaultProfile.windows": "Command Prompt",
   "files.autoSave": "onWindowChange",
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",
-    "source.organizeImports": "never"
+    "source.organizeImports": "never",
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.ts": "never",
+    "source.addMissingImports.ts": "never",
+    "source.removeUnused.ts": "never",
+    "source.removeUnusedImports": "never",
+    "source.sort.json": "never",
+    "source.sortImports": "never"
   },
   "editor.formatOnPaste": false,
   "editor.formatOnSave": false,
@@ -217,5 +234,43 @@
   "python.autoComplete.extraPaths": ["c:\\Users\\Dell\\.vscode\\extensions\\continue.continue-0.0.412-win32-x64"],
   "[typescript]": {
     "editor.defaultFormatter": "vscode.typescript-language-features"
-  }
+  },
+  "eslint.probe": [
+    "astro",
+    "civet",
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "html",
+    "mdx",
+    "vue",
+    "markdown",
+    "json",
+    "jsonc",
+    "css",
+    "glimmer-js",
+    "glimmer-ts",
+    "svelte",
+    "nunjucks"
+  ],
+  "eslint.validate": [
+    "astro",
+    "civet",
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "html",
+    "mdx",
+    "vue",
+    "markdown",
+    "json",
+    "jsonc",
+    "css",
+    "glimmer-js",
+    "glimmer-ts",
+    "svelte",
+    "nunjucks"
+  ]
 }

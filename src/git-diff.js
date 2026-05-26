@@ -97,7 +97,7 @@ function runGitDiff(command, successMessage, errorMessage) {
       `Hello, ChatGPT!\nCan you create a conventional commit message by diff content below:\n\n\`\`\`${result}\n\`\`\`\n\nGive me result as codeblock with language "text" only.\n\nThank you!`
     );
     console.log(`✅ ${successMessage}`);
-    console.log(`💾 GPT diff prompt saved to "${GPT_DIFF_OUTPUT_RELATIVE}"`);
+    console.log(`💾 GPT diff prompt saved to "${ansiColors.green(GPT_DIFF_OUTPUT_RELATIVE)}"`);
     return true;
   } catch (error) {
     console.error(`❌ ${errorMessage}`);
@@ -192,14 +192,17 @@ async function mainGitDiff() {
       '────────────────────────',
       '',
       '📄 App Prompt:',
-      `   Generate a conventional commit message from diff file: ${ansiColors.green(DIFF_OUTPUT)}`,
+      `   Generate a conventional commit message from diff file: ${DIFF_OUTPUT}`,
       '',
       '💻 CLI Command:',
       `   opencode run "Generate a conventional commit message from diff file ${DIFF_OUTPUT}"`,
       ''
     ];
 
-    console.log(opencodePrompt.join('\n'));
+    const opencodePromptPath = getTempPath(`git-diff/opencode-${FILENAME}.txt`);
+    writefile(opencodePromptPath, opencodePrompt.join('\n'));
+
+    console.log(`💡 OpenCode prompt saved to "${ansiColors.green(path.relative(process.cwd(), opencodePromptPath))}"`);
   }
 
   // Generate commit message prompt from ChatGPT (only if --ai is specified)

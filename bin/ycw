@@ -17,17 +17,15 @@ This tool:
   - Runs partial cleanup in parallel for speed
 
 Options:
-  -h, --help        Show this help message and exit
+  -h, --help              Show this help message and exit
+  -c, --concurrent <num>  Maximum parallel jobs (default: 4)
 
 Behavior:
   • Root is detected by scanning upward for package.json with "workspaces"
   • Workspace patterns are read from package.json (no jq required)
   • node_modules folders are removed in two phases:
-      1. Partial cleanup (letter-based parallel deletion)
-      2. Final full removal of remaining node_modules directories
-
-Performance:
-  max_jobs=4       Number of parallel deletion workers (hardcoded)
+       1. Partial cleanup (letter-based parallel deletion)
+       2. Final full removal of remaining node_modules directories
 
 Notes:
   - Designed for Yarn workspaces monorepos
@@ -37,13 +35,16 @@ Notes:
 Example:
   ycw
   ycw --help
+  ycw -c 8
 
 EOF
 }
 
-for arg in "$@"; do
-  case "$arg" in
+while [[ $# -gt 0 ]]; do
+  case "$1" in
     -h|--help) usage; exit 0 ;;
+    -c|--concurrent) max_jobs="$2"; shift 2 ;;
+    *) shift ;;
   esac
 done
 

@@ -9,19 +9,19 @@ usage() {
 Usage: $(basename "$0") [options]
 
 Options:
-  -h, --help     Show this help message
+  -h, --help               Show this help message
+  -c, --concurrent <num>   Maximum parallel jobs (default: 4)
 
 Description:
   Clean node_modules directories grouped by letter (a-z) in parallel.
-
-Environment:
-  max_jobs       Maximum parallel jobs (default: 4)
 EOF
 }
 
-for arg in "$@"; do
-  case "$arg" in
+while [[ $# -gt 0 ]]; do
+  case "$1" in
     -h|--help) usage; exit 0 ;;
+    -c|--concurrent) max_jobs="$2"; shift 2 ;;
+    *) shift ;;
   esac
 done
 

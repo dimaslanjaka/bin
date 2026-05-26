@@ -1,14 +1,11 @@
-import fs from 'fs-extra';
-import path from 'path';
 import { runChecksum } from '../../src/run-by-checksum/run.js';
-import { TEST_ROOT } from './shared.mjs';
+import { TEST_ROOT, cleanTestRoot, createTestFile } from './shared.mjs';
 
 describe('checksum-runner - runChecksum', () => {
-  beforeEach(async () => {
-    await fs.remove(TEST_ROOT);
-    await fs.ensureDir(TEST_ROOT);
-    await fs.outputFile(path.join(TEST_ROOT, 'a.js'), "console.log('a1')");
-    await fs.outputFile(path.join(TEST_ROOT, 'b.js'), "console.log('b1')");
+  beforeEach(() => {
+    cleanTestRoot();
+    createTestFile(TEST_ROOT, 'a.js', "console.log('a1')");
+    createTestFile(TEST_ROOT, 'b.js', "console.log('b1')");
   });
 
   test('should run command when files changed', async () => {
@@ -22,7 +19,7 @@ describe('checksum-runner - runChecksum', () => {
     expect(result1.changed).toBe(true);
 
     // modify file to force checksum change
-    await fs.outputFile(path.join(TEST_ROOT, 'a.js'), "console.log('changed')");
+    createTestFile(TEST_ROOT, 'a.js', "console.log('changed')");
 
     const result2 = await runChecksum({
       cwd: TEST_ROOT,

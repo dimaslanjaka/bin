@@ -29,8 +29,12 @@ Options:
 }
 
 const patterns = Array.isArray(argv.pattern) ? argv.pattern : [argv.pattern];
-
 const ignore = Array.isArray(argv.ignore) ? argv.ignore : [argv.ignore];
+
+console.log('[run-by-checksum] patterns:', patterns.join(', '));
+console.log('[run-by-checksum] ignore:', ignore.join(', ') || '(none)');
+console.log('[run-by-checksum] cwd:', argv.cwd || process.env.INIT_CWD || process.cwd());
+console.log('[run-by-checksum] exec:', argv.exec || '(none)');
 
 runChecksum({
   patterns,

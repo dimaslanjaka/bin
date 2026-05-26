@@ -23,6 +23,7 @@ This command is available under several aliases (all invoke the same CLI):
 | `-p`, `--pattern` | `string[]` | Glob pattern(s) to include (can be repeated) |
 | `-i`, `--ignore` | `string[]` | Glob pattern(s) to exclude (can be repeated) |
 | `-e`, `--exec` | `string` | Command to execute when checksum changes |
+| `-c`, `--cwd` | `string` | Working directory for glob scanning and spawn (default: `INIT_CWD` or current directory) |
 | `-h`, `--help` | `boolean` | Show help message |
 
 ### Examples
@@ -37,6 +38,12 @@ Ignore node_modules and run tests when source files change:
 
 ```bash
 run-by-checksum -p "src/**/*.js" -i "**/node_modules/**" -e "npm test"
+```
+
+Override the working directory (both glob scanning and spawned command run relative to the given directory):
+
+```bash
+run-by-checksum -p "*.js" -e "npm test" --cwd /path/to/project
 ```
 
 ### How it works

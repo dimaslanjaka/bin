@@ -63,7 +63,7 @@ export async function runChecksum({
     };
   }
 
-  await runCommand(exec);
+  await runCommand(exec, cwd);
 
   return {
     changed: true,
@@ -74,13 +74,15 @@ export async function runChecksum({
 
 /**
  * @param {string} command
+ * @param {string} [cwd]
  * @returns {Promise<void>}
  */
-function runCommand(command) {
+function runCommand(command, cwd) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, {
       shell: true,
-      stdio: 'inherit'
+      stdio: 'inherit',
+      cwd
     });
 
     child.on('exit', (code) => {

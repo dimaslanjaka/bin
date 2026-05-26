@@ -4,8 +4,8 @@ import minimist from 'minimist';
 import { runChecksum } from './run-by-checksum/run.js';
 
 const argv = minimist(process.argv.slice(2), {
-  string: ['pattern', 'ignore', 'exec'],
-  alias: { p: 'pattern', i: 'ignore', e: 'exec', h: 'help' },
+  string: ['pattern', 'ignore', 'exec', 'cwd'],
+  alias: { p: 'pattern', i: 'ignore', e: 'exec', c: 'cwd', h: 'help' },
   default: {
     pattern: [],
     ignore: []
@@ -22,6 +22,7 @@ Options:
   -p, --pattern <glob>   Glob pattern(s) to include (can be repeated)
   -i, --ignore <glob>    Glob pattern(s) to exclude (can be repeated)
   -e, --exec <command>   Command to execute when checksum changes
+  -c, --cwd <dir>        Working directory for glob and spawn (default: process.env.INIT_CWD or cwd)
   -h, --help             Show this help message
 `);
   process.exit(0);
@@ -34,7 +35,8 @@ const ignore = Array.isArray(argv.ignore) ? argv.ignore : [argv.ignore];
 runChecksum({
   patterns,
   ignore,
-  exec: argv.exec
+  exec: argv.exec,
+  cwd: argv.cwd
 }).catch((err) => {
   console.error(err);
   process.exit(1);

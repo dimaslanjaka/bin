@@ -18,7 +18,7 @@ const positional = args._ || [];
 // Output path using centralized temp directory configuration
 const FILENAME = md5((positional[0] || 'default') + JSON.stringify(args));
 const DIFF_OUTPUT = getTempPath(`git-diff/${FILENAME}.txt`);
-const GPT_DIFF_OUTPUT = getTempPath(`gpt-question/${FILENAME}.txt`);
+const GPT_DIFF_OUTPUT = getTempPath(`git-diff/gpt-${FILENAME}.txt`);
 const CACHE_DIR = path.dirname(DIFF_OUTPUT);
 
 // Relative paths for display in logs

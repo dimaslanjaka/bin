@@ -80,6 +80,7 @@
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/44e5c7b79b4e60f8c2d34857c27b8ce677d7493e/packages/sbg-utility/release/sbg-utility.tgz",
     "upath": "^3.0.7",
+    "which": "^7.0.0",
     "yaml": "^2.9.0",
     "yarn": "^1.22.22"
   },
@@ -101,6 +102,7 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^25.9.1",
     "@types/ps-node": "^0",
+    "@types/which": "^3.0.4",
     "babel-jest": "^30.4.1",
     "browser-sync": "^3.0.4",
     "cross-env": "^10.1.0",
@@ -209,6 +211,7 @@
     "yarn-install": "lib/yarn-per-branch-lock-installer.cjs",
     "yarn-per-branch-lock-installer": "lib/yarn-per-branch-lock-installer.cjs",
     "yarn-reinstall": "lib/yarn-reinstall.cjs",
-    "yc": "binaries/yc.cjs"
+    "yc": "binaries/yc.cjs",
+    "ycw": "binaries/ycw.cjs"
   }
 }

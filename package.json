@@ -43,7 +43,7 @@
   ],
   "scripts": {
     "build": "tsc -b tsconfig.build.json && npm run build-tsup && npm run build-exports",
-    "build-exports": "node -r ts-node/register -r dotenv/config build.exports.mjs",
+    "build-exports": "node -r ts-node/register -r dotenv/config build.mjs",
     "build-packages": "yarn workspaces foreach --worktree --exclude=binary-collections --no-private run build",
     "build-rollup": "rollup -c rollup.config.js",
     "build-tsup": "node build.tsup.js",

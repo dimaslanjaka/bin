@@ -36,7 +36,7 @@
   "files": [
     "binaries",
     "lib",
-    "package.json",
+    "docs-src",
     "readme.md",
     ".puppeterrc.cjs",
     "requirements.txt"

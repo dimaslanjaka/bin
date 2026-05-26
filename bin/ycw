@@ -4,6 +4,49 @@ set -u
 cwd="$(pwd)"
 max_jobs=4
 
+usage() {
+  cat <<'EOF'
+Usage: ycw [options]
+
+Clean node_modules directories across a Yarn monorepo (workspaces-aware).
+
+This tool:
+  - Automatically detects monorepo root via package.json "workspaces"
+  - Expands workspace globs (e.g. packages/*)
+  - Removes node_modules in root + all workspace packages
+  - Runs partial cleanup in parallel for speed
+
+Options:
+  -h, --help        Show this help message and exit
+
+Behavior:
+  • Root is detected by scanning upward for package.json with "workspaces"
+  • Workspace patterns are read from package.json (no jq required)
+  • node_modules folders are removed in two phases:
+      1. Partial cleanup (letter-based parallel deletion)
+      2. Final full removal of remaining node_modules directories
+
+Performance:
+  max_jobs=4       Number of parallel deletion workers (hardcoded)
+
+Notes:
+  - Designed for Yarn workspaces monorepos
+  - Safe fallback: if no root is detected, current directory is used
+  - Uses rm -rf (destructive operation)
+
+Example:
+  ycw
+  ycw --help
+
+EOF
+}
+
+for arg in "$@"; do
+  case "$arg" in
+    -h|--help) usage; exit 0 ;;
+  esac
+done
+
 # colors
 GREEN='\033[0;32m'
 RED='\033[0;31m'

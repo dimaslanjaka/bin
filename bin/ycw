@@ -1,0 +1,212 @@
+#!/bin/bash
+set -u
+
+cwd="$(pwd)"
+max_jobs=4
+
+# colors
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+GRAY='\033[0;90m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+timestamp() {
+  date "+%Y-%m-%d %H:%M:%S"
+}
+
+relative_path() {
+  local path="$1"
+  path="${path#"$cwd"/}"
+  [[ "$path" == "$cwd" ]] && path="."
+  echo "$path"
+}
+
+log() {
+  local level="$1"
+  shift
+
+  local color="$NC"
+  case "$level" in
+    OK) color="$GREEN" ;;
+    FAIL) color="$RED" ;;
+    SKIP) color="$GRAY" ;;
+    INFO) color="$BLUE" ;;
+  esac
+
+  echo -e "[${GRAY}$(timestamp)${NC}] [${color}${level}${NC}] $*"
+}
+
+# -----------------------------------
+# find project root (NO GIT)
+# -----------------------------------
+find_root() {
+  local dir="$cwd"
+
+  while [[ "$dir" != "/" ]]; do
+    if [[ -f "$dir/package.json" ]] && grep -q '"workspaces"' "$dir/package.json" 2>/dev/null; then
+      echo "$dir"
+      return 0
+    fi
+    dir="$(dirname "$dir")"
+  done
+
+  echo "$cwd"
+}
+
+ROOT="$(find_root)"
+cwd="$ROOT"
+
+log INFO "Using root: $(relative_path "$ROOT")"
+
+# -----------------------------------
+# parse workspaces from package.json
+# -----------------------------------
+get_workspaces() {
+  local pkg="$ROOT/package.json"
+
+  # naive JSON parsing (no jq required)
+  # supports:
+  # "workspaces": ["packages/*"] OR { "packages": [] }
+
+  grep -oP '"workspaces"\s*:\s*\K\[[^\]]+\]' "$pkg" 2>/dev/null |
+  tr -d '[]"' |
+  tr ',' '\n' |
+  sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+}
+
+# -----------------------------------
+# expand glob patterns safely
+# -----------------------------------
+expand_glob() {
+  local pattern="$1"
+
+  for dir in $pattern; do
+    [[ -d "$dir" ]] && echo "$ROOT/$dir"
+  done
+}
+
+# -----------------------------------
+# collect node_modules targets
+# -----------------------------------
+declare -a NODE_MODULES_TARGETS
+
+# root
+NODE_MODULES_TARGETS+=("$ROOT/node_modules")
+
+# workspaces
+while IFS= read -r pattern; do
+  [[ -z "$pattern" ]] && continue
+
+  while IFS= read -r ws; do
+    NODE_MODULES_TARGETS+=("$ws/node_modules")
+  done < <(expand_glob "$pattern")
+
+done < <(get_workspaces)
+
+# -----------------------------------
+# deduplicate
+# -----------------------------------
+declare -A seen
+declare -a unique
+
+for t in "${NODE_MODULES_TARGETS[@]}"; do
+  [[ -z "$t" ]] && continue
+  [[ -n "${seen[$t]:-}" ]] && continue
+  seen["$t"]=1
+  unique+=("$t")
+done
+
+NODE_MODULES_TARGETS=("${unique[@]}")
+
+# -----------------------------------
+# cleanup function
+# -----------------------------------
+cleanup_letter() {
+  local base="$1"
+  local letter="$2"
+
+  [[ -d "$base" ]] || return 0
+
+  shopt -s nullglob
+
+  local targets=(
+    "${base}/${letter}"*
+    "${base}/@types/${letter}"*
+    "${base}/@${letter}"*
+  )
+
+  local removed_any=0
+
+  for path in "${targets[@]}"; do
+    [[ -e "$path" ]] || continue
+
+    local rel
+    rel="$(relative_path "$path")"
+
+    if rm -rf "$path"; then
+      log OK "$rel"
+      removed_any=1
+    else
+      log FAIL "$rel"
+    fi
+  done
+
+  if (( removed_any == 0 )); then
+    log SKIP "$(relative_path "$base") '${letter}'"
+  fi
+}
+
+# export for parallel
+export -f cleanup_letter
+export -f log
+export -f timestamp
+export -f relative_path
+export cwd GREEN RED GRAY BLUE NC ROOT
+
+log INFO "Detected ${#NODE_MODULES_TARGETS[@]} node_modules directories"
+
+for t in "${NODE_MODULES_TARGETS[@]}"; do
+  log INFO "$(relative_path "$t")"
+done
+
+# -----------------------------------
+# parallel deletion
+# -----------------------------------
+running=0
+
+for base in "${NODE_MODULES_TARGETS[@]}"; do
+  for letter in $(printf "%s\n" {a..z} | shuf); do
+
+    cleanup_letter "$base" "$letter" &
+
+    ((running++))
+
+    if (( running >= max_jobs )); then
+      wait -n
+      ((running--))
+    fi
+
+  done
+done
+
+wait
+
+# -----------------------------------
+# final cleanup
+# -----------------------------------
+log INFO "Removing remaining node_modules directories"
+
+for target in "${NODE_MODULES_TARGETS[@]}"; do
+  [[ -e "$target" ]] || continue
+
+  rel="$(relative_path "$target")"
+
+  if rm -rf "$target"; then
+    log OK "$rel"
+  else
+    log FAIL "$rel"
+  fi
+done
+
+log INFO "Done"

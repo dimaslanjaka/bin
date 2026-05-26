@@ -44,6 +44,8 @@ If missing, ask the user to clarify before making changes.
    - Brief explanation of what changed
    - Mention any side effects or migration notes (if needed)
 
+---
+
 ## Rules
 
 - Prefer small, incremental edits over full rewrites
@@ -53,35 +55,124 @@ If missing, ask the user to clarify before making changes.
 - Avoid introducing new dependencies unless required and justified
 - Ensure TypeScript types are correct and not weakened (no `any` unless necessary)
 
+---
+
 ## Memory Rule
 
 Every time the agent modifies any JS/TS file:
 
-1. Save a record into `.opencode/memory/changes/<sanitized-filepath>.json`
-2. Include:
-   - changed file path
-   - before/after summary
-   - reason for change
-3. Never skip logging unless explicitly disabled by user
+1. Save memory into:
+
+```text
+.opencode/memory/<sanitized-filepath>.md
+````
+
+2. The sanitized filepath MUST:
+
+   * replace `/` with `__`
+   * replace `\` with `__`
+   * preserve filename
+   * example:
+
+```text
+src/utils/parser.ts
+→
+.opencode/memory/src__utils__parser.ts.md
+```
+
+3. Memory file format:
+
+```markdown
+# File Memory
+
+## File
+src/utils/parser.ts
+
+## Summary
+Short explanation of modifications.
+
+## Reason
+Why the change was needed.
+
+## Changes
+- added parser normalization
+- removed duplicate extension logic
+- improved fallback handling
+
+## Notes
+Optional migration or compatibility notes.
+```
+
+4. Update the memory file after every modification
+5. Never skip memory logging unless explicitly disabled by user
+6. Memory files are append-friendly and should preserve previous history where possible
+
+---
 
 ## Formatting Rule (Strict Auto-Fix Mode)
 
-- Never perform manual formatting decisions
-- Never adjust indentation, spacing, or naming style manually
-- Always defer to `eslint --fix`
-- Do not block changes due to style warnings
+* Never perform manual formatting decisions
+* Never adjust indentation, spacing, or naming style manually
+* Always defer to:
+
+```bash
+eslint --fix src
+```
+
+* Do not block changes because of style warnings
+* Prefer functional correctness over formatting perfection
+
+Optional TypeScript validation:
+
+```bash
+tsc --noEmit
+```
+
+---
 
 ## Source Awareness
 
-- Always assume:
-  - `src/` = source of truth
-  - `lib/` = compiled output (ignore for editing decisions)
-  - changes in `src/` will be reflected in `lib/` after build
+Always assume:
+
+* `src/` = source of truth
+* `lib/` = compiled output (ignore for editing decisions)
+* changes in `src/` will be reflected in `lib/` after build
+
+Never prioritize `lib/` over `src/`.
+
+---
 
 ## Optional Enhancements (if relevant)
 
 If request involves:
-- refactoring → propose step-by-step migration
-- bug fix → include root cause analysis
-- performance → include before/after reasoning
-- API change → document breaking changes clearly
+
+### Refactoring
+
+* propose step-by-step migration
+* minimize API breakage
+* isolate risky changes
+
+### Bug Fix
+
+* include root cause analysis
+* explain behavioral fix
+
+### Performance
+
+* include before/after reasoning
+* avoid premature optimization
+
+### API Change
+
+* clearly document breaking changes
+* provide migration guidance if needed
+
+---
+
+## Safety Rules
+
+* Never modify unrelated files
+* Never rewrite architecture unnecessarily
+* Never weaken existing types without reason
+* Never introduce dead code
+* Never silently remove backward compatibility

@@ -75,3 +75,108 @@ ycw [options]
 
 See [`bin/yc`](../bin/yc) & [`bin/ycw`](../bin/ycw)
 
+---
+
+## Node Modules Cleaner
+
+Recursively finds and removes `node_modules` directories.
+
+### Aliases
+
+- `del-nodemodules` (default)
+- `del-node-modules`
+
+### Usage
+
+```bash
+del-nodemodules [options]
+```
+
+### Options
+
+| Option | Description |
+|--------|-------------|
+| `--force`, `-f` | Actually delete (default is dry-run mode) |
+| `-c, --concurrent N` | Set concurrent removals (default: 2, or CPU count) |
+| `-h, --help` | Show help message |
+
+### Description
+
+- Searches for all `node_modules` directories recursively
+- Also removes `package-lock.json`, `yarn.lock`, and `.yarn/cache` directories
+- By default runs in dry-run mode (shows what would be deleted)
+- Pass `--force` to actually perform deletion
+
+### Source
+
+See [`src/del-node-modules.js`](../src/del-node-modules.js)
+
+---
+
+## Yarn Cache Cleaner
+
+Deletes Yarn cache directories and cached `.gz` files.
+
+### Aliases
+
+- `del-yarncaches` (default)
+- `del-yarn-caches`
+
+### Usage
+
+```bash
+del-yarncaches
+```
+
+### Description
+
+Finds and deletes all `.yarn/cache*` directories and `.yarn/*.gz` files under the current working directory, excluding `.git` and `vendor` directories.
+
+### Source
+
+See [`src/del-yarn-caches.js`](../src/del-yarn-caches.js)
+
+---
+
+## Remove Node Modules (Fast)
+
+Alternative tool for removing `node_modules` — faster for very large projects. Removes subfolders by first-letter in parallel.
+
+### Aliases
+
+- `rm-node-modules` (default)
+- `rm-node-module`
+- `remove-node-modules`
+- `remove-node-module`
+
+### Usage
+
+```bash
+rm-node-modules [options]
+```
+
+### Options
+
+| Option | Description |
+|--------|-------------|
+| `--force` | Actually delete (default is dry-run mode) |
+| `-h, --help` | Show help message |
+
+### Description
+
+- Removes `node_modules` subfolders by first-letter in parallel (a-z, A-Z)
+- Writes and executes a temporary shell script (auto-removed after completion)
+- On Windows requires a Unix-compatible shell in `PATH` (e.g., Git Bash or WSL)
+
+### Examples
+
+```bash
+npx binary-collections rm-node-modules
+npx binary-collections rm-node-modules --force
+yarn run rm-node-modules
+```
+
+### Source
+
+See [`src/rm-node-module-cli.cjs`](../src/rm-node-module-cli.cjs) & [`src/rm-node-modules.cjs`](../src/rm-node-modules.cjs)
+

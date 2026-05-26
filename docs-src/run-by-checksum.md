@@ -51,8 +51,9 @@ run-by-checksum -p "*.js" -e "npm test" --cwd /path/to/project
 1. **Scan**: All files matching the given glob patterns are collected.
 2. **Hash**: SHA-256 checksums are computed for each matched file's content and combined into a single hash.
 3. **Compare**: The combined hash is compared against a previously cached hash stored in `tmp/.checksum/<md5-key>.json`.
-4. **Execute**: If the hash differs (files have changed), the specified command is executed and the cache is updated.
-5. **Skip**: If the hash matches (no changes), the command is skipped.
+4. **Execute**: If the hash differs (files have changed), the specified command is executed.
+5. **Cache**: Only if the command exits successfully (exit code 0) is the new checksum persisted to the cache. On failure, the old checksum is retained so the command will re-run on the next invocation.
+6. **Skip**: If the hash matches (no changes), the command is skipped.
 
 ### Programmatic API
 

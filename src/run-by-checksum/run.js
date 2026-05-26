@@ -46,14 +46,6 @@ export async function runChecksum({
     };
   }
 
-  saveCache(cacheFile, {
-    checksum,
-    files,
-    patterns,
-    ignore,
-    updatedAt: new Date().toISOString()
-  });
-
   if (dryRun) {
     return {
       changed: true,
@@ -64,6 +56,14 @@ export async function runChecksum({
   }
 
   await runCommand(exec, cwd);
+
+  saveCache(cacheFile, {
+    checksum,
+    files,
+    patterns,
+    ignore,
+    updatedAt: new Date().toISOString()
+  });
 
   return {
     changed: true,

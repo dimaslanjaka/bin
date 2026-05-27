@@ -3,6 +3,7 @@ const axios = require('axios');
 /**
  * Fetch a URL with axios and return response metadata.
  * @param {string} url The URL to request.
+ * @param {import('axios').AxiosRequestConfig} [options] Axios request options.
  * @returns {Promise<{
  *   finalUrl: string,
  *   status: number,
@@ -12,11 +13,12 @@ const axios = require('axios');
  *   dataLength: number | undefined
  * }>}
  */
-async function fetchResponse(url) {
+async function fetchResponse(url, options = {}) {
   const response = await axios.get(url, {
     maxRedirects: 5,
     responseType: 'arraybuffer',
-    validateStatus: () => true
+    validateStatus: () => true,
+    ...options
   });
 
   const finalUrl = response.request?.res?.responseUrl ?? response.request?.responseURL ?? url;

@@ -27,7 +27,6 @@
 
 import * as dotenv from 'dotenv';
 import fs from 'fs';
-import https from 'https';
 import os from 'os';
 import path from 'path';
 import * as utils from './utils/index.cjs';
@@ -113,34 +112,23 @@ try {
  * @param {string} url
  * @returns {Promise<any>}
  */
-export function fetchJson(url) {
-  const headers = {
-    'User-Agent': selectedUserAgent,
-    Accept: 'application/vnd.github.v3+json',
-    'X-GitHub-Api-Version': '2022-11-28',
-    ...(ACCESS_TOKEN ? { Authorization: `token ${ACCESS_TOKEN}` } : {})
-  };
-  return new Promise((resolve, reject) => {
-    https
-      .get(url, { headers }, (res) => {
-        let data = '';
-        res.on('data', (chunk) => (data += chunk));
-        res.on('end', () => {
-          try {
-            const json = JSON.parse(data);
-            if (res.statusCode < 200 || res.statusCode >= 300) {
-              return reject(
-                new Error(`GitHub API Error ${res.statusCode}: ${json.message || 'Unknown error'}\nURL: ${url}`)
-              );
-            }
-            resolve(json);
-          } catch {
-            reject(new Error(`Invalid JSON from: ${url}`));
-          }
-        });
-      })
-      .on('error', reject);
+export async function fetchJson(url) {
+  const response = await fetchResponse(url, {
+    headers: {
+      'User-Agent': selectedUserAgent,
+      Accept: 'application/vnd.github.v3+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      ...(ACCESS_TOKEN ? { Authorization: `token ${ACCESS_TOKEN}` } : {})
+    },
+    responseType: 'json'
   });
+
+  if (response.status < 200 || response.status >= 300) {
+    const message = response.data?.message || 'Unknown error';
+    throw new Error(`GitHub API Error ${response.status}: ${message}\nURL: ${url}`);
+  }
+
+  return response.data;
 }
 
 /**
@@ -283,7 +271,7 @@ export async function resolvePackageResolutionUpdates(resolutions, specialPackag
           new_url,
           repo,
           latest,
-          error: new Error(`New URL is not accessible, status code: ${response.status}`)
+          error: new Error(`New URL not accessible (status ${response.status}).\noriginal: ${url}\nnew: ${new_url}`)
         });
         continue;
       }

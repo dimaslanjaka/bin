@@ -17,6 +17,8 @@ describe('resolvePackageResolutionUpdates (real GitHub API)', () => {
 
     const update = result[0];
 
+    console.log('Update result:', update);
+
     expect(update.failed).toBe(true);
     expect(update.currentPkgName).toBe('@types/through2');
   });

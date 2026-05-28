@@ -51,7 +51,12 @@ const defaultBin = {
   'node-executor': 'lib/node-executor.cjs',
   'run-by-checksum': 'lib/run-by-checksum-cli.cjs',
   'run-checksum': 'lib/run-by-checksum-cli.cjs',
-  'run-c': 'lib/run-by-checksum-cli.cjs'
+  'run-c': 'lib/run-by-checksum-cli.cjs',
+  downloader: 'lib/downloader-cli.cjs',
+  'download-file': 'lib/downloader-cli.cjs',
+  'file-downloader': 'lib/downloader-cli.cjs',
+  'fetch-file': 'lib/downloader-cli.cjs',
+  download: 'lib/downloader-cli.cjs'
 };
 
 /**

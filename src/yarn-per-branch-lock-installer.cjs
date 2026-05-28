@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-const { execSync, spawnSync } = require('child_process');
+const { execSync } = require('child_process');
+const spawn = require('cross-spawn');
 const fs = require('fs-extra');
 const minimist = require('minimist');
 
@@ -25,6 +26,18 @@ function safeBranchName(name) {
   return name.replace(/[\\/]/g, '-');
 }
 
+function findCorepack() {
+  try {
+    const paths = run(process.platform === 'win32' ? 'where corepack' : 'which corepack')
+      .split(/\r?\n/)
+      .filter(Boolean);
+
+    return paths[0] || null;
+  } catch {
+    return null;
+  }
+}
+
 function findYarn() {
   try {
     const paths = run(process.platform === 'win32' ? 'where yarn' : 'which yarn')
@@ -41,15 +54,10 @@ function findYarn() {
   }
 }
 
-function runYarn(yarnPath, args) {
-  const result =
-    process.platform === 'win32'
-      ? spawnSync('cmd.exe', ['/d', '/s', '/c', yarnPath, ...args], {
-          stdio: 'inherit'
-        })
-      : spawnSync(yarnPath, args, {
-          stdio: 'inherit'
-        });
+function runYarn(runner, args) {
+  const result = spawn.sync(runner.command, [...runner.args, ...args], {
+    stdio: 'inherit'
+  });
 
   if (result.error) {
     console.error(result.error.message);
@@ -93,10 +101,16 @@ function main() {
   const yarnLock = 'yarn.lock';
   const branchLock = `yarn.${branch}.lock`;
 
+  const corepackPath = findCorepack();
   const yarnPath = findYarn();
+  const yarnRunner = corepackPath
+    ? { command: corepackPath, args: ['yarn'] }
+    : yarnPath
+      ? { command: yarnPath, args: [] }
+      : null;
 
-  if (!yarnPath) {
-    console.error('Error: Yarn not found in PATH.');
+  if (!yarnRunner) {
+    console.error('Error: Corepack or Yarn not found in PATH.');
     process.exit(1);
   }
 
@@ -113,10 +127,11 @@ function main() {
 
   // Run yarn
   const args = packages.length ? ['up', ...packages] : ['install'];
+  const commandText = [yarnRunner.command, ...yarnRunner.args, ...args].join(' ');
 
-  console.log(`Running: yarn ${args.join(' ')}`);
+  console.log(`Running: ${commandText}`);
 
-  runYarn(yarnPath, args);
+  runYarn(yarnRunner, args);
 
   // Save updated lockfile
   if (fs.existsSync(yarnLock)) {

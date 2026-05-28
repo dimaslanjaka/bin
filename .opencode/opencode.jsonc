@@ -8,6 +8,7 @@
   "instructions": [
     "AGENTS.md",
     ".github/instructions/*.md",
-    ".github/*.md"
+    ".github/*.md",
+    "packages/*/AGENTS.md"
   ],
 }

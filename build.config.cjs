@@ -64,7 +64,9 @@ const defaultBin = {
   'pack-tarball': 'lib/node-package-packer-cli.cjs',
   'build-tarball': 'lib/node-package-packer-cli.cjs',
   'build-package': 'lib/node-package-packer-cli.cjs',
-  'build-package-tarball': 'lib/node-package-packer-cli.cjs'
+  'build-package-tarball': 'lib/node-package-packer-cli.cjs',
+  'print-tarball-tree': 'lib/print-tarball-tree.cjs',
+  'tarball-tree': 'lib/print-tarball-tree.cjs'
 };
 
 /**

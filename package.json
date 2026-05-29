@@ -80,10 +80,12 @@
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/44e5c7b79b4e60f8c2d34857c27b8ce677d7493e/packages/sbg-utility/release/sbg-utility.tgz",
+    "tar-stream": "^3.2.0",
     "upath": "^3.0.7",
     "which": "^7.0.0",
     "yaml": "^2.9.0",
-    "yarn": "^1.22.22"
+    "yarn": "^1.22.22",
+    "zlib": "^1.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
@@ -104,6 +106,7 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^25.9.1",
     "@types/ps-node": "^0",
+    "@types/tar-stream": "^3",
     "@types/which": "^3.0.4",
     "babel-jest": "^30.4.1",
     "browser-sync": "^3.0.4",
@@ -198,6 +201,7 @@
     "pkg-res-updater": "lib/package-resolutions-updater-cli.cjs",
     "pkg-resolutions-updater": "lib/package-resolutions-updater-cli.cjs",
     "print-directory-tree": "lib/print-directory-tree.cjs",
+    "print-tarball-tree": "lib/print-tarball-tree.cjs",
     "print-tree": "lib/print-directory-tree.cjs",
     "prod": "binaries/prod.cjs",
     "py": "binaries/py.cjs",
@@ -218,6 +222,7 @@
     "submodule-remove": "lib/submodule-remove-cli.cjs",
     "submodule-token": "binaries/submodule-token.cjs",
     "tarball-packer": "lib/node-package-packer-cli.cjs",
+    "tarball-tree": "lib/print-tarball-tree.cjs",
     "test-cjs": "binaries/test-cjs.cjs",
     "test-esm": "binaries/test-esm.cjs",
     "undo-commit": "lib/git/undo-commit.cjs",

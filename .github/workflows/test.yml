@@ -142,3 +142,7 @@ jobs:
         run: bash bin/test-esm --coverage=true --detectOpenHandles --testPathPatterns="${{ github.workspace }}/test/"
         env:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: '🧹 Clean GitHub Actions cache (npx)'
+        run: npx clean-github-actions-cache
+        continue-on-error: true

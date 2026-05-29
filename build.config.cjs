@@ -56,7 +56,8 @@ const defaultBin = {
   'download-file': 'lib/downloader-cli.cjs',
   'file-downloader': 'lib/downloader-cli.cjs',
   'fetch-file': 'lib/downloader-cli.cjs',
-  download: 'lib/downloader-cli.cjs'
+  download: 'lib/downloader-cli.cjs',
+  rmpath: 'lib/rmpath-cli.cjs'
 };
 
 /**

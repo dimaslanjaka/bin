@@ -5,8 +5,7 @@ import dotenv from 'dotenv';
 import fs from 'fs-extra';
 import * as glob from 'glob';
 import path from 'upath';
-import { fileURLToPath, pathToFileURL } from 'url';
-import { getArgs } from './utils/index.cjs';
+import { fileURLToPath } from 'url';
 
 // Polyfill __filename and __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -17,9 +16,6 @@ const dotenvPath = path.resolve(process.cwd(), '.env');
 if (fs.existsSync(dotenvPath)) {
   dotenv.config({ path: dotenvPath, override: true, quiet: true });
 }
-
-const argv = getArgs();
-const positional = argv._ || [];
 
 const deletePatterns = [];
 
@@ -80,36 +76,4 @@ export async function deleteMainScript(targetPath) {
   } catch (_e) {
     // ignore
   }
-}
-
-// Support both ES modules and CommonJS main script detection
-let isMain = false;
-try {
-  // CommonJS
-  if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.main === module) {
-    isMain = true;
-  }
-} catch (_e) {
-  // ignore
-}
-// ES module (robust, cross-platform)
-try {
-  const mainArg = process.argv[1] && path.resolve(process.argv[1]);
-  if (mainArg && import.meta.url === pathToFileURL(mainArg).href) {
-    isMain = true;
-  }
-} catch (_e) {
-  // ignore
-}
-
-if (isMain) {
-  console.log('Invoked from CLI');
-  if (positional.length === 0) {
-    console.error('You need to provide a file or folder path');
-    process.exit(1);
-  } else {
-    deleteMainScript(positional[0]);
-  }
-} else {
-  console.log('Not invoked from CLI');
 }

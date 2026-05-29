@@ -4,7 +4,7 @@ on:
   # Trigger this workflow when the specified workflows complete (e.g., after build and test workflows)
   workflow_run:
     workflows:
-      - Node.js Package Build
+      - Build Release
       - Node.js Package Test
     types:
       - completed
@@ -37,9 +37,9 @@ jobs:
     runs-on: windows-latest
 
     env:
-      PIP_CACHE_DIR: "${{ github.workspace }}/project/tmp/pip"
-      NUITKA_CACHE_DIR: "${{ github.workspace }}/project/tmp/nuitka-cache"
-      NODE_OPTIONS: "--max_old_space_size=4096"
+      PIP_CACHE_DIR: '${{ github.workspace }}/project/tmp/pip'
+      NUITKA_CACHE_DIR: '${{ github.workspace }}/project/tmp/nuitka-cache'
+      NODE_OPTIONS: '--max_old_space_size=4096'
       YARN_ENABLE_IMMUTABLE_INSTALLS: false
       ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
       GH_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
@@ -54,8 +54,8 @@ jobs:
       - name: 🐍 Setup Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
-          architecture: "x64"
+          python-version: '3.11'
+          architecture: 'x64'
 
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v6

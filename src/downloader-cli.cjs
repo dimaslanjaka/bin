@@ -2,10 +2,10 @@
 
 const fs = require('fs-extra');
 const path = require('upath');
-const minimist = require('minimist');
+const { getArgs } = require('./utils/index.cjs');
 const axios = require('axios');
 
-const args = minimist(process.argv.slice(2), {
+const args = getArgs({
   alias: { h: 'help' }
 });
 

@@ -2,10 +2,10 @@
 
 const fs = require('fs-extra');
 const path = require('upath');
-const minimist = require('minimist');
+const { getArgs } = require('./utils/index.cjs');
 const { spawn } = require('child_process');
 
-const argv = minimist(process.argv.slice(2), {
+const argv = getArgs({
   boolean: ['help', 'h'],
   string: ['exit-code'],
   alias: {

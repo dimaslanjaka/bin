@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('upath');
-const argv = require('minimist')(process.argv.slice(2));
+const minimistLib = require('minimist');
+const argv = minimistLib(process.argv.slice(2));
 const { exec } = require('child_process');
 const { promisify } = require('util');
 
@@ -52,9 +53,13 @@ module.exports.parseGitRemotes = parseGitRemotes;
 
 /**
  * Returns parsed command line arguments using minimist.
+ * @param {import('minimist').Opts} [opts] Optional minimist options for custom parsing.
  * @returns {import('minimist').ParsedArgs} Parsed command line arguments
  */
-function getArgs() {
+function getArgs(opts) {
+  if (opts) {
+    return minimistLib(process.argv.slice(2), opts);
+  }
   return argv;
 }
 module.exports.getArgs = getArgs;

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import minimist from 'minimist';
+import { getArgs } from './utils/index.cjs';
 import { cleanNpmCache } from './node-cache-cleaner/npm';
 import { cleanNpxCache } from './node-cache-cleaner/npx';
 import { cleanYarnCache } from './node-cache-cleaner/yarn';
@@ -18,7 +18,7 @@ Description:
 }
 
 async function run() {
-  const argv = minimist(process.argv.slice(2), {
+  const argv = getArgs({
     boolean: ['help'],
     alias: {
       h: 'help'

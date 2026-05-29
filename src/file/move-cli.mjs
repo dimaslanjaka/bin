@@ -1,4 +1,4 @@
-import minimist from 'minimist';
+import { getArgs } from '../utils/index.cjs';
 import { move } from './move.mjs';
 
 function showHelp(exitCode = 0) {
@@ -20,7 +20,7 @@ Examples:
 }
 
 async function main() {
-  const args = minimist(process.argv.slice(2), {
+  const args = getArgs({
     boolean: ['help', 'h'],
     alias: {
       h: 'help'

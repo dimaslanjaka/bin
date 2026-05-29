@@ -3,7 +3,7 @@
 const { execSync } = require('child_process');
 const spawn = require('cross-spawn');
 const fs = require('fs-extra');
-const minimist = require('minimist');
+const { getArgs } = require('./utils/index.cjs');
 
 function run(cmd, opts = {}) {
   try {
@@ -82,7 +82,7 @@ Examples:
 }
 
 function main() {
-  const argv = minimist(process.argv.slice(2), {
+  const argv = getArgs({
     boolean: ['help'],
     alias: {
       h: 'help'

@@ -1,7 +1,7 @@
 import { describe, expect, test } from '@jest/globals';
 import { execFileSync } from 'child_process';
 import fs from 'fs-extra';
-import path from 'path';
+import path from 'upath';
 import { TEST_ROOT, createTestFile, ensureTestDir, deleteTestFile } from './shared.mjs';
 
 const cliScript = path.resolve(process.cwd(), 'src/run-by-checksum-cli.js');

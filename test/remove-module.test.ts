@@ -1,5 +1,5 @@
 import { spawnSync } from 'child_process';
-import path from 'path';
+import path from 'upath';
 
 describe('remove-module CLI --help and -h', () => {
   const cliPath = path.resolve(__dirname, '../src/remove-module.mjs');

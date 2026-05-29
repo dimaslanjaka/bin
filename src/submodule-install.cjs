@@ -3,7 +3,7 @@
 const { spawnSync } = require('child_process');
 const color = require('ansi-colors');
 const fs = require('fs');
-const path = require('path');
+const path = require('upath');
 const dotenv = require('dotenv');
 
 // Load .env using dotenv from process.cwd()

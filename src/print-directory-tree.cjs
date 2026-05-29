@@ -1,6 +1,6 @@
 const fs = require('fs');
 const fsp = require('fs').promises;
-const path = require('path');
+const path = require('upath');
 const CryptoJS = require('crypto-js');
 const { execSync } = require('child_process');
 const glob = require('glob');

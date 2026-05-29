@@ -1,5 +1,5 @@
 const glob = require('glob');
-const path = require('path');
+const path = require('upath');
 
 /**
  * Asynchronously finds all "node_modules" directories within the given directory.

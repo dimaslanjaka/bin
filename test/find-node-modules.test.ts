@@ -5,7 +5,7 @@
 import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals';
 import * as fs from 'fs-extra';
 import * as os from 'os';
-import * as path from 'path';
+import path from 'upath';
 import { findNodeModules } from '../src/index';
 import './env.cjs'; // Ensure environment is set up
 

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const fsp = fs.promises;
-const path = require('path');
+const path = require('upath');
 const os = require('os');
 const { getArgs } = require('./utils/index.cjs');
 

@@ -167,6 +167,9 @@ Rules:
 * NEVER generate empty-body commits except for tiny typo/docs-only changes
 * Keep title under 72 characters
 * Use imperative mood
+* No icons
+* UTF-8 encoding
+* LF end of line
 
 The body is REQUIRED when:
 

@@ -17,7 +17,7 @@ const { spawn } = require('child_process');
 const fs = require('fs-extra');
 const { resolve, join, dirname, toUnix, basename } = require('upath');
 const packagejson = require('./package.json');
-const crypto = require('crypto');
+const CryptoJS = require('crypto-js');
 const path = require('upath');
 
 const args = process.argv.slice(2);
@@ -361,19 +361,50 @@ npm i https://github.com/dimaslanjaka/nodejs-package-types/raw/main/release/node
 }
 
 /**
- * convert file to hash
- * @param {'sha1' | 'sha256' | 'sha384' | 'sha512', 'md5'} alogarithm
- * @param {string} path
- * @param {import('crypto').BinaryToTextEncoding} encoding
- * @returns
+ * convert file to hash using crypto-js
+ * @param {'sha1' | 'sha256' | 'sha384' | 'sha512' | 'md5'} alogarithm
+ * @param {string} filePath
+ * @param {'hex' | 'base64'} encoding
+ * @returns {Promise<string>}
  */
-function file_to_hash(alogarithm = 'sha1', path, encoding = 'hex') {
+function file_to_hash(alogarithm = 'sha1', filePath, encoding = 'hex') {
   return new Promise((resolve, reject) => {
-    const hash = crypto.createHash(alogarithm);
-    const rs = fs.createReadStream(path);
-    rs.on('error', reject);
-    rs.on('data', (chunk) => hash.update(chunk));
-    rs.on('end', () => resolve(hash.digest(encoding)));
+    try {
+      const buffer = fs.readFileSync(filePath);
+      // Convert Buffer to CryptoJS WordArray
+      const words = [];
+      for (let i = 0; i < buffer.length; i++) {
+        words[i >>> 2] |= buffer[i] << (24 - (i % 4) * 8);
+      }
+      const wordArray = CryptoJS.lib.WordArray.create(words, buffer.length);
+
+      let hash;
+      switch (alogarithm) {
+        case 'sha1':
+          hash = CryptoJS.SHA1(wordArray);
+          break;
+        case 'sha256':
+          hash = CryptoJS.SHA256(wordArray);
+          break;
+        case 'sha384':
+          hash = CryptoJS.SHA384(wordArray);
+          break;
+        case 'sha512':
+          hash = CryptoJS.SHA512(wordArray);
+          break;
+        case 'md5':
+          hash = CryptoJS.MD5(wordArray);
+          break;
+        default:
+          return reject(new Error(`Unknown algorithm: ${alogarithm}`));
+      }
+
+      resolve(
+        encoding === 'base64' ? hash.toString(CryptoJS.enc.Base64) : hash.toString(CryptoJS.enc.Hex)
+      );
+    } catch (e) {
+      reject(e);
+    }
   });
 }
 

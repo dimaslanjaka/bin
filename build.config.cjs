@@ -57,7 +57,14 @@ const defaultBin = {
   'file-downloader': 'lib/downloader-cli.cjs',
   'fetch-file': 'lib/downloader-cli.cjs',
   download: 'lib/downloader-cli.cjs',
-  rmpath: 'lib/rmpath-cli.cjs'
+  rmpath: 'lib/rmpath-cli.cjs',
+  'tarball-packer': 'lib/node-package-packer-cli.cjs',
+  'node-package-packer': 'lib/node-package-packer-cli.cjs',
+  'pack-node-package': 'lib/node-package-packer-cli.cjs',
+  'pack-tarball': 'lib/node-package-packer-cli.cjs',
+  'build-tarball': 'lib/node-package-packer-cli.cjs',
+  'build-package': 'lib/node-package-packer-cli.cjs',
+  'build-package-tarball': 'lib/node-package-packer-cli.cjs'
 };
 
 /**

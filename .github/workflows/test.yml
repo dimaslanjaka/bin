@@ -134,6 +134,10 @@ jobs:
 
       - name: 🧪 Run CJS tests with coverage
         run: bash bin/test-cjs --coverage=true --detectOpenHandles --testPathPatterns="${{ github.workspace }}/test/"
+        env:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: 🧪 Run ESM tests with coverage
         run: bash bin/test-esm --coverage=true --detectOpenHandles --testPathPatterns="${{ github.workspace }}/test/"
+        env:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}

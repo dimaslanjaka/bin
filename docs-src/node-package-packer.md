@@ -8,6 +8,14 @@ Automated tarball (tgz) creator for release folder. It packs the current package
 tarball-packer [options]
 ```
 
+### One-off Call
+
+You can run the command without installing the library:
+
+```bash
+npx -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz node-package-packer [options]
+```
+
 ### Aliases
 
 This command is available under the following aliases:

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-import minimist from 'minimist';
+import { getArgs } from './utils/index.cjs';
 import { runChecksum } from './run-by-checksum/run.js';
 
-const argv = minimist(process.argv.slice(2), {
+const argv = getArgs({
   string: ['pattern', 'ignore', 'exec', 'cwd'],
   alias: { p: 'pattern', i: 'ignore', e: 'exec', c: 'cwd', h: 'help' },
   default: {

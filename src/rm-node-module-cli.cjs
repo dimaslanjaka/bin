@@ -1,11 +1,11 @@
 const path = require('upath');
 const fs = require('fs-extra');
-const minimist = require('minimist');
+const { getArgs } = require('./utils/index.cjs');
 const glob = require('glob');
 const ansiColors = require('ansi-colors');
 const { cleanUp } = require('./rm-node-modules.cjs');
 
-const argv = minimist(process.argv.slice(2), {
+const argv = getArgs({
   boolean: ['h', 'help', 'force'],
   alias: {
     h: 'help'

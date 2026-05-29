@@ -1,5 +1,5 @@
 const axios = require('axios');
-const minimist = require('minimist');
+const { getArgs } = require('./utils/index.cjs');
 const { findEnvWithToken } = require('./utils/findEnvFiles.cjs');
 
 require('dotenv').config({
@@ -69,7 +69,7 @@ Notes:
 /**
  * Parsed CLI arguments.
  */
-const argv = minimist(process.argv.slice(2), {
+const argv = getArgs({
   alias: {
     h: 'help',
     r: 'repo'

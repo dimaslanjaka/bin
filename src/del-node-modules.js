@@ -2,12 +2,12 @@ const fs = require('fs');
 const fsp = fs.promises;
 const path = require('path');
 const os = require('os');
-const minimist = require('minimist');
+const { getArgs } = require('./utils/index.cjs');
 
 // ----------------------
 // CLI
 // ----------------------
-const argv = minimist(process.argv.slice(2), {
+const argv = getArgs({
   boolean: ['force', 'help'],
   alias: { h: 'help', f: 'force', c: 'concurrent' },
   default: { force: false, concurrent: 2 }

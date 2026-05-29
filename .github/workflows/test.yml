@@ -129,7 +129,7 @@ jobs:
         run: yarn install
 
       - name: 🧪 Run CJS tests with coverage
-        run: bash bin/test-cjs --coverage=true --detectOpenHandles
+        run: bash bin/test-cjs --coverage=true --detectOpenHandles --testPathPatterns="test/"
 
       - name: 🧪 Run ESM tests with coverage
-        run: bash bin/test-esm --coverage=true --detectOpenHandles
+        run: bash bin/test-esm --coverage=true --detectOpenHandles --testPathPatterns="test/"

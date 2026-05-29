@@ -22,8 +22,8 @@ Usage:
 Examples:
   node src/rm-node-module-cli.cjs
   node src/rm-node-module-cli.cjs --force
-  npx binary-collections rm-node-modules
-  npx binary-collections rm-node-modules --force
+  npx --legacy-peer-deps -y binary-collections rm-node-modules
+  npx --legacy-peer-deps -y binary-collections rm-node-modules --force
 
 Options:
   -h, --help     Show this help message

@@ -13,7 +13,7 @@ tarball-packer [options]
 You can run the command without installing the library:
 
 ```bash
-npx -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz node-package-packer [options]
+npx --legacy-peer-deps -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz node-package-packer [options]
 ```
 
 ### Aliases

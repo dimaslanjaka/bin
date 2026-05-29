@@ -5,7 +5,7 @@ The main entry point that dynamically finds and executes other scripts by name.
 ### Usage
 
 ```bash
-npx binary-collections <script-name> [...args]
+npx --legacy-peer-deps -y binary-collections <script-name> [...args]
 ```
 
 ### Subcommands
@@ -19,10 +19,10 @@ npx binary-collections <script-name> [...args]
 ### Examples
 
 ```bash
-npx binary-collections list
-npx binary-collections git-diff -s
-npx binary-collections del-node-modules --force
-npx binary-collections find-node-modules
+npx --legacy-peer-deps -y binary-collections list
+npx --legacy-peer-deps -y binary-collections git-diff -s
+npx --legacy-peer-deps -y binary-collections del-node-modules --force
+npx --legacy-peer-deps -y binary-collections find-node-modules
 ```
 
 ### Development

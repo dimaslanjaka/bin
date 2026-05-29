@@ -58,7 +58,7 @@ Examples:
   clean-github-actions-caches --repo octocat/hello-world
 
   # Run via npx without installing
-    npx -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz clean-github-actions-caches --repo owner/repo --prefix-depth 3
+    npx --legacy-peer-deps -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz clean-github-actions-caches --repo owner/repo --prefix-depth 3
 
   # Run via yarn dlx
     yarn dlx binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz clean-github-actions-caches --prefix-depth 3

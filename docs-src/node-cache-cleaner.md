@@ -171,8 +171,8 @@ rm-node-modules [options]
 ### Examples
 
 ```bash
-npx binary-collections rm-node-modules
-npx binary-collections rm-node-modules --force
+npx --legacy-peer-deps -y binary-collections rm-node-modules
+npx --legacy-peer-deps -y binary-collections rm-node-modules --force
 yarn run rm-node-modules
 ```
 

@@ -11,7 +11,7 @@ const defaultBin = {
   'npm-run-series': 'lib/npm-run-series.cjs',
   'del-nodemodules': 'lib/del-node-modules.cjs',
   'del-yarncaches': 'lib/del-yarn-caches.cjs',
-  'del-ps': 'lib/del-ps.cjs',
+  'del-ps': 'lib/del-ps-cli.cjs',
   'del-gradle': 'lib/del-gradle.cjs',
   'git-purge': 'lib/git-purge.cjs',
   'git-fix': 'lib/git-fix.cjs',

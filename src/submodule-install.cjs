@@ -29,7 +29,7 @@ if (args.help || args.h) {
   process.exit(0);
 }
 
-const ACCESS_TOKEN = process.env.GITHUB_TOKEN || process.env.ACCESS_TOKEN;
+const ACCESS_TOKEN = process.env.ACCESS_TOKEN || process.env.GITHUB_TOKEN;
 
 let ROOT = runGit(['rev-parse', '--show-toplevel']).trim();
 let REPO_PATH = ROOT;

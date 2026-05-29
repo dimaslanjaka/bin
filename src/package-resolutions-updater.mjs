@@ -53,7 +53,7 @@ if (!fs.existsSync(envPath)) {
 if (fs.existsSync(envPath)) {
   dotenv.config({ path: envPath, quiet: true, override: true });
 }
-const ACCESS_TOKEN = process.env.GITHUB_TOKEN || process.env.ACCESS_TOKEN;
+const ACCESS_TOKEN = process.env.ACCESS_TOKEN || process.env.GITHUB_TOKEN;
 
 // Show help if --help/-h is passed
 if (args.help || args.h) {

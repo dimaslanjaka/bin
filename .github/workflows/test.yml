@@ -3,7 +3,7 @@
 name: Node.js Package Test
 
 concurrency:
-  group: test-${{ github.ref }}
+  group: test-${{ github.event.workflow_run.head_sha }}
   cancel-in-progress: true
 
 on:
@@ -12,10 +12,11 @@ on:
       - Node.js Package Build
     types:
       - completed
+  workflow_dispatch:
 
 jobs:
   test:
-    name: 🧪 Run Tests ${{ github.event.workflow_run.head_sha }}
+    name: 🧪 Run Tests
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
@@ -24,14 +25,14 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: master
-          token: "${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}"
+          token: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}'
 
       - name: ⬇️ Checkout test-repo
         uses: actions/checkout@v6
         with:
           repository: dimaslanjaka/test-repo
           path: tmp/test-repo
-          token: "${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}"
+          token: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}'
           ref: test
 
       - name: ⬇️ Checkout packages/git-command-helper
@@ -39,7 +40,7 @@ jobs:
         with:
           repository: dimaslanjaka/git-command-helper
           path: packages/git-command-helper
-          token: "${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}"
+          token: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}'
           ref: pre-release
 
       - name: ⬇️ Checkout packages/cross-spawn
@@ -47,7 +48,7 @@ jobs:
         with:
           repository: dimaslanjaka/node-cross-spawn
           path: packages/cross-spawn
-          token: "${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}"
+          token: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}'
           ref: private
 
       - name: 🟢 Setup Node.js
@@ -58,7 +59,7 @@ jobs:
       - name: 🐍 Setup Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.x"
+          python-version: '3.x'
 
       - name: 🐍 Create virtual environment
         shell: bash

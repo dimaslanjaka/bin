@@ -34,3 +34,78 @@ This command is available under several aliases (all invoke the same CLI):
 
 ### Source
 See [`src/clean-github-actions-caches.cjs`](../src/clean-github-actions-caches.cjs) & [`src/clean-github-actions-caches-cli.cjs`](../src/clean-github-actions-caches-cli.cjs)
+
+### Github CI Examples
+
+```yaml
+name: Clean GitHub Actions Cache
+
+on:
+  # Trigger this workflow when the specified workflows complete (e.g., after build and test workflows)
+  workflow_run:
+    workflows:
+      - Node.js Package Build
+      - Node.js Package Test
+    types:
+      - completed
+
+  # Allow manual triggering of this workflow from the GitHub Actions UI
+  workflow_dispatch:
+
+  # Uncomment the following lines to enable scheduled cache cleaning (e.g., every hour)
+  # schedule:
+  #   - cron: '0 * * * *'
+
+  # Uncomment the following lines to enable cache cleaning on pushes to the master branch
+  # push:
+  #   branches:
+  #     - master
+
+  # Allow this workflow to be called by other workflows, passing the ACCESS_TOKEN secret
+  workflow_call:
+    secrets:
+      ACCESS_TOKEN:
+        required: true
+
+concurrency:
+  group: clean-cache
+  cancel-in-progress: true
+
+jobs:
+  clean-cache:
+    # if: contains(github.repository, 'php-proxy-hunter')
+    runs-on: windows-latest
+
+    env:
+      PIP_CACHE_DIR: "${{ github.workspace }}/project/tmp/pip"
+      NUITKA_CACHE_DIR: "${{ github.workspace }}/project/tmp/nuitka-cache"
+      NODE_OPTIONS: "--max_old_space_size=4096"
+      YARN_ENABLE_IMMUTABLE_INSTALLS: false
+      ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
+      YARN_CHECKSUM_BEHAVIOR: update
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          architecture: "x64"
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20.x
+
+      - name: 🧹 Clean GitHub Actions Cache ${{ github.event.workflow_run.head_sha }}
+        env:
+          GH_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          npx -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz clean-github-actions-caches --repo ${{ github.repository }} --sha ${{ github.event.workflow_run.head_sha }}
+        shell: bash
+```

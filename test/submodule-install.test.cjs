@@ -1,14 +1,14 @@
-const fs = require("fs");
-const path = require("path");
-const { execSync } = require("child_process");
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
 
 jest.setTimeout(360000); // Set a longer timeout for tests
 
-describe("submodule-install.cjs", () => {
-  const TEST_DIR = path.join(__dirname, "../tmp/submodule-install/hexo-renderers");
+describe('submodule-install.cjs', () => {
+  const TEST_DIR = path.join(__dirname, '../tmp/submodule-install/hexo-renderers');
   fs.mkdirSync(TEST_DIR, { recursive: true });
-  const REPO_URL = "https://github.com/dimaslanjaka/hexo-renderers.git";
-  const SCRIPT = path.resolve(__dirname, "../src/submodule-install.cjs");
+  const REPO_URL = 'https://github.com/dimaslanjaka/hexo-renderers.git';
+  const SCRIPT = path.resolve(__dirname, '../src/submodule-install.cjs');
 
   let consoleSpy;
   beforeAll(() => {
@@ -18,11 +18,11 @@ describe("submodule-install.cjs", () => {
       fs.rmSync(TEST_DIR, { recursive: true, force: true });
     }
     fs.mkdirSync(TEST_DIR, { recursive: true });
-    execSync(`git clone --depth=1 ${REPO_URL} .`, { cwd: TEST_DIR, stdio: "inherit" });
+    execSync(`git clone --depth=1 ${REPO_URL} .`, { cwd: TEST_DIR, stdio: 'inherit' });
   }, 60000);
 
   beforeEach(() => {
-    consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+    consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -38,15 +38,15 @@ describe("submodule-install.cjs", () => {
     }
   });
 
-  test("should install submodules without infinite loop", async () => {
+  test('should install submodules without infinite loop', async () => {
     // Run the script in the cloned repo
-    execSync(`node "${SCRIPT}"`, { cwd: TEST_DIR, stdio: "inherit", env: { ...process.env } });
+    execSync(`node "${SCRIPT}"`, { cwd: TEST_DIR, stdio: 'inherit', env: { ...process.env } });
     // Check if .gitmodules exists and submodules are present
-    expect(fs.existsSync(path.join(TEST_DIR, ".gitmodules"))).toBe(true);
-    expect(fs.existsSync(path.join(TEST_DIR, "test/test-site/.git"))).toBe(true);
-    expect(fs.readdirSync(path.join(TEST_DIR, "test/test-site")).length).toBeGreaterThan(7);
-    expect(fs.existsSync(path.join(TEST_DIR, "test/test-site/.gitmodules"))).toBe(true);
-    expect(fs.existsSync(path.join(TEST_DIR, "test/test-site/src-posts/.git"))).toBe(true);
-    expect(fs.readdirSync(path.join(TEST_DIR, "test/test-site/src-posts")).length).toBeGreaterThan(7);
+    expect(fs.existsSync(path.join(TEST_DIR, '.gitmodules'))).toBe(true);
+    expect(fs.existsSync(path.join(TEST_DIR, 'test/test-site/.git'))).toBe(true);
+    expect(fs.readdirSync(path.join(TEST_DIR, 'test/test-site')).length).toBeGreaterThan(7);
+    expect(fs.existsSync(path.join(TEST_DIR, 'test/test-site/.gitmodules'))).toBe(true);
+    expect(fs.existsSync(path.join(TEST_DIR, 'test/test-site/src-posts/.git'))).toBe(true);
+    expect(fs.readdirSync(path.join(TEST_DIR, 'test/test-site/src-posts')).length).toBeGreaterThan(7);
   }, 120000);
 });

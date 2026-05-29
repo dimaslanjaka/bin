@@ -1,18 +1,18 @@
-import { expect, jest, test } from "@jest/globals";
+import { expect, jest, test } from '@jest/globals';
 
 let sendLine: (line: string) => void;
 let sendClose: () => void;
 
-jest.mock("readline", () => {
+jest.mock('readline', () => {
   return {
     createInterface: () => {
       return {
         on: (event: string, callback: (...args: any) => void) => {
           switch (event) {
-            case "line":
+            case 'line':
               sendLine = callback;
               break;
-            case "close":
+            case 'close':
               sendClose = callback;
               break;
           }
@@ -22,18 +22,18 @@ jest.mock("readline", () => {
   };
 });
 
-test("input lines has duplicate key", async () => {
+test('input lines has duplicate key', async () => {
   // given
-  const spyConsoleLog = jest.spyOn(console, "log");
+  const spyConsoleLog = jest.spyOn(console, 'log');
 
   // when
 
   // Use dynamic import to load the module
-  await import("./readline-mock");
-  sendLine("hello world");
-  sendLine("foo baz");
-  sendLine("hoge fuga");
-  sendLine("hoge piyo");
+  await import('./readline-mock');
+  sendLine('hello world');
+  sendLine('foo baz');
+  sendLine('hoge fuga');
+  sendLine('hoge piyo');
   sendClose();
 
   // then

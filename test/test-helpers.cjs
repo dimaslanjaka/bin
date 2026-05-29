@@ -1,6 +1,6 @@
-const fs = require("fs");
-const path = require("path");
-const { execSync } = require("child_process");
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
 
 /**
  * Test helper functions for git-fix testing
@@ -17,18 +17,18 @@ function createTempGitRepo(tempDir) {
   }
 
   // Initialize git repo
-  execSync("git init", { cwd: tempDir, stdio: "pipe" });
+  execSync('git init', { cwd: tempDir, stdio: 'pipe' });
 
   // Set basic git config for the repository
-  execSync('git config user.name "Test User"', { cwd: tempDir, stdio: "pipe" });
-  execSync('git config user.email "test@example.com"', { cwd: tempDir, stdio: "pipe" });
+  execSync('git config user.name "Test User"', { cwd: tempDir, stdio: 'pipe' });
+  execSync('git config user.email "test@example.com"', { cwd: tempDir, stdio: 'pipe' });
 
   // Create a test file
-  fs.writeFileSync(path.join(tempDir, "test.txt"), "test content\n");
+  fs.writeFileSync(path.join(tempDir, 'test.txt'), 'test content\n');
 
   // Add and commit
-  execSync("git add .", { cwd: tempDir, stdio: "pipe" });
-  execSync('git commit -m "Initial commit"', { cwd: tempDir, stdio: "pipe" });
+  execSync('git add .', { cwd: tempDir, stdio: 'pipe' });
+  execSync('git commit -m "Initial commit"', { cwd: tempDir, stdio: 'pipe' });
 }
 
 /**
@@ -50,13 +50,13 @@ function cleanupTempDir(tempDir) {
  */
 function getGitConfig(key, cwd = process.cwd(), localOnly = false) {
   try {
-    const configFlag = localOnly ? "--local" : "";
-    return execSync(`git config ${configFlag} ${key}`, { cwd, encoding: "utf-8" }).trim();
+    const configFlag = localOnly ? '--local' : '';
+    return execSync(`git config ${configFlag} ${key}`, { cwd, encoding: 'utf-8' }).trim();
   } catch {
     // If local-only check failed, try without --local flag
     if (localOnly) {
       try {
-        return execSync(`git config ${key}`, { cwd, encoding: "utf-8" }).trim();
+        return execSync(`git config ${key}`, { cwd, encoding: 'utf-8' }).trim();
       } catch {
         return null;
       }
@@ -71,7 +71,7 @@ function getGitConfig(key, cwd = process.cwd(), localOnly = false) {
  */
 function mockProcessArgv(args) {
   const originalArgv = process.argv;
-  process.argv = ["node", "git-fix.cjs", ...args];
+  process.argv = ['node', 'git-fix.cjs', ...args];
   return originalArgv;
 }
 

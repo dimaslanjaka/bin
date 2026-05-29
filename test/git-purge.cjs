@@ -1,3 +1,3 @@
-require("./env.cjs");
+require('./env.cjs');
 
-require("../src/git-purge.cjs");
+require('../src/git-purge.cjs');

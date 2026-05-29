@@ -1,5 +1,5 @@
-const { get_caches, deleteGitHubActionsCache } = require("./clean-github-actions-caches.cjs");
-const { parseGitRemotes } = require("./utils/index.cjs");
+const { get_caches, deleteGitHubActionsCache } = require('./clean-github-actions-caches.cjs');
+const { parseGitRemotes } = require('./utils/index.cjs');
 
 /**
  * Deletes old GitHub Actions caches for the current repository (origin remote),
@@ -29,8 +29,8 @@ const { parseGitRemotes } = require("./utils/index.cjs");
               try {
                 await deleteGitHubActionsCache(GH_REPO, id);
               } catch (err) {
-                const code = err.response?.status || err.code || "UNKNOWN";
-                const message = err.response?.statusText || err.message || "Unknown error";
+                const code = err.response?.status || err.code || 'UNKNOWN';
+                const message = err.response?.statusText || err.message || 'Unknown error';
                 console.error(`Error deleting cache ${id}: [${code}] [${message}]\n${err.stack}`);
               }
             }
@@ -43,8 +43,8 @@ const { parseGitRemotes } = require("./utils/index.cjs");
       }
     }
   } catch (e) {
-    const code = e.response?.status || e.code || "UNKNOWN";
-    const message = e.response?.statusText || e.message || "Unknown error";
+    const code = e.response?.status || e.code || 'UNKNOWN';
+    const message = e.response?.statusText || e.message || 'Unknown error';
     console.error(`[${code}] [${message}]\n${e.stack}`);
     process.exit(1);
   }

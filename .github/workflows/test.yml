@@ -13,7 +13,9 @@ on:
     types:
       - completed
   workflow_dispatch:
-
+  push:
+    paths:
+      - '**/test*/**'
 jobs:
   test:
     name: 🧪 Run Tests

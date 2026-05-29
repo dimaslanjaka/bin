@@ -16,6 +16,8 @@ on:
   push:
     paths:
       - '**/test*/**'
+      - '**/test*'
+      - '**/src/**'
 jobs:
   test:
     name: 🧪 Run Tests

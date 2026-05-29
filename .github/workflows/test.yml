@@ -95,9 +95,10 @@ jobs:
             **/tmp/**
             **/*.bak
             .cache/
-          key: ${{ runner.os }}-${{ hashFiles('**/package.json', '**/requirements*.txt', '.github') }}
+          key: ${{ runner.os }}-test-${{ hashFiles('**/package.json', '**/requirements*.txt', '.github') }}
           restore-keys: |
-            ${{ runner.os }}-${{ hashFiles('**/package.json', '**/requirements*.txt', '.github') }}
+            ${{ runner.os }}-test-${{ hashFiles('**/package.json', '**/requirements*.txt', '.github') }}
+            ${{ runner.os }}-test-
             ${{ runner.os }}-
 
       - name: Add custom bins to PATH

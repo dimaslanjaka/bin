@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import * as glob from 'glob';
 import upath from 'upath';
-import path from 'path';
+import path from 'upath';
 import crypto from 'crypto';
 
 /**

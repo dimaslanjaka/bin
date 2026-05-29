@@ -1,5 +1,5 @@
 const fs = require('fs');
-const path = require('path');
+const path = require('upath');
 const { execSync } = require('child_process');
 
 jest.setTimeout(360000); // Set a longer timeout for tests

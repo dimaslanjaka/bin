@@ -1,7 +1,7 @@
 import fs from 'fs';
 import zlib from 'zlib';
 import tar from 'tar-stream';
-import path from 'path';
+import path from 'upath';
 import { getArgs } from './utils/index.cjs';
 
 function addToTree(tree, parts) {

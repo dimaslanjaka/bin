@@ -1,6 +1,6 @@
 import { getArgs } from './utils/index.cjs';
 import fs from 'fs';
-import path from 'path';
+import path from 'upath';
 import * as glob from 'glob';
 
 const argv = getArgs();

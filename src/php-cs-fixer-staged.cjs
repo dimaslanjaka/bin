@@ -2,7 +2,7 @@ const { exec } = require('child_process');
 const { spawn, spawnSync } = require('child_process');
 const util = require('util');
 const fs = require('fs');
-const path = require('path');
+const path = require('upath');
 const execP = util.promisify(exec);
 
 function log(...args) {

@@ -1,6 +1,6 @@
 import ansiColors from 'ansi-colors';
 import fs from 'fs';
-import path from 'path';
+import path from 'upath';
 import { resolvePackageResolutionUpdates } from './package-resolutions-updater.mjs';
 
 // --- Main logic ---

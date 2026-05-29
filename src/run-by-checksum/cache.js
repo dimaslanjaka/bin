@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import path from 'path';
+import path from 'upath';
 import crypto from 'crypto';
 
 /**

@@ -2,7 +2,7 @@
 
 const { spawnSync } = require('child_process');
 const fs = require('fs');
-const path = require('path');
+const path = require('upath');
 const { Minimatch } = require('minimatch');
 const { getArgs } = require('./utils/index.cjs');
 

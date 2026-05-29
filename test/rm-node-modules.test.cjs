@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('upath');
 const cp = require('cross-spawn');
 const fs = require('fs-extra');
 const { createMockProject } = require('./utils/createMockProject.cjs');

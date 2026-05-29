@@ -1,5 +1,5 @@
 const fs = require('fs');
-const path = require('path');
+const path = require('upath');
 const os = require('os');
 const { parseGitAttributes } = require('../src/git/gitattributes.cjs').default;
 require('./env.cjs');

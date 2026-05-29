@@ -12,7 +12,7 @@
  * const myTempPath = getTempPath('my-module', 'output.txt');
  */
 
-const path = require('path');
+const path = require('upath');
 const { findEnvWithToken } = require('../utils/findEnvFiles.cjs');
 
 require('dotenv').config({ path: findEnvWithToken(), quiet: true, overwrite: true });

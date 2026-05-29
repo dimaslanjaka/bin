@@ -1,5 +1,5 @@
 const fs = require('fs-extra');
-const path = require('path');
+const path = require('upath');
 const cp = require('cross-spawn');
 
 function createMockProject(projectPath, options) {

@@ -1,5 +1,5 @@
 const fs = require('fs');
-const path = require('path');
+const path = require('upath');
 const { EOL } = require('os');
 const { getArgs } = require('./utils/index.cjs');
 const spawn = require('child_process').spawn;

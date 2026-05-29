@@ -28,7 +28,7 @@
 import * as dotenv from 'dotenv';
 import fs from 'fs';
 import os from 'os';
-import path from 'path';
+import path from 'upath';
 import * as utils from './utils/index.cjs';
 import fetchResponse from './utils/fetchResponse.cjs';
 import { findEnvFiles } from './utils/findEnvFiles.cjs';

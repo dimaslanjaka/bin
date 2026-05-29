@@ -14,11 +14,11 @@ describe('clean-github-actions-caches prefix grouping', () => {
   });
 
   it('keeps the first three key segments as the grouping prefix', () => {
-    expect(getCachePrefix('Linux-36b76193f978c44ac66de6d0f0d15ade304b7d4e22e846b9a5110b10fec4a5f6')).toBe('Linux-');
-    expect(getCachePrefix('Linux-node-36b76193f978c44ac66de6d0f0d15ade304b7d4e22e846b9a5110b10fec4a5f6')).toBe(
+    expect(getCachePrefix('Linux-36b76193f978c44ac66de6d0f0d15ade304b7d4e22e846b9a5110b10fec4a5f6', 3)).toBe('Linux-');
+    expect(getCachePrefix('Linux-node-36b76193f978c44ac66de6d0f0d15ade304b7d4e22e846b9a5110b10fec4a5f6', 3)).toBe(
       'Linux-node-'
     );
-    expect(getCachePrefix('Linux-node-vxx-36b76193f978c44ac66de6d0f0d15ade304b7d4e22e846b9a5110b10fec4a5f6')).toBe(
+    expect(getCachePrefix('Linux-node-vxx-36b76193f978c44ac66de6d0f0d15ade304b7d4e22e846b9a5110b10fec4a5f6', 3)).toBe(
       'Linux-node-vxx'
     );
   });
@@ -27,7 +27,7 @@ describe('clean-github-actions-caches prefix grouping', () => {
     expect(isChecksumSegment('36b76193f978c44ac66de6d0f0d15ade304b7d4e22e846b9a5110b10fec4a5f6')).toBe(true);
     expect(isChecksumSegment('Linux')).toBe(false);
     expect(
-      getMeaningfulCacheKeyParts('Linux-36b76193f978c44ac66de6d0f0d15ade304b7d4e22e846b9a5110b10fec4a5f6')
+      getMeaningfulCacheKeyParts('Linux-36b76193f978c44ac66de6d0f0d15ade304b7d4e22e846b9a5110b10fec4a5f6', 3)
     ).toEqual(['Linux']);
   });
 

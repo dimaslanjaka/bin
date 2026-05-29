@@ -7,8 +7,8 @@ const executeScript = require('./binary-collections/executeScript.cjs');
 
 /**
  * Main binary-collections script that dynamically finds and executes other scripts
- * Usage: npx binary-collections <script-name> [...args]
- * Example: npx binary-collections git-diff -s
+ * Usage: npx --legacy-peer-deps -y binary-collections <script-name> [...args]
+ * Example: npx --legacy-peer-deps -y binary-collections git-diff -s
  */
 
 /**
@@ -20,12 +20,12 @@ function showHelp() {
   console.log('🚀 Binary Collections - Dynamic Script Runner');
   console.log('═══════════════════════════════════════════════');
   console.log('');
-  console.log('📋 Usage: npx binary-collections <script-name> [...args]');
+  console.log('📋 Usage: npx --legacy-peer-deps -y binary-collections <script-name> [...args]');
   console.log('');
   console.log('✨ Examples:');
-  console.log('  📊 npx binary-collections git-diff -s');
-  console.log('  🧹 npx binary-collections del-node-modules');
-  console.log('  🔍 npx binary-collections find-node-modules --help');
+  console.log('  📊 npx --legacy-peer-deps -y binary-collections git-diff -s');
+  console.log('  🧹 npx --legacy-peer-deps -y binary-collections del-node-modules');
+  console.log('  🔍 npx --legacy-peer-deps -y binary-collections find-node-modules --help');
   console.log('');
   console.log("ℹ️  This tool will search for <script-name>.{cjs,js,mjs} in the script's directory");
   console.log('   and execute it with the provided arguments.');

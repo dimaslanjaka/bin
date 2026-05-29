@@ -1,5 +1,13 @@
 const { get_caches, deleteGitHubActionsCache } = require('./clean-github-actions-caches.cjs');
-const { parseGitRemotes } = require('./utils/index.cjs');
+const { getArgs, parseGitRemotes } = require('./utils/index.cjs');
+
+const argv = getArgs({
+  alias: {
+    p: 'prefix-depth',
+    r: 'repo'
+  },
+  string: ['prefix-depth', 'repo']
+});
 
 /**
  * Deletes old GitHub Actions caches for the current repository (origin remote),
@@ -9,8 +17,13 @@ const { parseGitRemotes } = require('./utils/index.cjs');
 (async () => {
   try {
     const remotes = await parseGitRemotes();
-    const GH_REPO = remotes.origin;
-    const caches = await get_caches(GH_REPO);
+    const GH_REPO = argv.repo || remotes.origin;
+
+    if (!GH_REPO) {
+      throw new Error('Repository is not provided and origin remote could not be inferred. Use --repo owner/repo.');
+    }
+
+    const caches = await get_caches(GH_REPO, argv['prefix-depth']);
 
     for (const key in caches) {
       if (Object.hasOwnProperty.call(caches, key)) {

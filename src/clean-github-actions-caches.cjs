@@ -39,6 +39,9 @@ Options:
   -r, --repo <repo>    GitHub repository (owner/repo). If omitted, the tool will
                        attempt to infer the repository from the current working
                        directory's git remotes.
+    -p, --prefix-depth <n>
+                         Number of leading cache key segments to use as the
+                         grouping prefix when splitting on /[-_]/. Default: 3.
 
 Environment Variables:
   ACCESS_TOKEN         GitHub access token (preferred)
@@ -55,10 +58,10 @@ Examples:
   clean-github-actions-caches --repo octocat/hello-world
 
   # Run via npx without installing
-  npx -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz clean-github-actions-caches --repo owner/repo
+    npx -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz clean-github-actions-caches --repo owner/repo --prefix-depth 3
 
   # Run via yarn dlx
-  yarn dlx binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz clean-github-actions-caches
+    yarn dlx binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz clean-github-actions-caches --prefix-depth 3
 
 Notes:
   - Ensure ACCESS_TOKEN or GITHUB_TOKEN is set and has permissions to manage Actions caches.
@@ -72,9 +75,10 @@ Notes:
 const argv = getArgs({
   alias: {
     h: 'help',
+    p: 'prefix-depth',
     r: 'repo'
   },
-  string: ['repo'],
+  string: ['prefix-depth', 'repo'],
   boolean: ['help']
 });
 
@@ -119,12 +123,108 @@ function deleteGitHubActionsCache(GH_REPO, cacheId) {
 }
 
 /**
+ * Normalize the number of cache key segments to use for grouping.
+ *
+ * @param {unknown} prefixDepth
+ * @returns {number}
+ */
+function normalizePrefixDepth(prefixDepth) {
+  const parsed = Number(prefixDepth);
+
+  if (!Number.isFinite(parsed) || parsed < 1) {
+    return 3;
+  }
+
+  return Math.floor(parsed);
+}
+
+/**
+ * Detect cache-key segments that look like checksum hashes.
+ *
+ * @param {string} segment
+ * @returns {boolean}
+ */
+function isChecksumSegment(segment) {
+  return /^[a-f0-9]{32,}$/i.test(segment);
+}
+
+/**
+ * Remove checksum-like segments from a cache key.
+ *
+ * @param {string} key
+ * @returns {string[]}
+ */
+function getMeaningfulCacheKeyParts(key) {
+  return String(key)
+    .split(/[-_]/)
+    .filter(Boolean)
+    .filter((segment) => !isChecksumSegment(segment));
+}
+
+/**
+ * Extract the grouping prefix from a cache key.
+ *
+ * @param {string} key
+ * @param {number} [prefixDepth=3]
+ * @returns {string}
+ */
+function getCachePrefix(key, prefixDepth = 3) {
+  const normalizedDepth = normalizePrefixDepth(prefixDepth);
+  const parts = String(key).split(/[-_]/).filter(Boolean);
+  const meaningfulParts = getMeaningfulCacheKeyParts(key);
+
+  if (meaningfulParts.length !== parts.length) {
+    if (meaningfulParts.length < normalizedDepth) {
+      return `${meaningfulParts.join('-')}-`;
+    }
+
+    return meaningfulParts.join('-');
+  }
+
+  if (parts.length <= normalizedDepth) {
+    return parts.join('-');
+  }
+
+  return parts.slice(0, normalizedDepth).join('-');
+}
+
+/**
+ * Group GitHub Actions caches by their derived prefix.
+ *
+ * @param {Record<string, any>[]} caches
+ * @param {number} [prefixDepth=3]
+ * @returns {Record<string, Record<string, any>[]>}
+ */
+function groupCachesByPrefix(caches, prefixDepth = 3) {
+  return caches.reduce(
+    /**
+     * @param {Record<string, Record<string, any>[]>} acc
+     * @param {Record<string, any>} item
+     * @returns {Record<string, Record<string, any>[]>}
+     */
+    (acc, item) => {
+      const prefix = getCachePrefix(item.key, prefixDepth);
+
+      if (!acc[prefix]) {
+        acc[prefix] = [];
+      }
+
+      acc[prefix].push(item);
+
+      return acc;
+    },
+    {}
+  );
+}
+
+/**
  * List GitHub Actions caches grouped by cache key prefix.
  *
  * @param {string} GH_REPO GitHub repository in format `owner/repo`.
+ * @param {number} [prefixDepth=3]
  * @returns {Promise<Record<string, Record<string, any>[]>>}
  */
-function get_caches(GH_REPO) {
+function get_caches(GH_REPO, prefixDepth = 3) {
   const url = `https://api.github.com/repos/${GH_REPO}/actions/caches`;
 
   return new Promise((resolve, reject) => {
@@ -140,47 +240,7 @@ function get_caches(GH_REPO) {
          * @type {Record<string, any>[]}
          */
         const data = response.data.actions_caches;
-
-        /**
-         * Extract cache prefix from cache key.
-         *
-         * @param {string} key
-         * @returns {string}
-         */
-        const getPrefix = (key) => {
-          const split = key.split(/[-_]/);
-
-          if (split.length === 3) {
-            return `${split[0]}-${split[1]}`;
-          }
-
-          if (split.length > 3) {
-            return `${split[0]}-${split[1]}-${split[2]}`;
-          }
-
-          return split[0];
-        };
-
-        // Group by prefix
-        const grouped = data.reduce(
-          /**
-           * @param {Record<string, Record<string, any>[]>} acc
-           * @param {Record<string, any>} item
-           * @returns {Record<string, Record<string, any>[]>}
-           */
-          (acc, item) => {
-            const prefix = getPrefix(item.key);
-
-            if (!acc[prefix]) {
-              acc[prefix] = [];
-            }
-
-            acc[prefix].push(item);
-
-            return acc;
-          },
-          {}
-        );
+        const grouped = groupCachesByPrefix(data, prefixDepth);
 
         resolve(grouped);
       })
@@ -193,5 +253,10 @@ function get_caches(GH_REPO) {
 
 module.exports = {
   deleteGitHubActionsCache,
-  get_caches
+  getCachePrefix,
+  getMeaningfulCacheKeyParts,
+  get_caches,
+  groupCachesByPrefix,
+  isChecksumSegment,
+  normalizePrefixDepth
 };

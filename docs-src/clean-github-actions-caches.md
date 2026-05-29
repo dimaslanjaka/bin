@@ -10,6 +10,9 @@ npx --yes binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/
 
 # use yarn dlx
 yarn dlx binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz clean-github-actions-caches
+
+# keep the first 3 cache key segments as the grouping prefix
+clean-github-actions-caches --prefix-depth 3
 ```
 
 ### Aliases
@@ -24,9 +27,10 @@ This command is available under several aliases (all invoke the same CLI):
 
 ### Features
 - Authenticates using `ACCESS_TOKEN` or `GITHUB_TOKEN` from your `.env` file
-- Groups caches by prefix and deletes all but the latest for each group
+- Groups caches by the first N key segments split on `-` or `_` and deletes all but the latest for each group
 - Operates on the current repository (origin remote) and matches the working directory of your terminal
 - Safe: Only deletes caches older than the most recent per prefix
+- Accepts `--repo owner/repo` to target a specific repository and `--prefix-depth <n>` to control grouping
 
 ### Environment Setup
 1. Add `ACCESS_TOKEN` or `GITHUB_TOKEN` to your `.env` file

@@ -48,7 +48,7 @@
     "build-rollup": "rollup -c rollup.config.js",
     "build-tsup": "node build.tsup.js",
     "clean": "rimraf lib tmp/dist binaries",
-    "pack": "node packer.cjs --yarn --filename=bin",
+    "pack": "node package.cjs --yarn --filename=bin",
     "prepare": "husky",
     "puppeteer:browser": "npx -y puppeteer browsers install chrome",
     "test": "test-cjs",

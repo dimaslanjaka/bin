@@ -26,7 +26,6 @@ jobs:
       - name: ⬇️ Checkout main repository
         uses: actions/checkout@v6
         with:
-          ref: master
           token: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}'
 
       - name: ⬇️ Checkout test-repo
@@ -56,29 +55,12 @@ jobs:
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: '24.x'
 
       - name: 🐍 Setup Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.x'
-
-      - name: 🐍 Create virtual environment
-        shell: bash
-        run: |
-          python -m venv .venv
-          source .venv/bin/activate
-
-          python -m pip install --upgrade pip setuptools wheel
-
-          # Install requirements if available
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          fi
-
-          if [ -f requirements-dev.txt ]; then
-            pip install -r requirements-dev.txt
-          fi
+          python-version: '3.11'
 
       - uses: actions/cache@v5
         id: cache
@@ -100,6 +82,24 @@ jobs:
             ${{ runner.os }}-test-${{ hashFiles('**/package.json', '**/requirements*.txt', '.github') }}
             ${{ runner.os }}-test-
             ${{ runner.os }}-
+
+      - name: 🐍 Create virtual environment
+        shell: bash
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+
+          python -m pip install --upgrade pip setuptools wheel
+
+          # Install requirements if available
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+
+          if [ -f requirements-dev.txt ]; then
+            pip install -r requirements-dev.txt
+          fi
 
       - name: Add custom bins to PATH
         shell: bash
@@ -128,6 +128,10 @@ jobs:
 
       - name: 📦 Install dependencies
         run: yarn install
+
+      - name: '🔨 Build project'
+        shell: bash
+        run: yarn run build
 
       - name: '📦 Pack project'
         shell: bash

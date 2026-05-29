@@ -20,19 +20,6 @@ const packagejson = require('./package.json');
 const crypto = require('crypto');
 const path = require('upath');
 
-//// CHECK REQUIRED PACKAGES
-
-const scriptname = `[packer]`;
-const isAllPackagesInstalled = ['ansi-colors', 'glob', 'upath', 'minimist'].map((name) => ({
-  name,
-  installed: isPackageInstalled(name)
-}));
-if (!isAllPackagesInstalled.every((o) => o.installed === true)) {
-  const names = isAllPackagesInstalled.filter((o) => o.installed === false).map((o) => o.name);
-  console.log(scriptname, 'package', names.join(', '), 'is not installed', 'skipping postinstall script');
-  process.exit(0);
-}
-
 const args = process.argv.slice(2);
 const argv = require('minimist')(args);
 
@@ -390,16 +377,4 @@ function file_to_hash(alogarithm = 'sha1', path, encoding = 'hex') {
   });
 }
 
-/**
- * check package installed
- * @param {string} packageName
- * @returns
- */
-function isPackageInstalled(packageName) {
-  try {
-    const modules = Array.from(process.moduleLoadList).filter((str) => !str.startsWith('NativeModule internal/'));
-    return modules.indexOf(`NativeModule ${packageName}`) >= 0 || fs.existsSync(require.resolve(packageName));
-  } catch (_e) {
-    return false;
-  }
-}
+

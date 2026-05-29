@@ -128,6 +128,10 @@ jobs:
       - name: 📦 Install dependencies
         run: yarn install
 
+      - name: '📦 Pack project'
+        shell: bash
+        run: yarn run pack
+
       - name: 🧪 Run CJS tests with coverage
         run: bash bin/test-cjs --coverage=true --detectOpenHandles --testPathPatterns="test/"
 

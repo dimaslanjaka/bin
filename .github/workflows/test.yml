@@ -143,6 +143,10 @@ jobs:
         env:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
 
-      - name: '🧹 Clean GitHub Actions cache (npx)'
-        run: npx clean-github-actions-cache
+      - name: 🧹 Clean GitHub Actions Cache ${{ github.event.workflow_run.head_sha }}
+        env:
+          GH_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          npx --legacy-peer-deps -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz clean-github-actions-caches --repo ${{ github.repository }} --sha ${{ github.event.workflow_run.head_sha }}
+        shell: bash
         continue-on-error: true

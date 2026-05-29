@@ -1,6 +1,7 @@
-const fs = require('fs').promises;
+const fs = require('fs');
+const fsp = require('fs').promises;
 const path = require('path');
-const crypto = require('crypto');
+const CryptoJS = require('crypto-js');
 const { execSync } = require('child_process');
 const glob = require('glob');
 const { getArgs } = require('./utils/index.cjs');
@@ -93,9 +94,9 @@ async function main() {
     let relativePath = path.relative(projectDir, file);
     relativePath = relativePath.split(path.sep).join('/');
     try {
-      const stats = await fs.stat(file);
+      const stats = await fsp.stat(file);
       const pseudoHash = `${stats.size}-${stats.mtimeMs}`;
-      const hash = crypto.createHash('sha256').update(pseudoHash).digest('hex');
+      const hash = CryptoJS.SHA256(pseudoHash).toString(CryptoJS.enc.Hex);
       hashArray.push(`${relativePath} ${hash.slice(0, 8)}`);
     } catch (err) {
       console.error(`Error processing file: ${file}`, err instanceof Error ? err.message : '<unknown error>');
@@ -134,7 +135,11 @@ async function main() {
   const allFiles = new Set([...initialFiles, ...globFiles]);
 
   // Hash all unique files
-  await Promise.all(Array.from(allFiles).map(hashAndPush));
+  await Promise.all(
+    Array.from(allFiles)
+      .filter((p) => fs.existsSync(p))
+      .map(hashAndPush)
+  );
 
   // Sort the hashArray by file paths
   hashArray.sort((a, b) => a.localeCompare(b));
@@ -194,7 +199,7 @@ async function main() {
 
   // Write directory/file tree to the output file (hashes are included in the tree)
   const fileTreeString = getFileTreeString(hashArray);
-  await fs.writeFile(outputFile, fileTreeString + '\n', 'utf-8');
+  await fsp.writeFile(outputFile, fileTreeString + '\n', 'utf-8');
 
   // Add the hash file to the commit if --git-add is present
   if (argv['git-add']) {

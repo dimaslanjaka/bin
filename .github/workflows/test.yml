@@ -3,7 +3,7 @@
 name: Node.js Package Test
 
 concurrency:
-  group: test-${{ github.event.workflow_run.head_sha }}
+  group: test-${{ github.event.workflow_run.head_sha || github.sha }}
   cancel-in-progress: true
 
 on:
@@ -21,7 +21,7 @@ on:
 jobs:
   test:
     name: 🧪 Run Tests
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:

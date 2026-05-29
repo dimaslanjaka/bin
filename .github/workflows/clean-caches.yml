@@ -1,6 +1,7 @@
 name: Clean GitHub Actions Cache
 
 on:
+  # Trigger this workflow when the specified workflows complete (e.g., after build and test workflows)
   workflow_run:
     workflows:
       - Node.js Package Build
@@ -8,8 +9,19 @@ on:
     types:
       - completed
 
+  # Allow manual triggering of this workflow from the GitHub Actions UI
   workflow_dispatch:
 
+  # Uncomment the following lines to enable scheduled cache cleaning (e.g., every hour)
+  # schedule:
+  #   - cron: '0 * * * *'
+
+  # Uncomment the following lines to enable cache cleaning on pushes to the master branch
+  # push:
+  #   branches:
+  #     - master
+
+  # Allow this workflow to be called by other workflows, passing the ACCESS_TOKEN secret
   workflow_call:
     secrets:
       ACCESS_TOKEN:

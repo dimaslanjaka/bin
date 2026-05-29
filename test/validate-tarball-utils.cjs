@@ -1,23 +1,23 @@
 /**
  * Utility functions for validate-tarball tests.
  */
-const { repoDir, ensureRepoExists } = require("./env.cjs");
-const path = require("upath");
-const fs = require("fs-extra");
-const { writefile } = require("sbg-utility");
+const { repoDir, ensureRepoExists } = require('./env.cjs');
+const path = require('upath');
+const fs = require('fs-extra');
+const { writefile } = require('sbg-utility');
 
 // Define lock file paths used by the original implementation
-const npmLockFile = path.join(repoDir, "package-lock.json");
-const yarnLockFile = path.join(repoDir, "yarn.lock");
-const npmLockFileBackup = npmLockFile + ".bak";
-const yarnLockFileBackup = yarnLockFile + ".bak";
-const nodeModules = path.join(repoDir, "node_modules");
+const npmLockFile = path.join(repoDir, 'package-lock.json');
+const yarnLockFile = path.join(repoDir, 'yarn.lock');
+const npmLockFileBackup = npmLockFile + '.bak';
+const yarnLockFileBackup = yarnLockFile + '.bak';
+const nodeModules = path.join(repoDir, 'node_modules');
 
 // Load bin keys from the main package.json (used by checkBinLinks)
-const mainPkg = require(path.resolve(__dirname, "../package.json"));
-const binEntries = mainPkg.bin ? (typeof mainPkg.bin === "string" ? [mainPkg.bin] : Object.keys(mainPkg.bin)) : [];
+const mainPkg = require(path.resolve(__dirname, '../package.json'));
+const binEntries = mainPkg.bin ? (typeof mainPkg.bin === 'string' ? [mainPkg.bin] : Object.keys(mainPkg.bin)) : [];
 
-const { spawnSync } = require("child_process");
+const { spawnSync } = require('child_process');
 
 /**
  * Run `yarn build` and `yarn run pack` in the workspace directory.
@@ -27,18 +27,18 @@ const { spawnSync } = require("child_process");
  */
 function buildAndPack(workspaceDir) {
   // Build
-  const build = spawnSync("yarn", ["build"], { cwd: workspaceDir, stdio: "pipe", shell: true });
+  const build = spawnSync('yarn', ['build'], { cwd: workspaceDir, stdio: 'pipe', shell: true });
   if (build.error || build.status !== 0) {
-    const out = (build.stdout || Buffer.from("")).toString();
-    const err = (build.stderr || Buffer.from("")).toString();
+    const out = (build.stdout || Buffer.from('')).toString();
+    const err = (build.stderr || Buffer.from('')).toString();
     throw new Error(`yarn build failed:\n${out}\n${err}`);
   }
 
   // Pack
-  const pack = spawnSync("yarn", ["run", "pack"], { cwd: workspaceDir, stdio: "pipe", shell: true });
+  const pack = spawnSync('yarn', ['run', 'pack'], { cwd: workspaceDir, stdio: 'pipe', shell: true });
   if (pack.error || pack.status !== 0) {
-    const out = (pack.stdout || Buffer.from("")).toString();
-    const err = (pack.stderr || Buffer.from("")).toString();
+    const out = (pack.stdout || Buffer.from('')).toString();
+    const err = (pack.stderr || Buffer.from('')).toString();
     throw new Error(`yarn run pack failed:\n${out}\n${err}`);
   }
 }
@@ -60,32 +60,32 @@ function prepareInstallation(type) {
   }
 
   // Restore only the relevant lock file for the install type
-  if (type === "yarn" && fs.existsSync(yarnLockFileBackup)) {
+  if (type === 'yarn' && fs.existsSync(yarnLockFileBackup)) {
     fs.renameSync(yarnLockFileBackup, yarnLockFile);
   }
-  if (type === "npm" && fs.existsSync(npmLockFileBackup)) {
+  if (type === 'npm' && fs.existsSync(npmLockFileBackup)) {
     fs.renameSync(npmLockFileBackup, npmLockFile);
   }
 
   // Remove binary-collections and .bin from node_modules to ensure a clean slate for installation
-  for (const dir of ["binary-collections", ".bin"]) {
+  for (const dir of ['binary-collections', '.bin']) {
     const target = path.join(nodeModules, dir);
     if (fs.existsSync(target)) fs.removeSync(target);
     expect(fs.existsSync(target)).toBe(false);
   }
 
   // Ensure the test project has a package.json (initialize if missing)
-  const pkgJson = path.join(repoDir, "package.json");
+  const pkgJson = path.join(repoDir, 'package.json');
   if (!fs.existsSync(pkgJson)) {
-    spawnSync("npm", ["init", "-y"], { cwd: repoDir, stdio: "ignore", shell: true });
+    spawnSync('npm', ['init', '-y'], { cwd: repoDir, stdio: 'ignore', shell: true });
   }
 
-  const pkgObj = JSON.parse(fs.readFileSync(pkgJson, "utf8"));
-  const projectObj = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../package.json"), "utf8"));
+  const pkgObj = JSON.parse(fs.readFileSync(pkgJson, 'utf8'));
+  const projectObj = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../package.json'), 'utf8'));
   pkgObj.resolutions = Object.assign(pkgObj.resolutions || {}, projectObj.resolutions);
   pkgObj.dependencies = {};
   pkgObj.devDependencies = {
-    "binary-collections": `file:${path.resolve(__dirname, "../releases/bin.tgz")}`
+    'binary-collections': `file:${path.resolve(__dirname, '../releases/bin.tgz')}`
   };
   fs.writeFileSync(pkgJson, JSON.stringify(pkgObj, null, 2));
 }
@@ -98,22 +98,22 @@ function prepareInstallation(type) {
  * @param {string} tarball - Path to the tarball being tested.
  */
 function checkBinLinks(id, tarball) {
-  const binDir = path.join(nodeModules, ".bin");
+  const binDir = path.join(nodeModules, '.bin');
   const logFile = path.resolve(__dirname, `../tmp/binLinks${id}.txt`);
   const failedBins = [];
   const logLines = binEntries.map((binPath) => {
     const binName = path.basename(binPath);
-    const binVariants = ["", ".cmd", ".ps1"].map((ext) => path.join(binDir, binName + ext));
+    const binVariants = ['', '.cmd', '.ps1'].map((ext) => path.join(binDir, binName + ext));
     const foundVariant = binVariants.find((variant) => fs.existsSync(variant));
     if (!foundVariant) failedBins.push(binName);
-    const binVariantsStr = binVariants.map((v) => `\t${v}\n\tExist: ${fs.existsSync(v)}`).join("\n");
-    return `${binName}:\n${binVariantsStr}\nResult: ${foundVariant || "NOT FOUND"}`;
+    const binVariantsStr = binVariants.map((v) => `\t${v}\n\tExist: ${fs.existsSync(v)}`).join('\n');
+    return `${binName}:\n${binVariantsStr}\nResult: ${foundVariant || 'NOT FOUND'}`;
   });
   // Ensure tmp dir exists
   fs.ensureDirSync(path.dirname(logFile));
-  writefile(logFile, `Tarball: ${tarball}\n\n${logLines.join("\n")}`);
+  writefile(logFile, `Tarball: ${tarball}\n\n${logLines.join('\n')}`);
   if (failedBins.length > 0) {
-    throw new Error(`Missing bin links: ${failedBins.join(", ")}. See log: ${logFile}`);
+    throw new Error(`Missing bin links: ${failedBins.join(', ')}. See log: ${logFile}`);
   }
 }
 
@@ -127,10 +127,10 @@ function checkBinLinks(id, tarball) {
 function validateBinaries(packageManager) {
   const pkgJson = `${repoDir}/node_modules/binary-collections/package.json`;
   const checks = [
-    { cmd: "git-diff", args: ["--help"] },
-    { cmd: "pkg-resolutions-updater", args: ["--help"] },
-    { cmd: "submodule-install", args: ["--help"] },
-    { cmd: "kill-night-crows", args: ["--help"] }
+    { cmd: 'git-diff', args: ['--help'] },
+    { cmd: 'pkg-resolutions-updater', args: ['--help'] },
+    { cmd: 'submodule-install', args: ['--help'] },
+    { cmd: 'kill-night-crows', args: ['--help'] }
   ];
 
   for (const { cmd, args } of checks) {
@@ -140,16 +140,16 @@ function validateBinaries(packageManager) {
       }
       const pkg = require(pkgJson);
 
-      expect(pkg).toHaveProperty("bin");
+      expect(pkg).toHaveProperty('bin');
       expect(pkg.bin).toHaveProperty(cmd);
-      expect(typeof pkg.bin[cmd]).toBe("string");
+      expect(typeof pkg.bin[cmd]).toBe('string');
 
-      const actualBinPath = path.resolve(repoDir, "node_modules/binary-collections", pkg.bin[cmd]);
+      const actualBinPath = path.resolve(repoDir, 'node_modules/binary-collections', pkg.bin[cmd]);
       expect(fs.existsSync(actualBinPath)).toBe(true);
 
-      const result = spawnSync("node", [actualBinPath, ...args], {
+      const result = spawnSync('node', [actualBinPath, ...args], {
         cwd: repoDir,
-        stdio: "pipe",
+        stdio: 'pipe',
         shell: true
       });
       if (result.status !== 0) {
@@ -159,11 +159,11 @@ function validateBinaries(packageManager) {
       expect(result.status).toBe(0);
 
       // Proxy (binary-collections commandName)
-      const proxyPath = path.resolve(repoDir, "node_modules/binary-collections/lib/binary-collections.cjs");
+      const proxyPath = path.resolve(repoDir, 'node_modules/binary-collections/lib/binary-collections.cjs');
       expect(fs.existsSync(proxyPath)).toBe(true);
-      const resultProxy = spawnSync("node", [proxyPath, cmd, ...args], {
+      const resultProxy = spawnSync('node', [proxyPath, cmd, ...args], {
         cwd: repoDir,
-        stdio: "pipe",
+        stdio: 'pipe',
         shell: true
       });
       expect(resultProxy.error).toBeUndefined();

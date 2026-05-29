@@ -1,13 +1,13 @@
-const { repoDir, nonGitDir } = require("../env.cjs");
+const { repoDir, nonGitDir } = require('../env.cjs');
 const originalCwd = process.cwd();
 
-describe("isGitRepository", () => {
+describe('isGitRepository', () => {
   let isGitRepository;
   let logSpy;
   beforeEach(() => {
     jest.resetModules();
-    logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
-    isGitRepository = require("../../src/git/utils.cjs").isGitRepository;
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    isGitRepository = require('../../src/git/utils.cjs').isGitRepository;
   });
 
   afterEach(() => {
@@ -15,13 +15,13 @@ describe("isGitRepository", () => {
     process.chdir(originalCwd); // Restore original working directory
   });
 
-  it("returns true if git rev-parse succeeds", () => {
+  it('returns true if git rev-parse succeeds', () => {
     process.chdir(repoDir); // Ensure we're in the test repo directory
     expect(isGitRepository(repoDir)).toBe(true);
     expect(isGitRepository()).toBe(true);
   });
 
-  it("returns true if git rev-parse failed", () => {
+  it('returns true if git rev-parse failed', () => {
     process.chdir(nonGitDir); // Ensure we're in a non-git directory
     expect(isGitRepository(nonGitDir)).toBe(false);
     process.cwd = () => nonGitDir; // Mock current working directory

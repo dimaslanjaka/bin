@@ -1,13 +1,13 @@
 // Load .env file for project environment
-require("dotenv").config({ path: require("path").join(__dirname, "../.env"), quiet: true, override: true });
-require("./env.cjs"); // Ensure environment is set up
-const fs = require("fs");
-const path = require("path");
-const os = require("os");
-const { execSync } = require("child_process");
-const { forceLfLineEndings } = require("../src/git/line-endings.cjs");
+require('dotenv').config({ path: require('path').join(__dirname, '../.env'), quiet: true, override: true });
+require('./env.cjs'); // Ensure environment is set up
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+const { execSync } = require('child_process');
+const { forceLfLineEndings } = require('../src/git/line-endings.cjs');
 
-describe("git-fix focused integration tests", () => {
+describe('git-fix focused integration tests', () => {
   let tempDir;
   let originalCwd;
   let consoleLogSpy;
@@ -19,8 +19,8 @@ describe("git-fix focused integration tests", () => {
     originalCwd = process.cwd();
 
     // Mock console methods
-    consoleLogSpy = jest.spyOn(console, "log").mockImplementation();
-    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
   });
 
   afterEach(() => {
@@ -35,84 +35,84 @@ describe("git-fix focused integration tests", () => {
     consoleErrorSpy.mockRestore();
   });
 
-  describe("gitattributes file creation", () => {
+  describe('gitattributes file creation', () => {
     beforeEach(() => {
       fs.mkdirSync(tempDir, { recursive: true });
       process.chdir(tempDir);
-      execSync("git init", { stdio: "pipe" });
+      execSync('git init', { stdio: 'pipe' });
 
       // Set basic git config to avoid commit issues
       try {
-        execSync('git config user.name "Test User"', { stdio: "pipe" });
-        execSync('git config user.email "test@example.com"', { stdio: "pipe" });
+        execSync('git config user.name "Test User"', { stdio: 'pipe' });
+        execSync('git config user.email "test@example.com"', { stdio: 'pipe' });
       } catch {
         // Ignore config errors for this focused test
       }
     });
 
-    it("should create .gitattributes file with correct content", () => {
+    it('should create .gitattributes file with correct content', () => {
       // No need to chdir, cwd is forced by env.js
       forceLfLineEndings();
 
-      const gitattributesPath = path.join(process.cwd(), ".gitattributes");
+      const gitattributesPath = path.join(process.cwd(), '.gitattributes');
       expect(fs.existsSync(gitattributesPath)).toBe(true);
 
-      const content = fs.readFileSync(gitattributesPath, "utf-8");
+      const content = fs.readFileSync(gitattributesPath, 'utf-8');
 
       // Check for the key patterns that should be in the file
-      expect(content).toContain("* text=auto eol=lf");
-      expect(content).toContain("*.{cmd,bat,ps1,sh,cmd1,cmd2,bat1,bat2,vbs} text eol=crlf");
-      expect(content).toContain("binary");
+      expect(content).toContain('* text=auto eol=lf');
+      expect(content).toContain('*.{cmd,bat,ps1,sh,cmd1,cmd2,bat1,bat2,vbs} text eol=crlf');
+      expect(content).toContain('binary');
     });
 
-    it("should handle pattern conflicts correctly", () => {
-      const gitattributesPath = path.join(process.cwd(), ".gitattributes");
+    it('should handle pattern conflicts correctly', () => {
+      const gitattributesPath = path.join(process.cwd(), '.gitattributes');
       // This content should NOT prevent the '* text=auto eol=lf' rule from being added
       // because the pattern matching checks for exact patterns
-      const existingContent = "*.txt text\n*.js text\n";
+      const existingContent = '*.txt text\n*.js text\n';
       fs.writeFileSync(gitattributesPath, existingContent);
 
       forceLfLineEndings();
 
-      const content = fs.readFileSync(gitattributesPath, "utf-8");
-      expect(content).toContain("*.txt text");
-      expect(content).toContain("*.js text");
+      const content = fs.readFileSync(gitattributesPath, 'utf-8');
+      expect(content).toContain('*.txt text');
+      expect(content).toContain('*.js text');
 
       // The algorithm checks if `*` (the pattern) exists in the content
       // Since `*.txt` contains `*`, it might think the rule exists
       // Let's verify what actually happens
-      console.log("Generated content:", JSON.stringify(content));
+      console.log('Generated content:', JSON.stringify(content));
     });
 
-    it("should preserve existing .gitattributes content", () => {
+    it('should preserve existing .gitattributes content', () => {
       // No need to chdir, cwd is forced by env.js
-      const gitattributesPath = path.join(process.cwd(), ".gitattributes");
+      const gitattributesPath = path.join(process.cwd(), '.gitattributes');
       // Use content that won't conflict with the patterns being added
-      const existingContent = "# Existing content\n# Custom rules\n";
+      const existingContent = '# Existing content\n# Custom rules\n';
       fs.writeFileSync(gitattributesPath, existingContent);
 
       forceLfLineEndings();
 
-      const content = fs.readFileSync(gitattributesPath, "utf-8");
+      const content = fs.readFileSync(gitattributesPath, 'utf-8');
       // Debug output
-      console.log("CWD:", process.cwd());
-      console.log("gitattributes exists:", fs.existsSync(gitattributesPath));
+      console.log('CWD:', process.cwd());
+      console.log('gitattributes exists:', fs.existsSync(gitattributesPath));
       if (fs.existsSync(gitattributesPath)) {
-        console.log("gitattributes content:", content);
+        console.log('gitattributes content:', content);
       }
-      expect(content).toContain("# Existing content");
-      expect(content).toContain("# Custom rules");
-      expect(content).toContain("* text=auto eol=lf");
+      expect(content).toContain('# Existing content');
+      expect(content).toContain('# Custom rules');
+      expect(content).toContain('* text=auto eol=lf');
     });
 
-    it("should not duplicate rules if already present", () => {
-      const gitattributesPath = path.join(process.cwd(), ".gitattributes");
-      const existingContent = "* text=auto eol=lf\n*.{cmd,bat,ps1,sh,cmd1,cmd2,bat1,bat2,vbs} text eol=crlf\n";
+    it('should not duplicate rules if already present', () => {
+      const gitattributesPath = path.join(process.cwd(), '.gitattributes');
+      const existingContent = '* text=auto eol=lf\n*.{cmd,bat,ps1,sh,cmd1,cmd2,bat1,bat2,vbs} text eol=crlf\n';
       fs.writeFileSync(gitattributesPath, existingContent);
 
       forceLfLineEndings();
 
-      const content = fs.readFileSync(gitattributesPath, "utf-8");
+      const content = fs.readFileSync(gitattributesPath, 'utf-8');
 
       // Count occurrences - should only appear once each
       const lfRuleCount = (content.match(/\* text=auto eol=lf/g) || []).length;
@@ -124,20 +124,20 @@ describe("git-fix focused integration tests", () => {
     });
   });
 
-  describe("console output verification", () => {
+  describe('console output verification', () => {
     beforeEach(() => {
       fs.mkdirSync(tempDir, { recursive: true });
       process.chdir(tempDir);
-      execSync("git init", { stdio: "pipe" });
+      execSync('git init', { stdio: 'pipe' });
     });
 
-    it("should log configuration messages", () => {
+    it('should log configuration messages', () => {
       forceLfLineEndings();
 
       // Verify that configuration messages were logged
-      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining("Configuring LF Line Endings"));
-      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining("Disable automatic CRLF conversion"));
-      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining("Set end-of-line to LF"));
+      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('Configuring LF Line Endings'));
+      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('Disable automatic CRLF conversion'));
+      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('Set end-of-line to LF'));
     });
   });
 });

@@ -1,3 +1,3 @@
-require("./env.cjs");
+require('./env.cjs');
 
-require("../lib/del-yarn-caches");
+require('../lib/del-yarn-caches');

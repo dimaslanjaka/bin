@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('upath');
 const argv = require('minimist')(process.argv.slice(2));
 const { exec } = require('child_process');
-const { URL } = require('url');
 const { promisify } = require('util');
 
 /**

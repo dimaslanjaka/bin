@@ -16,6 +16,7 @@ const { spawnSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const which = require('which');
+const { isWindows } = require('../src/utils/isWindows.js');
 
 /**
  * __dirname
@@ -186,8 +187,32 @@ if (isPs1) {
 
   if (interpreter) {
     const resolvedOrNull = which.sync(interpreter, { nothrow: true });
-    cmd = resolvedOrNull || interpreter;
-    args = [found, ...process.argv.slice(2)];
+    if (!resolvedOrNull) {
+      if (['bash', 'sh'].includes(interpreter) && isWindows()) {
+        const locationsToCheck = [
+          'C:\\Program Files\\Git\\usr\\bin',
+          'C:\\Program Files\\Git\\bin',
+          'C:\\Program Files (x86)\\Git\\usr\\bin',
+          'C:\\msys64\\usr\\bin',
+          'C:\\msys64\\bin',
+          'C:\\cygwin64\\bin',
+          'C:\\cygwin\\bin',
+          'C:\\MinGW\\bin',
+          'C:\\MinGW\\msys\\1.0\\bin'
+        ];
+        for (const location of locationsToCheck) {
+          const potentialPath = path.join(location, 'bash.exe');
+          if (fs.existsSync(potentialPath)) {
+            cmd = potentialPath;
+            args = [found, ...process.argv.slice(2)];
+            break;
+          }
+        }
+      }
+    } else {
+      cmd = resolvedOrNull || interpreter;
+      args = [found, ...process.argv.slice(2)];
+    }
   } else {
     cmd = found;
     args = process.argv.slice(2);

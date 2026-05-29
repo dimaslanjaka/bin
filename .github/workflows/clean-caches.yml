@@ -103,19 +103,9 @@ jobs:
           npx -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz submodule-install
         shell: bash
 
-      - name: 📥 Install Dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          corepack enable
-          yarn install
-
-      - name: 🏗️ Build Project
-        run: |
-          yarn build
-
       - name: 🧹 Clean GitHub Actions Cache ${{ github.event.workflow_run.head_sha }}
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
-          node lib/clean-github-actions-caches-cli.cjs
+          npx -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz clean-github-actions-caches --repo ${{ github.repository }} --sha ${{ github.event.workflow_run.head_sha }}
         shell: bash

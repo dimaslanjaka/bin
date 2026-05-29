@@ -9,7 +9,7 @@ concurrency:
 on:
   workflow_run:
     workflows:
-      - Node.js Package Build
+      - Build Release
     types:
       - completed
   workflow_dispatch:

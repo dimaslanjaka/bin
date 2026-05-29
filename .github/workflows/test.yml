@@ -133,7 +133,7 @@ jobs:
         run: yarn run pack
 
       - name: 🧪 Run CJS tests with coverage
-        run: bash bin/test-cjs --coverage=true --detectOpenHandles --testPathPatterns="test/"
+        run: bash bin/test-cjs --coverage=true --detectOpenHandles --testPathPatterns="${{ github.workspace }}/test/"
 
       - name: 🧪 Run ESM tests with coverage
-        run: bash bin/test-esm --coverage=true --detectOpenHandles --testPathPatterns="test/"
+        run: bash bin/test-esm --coverage=true --detectOpenHandles --testPathPatterns="${{ github.workspace }}/test/"

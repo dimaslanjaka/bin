@@ -1,6 +1,6 @@
 import { spawnAsync } from 'cross-spawn';
 import { lookup } from 'ps-node';
-import isWin from './utils/isWindows.js';
+import { isWindows } from './utils/isWindows.js';
 import { getArgs } from './utils/index.cjs';
 
 getArgs()._.forEach((command) => {
@@ -17,7 +17,7 @@ getArgs()._.forEach((command) => {
       resultList.forEach(function (process) {
         if (process) {
           // console.log('PID: %s, COMMAND: %s, ARGUMENTS: %s', process.pid, process.command, process.arguments);
-          if (!isWin) {
+          if (!isWindows()) {
             spawnAsync('kill', ['-9', process.pid]).catch((e) => console.log(`kill failed ${e.message}`));
             spawnAsync('killall', ['-9', process.pid]).catch((e) => console.log(`killall failed ${e.message}`));
           } else {

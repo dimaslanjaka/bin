@@ -10,10 +10,12 @@ on:
       - Build Release
     types:
       - completed
-
   workflow_dispatch:
-
   push:
+    paths:
+      - '**/test*/**'
+      - '**/test*'
+      - '**/src/**'
 
 env:
   CI_NODE_VERSION: '24.x'

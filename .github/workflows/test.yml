@@ -87,24 +87,38 @@ jobs:
           name: build-output
           path: .
 
-      - name: 🧪 Run CJS tests
-        env:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || github.token }}
-        run: |
-          bash bin/test-cjs \
-            --coverage=true \
-            --detectOpenHandles \
-            --testPathPatterns="${{ github.workspace }}/test/"
+      # - name: 🧪 Run CJS tests
+      #   env:
+      #     ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || github.token }}
+      #   run: |
+      #     bash bin/test-cjs \
+      #       --coverage=true \
+      #       --detectOpenHandles \
+      #       --testPathPatterns="${{ github.workspace }}/test/"
 
-      - name: 🧪 Run ESM tests
-        env:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || github.token }}
-        run: |
-          bash bin/test-esm \
-            --coverage=true \
-            --detectOpenHandles \
-            --testPathPatterns="${{ github.workspace }}/test/"
+      # - name: 🧪 Run ESM tests
+      #   env:
+      #     ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || github.token }}
+      #   run: |
+      #     bash bin/test-esm \
+      #       --coverage=true \
+      #       --detectOpenHandles \
+      #       --testPathPatterns="${{ github.workspace }}/test/"
 
+      - name: 🧪 Run tests individually
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          find test tests \
+            -type f \
+            \( -name "*.test.*" -o -name "*.spec.*" \) \
+            -print0 |
+          while IFS= read -r -d '' file; do
+            echo "::group::$file"
+            npm test -- "$file"
+            echo "::endgroup::"
+          done
   cleanup:
     name: 🧹 Clean GitHub Actions Cache
     needs:

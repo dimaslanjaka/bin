@@ -38,3 +38,10 @@ runs:
         path: packages/cross-spawn
         token: ${{ inputs.token }}
         ref: private
+
+    - name: 🔄 Update submodules
+      shell: bash
+      run: |
+        git submodule update --init --recursive || true
+        npx -y rimraf .git/modules
+        npx --legacy-peer-deps -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz submodule-install

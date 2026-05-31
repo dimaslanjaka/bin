@@ -44,13 +44,15 @@ jobs:
           python-version: ${{ env.CI_PYTHON_VERSION }}
 
       - name: 📦 Install dependencies
-        run: yarn install --frozen-lockfile
+        run: |
+          touch yarn.lock
+          corepack yarn install
 
       - name: 🔨 Build project
-        run: yarn build
+        run: corepack yarn build
 
       - name: 📦 Pack project
-        run: yarn pack
+        run: corepack yarn pack
 
       - name: 📤 Upload build artifacts
         uses: actions/upload-artifact@v4

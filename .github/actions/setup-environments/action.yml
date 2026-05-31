@@ -1,0 +1,78 @@
+name: Setup CI Environment
+description: Setup Node.js, Python, cache, virtual environment, and PATH for CI workflows
+
+inputs:
+  node-version:
+    description: Node.js version to install
+    required: true
+  python-version:
+    description: Python version to install (skip Python setup if empty)
+    required: false
+    default: ''
+
+runs:
+  using: composite
+
+  steps:
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: 🐍 Setup Python
+      if: inputs.python-version != ''
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: 📚 Restore Cache
+      id: cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          **/.yarn
+          **/node_modules
+          **/.venv
+          **/venv
+          **/__pycache__
+          **/*.pyc
+          .cache
+        key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock', '**/package.json', '**/requirements*.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-
+
+    - name: 🐍 Create virtual environment
+      if: inputs.python-version != '' && steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        python -m venv .venv
+        source .venv/bin/activate
+
+        python -m pip install --upgrade pip setuptools wheel
+
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt
+        fi
+
+        if [ -f requirements-dev.txt ]; then
+          pip install -r requirements-dev.txt
+        fi
+
+    - name: Add custom bins to PATH
+      shell: bash
+      run: |
+        BIN_DIRS=(
+          "${{ github.workspace }}/node_modules/.bin"
+          "${{ github.workspace }}/vendor/bin"
+          "${{ github.workspace }}/.venv/bin"
+          "${{ github.workspace }}/venv/bin"
+          "${{ github.workspace }}/bin"
+          "${{ github.workspace }}/binaries"
+        )
+
+        for dir in "${BIN_DIRS[@]}"; do
+          if [ -d "$dir" ]; then
+            chmod -R +x "$dir" || true
+            echo "$dir" >> "$GITHUB_PATH"
+          fi
+        done

@@ -20,8 +20,8 @@ on:
       - '**/src/**'
 
 env:
-  NODE_VERSION: '24.x'
-  PYTHON_VERSION: '3.11'
+  CI_NODE_VERSION: '24.x'
+  CI_PYTHON_VERSION: '3.11'
 
 jobs:
   build:
@@ -40,12 +40,12 @@ jobs:
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: ${{ env.CI_NODE_VERSION }}
 
       - name: 🐍 Setup Python
         uses: actions/setup-python@v6
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version: ${{ env.CI_PYTHON_VERSION }}
 
       - name: 📚 Restore Cache
         id: cache
@@ -137,7 +137,7 @@ jobs:
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: ${{ env.CI_NODE_VERSION }}
 
       - name: 📚 Restore Cache
         uses: actions/cache@v4

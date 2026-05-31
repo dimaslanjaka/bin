@@ -12,11 +12,49 @@ inputs:
   prefix-cache-key:
     description: Prefix for cache keys
     required: false
-    default: '${{ runner.os }}-test-'
+    default: '${{ runner.os }}-'
   token:
     description: GitHub token for accessing resources
     required: false
     default: '${{ github.token }}'
+
+outputs:
+  CACHE_YARN:
+    description: Yarn cache folder
+    value: ${{ steps.set-env.outputs.CACHE_YARN }}
+  CACHE_NPM:
+    description: NPM cache folder
+    value: ${{ steps.set-env.outputs.CACHE_NPM }}
+  CACHE_NPM_USER_GLOBAL:
+    description: NPM user global cache
+    value: ${{ steps.set-env.outputs.CACHE_NPM_USER_GLOBAL }}
+  PIP_CACHE_DIR:
+    description: Pip cache dir
+    value: ${{ steps.set-env.outputs.PIP_CACHE_DIR }}
+  CURRENT_YARN_VERSION:
+    description: Current Yarn version
+    value: ${{ steps.set-env.outputs.CURRENT_YARN_VERSION }}
+  GITHUB_BRANCH:
+    description: Git branch name
+    value: ${{ steps.set-env.outputs.GITHUB_BRANCH }}
+  GITHUB_SHA_SHORT:
+    description: Short git sha
+    value: ${{ steps.set-env.outputs.GITHUB_SHA_SHORT }}
+  GITHUB_COMMIT_URL:
+    description: Commit URL
+    value: ${{ steps.set-env.outputs.GITHUB_COMMIT_URL }}
+  GITHUB_RUNNER_URL:
+    description: Runner URL
+    value: ${{ steps.set-env.outputs.GITHUB_RUNNER_URL }}
+  PACKAGE_MANAGER:
+    description: Detected package manager
+    value: ${{ steps.set-env.outputs['PACKAGE-MANAGER'] }}
+  MACHINE:
+    description: Detected machine/os
+    value: ${{ steps.set-env.outputs.machine }}
+  CACHE_HIT:
+    description: Whether cache restore was a hit
+    value: ${{ steps.cache.outputs.cache-hit }}
 
 runs:
   using: composite
@@ -233,3 +271,19 @@ runs:
             echo "$dir" >> "$GITHUB_PATH"
           fi
         done
+
+    - name: '🔗 Export composite action outputs'
+      shell: bash
+      run: |
+        echo "CACHE_YARN=${{ steps.set-env.outputs.CACHE_YARN }}" >> $GITHUB_OUTPUT
+        echo "CACHE_NPM=${{ steps.set-env.outputs.CACHE_NPM }}" >> $GITHUB_OUTPUT
+        echo "CACHE_NPM_USER_GLOBAL=${{ steps.set-env.outputs.CACHE_NPM_USER_GLOBAL }}" >> $GITHUB_OUTPUT
+        echo "PIP_CACHE_DIR=${{ steps.set-env.outputs.PIP_CACHE_DIR }}" >> $GITHUB_OUTPUT
+        echo "CURRENT_YARN_VERSION=${{ steps.set-env.outputs.CURRENT_YARN_VERSION }}" >> $GITHUB_OUTPUT
+        echo "GITHUB_BRANCH=${{ steps.set-env.outputs.GITHUB_BRANCH }}" >> $GITHUB_OUTPUT
+        echo "GITHUB_SHA_SHORT=${{ steps.set-env.outputs.GITHUB_SHA_SHORT }}" >> $GITHUB_OUTPUT
+        echo "GITHUB_COMMIT_URL=${{ steps.set-env.outputs.GITHUB_COMMIT_URL }}" >> $GITHUB_OUTPUT
+        echo "GITHUB_RUNNER_URL=${{ steps.set-env.outputs.GITHUB_RUNNER_URL }}" >> $GITHUB_OUTPUT
+        echo "PACKAGE_MANAGER=${{ steps.set-env.outputs['PACKAGE-MANAGER'] }}" >> $GITHUB_OUTPUT
+        echo "MACHINE=${{ steps.set-env.outputs.machine }}" >> $GITHUB_OUTPUT
+        echo "CACHE_HIT=${{ steps.cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT

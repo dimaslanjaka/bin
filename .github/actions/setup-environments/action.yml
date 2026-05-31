@@ -37,8 +37,9 @@ runs:
           **/__pycache__
           **/*.pyc
           .cache
-        key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock', '**/package.json', '**/requirements*.txt') }}
+        key: ${{ runner.os }}-test-${{ hashFiles('**/yarn.lock', '**/package.json', '**/requirements*.txt') }}
         restore-keys: |
+          ${{ runner.os }}-test-
           ${{ runner.os }}-
 
     - name: 🐍 Create virtual environment

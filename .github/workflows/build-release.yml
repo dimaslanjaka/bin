@@ -188,10 +188,10 @@ jobs:
 
           if git cat-file -e "$BASE" 2>/dev/null; then
             echo "Found base commit $BASE"
-            FILES=$(git diff --name-only "$BASE" "$GITHUB_SHA" | grep -E '^release.*/.*\.tgz$' || true)
+            FILES=$(git diff --name-only "$BASE" "$GITHUB_SHA" | grep -E '^release.*/.*\.tgz$|^lib/.*|^dist/.*' || true)
           else
             echo "Base commit not found, falling back to HEAD~1"
-            FILES=$(git diff --name-only HEAD~1 HEAD | grep -E '^release.*/.*\.tgz$' || true)
+            FILES=$(git diff --name-only HEAD~1 HEAD | grep -E '^release.*/.*\.tgz$|^lib/.*|^dist/.*' || true)
           fi
 
           echo "files<<EOF" >> "$GITHUB_OUTPUT"

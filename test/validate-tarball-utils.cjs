@@ -2,6 +2,8 @@
  * Utility functions for validate-tarball tests.
  */
 const { repoDir, ensureRepoExists } = require('./env.cjs');
+const CryptoJS = require('crypto-js');
+const { globSync } = require('glob');
 const path = require('upath');
 const fs = require('fs-extra');
 const { writefile } = require('sbg-utility');
@@ -17,15 +19,84 @@ const nodeModules = path.join(repoDir, 'node_modules');
 const mainPkg = require(path.resolve(__dirname, '../package.json'));
 const binEntries = mainPkg.bin ? (typeof mainPkg.bin === 'string' ? [mainPkg.bin] : Object.keys(mainPkg.bin)) : [];
 
-const { spawnSync } = require('child_process');
+const { spawnSync, execSync } = require('child_process');
+
+/**
+ * Path to the checksum cache file used to skip rebuilds when nothing changed.
+ */
+const CHECKSUM_CACHE_FILE = path.resolve(__dirname, '../tmp/.buildAndPack-checksum');
+
+/**
+ * Compute a composite checksum from:
+ * - current git short hash
+ * - contents of releases/*.tgz files
+ * - contents of src/**\/*.{js,ts,cjs,mjs} files
+ *
+ * @param {string} cwd - workspace directory
+ * @returns {string} hex sha-256 digest
+ */
+function computeBuildChecksum(cwd) {
+  const hash = CryptoJS.algo.SHA256.create();
+
+  // 1. Git short hash
+  try {
+    const gitHash = execSync('git rev-parse --short HEAD', { cwd, encoding: 'utf8' }).trim();
+    hash.update('git:' + gitHash);
+  } catch {
+    // If git is unavailable, force a rebuild by making checksum unpredictable
+    hash.update('git:unknown:' + Date.now());
+  }
+
+  // 2. releases/*.tgz files — binary content, preserve bytes via Latin1
+  const tgzFiles = globSync('releases/*.tgz', { cwd, nodir: true }).sort();
+  for (const file of tgzFiles) {
+    const absPath = path.resolve(cwd, file);
+    if (fs.existsSync(absPath)) {
+      hash.update('tgz:' + file);
+      hash.update(CryptoJS.enc.Latin1.parse(fs.readFileSync(absPath, 'latin1')));
+    }
+  }
+
+  // 3. src/**/*.{js,ts,cjs,mjs} files — text content, UTF-8
+  const srcFiles = globSync('src/**/*.{js,ts,cjs,mjs}', { cwd, nodir: true }).sort();
+  for (const file of srcFiles) {
+    const absPath = path.resolve(cwd, file);
+    if (fs.existsSync(absPath)) {
+      hash.update('src:' + file);
+      hash.update(fs.readFileSync(absPath, 'utf8'));
+    }
+  }
+
+  return hash.finalize().toString(CryptoJS.enc.Hex);
+}
 
 /**
  * Run `yarn build` and `yarn run pack` in the workspace directory.
  * Keeps output quiet but throws on failure.
  *
+ * Skips both steps when a cached checksum shows nothing has changed
+ * (same git hash, same tarballs, same source files).
+ *
  * @param {string} workspaceDir
  */
 function buildAndPack(workspaceDir) {
+  // ---- checksum guard --------------------------------------------------
+  const currentChecksum = computeBuildChecksum(workspaceDir);
+
+  let previousChecksum = null;
+  if (fs.existsSync(CHECKSUM_CACHE_FILE)) {
+    previousChecksum = fs.readFileSync(CHECKSUM_CACHE_FILE, 'utf8').trim();
+  }
+
+  if (previousChecksum === currentChecksum) {
+    console.log('[buildAndPack] checksum unchanged — skipping build & pack');
+    return;
+  }
+
+  if (previousChecksum !== null) {
+    console.log('[buildAndPack] checksum changed — rebuilding');
+  }
+  // ---- end checksum guard ----------------------------------------------
   // Build
   const build = spawnSync('yarn', ['build'], { cwd: workspaceDir, stdio: 'pipe', shell: true });
   if (build.error || build.status !== 0) {
@@ -41,6 +112,10 @@ function buildAndPack(workspaceDir) {
     const err = (pack.stderr || Buffer.from('')).toString();
     throw new Error(`yarn run pack failed:\n${out}\n${err}`);
   }
+
+  // Save checksum only after both build and pack succeed
+  fs.ensureDirSync(path.dirname(CHECKSUM_CACHE_FILE));
+  fs.writeFileSync(CHECKSUM_CACHE_FILE, currentChecksum);
 }
 /**
  * Prepare the installation environment for a given package manager.

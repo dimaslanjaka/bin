@@ -1,0 +1,40 @@
+name: Checkout Dependencies
+description: Checkout all repositories required by tests and builds
+
+inputs:
+  token:
+    description: GitHub token
+    required: true
+
+runs:
+  using: composite
+
+  steps:
+    - name: ⬇️ Checkout main repository
+      uses: actions/checkout@v6
+      with:
+        token: ${{ inputs.token }}
+
+    - name: ⬇️ Checkout test-repo
+      uses: actions/checkout@v6
+      with:
+        repository: dimaslanjaka/test-repo
+        path: tmp/test-repo
+        token: ${{ inputs.token }}
+        ref: test
+
+    - name: ⬇️ Checkout packages/git-command-helper
+      uses: actions/checkout@v6
+      with:
+        repository: dimaslanjaka/git-command-helper
+        path: packages/git-command-helper
+        token: ${{ inputs.token }}
+        ref: pre-release
+
+    - name: ⬇️ Checkout packages/cross-spawn
+      uses: actions/checkout@v6
+      with:
+        repository: dimaslanjaka/node-cross-spawn
+        path: packages/cross-spawn
+        token: ${{ inputs.token }}
+        ref: private

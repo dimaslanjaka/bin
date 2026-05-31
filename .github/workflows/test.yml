@@ -37,67 +37,11 @@ jobs:
         with:
           token: ${{ secrets.ACCESS_TOKEN || github.token }}
 
-      - name: 🟢 Setup Node.js
-        uses: actions/setup-node@v6
+      - name: 🚀 Setup CI environment
+        uses: ./.github/actions/setup-environments
         with:
           node-version: ${{ env.CI_NODE_VERSION }}
-
-      - name: 🐍 Setup Python
-        uses: actions/setup-python@v6
-        with:
           python-version: ${{ env.CI_PYTHON_VERSION }}
-
-      - name: 📚 Restore Cache
-        id: cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            **/.yarn
-            **/node_modules
-            **/.venv
-            **/venv
-            **/__pycache__
-            **/*.pyc
-            .cache
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock', '**/package.json', '**/requirements*.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-
-
-      - name: 🐍 Create virtual environment
-        if: steps.cache.outputs.cache-hit != 'true'
-        shell: bash
-        run: |
-          python -m venv .venv
-          source .venv/bin/activate
-
-          python -m pip install --upgrade pip setuptools wheel
-
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          fi
-
-          if [ -f requirements-dev.txt ]; then
-            pip install -r requirements-dev.txt
-          fi
-
-      - name: Add custom bins to PATH
-        shell: bash
-        run: |
-          BIN_DIRS=(
-            "${{ github.workspace }}/node_modules/.bin"
-            "${{ github.workspace }}/vendor/bin"
-            "${{ github.workspace }}/.venv/bin"
-            "${{ github.workspace }}/venv/bin"
-            "${{ github.workspace }}/bin"
-            "${{ github.workspace }}/binaries"
-          )
-
-          for dir in "${BIN_DIRS[@]}"; do
-            if [ -d "$dir" ]; then
-              chmod -R +x "$dir" || true
-              echo "$dir" >> "$GITHUB_PATH"
-            fi
-          done
 
       - name: 📦 Install dependencies
         run: yarn install --frozen-lockfile
@@ -134,50 +78,16 @@ jobs:
         with:
           token: ${{ secrets.ACCESS_TOKEN || github.token }}
 
-      - name: 🟢 Setup Node.js
-        uses: actions/setup-node@v6
+      - name: 🚀 Setup CI environment
+        uses: ./.github/actions/setup-environments
         with:
           node-version: ${{ env.CI_NODE_VERSION }}
-
-      - name: 📚 Restore Cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            **/.yarn
-            **/node_modules
-            **/.venv
-            **/venv
-            **/__pycache__
-            **/*.pyc
-            .cache
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock', '**/package.json', '**/requirements*.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-
 
       - name: 📥 Download build artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-output
           path: .
-
-      - name: Add custom bins to PATH
-        shell: bash
-        run: |
-          BIN_DIRS=(
-            "${{ github.workspace }}/node_modules/.bin"
-            "${{ github.workspace }}/vendor/bin"
-            "${{ github.workspace }}/.venv/bin"
-            "${{ github.workspace }}/venv/bin"
-            "${{ github.workspace }}/bin"
-            "${{ github.workspace }}/binaries"
-          )
-
-          for dir in "${BIN_DIRS[@]}"; do
-            if [ -d "$dir" ]; then
-              chmod -R +x "$dir" || true
-              echo "$dir" >> "$GITHUB_PATH"
-            fi
-          done
 
       - name: 🧪 Run CJS tests
         env:

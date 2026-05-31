@@ -30,6 +30,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: ⬇️ Checkout workflow repository
+        uses: actions/checkout@v6
       - name: ⬇️ Checkout dependencies
         uses: ./.github/actions/checkout-dependencies
         with:
@@ -125,6 +127,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: ⬇️ Checkout workflow repository
+        uses: actions/checkout@v6
       - name: ⬇️ Checkout dependencies
         uses: ./.github/actions/checkout-dependencies
         with:

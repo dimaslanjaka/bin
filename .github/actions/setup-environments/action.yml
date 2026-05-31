@@ -272,6 +272,16 @@ runs:
           fi
         done
 
+    - name: '🗑️ Remove packageManager from package.json'
+      shell: bash
+      run: |
+        if command -v jq >/dev/null 2>&1; then
+          jq 'del(.packageManager)' package.json > temp.json && mv temp.json package.json
+          awk 'NR==1{print $0} NR>1{print $0} END{print ""}' package.json > temp.json && mv temp.json package.json
+        else
+          node -e "let f='package.json';let j=require('./'+f);delete j.packageManager;require('fs').writeFileSync(f,JSON.stringify(j,null,2)+'\n');"
+        fi
+
     - name: '🔗 Export composite action outputs'
       shell: bash
       run: |

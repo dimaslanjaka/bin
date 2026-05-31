@@ -180,19 +180,6 @@ jobs:
             fi
           fi
 
-      - name: '🗑️ Remove packageManager from package.json'
-        shell: bash
-        run: |
-          # Remove packageManager from package.json if it exists
-          # Prefer jq if available, otherwise use Node.js (cross-platform)
-          if command -v jq >/dev/null 2>&1; then
-            jq 'del(.packageManager)' package.json > temp.json && mv temp.json package.json
-            # Ensure package.json ends with a single empty line
-            awk 'NR==1{print $0} NR>1{print $0} END{print ""}' package.json > temp.json && mv temp.json package.json
-          else
-            node -e "let f='package.json';let j=require('./'+f);delete j.packageManager;require('fs').writeFileSync(f,JSON.stringify(j,null,2)+'\n');"
-          fi
-
       - name: '🕵️‍♂️ Check for changes in build artifacts'
         id: changes
         shell: bash
@@ -223,6 +210,7 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
       - name: '➕ Add build files to git'
         if: steps.changes.outputs.files_changed == 'true'
         continue-on-error: true

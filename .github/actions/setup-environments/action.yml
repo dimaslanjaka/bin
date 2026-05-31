@@ -22,6 +22,57 @@ runs:
   using: composite
 
   steps:
+    - name: ⬇️ Checkout main repository
+      uses: actions/checkout@v6
+      with:
+        token: ${{ inputs.token }}
+
+    - name: ⬇️ Checkout test-repo
+      uses: actions/checkout@v6
+      with:
+        repository: dimaslanjaka/test-repo
+        path: tmp/test-repo
+        token: ${{ inputs.token }}
+        ref: test
+
+    - name: ⬇️ Checkout packages/git-command-helper
+      uses: actions/checkout@v6
+      with:
+        repository: dimaslanjaka/git-command-helper
+        path: packages/git-command-helper
+        token: ${{ inputs.token }}
+        ref: pre-release
+
+    - name: ⬇️ Checkout packages/cross-spawn
+      uses: actions/checkout@v6
+      with:
+        repository: dimaslanjaka/node-cross-spawn
+        path: packages/cross-spawn
+        token: ${{ inputs.token }}
+        ref: private
+
+    - name: '🔁 Pull & update submodules recursively'
+      continue-on-error: true
+      shell: bash
+      run: |
+        if [ -f ".gitmodules" ] && [ -s ".gitmodules" ]; then
+          git submodule update --init --recursive
+          git submodule update --recursive --remote
+          git pull -X theirs
+          echo "init submodules"
+          git submodule init
+          git submodule foreach "git submodule init"
+          echo "sync submodules"
+          git submodule sync
+          git submodule foreach "git submodule sync"
+          echo "update submodules"
+          npx -y rimraf .git/modules
+          npx --legacy-peer-deps -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz submodule-install
+        else
+          echo "No submodules found or .gitmodules is empty, skipping update."
+          exit 0
+        fi
+
     - name: 🟢 Setup Node.js
       uses: actions/setup-node@v6
       with:
@@ -56,28 +107,6 @@ runs:
         corepack prepare yarn@4.13.0 --activate
         curl -L https://raw.githubusercontent.com/dimaslanjaka/nodejs-package-types/refs/heads/main/.yarnrc-template.yml -o .yarnrc.yml
         yarn set version 4.13.0
-
-    - name: '🔁 Pull & update submodules recursively'
-      continue-on-error: true
-      shell: bash
-      run: |
-        if [ -f ".gitmodules" ] && [ -s ".gitmodules" ]; then
-          git submodule update --init --recursive
-          git submodule update --recursive --remote
-          git pull -X theirs
-          echo "init submodules"
-          git submodule init
-          git submodule foreach "git submodule init"
-          echo "sync submodules"
-          git submodule sync
-          git submodule foreach "git submodule sync"
-          echo "update submodules"
-          npx -y rimraf .git/modules
-          npx --legacy-peer-deps -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz submodule-install
-        else
-          echo "No submodules found or .gitmodules is empty, skipping update."
-          exit 0
-        fi
 
     - name: '🌎 Set environment variables'
       id: set-env

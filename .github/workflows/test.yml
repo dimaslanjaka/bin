@@ -28,16 +28,14 @@ jobs:
     steps:
       - name: ⬇️ Checkout workflow repository
         uses: actions/checkout@v6
-      - name: ⬇️ Checkout dependencies
-        uses: ./.github/actions/checkout-dependencies
-        with:
-          token: ${{ secrets.ACCESS_TOKEN || github.token }}
-
-      - name: 🚀 Setup CI environment
+      - name: ⬇️ Setup CI & Checkout dependencies
         uses: ./.github/actions/setup-environments
         with:
           node-version: ${{ env.CI_NODE_VERSION }}
           python-version: ${{ env.CI_PYTHON_VERSION }}
+          token: ${{ secrets.ACCESS_TOKEN || github.token }}
+
+      # setup-environments already ran earlier (checkout + env), skipped here
 
       - name: 📦 Install dependencies
         run: |
@@ -71,15 +69,11 @@ jobs:
     steps:
       - name: ⬇️ Checkout workflow repository
         uses: actions/checkout@v6
-      - name: ⬇️ Checkout dependencies
-        uses: ./.github/actions/checkout-dependencies
-        with:
-          token: ${{ secrets.ACCESS_TOKEN || github.token }}
-
-      - name: 🚀 Setup CI environment
+      - name: ⬇️ Setup CI & Checkout dependencies
         uses: ./.github/actions/setup-environments
         with:
           node-version: ${{ env.CI_NODE_VERSION }}
+          token: ${{ secrets.ACCESS_TOKEN || github.token }}
 
       - name: 📥 Download build artifacts
         uses: actions/download-artifact@v4

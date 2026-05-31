@@ -9,6 +9,10 @@ inputs:
     description: Python version to install (skip Python setup if empty)
     required: false
     default: ''
+  prefix-cache-key:
+    description: Prefix for cache keys
+    required: false
+    default: '${{ runner.os }}-test-'
 
 runs:
   using: composite
@@ -37,9 +41,9 @@ runs:
           **/__pycache__
           **/*.pyc
           .cache
-        key: ${{ runner.os }}-test-${{ hashFiles('**/yarn.lock', '**/package.json', '**/requirements*.txt') }}
+        key: ${{ inputs.prefix-cache-key }}${{ hashFiles('**/yarn.lock', '**/package.json', '**/requirements*.txt') }}
         restore-keys: |
-          ${{ runner.os }}-test-
+          ${{ inputs.prefix-cache-key }}
           ${{ runner.os }}-
 
     - name: 🐍 Create virtual environment

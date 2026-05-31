@@ -9,6 +9,30 @@ function slugifyPkgName(str) {
   return str.replace(/\//g, '-').replace(/@/g, '');
 }
 
+function resolveNewestTarball(dirname, candidateNames) {
+  const candidates = new Set();
+
+  for (const name of candidateNames) {
+    const candidatePath = path.join(dirname, name);
+    if (fs.existsSync(candidatePath)) {
+      candidates.add(candidatePath);
+    }
+  }
+
+  for (const entry of fs.readdirSync(dirname)) {
+    if (entry.endsWith('.tgz')) {
+      candidates.add(path.join(dirname, entry));
+    }
+  }
+
+  const tarballs = Array.from(candidates);
+  if (tarballs.length === 0) {
+    return null;
+  }
+
+  return tarballs.sort((left, right) => fs.statSync(right).mtimeMs - fs.statSync(left).mtimeMs)[0];
+}
+
 export async function getPackageHashes(dirname, releaseDir) {
   let hashes = {};
   const metafile = path.join(releaseDir, 'metadata.json');
@@ -67,33 +91,29 @@ export async function getPackageHashes(dirname, releaseDir) {
 export async function bundleWithYarn(dirname, packagejson, releaseDir, argv, withFilename, isCI) {
   await buildReadme(dirname, packagejson, releaseDir, argv, isCI);
 
-  let filename = 'package.tgz';
-  let tgz = path.join(dirname, filename);
   const targetFname =
     argv['fn'] || argv['filename'] || slugifyPkgName(`${packagejson.name}-${packagejson.version}.tgz`);
-  if (!fs.existsSync(tgz)) {
-    filename = slugifyPkgName(`${packagejson.name}-v${packagejson.version}.tgz`);
-    tgz = path.join(dirname, filename);
+  const tgz = resolveNewestTarball(dirname, [
+    'package.tgz',
+    slugifyPkgName(`${packagejson.name}-v${packagejson.version}.tgz`)
+  ]);
+
+  if (!tgz) {
+    throw new Error(`No Yarn pack tarball found in ${dirname}`);
   }
 
   if (withFilename) {
     const tgzlatest = path.join(releaseDir, targetFname + '.tgz');
-    if (fs.existsSync(tgz)) {
-      fs.copySync(tgz, tgzlatest, { overwrite: true });
-    }
+    fs.copySync(tgz, tgzlatest, { overwrite: true });
   } else {
     const tgzlatest = path.join(releaseDir, slugifyPkgName(`${packagejson.name}.tgz`));
     const tgzversion = path.join(releaseDir, targetFname);
 
-    if (fs.existsSync(tgz)) {
-      fs.copySync(tgz, tgzlatest, { overwrite: true });
-      fs.copySync(tgz, tgzversion, { overwrite: true });
-    }
+    fs.copySync(tgz, tgzlatest, { overwrite: true });
+    fs.copySync(tgz, tgzversion, { overwrite: true });
   }
 
-  if (fs.existsSync(tgz)) {
-    fs.rmSync(tgz, { recursive: true, force: true });
-  }
+  fs.rmSync(tgz, { recursive: true, force: true });
 
   await getPackageHashes(dirname, releaseDir);
 }

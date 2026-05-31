@@ -26,16 +26,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: ⬇️ Checkout workflow repository
+      - name: '⬇️ Checkout workflow repository'
         uses: actions/checkout@v6
-      - name: ⬇️ Setup CI & Checkout dependencies
+      - name: '⬇️ Setup CI Environment'
         uses: ./.github/actions/setup-environments
         with:
           node-version: ${{ env.CI_NODE_VERSION }}
           python-version: ${{ env.CI_PYTHON_VERSION }}
           token: ${{ secrets.ACCESS_TOKEN || github.token }}
-
-      # setup-environments already ran earlier (checkout + env), skipped here
+          prefix-cache-key: '${{ runner.os }}-test-'
 
       - name: 📦 Install dependencies
         run: |

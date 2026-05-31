@@ -115,7 +115,7 @@ jobs:
       - build
       - test
     runs-on: ubuntu-latest
-    if: always()
+    # if: always()
 
     steps:
       - name: 🧹 Clean GitHub Actions Cache

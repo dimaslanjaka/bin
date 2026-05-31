@@ -1,5 +1,3 @@
-# This workflow runs tests only
-
 name: Node.js Package Test
 
 concurrency:
@@ -12,89 +10,66 @@ on:
       - Build Release
     types:
       - completed
+
   workflow_dispatch:
+
   push:
     paths:
       - '**/test*/**'
       - '**/test*'
       - '**/src/**'
+
+env:
+  NODE_VERSION: '24.x'
+  PYTHON_VERSION: '3.11'
+
 jobs:
-  test:
-    name: 🧪 Run Tests
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+  build:
+    name: 🔨 Build & Pack
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
 
     steps:
-      - name: ⬇️ Checkout main repository
-        uses: actions/checkout@v6
+      - name: ⬇️ Checkout dependencies
+        uses: ./.github/actions/checkout-dependencies
         with:
-          token: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}'
-
-      - name: ⬇️ Checkout test-repo
-        uses: actions/checkout@v6
-        with:
-          repository: dimaslanjaka/test-repo
-          path: tmp/test-repo
-          token: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}'
-          ref: test
-
-      - name: ⬇️ Checkout packages/git-command-helper
-        uses: actions/checkout@v6
-        with:
-          repository: dimaslanjaka/git-command-helper
-          path: packages/git-command-helper
-          token: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}'
-          ref: pre-release
-
-      - name: ⬇️ Checkout packages/cross-spawn
-        uses: actions/checkout@v6
-        with:
-          repository: dimaslanjaka/node-cross-spawn
-          path: packages/cross-spawn
-          token: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}'
-          ref: private
+          token: ${{ secrets.ACCESS_TOKEN || github.token }}
 
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '24.x'
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: 🐍 Setup Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.11'
+          python-version: ${{ env.PYTHON_VERSION }}
 
-      - uses: actions/cache@v5
+      - name: 📚 Restore Cache
         id: cache
-        name: 📚 Init cache
+        uses: actions/cache@v4
         with:
           path: |
             **/.yarn
-            **/yarn.lock
             **/node_modules
             **/.venv
             **/venv
             **/__pycache__
             **/*.pyc
-            **/tmp/**
-            **/*.bak
-            .cache/
-          key: ${{ runner.os }}-test-${{ hashFiles('**/package.json', '**/requirements*.txt', '.github') }}
+            .cache
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock', '**/package.json', '**/requirements*.txt') }}
           restore-keys: |
-            ${{ runner.os }}-test-${{ hashFiles('**/package.json', '**/requirements*.txt', '.github') }}
-            ${{ runner.os }}-test-
             ${{ runner.os }}-
 
       - name: 🐍 Create virtual environment
-        shell: bash
         if: steps.cache.outputs.cache-hit != 'true'
+        shell: bash
         run: |
           python -m venv .venv
           source .venv/bin/activate
 
           python -m pip install --upgrade pip setuptools wheel
 
-          # Install requirements if available
           if [ -f requirements.txt ]; then
             pip install -r requirements.txt
           fi
@@ -117,42 +92,130 @@ jobs:
 
           for dir in "${BIN_DIRS[@]}"; do
             if [ -d "$dir" ]; then
+              chmod -R +x "$dir" || true
               echo "$dir" >> "$GITHUB_PATH"
-
-              # Fix permissions
-              chmod -R +x "$dir"
-
-              echo "Added: $dir"
-            else
-              echo "Skipped missing dir: $dir"
             fi
           done
 
       - name: 📦 Install dependencies
-        run: yarn install
+        run: yarn install --frozen-lockfile
 
-      - name: '🔨 Build project'
+      - name: 🔨 Build project
+        run: yarn build
+
+      - name: 📦 Pack project
+        run: yarn pack
+
+      - name: 📤 Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          retention-days: 1
+          compression-level: 0
+          path: |
+            dist/**
+            releases/**
+            *.tgz
+            packages/**/dist/**
+            packages/**/*.tgz
+
+  test:
+    name: 🧪 Tests
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout dependencies
+        uses: ./.github/actions/checkout-dependencies
+        with:
+          token: ${{ secrets.ACCESS_TOKEN || github.token }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📚 Restore Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/.yarn
+            **/node_modules
+            **/.venv
+            **/venv
+            **/__pycache__
+            **/*.pyc
+            .cache
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock', '**/package.json', '**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-
+
+      - name: 📥 Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: .
+
+      - name: Add custom bins to PATH
         shell: bash
-        run: yarn run build
-
-      - name: '📦 Pack project'
-        shell: bash
-        run: yarn run pack
-
-      - name: 🧪 Run CJS tests with coverage
-        run: bash bin/test-cjs --coverage=true --detectOpenHandles --testPathPatterns="${{ github.workspace }}/test/"
-        env:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
-
-      - name: 🧪 Run ESM tests with coverage
-        run: bash bin/test-esm --coverage=true --detectOpenHandles --testPathPatterns="${{ github.workspace }}/test/"
-        env:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
-
-      - name: 🧹 Clean GitHub Actions Cache ${{ github.event.workflow_run.head_sha }}
-        env:
-          GH_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
-          npx --legacy-peer-deps -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz clean-github-actions-caches --repo ${{ github.repository }} --sha ${{ github.event.workflow_run.head_sha }}
-        shell: bash
+          BIN_DIRS=(
+            "${{ github.workspace }}/node_modules/.bin"
+            "${{ github.workspace }}/vendor/bin"
+            "${{ github.workspace }}/.venv/bin"
+            "${{ github.workspace }}/venv/bin"
+            "${{ github.workspace }}/bin"
+            "${{ github.workspace }}/binaries"
+          )
+
+          for dir in "${BIN_DIRS[@]}"; do
+            if [ -d "$dir" ]; then
+              chmod -R +x "$dir" || true
+              echo "$dir" >> "$GITHUB_PATH"
+            fi
+          done
+
+      - name: 🧪 Run CJS tests
+        env:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || github.token }}
+        run: |
+          bash bin/test-cjs \
+            --coverage=true \
+            --detectOpenHandles \
+            --testPathPatterns="${{ github.workspace }}/test/"
+
+      - name: 🧪 Run ESM tests
+        env:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || github.token }}
+        run: |
+          bash bin/test-esm \
+            --coverage=true \
+            --detectOpenHandles \
+            --testPathPatterns="${{ github.workspace }}/test/"
+
+  cleanup:
+    name: 🧹 Clean GitHub Actions Cache
+    needs:
+      - build
+      - test
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: 🧹 Clean GitHub Actions Cache
         continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.ACCESS_TOKEN || github.token }}
+        shell: bash
+        run: |
+          SHA="${{ github.sha }}"
+
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            SHA="${{ github.event.workflow_run.head_sha }}"
+          fi
+
+          npx --legacy-peer-deps -y \
+            binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz \
+            clean-github-actions-caches \
+            --repo "${{ github.repository }}" \
+            --sha "$SHA"

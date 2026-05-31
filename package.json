@@ -51,7 +51,7 @@
     "pack": "node package.cjs --yarn --filename=bin",
     "prepare": "husky",
     "puppeteer:browser": "npx -y puppeteer browsers install chrome",
-    "test": "test-cjs",
+    "test": "npx -y jest --runInBand --forceExit --testTimeout=120000 --detectOpenHandles",
     "test-coverage": "npm test --coverage --detectOpenHandles",
     "test-esm": "test-esm",
     "test-nrs": "npm test -- nrs build-**",

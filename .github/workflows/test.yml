@@ -158,7 +158,32 @@ jobs:
           path: .
 
       - name: '🧪 Run test'
-        run: npm test -- "${{ matrix.file }}"
+        shell: bash
+        env:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          FILE="${{ matrix.file }}"
+
+          # remove surrounding quotes if present
+          FILE="${FILE%\"}"
+          FILE="${FILE#\"}"
+
+          ext="${FILE##*.}"
+
+          echo "Running test for: $FILE (ext: $ext)"
+
+          case "$ext" in
+            cjs)
+              bash bin/test-cjs -- "$FILE"
+              ;;
+            mjs)
+              bash bin/test-esm -- "$FILE"
+              ;;
+            *)
+              npm test -- "$FILE"
+              ;;
+          esac
 
   cleanup:
     name: '🧹 Clean GitHub Actions Cache'

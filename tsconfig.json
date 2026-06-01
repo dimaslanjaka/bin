@@ -6,7 +6,7 @@
     }
   },
   "compilerOptions": {
-    "module": "es2015",
+    "module": "esnext",
     "moduleResolution": "bundler",
     "strict": true,
     "types": ["node"],

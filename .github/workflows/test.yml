@@ -142,33 +142,33 @@ jobs:
     name: '🧪 Test ${{ matrix.file }}'
 
     steps:
-      - name: ⬇️ Checkout workflow repository
+      - name: '⬇️ Checkout workflow repository'
         uses: actions/checkout@v6
-      - name: ⬇️ Setup CI & Checkout dependencies
+      - name: '⬇️ Setup CI & Checkout dependencies'
         uses: ./.github/actions/setup-environments
         id: setup
         with:
           node-version: ${{ env.CI_NODE_VERSION }}
           token: ${{ secrets.ACCESS_TOKEN || github.token }}
 
-      - name: 📥 Download build artifacts
+      - name: '📥 Download build artifacts'
         uses: actions/download-artifact@v8
         with:
           name: build-output
           path: .
 
-      - name: Run test
+      - name: '🧪 Run test'
         run: npm test -- "${{ matrix.file }}"
 
   cleanup:
-    name: 🧹 Clean GitHub Actions Cache
+    name: '🧹 Clean GitHub Actions Cache'
     needs:
       - build
       - test
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🧹 Clean GitHub Actions Cache
+      - name: '🧹 Clean GitHub Actions Cache'
         continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN || github.token }}

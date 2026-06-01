@@ -187,17 +187,17 @@ jobs:
         id: changes
         shell: bash
         run: |
-          BASE="${{ github.event.before }}"
+          PATHS=( ':(glob)release*/*.tgz' ':(glob)dist/**' ':(glob)lib/**' )
 
-          if [ -n "$BASE" ] && git cat-file -e "$BASE^{commit}" 2>/dev/null; then
-            echo "Found base commit $BASE"
-            FILES=$(git diff --name-only "$BASE" "$GITHUB_SHA" -- ':(glob)release*/*.tgz' ':(glob)dist/**' ':(glob)lib/**' || true)
-          elif PREV=$(git rev-parse --verify HEAD~1 2>/dev/null); then
-            echo "Base commit not found, falling back to previous commit $PREV"
-            FILES=$(git diff --name-only "$PREV" HEAD -- ':(glob)release*/*.tgz' ':(glob)dist/**' ':(glob)lib/**' || true)
+          TRACKED=$(git diff --name-only HEAD -- "${PATHS[@]}" || true)
+          UNTRACKED=$(git ls-files --others --exclude-standard -- "${PATHS[@]}" || true)
+
+          FILES=$(printf '%s\n%s\n' "$TRACKED" "$UNTRACKED" | sed '/^$/d' | sort -u)
+
+          if [ -n "$FILES" ]; then
+            echo "Found artifact changes"
           else
-            echo "No previous commit available; skipping artifact diff"
-            FILES=""
+            echo "No artifact changes detected"
           fi
 
           echo "files<<EOF" >> "$GITHUB_OUTPUT"

@@ -3,6 +3,7 @@ import fs from 'fs-extra';
 import path from 'upath';
 import { fileURLToPath } from 'url';
 import yaml from 'yaml';
+import { execSync } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -60,6 +61,14 @@ async function main() {
       runCmd = `if [ -f "${file}" ]; then\n  bash bin/test-cjs --testPathPatterns="${filename}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
     } else {
       runCmd = `if [ -f "${file}" ]; then\n  npm test -- --testPathPatterns="${filename}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
+    }
+
+    // Skip files that are not tracked by git (untracked files shouldn't be included in committed actions)
+    try {
+      execSync(`git ls-files --error-unmatch -- "${file}"`, { cwd: process.cwd(), stdio: 'ignore' });
+    } catch {
+      console.warn(`Skipping untracked test file: ${file}`);
+      continue;
     }
 
     actionObject.runs.steps.push({

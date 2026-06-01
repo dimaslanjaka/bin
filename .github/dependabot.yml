@@ -15,8 +15,8 @@ updates:
     directory: '/'
     schedule:
       interval: 'daily'
-  - package-ecosystem: 'gitsubmodule'
-    target-branch: 'master'
-    schedule:
-      interval: 'daily'
-    directory: /
+  # - package-ecosystem: 'gitsubmodule'
+  #   target-branch: 'master'
+  #   schedule:
+  #     interval: 'daily'
+  #   directory: /

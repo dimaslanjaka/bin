@@ -19,7 +19,9 @@ const workflow = {
 
   env: {
     CI_NODE_VERSION: '24.16.0',
-    CI_PYTHON_VERSION: '3.11'
+    CI_PYTHON_VERSION: '3.11',
+    ACCESS_TOKEN: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN || github.token }}',
+    GH_TOKEN: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN || github.token }}'
   },
 
   jobs: {
@@ -39,7 +41,7 @@ const workflow = {
           with: {
             'node-version': '${{ env.CI_NODE_VERSION }}',
             'python-version': '${{ env.CI_PYTHON_VERSION }}',
-            token: '${{ secrets.ACCESS_TOKEN || github.token }}',
+            token: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN || github.token }}',
             'prefix-cache-key': '${{ runner.os }}-test-'
           }
         },
@@ -60,8 +62,8 @@ corepack yarn install`
         //   name: '🧪 Run committed composite tests action',
         //   uses: './.github/actions/run-tests',
         //   env: {
-        //     ACCESS_TOKEN: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}',
-        //     GH_TOKEN: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}'
+        //     ACCESS_TOKEN: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN || github.token }}',
+        //     GH_TOKEN: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN || github.token }}'
         //   }
         // },
         {
@@ -69,7 +71,7 @@ corepack yarn install`
           // if: 'always()',
           'continue-on-error': true,
           env: {
-            GH_TOKEN: '${{ secrets.ACCESS_TOKEN || github.token }}'
+            GH_TOKEN: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN || github.token }}'
           },
           shell: 'bash',
           run: `SHA="\${{ github.sha }}"

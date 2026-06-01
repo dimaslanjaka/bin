@@ -2,7 +2,11 @@
 
 # Generate composite run-tests action and stage it for commit
 node scripts/generate-test-ci-step.mjs
-git add .github/actions/run-tests/action.yml
+if [ -n "$GITHUB_ACTIONS" ] || [ -n "$CI" ]; then
+  echo "CI environment detected — skipping git add of generated action"
+else
+  git add .github/actions/run-tests/action.yml
+fi
 
 # Run lint-staged as before
 npx lint-staged

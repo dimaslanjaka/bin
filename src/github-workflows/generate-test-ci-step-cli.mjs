@@ -115,6 +115,11 @@ async function main() {
   const yamlContent = yaml.stringify(actionObject);
   fs.ensureDirSync(path.dirname(actionFile));
   fs.writeFileSync(actionFile, yamlContent, 'utf-8');
+  try {
+    execSync(`npx -y prettier@latest -w "${actionFile}"`, { stdio: 'inherit', cwd: process.cwd() });
+  } catch {
+    // prettier is optional — skip formatting if unavailable
+  }
   console.log(`Generated ${actionFile} with ${files.length} test steps.`);
 }
 

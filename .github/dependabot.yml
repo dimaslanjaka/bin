@@ -9,12 +9,12 @@ updates:
     directory: '/'
     target-branch: 'master'
     schedule:
-      interval: 'daily'
+      interval: 'weekly'
   - package-ecosystem: 'github-actions'
     target-branch: 'master'
     directory: '/'
     schedule:
-      interval: 'daily'
+      interval: 'weekly'
   # - package-ecosystem: 'gitsubmodule'
   #   target-branch: 'master'
   #   schedule:

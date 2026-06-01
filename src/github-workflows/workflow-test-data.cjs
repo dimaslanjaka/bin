@@ -2,7 +2,7 @@ const workflow = {
   name: 'Node.js Package Test',
 
   concurrency: {
-    group: 'test',
+    group: 'test-${{ github.event_name }}',
     'cancel-in-progress': true
   },
 

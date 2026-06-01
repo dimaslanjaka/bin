@@ -9,6 +9,7 @@
     "module": "es2015",
     "moduleResolution": "bundler",
     "strict": true,
+    "types": ["node"],
     "allowJs": true,
     "checkJs": false,
     "outDir": "lib",

@@ -195,18 +195,6 @@ runs:
       env:
         NODE_ENV: test
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
-    - name: Run tests in test/package-resolutions-updater.test.cjs
-      id: run-package-resolutions-updater.test
-      shell: bash
-      run: >-
-        if [ -f "test/package-resolutions-updater.test.cjs" ]; then
-          bash bin/test-cjs --testPathPatterns="package-resolutions-updater.test.cjs"
-        else
-          echo "Skipping missing test file: test/package-resolutions-updater.test.cjs"
-        fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/readline-mock.test.ts
       id: run-readline-mock.test
       shell: bash

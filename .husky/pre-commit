@@ -1,1 +1,8 @@
+#!/bin/sh
+
+# Generate composite run-tests action and stage it for commit
+node scripts/generate-test-ci-step.mjs
+git add .github/actions/run-tests/action.yml
+
+# Run lint-staged as before
 npx lint-staged

@@ -69,7 +69,8 @@ const defaultBin = {
   'print-tarball-tree': 'lib/print-tarball-tree.cjs',
   'tarball-tree': 'lib/print-tarball-tree.cjs',
   'opencode-cli': 'lib/opencode-cli.cjs',
-  opc: 'lib/opencode-cli.cjs'
+  opc: 'lib/opencode-cli.cjs',
+  'generate-test-ci': 'src/github-workflows/generate-test-ci-step-cli.mjs'
 };
 
 /**

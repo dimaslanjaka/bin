@@ -226,7 +226,7 @@ runs:
           ${{ steps.set-env.outputs.CACHE_NPM }}
           ${{ steps.set-env.outputs.CACHE_NPM_USER_GLOBAL }}
           ${{ steps.set-env.outputs.PIP_CACHE_DIR }}
-        key: ${{ inputs.prefix-cache-key }}${{ hashFiles('**/yarn.lock', '**/package.json', '**/requirements*.txt') }}
+        key: ${{ inputs.prefix-cache-key }}${{ hashFiles('**/package.json', '**/requirements*.txt') }}
         restore-keys: |
           ${{ inputs.prefix-cache-key }}
           ${{ runner.os }}-

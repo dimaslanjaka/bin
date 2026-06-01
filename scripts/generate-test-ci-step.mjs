@@ -66,11 +66,7 @@ async function main() {
       name: `Run tests in ${file}`,
       id: `run-${path.basename(file, path.extname(file))}`,
       shell: 'bash',
-      run: runCmd,
-      env: {
-        NODE_ENV: 'test',
-        ACCESS_TOKEN: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}'
-      }
+      run: runCmd
     });
   }
 

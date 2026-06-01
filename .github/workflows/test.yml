@@ -22,8 +22,8 @@ env:
   CI_PYTHON_VERSION: '3.11'
 
 jobs:
-  build:
-    name: 🔨 Build & Pack
+  ci:
+    name: 🔨 Build, Pack & Test
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
 
@@ -49,157 +49,11 @@ jobs:
       - name: 📦 Pack project
         run: corepack yarn pack
 
-      - name: 📤 Upload build artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: build-output
-          retention-days: 1
-          compression-level: 0
-          path: |
-            dist/**
-            releases/**
-            *.tgz
-            packages/**/dist/**
-            packages/**/*.tgz
+      - name: 'Run committed composite tests action'
+        uses: ./.github/actions/run-tests
 
-  discover:
-    name: 🧪 Discover Tests
-    needs: build
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.discover.outputs.matrix }}
-
-    steps:
-      - name: ⬇️ Checkout workflow repository
-        uses: actions/checkout@v6
-      - name: ⬇️ Setup CI & Checkout dependencies
-        uses: ./.github/actions/setup-environments
-        with:
-          node-version: ${{ env.CI_NODE_VERSION }}
-          token: ${{ secrets.ACCESS_TOKEN || github.token }}
-
-      - name: 📥 Download build artifacts
-        uses: actions/download-artifact@v8
-        with:
-          name: build-output
-          path: .
-
-      # - name: 🧪 Run CJS tests
-      #   env:
-      #     ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || github.token }}
-      #   run: |
-      #     bash bin/test-cjs \
-      #       --coverage=true \
-      #       --detectOpenHandles \
-      #       --testPathPatterns="${{ github.workspace }}/test/"
-
-      # - name: 🧪 Run ESM tests
-      #   env:
-      #     ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || github.token }}
-      #   run: |
-      #     bash bin/test-esm \
-      #       --coverage=true \
-      #       --detectOpenHandles \
-      #       --testPathPatterns="${{ github.workspace }}/test/"
-
-      - name: '🔎 Discover test files'
-        id: discover
-        run: |
-          TESTS=$(
-            {
-              if [ -d test ]; then
-                find test \
-                  -type f \
-                  \( -name "*.test.js" -o -name "*.spec.js" \
-                     -o -name "*.test.cjs" -o -name "*.spec.cjs" \
-                     -o -name "*.test.mjs" -o -name "*.spec.mjs" \
-                     -o -name "*.test.ts" -o -name "*.spec.ts" \)
-              fi
-
-              if [ -d tests ]; then
-                find tests \
-                  -type f \
-                  \( -name "*.test.js" -o -name "*.spec.js" \
-                     -o -name "*.test.cjs" -o -name "*.spec.cjs" \
-                     -o -name "*.test.mjs" -o -name "*.spec.mjs" \
-                     -o -name "*.test.ts" -o -name "*.spec.ts" \)
-              fi
-            } | jq -R . | jq -s -c .
-          )
-
-          MATRIX=$(jq -nc --argjson files "$TESTS" '{file: $files}')
-
-          echo "Discovered test files:"
-          echo "$TESTS" | jq -r '.[]?'
-          echo "Generated matrix: $MATRIX"
-
-          echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
-          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
-
-  test:
-    needs: discover
-
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.discover.outputs.matrix || '{"file":[]}' ) }}
-
-    runs-on: ubuntu-latest
-
-    name: '🧪 Test ${{ matrix.file }}'
-
-    steps:
-      - name: '⬇️ Checkout workflow repository'
-        uses: actions/checkout@v6
-      - name: '⬇️ Setup CI & Checkout dependencies'
-        uses: ./.github/actions/setup-environments
-        id: setup
-        with:
-          node-version: ${{ env.CI_NODE_VERSION }}
-          token: ${{ secrets.ACCESS_TOKEN || github.token }}
-
-      - name: '📥 Download build artifacts'
-        uses: actions/download-artifact@v8
-        with:
-          name: build-output
-          path: .
-
-      - name: '🧪 Run test'
-        shell: bash
-        env:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
-          GH_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
-        run: |
-          FILE="${{ matrix.file }}"
-
-          # remove surrounding quotes if present
-          FILE="${FILE%\"}"
-          FILE="${FILE#\"}"
-
-          ext="${FILE##*.}"
-
-          echo "Running test for: $FILE (ext: $ext)"
-
-          case "$ext" in
-            cjs)
-              bash bin/test-cjs -- "$FILE"
-              ;;
-            mjs)
-              bash bin/test-esm -- "$FILE"
-              ;;
-            *)
-              npm test -- "$FILE"
-              ;;
-          esac
-
-  cleanup:
-    name: '🧹 Clean GitHub Actions Cache'
-    needs:
-      - build
-      - test
-    runs-on: ubuntu-latest
-
-    steps:
       - name: '🧹 Clean GitHub Actions Cache'
+        if: always()
         continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN || github.token }}

@@ -100,25 +100,36 @@ jobs:
       #       --detectOpenHandles \
       #       --testPathPatterns="${{ github.workspace }}/test/"
 
-      - id: discover
+      - name: 🔎 Discover test files
+        id: discover
         run: |
           TESTS=$(
-            find test tests \
-              -type f \
-              \( -name "*.test.*" -o -name "*.spec.*" \) \
-              | jq -R . \
-              | jq -s -c .
+            {
+              if [ -d test ]; then
+                find test \
+                  -type f \
+                  \( -name "*.test.*" -o -name "*.spec.*" \)
+              fi
+
+              if [ -d tests ]; then
+                find tests \
+                  -type f \
+                  \( -name "*.test.*" -o -name "*.spec.*" \)
+              fi
+            } | jq -R . | jq -s -c .
           )
 
+          MATRIX=$(jq -nc --argjson files "$TESTS" '{file: $files}')
+
           echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
+          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
 
   test:
     needs: discover
 
     strategy:
       fail-fast: false
-      matrix:
-        file: ${{ fromJson(needs.discover.outputs.tests) }}
+      matrix: ${{ fromJson(needs.discover.outputs.matrix) }}
 
     runs-on: ubuntu-latest
 

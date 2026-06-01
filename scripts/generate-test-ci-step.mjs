@@ -59,6 +59,8 @@ async function main() {
       runCmd = `if [ -f "${file}" ]; then\n  bash bin/test-esm --testPathPatterns="${filename}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
     } else if (ext === '.cjs') {
       runCmd = `if [ -f "${file}" ]; then\n  bash bin/test-cjs --testPathPatterns="${filename}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
+    } else if (ext === '.ts') {
+      runCmd = `if [ -f "${file}" ]; then\n  node node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --testPathPatterns="${filename}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
     } else {
       runCmd = `if [ -f "${file}" ]; then\n  npm test -- --testPathPatterns="${filename}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
     }

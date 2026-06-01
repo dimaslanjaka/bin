@@ -24,9 +24,9 @@ runs:
     - name: Run tests in test/find-node-modules.test.ts
       id: run-test-find-node-modules-test-ts
       shell: bash
-      run: |-
+      run: >-
         if [ -f "test/find-node-modules.test.ts" ]; then
-          npm test -- --testPathPatterns="find-node-modules.test.ts"
+          node node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --testPathPatterns="find-node-modules.test.ts"
         else
           echo "Skipping missing test file: test/find-node-modules.test.ts"
         fi
@@ -150,18 +150,18 @@ runs:
     - name: Run tests in test/readline-mock.test.ts
       id: run-test-readline-mock-test-ts
       shell: bash
-      run: |-
+      run: >-
         if [ -f "test/readline-mock.test.ts" ]; then
-          npm test -- --testPathPatterns="readline-mock.test.ts"
+          node node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --testPathPatterns="readline-mock.test.ts"
         else
           echo "Skipping missing test file: test/readline-mock.test.ts"
         fi
     - name: Run tests in test/remove-module.test.ts
       id: run-test-remove-module-test-ts
       shell: bash
-      run: |-
+      run: >-
         if [ -f "test/remove-module.test.ts" ]; then
-          npm test -- --testPathPatterns="remove-module.test.ts"
+          node node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --testPathPatterns="remove-module.test.ts"
         else
           echo "Skipping missing test file: test/remove-module.test.ts"
         fi

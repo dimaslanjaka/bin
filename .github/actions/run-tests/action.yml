@@ -12,9 +12,6 @@ runs:
         else
           echo "Skipping missing test file: test/clean-github-actions-caches.test.cjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/filemanager/rmpath.test.mjs
       id: run-rmpath.test
       shell: bash
@@ -24,9 +21,6 @@ runs:
         else
           echo "Skipping missing test file: test/filemanager/rmpath.test.mjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/find-node-modules.test.ts
       id: run-find-node-modules.test
       shell: bash
@@ -36,9 +30,6 @@ runs:
         else
           echo "Skipping missing test file: test/find-node-modules.test.ts"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/getFileTreeString.test.cjs
       id: run-getFileTreeString.test
       shell: bash
@@ -48,9 +39,6 @@ runs:
         else
           echo "Skipping missing test file: test/getFileTreeString.test.cjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/getLatestCommit.test.mjs
       id: run-getLatestCommit.test
       shell: bash
@@ -60,9 +48,6 @@ runs:
         else
           echo "Skipping missing test file: test/getLatestCommit.test.mjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/git-diff.test.cjs
       id: run-git-diff.test
       shell: bash
@@ -72,9 +57,6 @@ runs:
         else
           echo "Skipping missing test file: test/git-diff.test.cjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/git-fix-focused.test.cjs
       id: run-git-fix-focused.test
       shell: bash
@@ -84,9 +66,6 @@ runs:
         else
           echo "Skipping missing test file: test/git-fix-focused.test.cjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/git-fix.help.test.cjs
       id: run-git-fix.help.test
       shell: bash
@@ -96,9 +75,6 @@ runs:
         else
           echo "Skipping missing test file: test/git-fix.help.test.cjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/git-fix.options.test.cjs
       id: run-git-fix.options.test
       shell: bash
@@ -108,9 +84,6 @@ runs:
         else
           echo "Skipping missing test file: test/git-fix.options.test.cjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/git-fix.summary.test.cjs
       id: run-git-fix.summary.test
       shell: bash
@@ -120,9 +93,6 @@ runs:
         else
           echo "Skipping missing test file: test/git-fix.summary.test.cjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/git-user-config.test.cjs
       id: run-git-user-config.test
       shell: bash
@@ -132,9 +102,6 @@ runs:
         else
           echo "Skipping missing test file: test/git-user-config.test.cjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/git-utils.test.cjs
       id: run-git-utils.test
       shell: bash
@@ -144,9 +111,6 @@ runs:
         else
           echo "Skipping missing test file: test/git-utils.test.cjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/gitattributes-parse.test.cjs
       id: run-gitattributes-parse.test
       shell: bash
@@ -156,9 +120,6 @@ runs:
         else
           echo "Skipping missing test file: test/gitattributes-parse.test.cjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/gitattributes-update.test.cjs
       id: run-gitattributes-update.test
       shell: bash
@@ -168,9 +129,6 @@ runs:
         else
           echo "Skipping missing test file: test/gitattributes-update.test.cjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/gitattributes.test.cjs
       id: run-gitattributes.test
       shell: bash
@@ -180,9 +138,6 @@ runs:
         else
           echo "Skipping missing test file: test/gitattributes.test.cjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/node-executor.test.cjs
       id: run-node-executor.test
       shell: bash
@@ -192,9 +147,6 @@ runs:
         else
           echo "Skipping missing test file: test/node-executor.test.cjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/package-resolutions-updater.test.cjs
       id: run-package-resolutions-updater.test
       shell: bash
@@ -204,9 +156,6 @@ runs:
         else
           echo "Skipping missing test file: test/package-resolutions-updater.test.cjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/readline-mock.test.ts
       id: run-readline-mock.test
       shell: bash
@@ -216,9 +165,6 @@ runs:
         else
           echo "Skipping missing test file: test/readline-mock.test.ts"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/remove-module.test.ts
       id: run-remove-module.test
       shell: bash
@@ -228,9 +174,6 @@ runs:
         else
           echo "Skipping missing test file: test/remove-module.test.ts"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/replaceRawWithLatestHash.test.mjs
       id: run-replaceRawWithLatestHash.test
       shell: bash
@@ -240,9 +183,6 @@ runs:
         else
           echo "Skipping missing test file: test/replaceRawWithLatestHash.test.mjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/resolvePackageResolutionUpdates.test.mjs
       id: run-resolvePackageResolutionUpdates.test
       shell: bash
@@ -252,9 +192,6 @@ runs:
         else
           echo "Skipping missing test file: test/resolvePackageResolutionUpdates.test.mjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/rm-node-modules.test.cjs
       id: run-rm-node-modules.test
       shell: bash
@@ -264,9 +201,6 @@ runs:
         else
           echo "Skipping missing test file: test/rm-node-modules.test.cjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/run-by-checksum/runChecksum-cli.spawn.test.mjs
       id: run-runChecksum-cli.spawn.test
       shell: bash
@@ -276,9 +210,6 @@ runs:
         else
           echo "Skipping missing test file: test/run-by-checksum/runChecksum-cli.spawn.test.mjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/run-by-checksum/runChecksum-cli.test.mjs
       id: run-runChecksum-cli.test
       shell: bash
@@ -288,9 +219,6 @@ runs:
         else
           echo "Skipping missing test file: test/run-by-checksum/runChecksum-cli.test.mjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/run-by-checksum/runChecksum-dry-run.test.mjs
       id: run-runChecksum-dry-run.test
       shell: bash
@@ -300,9 +228,6 @@ runs:
         else
           echo "Skipping missing test file: test/run-by-checksum/runChecksum-dry-run.test.mjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/run-by-checksum/runChecksum.test.mjs
       id: run-runChecksum.test
       shell: bash
@@ -312,9 +237,6 @@ runs:
         else
           echo "Skipping missing test file: test/run-by-checksum/runChecksum.test.mjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/submodule-install.test.cjs
       id: run-submodule-install.test
       shell: bash
@@ -324,9 +246,6 @@ runs:
         else
           echo "Skipping missing test file: test/submodule-install.test.cjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/utils/fetchResponse.test.mjs
       id: run-fetchResponse.test
       shell: bash
@@ -336,9 +255,6 @@ runs:
         else
           echo "Skipping missing test file: test/utils/fetchResponse.test.mjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/utils/isGitRepository.test.cjs
       id: run-isGitRepository.test
       shell: bash
@@ -348,9 +264,6 @@ runs:
         else
           echo "Skipping missing test file: test/utils/isGitRepository.test.cjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/utils/isGitRepository.test.js
       id: run-isGitRepository.test
       shell: bash
@@ -360,9 +273,6 @@ runs:
         else
           echo "Skipping missing test file: test/utils/isGitRepository.test.js"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/validate-tarball-npm.test.cjs
       id: run-validate-tarball-npm.test
       shell: bash
@@ -372,9 +282,6 @@ runs:
         else
           echo "Skipping missing test file: test/validate-tarball-npm.test.cjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
     - name: Run tests in test/validate-tarball-yarn.test.cjs
       id: run-validate-tarball-yarn.test
       shell: bash
@@ -384,6 +291,3 @@ runs:
         else
           echo "Skipping missing test file: test/validate-tarball-yarn.test.cjs"
         fi
-      env:
-        NODE_ENV: test
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}

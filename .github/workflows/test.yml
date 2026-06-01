@@ -51,6 +51,9 @@ jobs:
 
       - name: 'Run committed composite tests action'
         uses: ./.github/actions/run-tests
+        env:
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: '🧹 Clean GitHub Actions Cache'
         if: always()

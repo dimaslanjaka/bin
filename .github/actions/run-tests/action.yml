@@ -4,7 +4,7 @@ runs:
   using: composite
   steps:
     - name: Run tests in test/clean-github-actions-caches.test.cjs
-      id: run-clean-github-actions-caches.test
+      id: run-clean-github-actions-caches
       shell: bash
       run: >-
         if [ -f "test/clean-github-actions-caches.test.cjs" ]; then
@@ -13,7 +13,7 @@ runs:
           echo "Skipping missing test file: test/clean-github-actions-caches.test.cjs"
         fi
     - name: Run tests in test/filemanager/rmpath.test.mjs
-      id: run-rmpath.test
+      id: run-rmpath
       shell: bash
       run: |-
         if [ -f "test/filemanager/rmpath.test.mjs" ]; then
@@ -22,7 +22,7 @@ runs:
           echo "Skipping missing test file: test/filemanager/rmpath.test.mjs"
         fi
     - name: Run tests in test/find-node-modules.test.ts
-      id: run-find-node-modules.test
+      id: run-find-node-modules
       shell: bash
       run: |-
         if [ -f "test/find-node-modules.test.ts" ]; then
@@ -31,7 +31,7 @@ runs:
           echo "Skipping missing test file: test/find-node-modules.test.ts"
         fi
     - name: Run tests in test/getFileTreeString.test.cjs
-      id: run-getFileTreeString.test
+      id: run-getFileTreeString
       shell: bash
       run: |-
         if [ -f "test/getFileTreeString.test.cjs" ]; then
@@ -40,7 +40,7 @@ runs:
           echo "Skipping missing test file: test/getFileTreeString.test.cjs"
         fi
     - name: Run tests in test/getLatestCommit.test.mjs
-      id: run-getLatestCommit.test
+      id: run-getLatestCommit
       shell: bash
       run: |-
         if [ -f "test/getLatestCommit.test.mjs" ]; then
@@ -49,7 +49,7 @@ runs:
           echo "Skipping missing test file: test/getLatestCommit.test.mjs"
         fi
     - name: Run tests in test/git-diff.test.cjs
-      id: run-git-diff.test
+      id: run-git-diff
       shell: bash
       run: |-
         if [ -f "test/git-diff.test.cjs" ]; then
@@ -58,7 +58,7 @@ runs:
           echo "Skipping missing test file: test/git-diff.test.cjs"
         fi
     - name: Run tests in test/git-fix-focused.test.cjs
-      id: run-git-fix-focused.test
+      id: run-git-fix-focused
       shell: bash
       run: |-
         if [ -f "test/git-fix-focused.test.cjs" ]; then
@@ -67,7 +67,7 @@ runs:
           echo "Skipping missing test file: test/git-fix-focused.test.cjs"
         fi
     - name: Run tests in test/git-fix.help.test.cjs
-      id: run-git-fix.help.test
+      id: run-git-fix-help
       shell: bash
       run: |-
         if [ -f "test/git-fix.help.test.cjs" ]; then
@@ -76,7 +76,7 @@ runs:
           echo "Skipping missing test file: test/git-fix.help.test.cjs"
         fi
     - name: Run tests in test/git-fix.options.test.cjs
-      id: run-git-fix.options.test
+      id: run-git-fix-options
       shell: bash
       run: |-
         if [ -f "test/git-fix.options.test.cjs" ]; then
@@ -85,7 +85,7 @@ runs:
           echo "Skipping missing test file: test/git-fix.options.test.cjs"
         fi
     - name: Run tests in test/git-fix.summary.test.cjs
-      id: run-git-fix.summary.test
+      id: run-git-fix-summary
       shell: bash
       run: |-
         if [ -f "test/git-fix.summary.test.cjs" ]; then
@@ -94,7 +94,7 @@ runs:
           echo "Skipping missing test file: test/git-fix.summary.test.cjs"
         fi
     - name: Run tests in test/git-user-config.test.cjs
-      id: run-git-user-config.test
+      id: run-git-user-config
       shell: bash
       run: |-
         if [ -f "test/git-user-config.test.cjs" ]; then
@@ -103,7 +103,7 @@ runs:
           echo "Skipping missing test file: test/git-user-config.test.cjs"
         fi
     - name: Run tests in test/git-utils.test.cjs
-      id: run-git-utils.test
+      id: run-git-utils
       shell: bash
       run: |-
         if [ -f "test/git-utils.test.cjs" ]; then
@@ -112,7 +112,7 @@ runs:
           echo "Skipping missing test file: test/git-utils.test.cjs"
         fi
     - name: Run tests in test/gitattributes-parse.test.cjs
-      id: run-gitattributes-parse.test
+      id: run-gitattributes-parse
       shell: bash
       run: |-
         if [ -f "test/gitattributes-parse.test.cjs" ]; then
@@ -121,7 +121,7 @@ runs:
           echo "Skipping missing test file: test/gitattributes-parse.test.cjs"
         fi
     - name: Run tests in test/gitattributes-update.test.cjs
-      id: run-gitattributes-update.test
+      id: run-gitattributes-update
       shell: bash
       run: |-
         if [ -f "test/gitattributes-update.test.cjs" ]; then
@@ -130,7 +130,7 @@ runs:
           echo "Skipping missing test file: test/gitattributes-update.test.cjs"
         fi
     - name: Run tests in test/gitattributes.test.cjs
-      id: run-gitattributes.test
+      id: run-gitattributes
       shell: bash
       run: |-
         if [ -f "test/gitattributes.test.cjs" ]; then
@@ -139,7 +139,7 @@ runs:
           echo "Skipping missing test file: test/gitattributes.test.cjs"
         fi
     - name: Run tests in test/node-executor.test.cjs
-      id: run-node-executor.test
+      id: run-node-executor
       shell: bash
       run: |-
         if [ -f "test/node-executor.test.cjs" ]; then
@@ -148,7 +148,7 @@ runs:
           echo "Skipping missing test file: test/node-executor.test.cjs"
         fi
     - name: Run tests in test/readline-mock.test.ts
-      id: run-readline-mock.test
+      id: run-readline-mock
       shell: bash
       run: |-
         if [ -f "test/readline-mock.test.ts" ]; then
@@ -157,7 +157,7 @@ runs:
           echo "Skipping missing test file: test/readline-mock.test.ts"
         fi
     - name: Run tests in test/remove-module.test.ts
-      id: run-remove-module.test
+      id: run-remove-module
       shell: bash
       run: |-
         if [ -f "test/remove-module.test.ts" ]; then
@@ -166,7 +166,7 @@ runs:
           echo "Skipping missing test file: test/remove-module.test.ts"
         fi
     - name: Run tests in test/replaceRawWithLatestHash.test.mjs
-      id: run-replaceRawWithLatestHash.test
+      id: run-replaceRawWithLatestHash
       shell: bash
       run: >-
         if [ -f "test/replaceRawWithLatestHash.test.mjs" ]; then
@@ -175,7 +175,7 @@ runs:
           echo "Skipping missing test file: test/replaceRawWithLatestHash.test.mjs"
         fi
     - name: Run tests in test/resolvePackageResolutionUpdates.test.mjs
-      id: run-resolvePackageResolutionUpdates.test
+      id: run-resolvePackageResolutionUpdates
       shell: bash
       run: >-
         if [ -f "test/resolvePackageResolutionUpdates.test.mjs" ]; then
@@ -184,7 +184,7 @@ runs:
           echo "Skipping missing test file: test/resolvePackageResolutionUpdates.test.mjs"
         fi
     - name: Run tests in test/rm-node-modules.test.cjs
-      id: run-rm-node-modules.test
+      id: run-rm-node-modules
       shell: bash
       run: |-
         if [ -f "test/rm-node-modules.test.cjs" ]; then
@@ -193,7 +193,7 @@ runs:
           echo "Skipping missing test file: test/rm-node-modules.test.cjs"
         fi
     - name: Run tests in test/run-by-checksum/runChecksum-cli.spawn.test.mjs
-      id: run-runChecksum-cli.spawn.test
+      id: run-runChecksum-cli-spawn
       shell: bash
       run: >-
         if [ -f "test/run-by-checksum/runChecksum-cli.spawn.test.mjs" ]; then
@@ -202,7 +202,7 @@ runs:
           echo "Skipping missing test file: test/run-by-checksum/runChecksum-cli.spawn.test.mjs"
         fi
     - name: Run tests in test/run-by-checksum/runChecksum-cli.test.mjs
-      id: run-runChecksum-cli.test
+      id: run-runChecksum-cli
       shell: bash
       run: >-
         if [ -f "test/run-by-checksum/runChecksum-cli.test.mjs" ]; then
@@ -211,7 +211,7 @@ runs:
           echo "Skipping missing test file: test/run-by-checksum/runChecksum-cli.test.mjs"
         fi
     - name: Run tests in test/run-by-checksum/runChecksum-dry-run.test.mjs
-      id: run-runChecksum-dry-run.test
+      id: run-runChecksum-dry-run
       shell: bash
       run: >-
         if [ -f "test/run-by-checksum/runChecksum-dry-run.test.mjs" ]; then
@@ -220,7 +220,7 @@ runs:
           echo "Skipping missing test file: test/run-by-checksum/runChecksum-dry-run.test.mjs"
         fi
     - name: Run tests in test/run-by-checksum/runChecksum.test.mjs
-      id: run-runChecksum.test
+      id: run-runChecksum
       shell: bash
       run: >-
         if [ -f "test/run-by-checksum/runChecksum.test.mjs" ]; then
@@ -229,7 +229,7 @@ runs:
           echo "Skipping missing test file: test/run-by-checksum/runChecksum.test.mjs"
         fi
     - name: Run tests in test/submodule-install.test.cjs
-      id: run-submodule-install.test
+      id: run-submodule-install
       shell: bash
       run: |-
         if [ -f "test/submodule-install.test.cjs" ]; then
@@ -238,7 +238,7 @@ runs:
           echo "Skipping missing test file: test/submodule-install.test.cjs"
         fi
     - name: Run tests in test/utils/fetchResponse.test.mjs
-      id: run-fetchResponse.test
+      id: run-fetchResponse
       shell: bash
       run: |-
         if [ -f "test/utils/fetchResponse.test.mjs" ]; then
@@ -247,7 +247,7 @@ runs:
           echo "Skipping missing test file: test/utils/fetchResponse.test.mjs"
         fi
     - name: Run tests in test/utils/isGitRepository.test.cjs
-      id: run-isGitRepository.test
+      id: run-isGitRepository
       shell: bash
       run: |-
         if [ -f "test/utils/isGitRepository.test.cjs" ]; then
@@ -256,7 +256,7 @@ runs:
           echo "Skipping missing test file: test/utils/isGitRepository.test.cjs"
         fi
     - name: Run tests in test/utils/isGitRepository.test.js
-      id: run-isGitRepository.test
+      id: run-isGitRepository
       shell: bash
       run: |-
         if [ -f "test/utils/isGitRepository.test.js" ]; then
@@ -265,7 +265,7 @@ runs:
           echo "Skipping missing test file: test/utils/isGitRepository.test.js"
         fi
     - name: Run tests in test/validate-tarball-npm.test.cjs
-      id: run-validate-tarball-npm.test
+      id: run-validate-tarball-npm
       shell: bash
       run: |-
         if [ -f "test/validate-tarball-npm.test.cjs" ]; then
@@ -274,7 +274,7 @@ runs:
           echo "Skipping missing test file: test/validate-tarball-npm.test.cjs"
         fi
     - name: Run tests in test/validate-tarball-yarn.test.cjs
-      id: run-validate-tarball-yarn.test
+      id: run-validate-tarball-yarn
       shell: bash
       run: |-
         if [ -f "test/validate-tarball-yarn.test.cjs" ]; then

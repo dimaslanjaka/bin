@@ -71,9 +71,18 @@ async function main() {
       continue;
     }
 
+    const rawId = path.basename(file, path.extname(file));
+    let safeId = rawId.replace(/[^A-Za-z0-9_-]+/g, '-');
+    if (!/^[A-Za-z_]/.test(safeId)) safeId = `_${safeId}`;
+    safeId =
+      safeId
+        .slice(0, 90)
+        .replace(/-test$/, '')
+        .replace(/-spec$/, '') || `test-${Math.random().toString(36).slice(2, 8)}`;
+
     actionObject.runs.steps.push({
       name: `Run tests in ${file}`,
-      id: `run-${path.basename(file, path.extname(file))}`,
+      id: `run-${safeId}`,
       shell: 'bash',
       run: runCmd
     });

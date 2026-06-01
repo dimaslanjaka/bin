@@ -71,14 +71,10 @@ async function main() {
       continue;
     }
 
-    const rawId = path.basename(file, path.extname(file));
+    const rawId = file;
     let safeId = rawId.replace(/[^A-Za-z0-9_-]+/g, '-');
     if (!/^[A-Za-z_]/.test(safeId)) safeId = `_${safeId}`;
-    safeId =
-      safeId
-        .slice(0, 90)
-        .replace(/-test$/, '')
-        .replace(/-spec$/, '') || `test-${Math.random().toString(36).slice(2, 8)}`;
+    safeId = (safeId.slice(0, 90) || `test-${Math.random().toString(36).slice(2, 8)}`).replace(/-(test|spec)$/, '');
 
     actionObject.runs.steps.push({
       name: `Run tests in ${file}`,

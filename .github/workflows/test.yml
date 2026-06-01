@@ -102,7 +102,7 @@ jobs:
       #       --detectOpenHandles \
       #       --testPathPatterns="${{ github.workspace }}/test/"
 
-      - name: 🔎 Discover test files
+      - name: '🔎 Discover test files'
         id: discover
         run: |
           TESTS=$(
@@ -110,13 +110,19 @@ jobs:
               if [ -d test ]; then
                 find test \
                   -type f \
-                  \( -name "*.test.*" -o -name "*.spec.*" \)
+                  \( -name "*.test.js" -o -name "*.spec.js" \
+                     -o -name "*.test.cjs" -o -name "*.spec.cjs" \
+                     -o -name "*.test.mjs" -o -name "*.spec.mjs" \
+                     -o -name "*.test.ts" -o -name "*.spec.ts" \)
               fi
 
               if [ -d tests ]; then
                 find tests \
                   -type f \
-                  \( -name "*.test.*" -o -name "*.spec.*" \)
+                  \( -name "*.test.js" -o -name "*.spec.js" \
+                     -o -name "*.test.cjs" -o -name "*.spec.cjs" \
+                     -o -name "*.test.mjs" -o -name "*.spec.mjs" \
+                     -o -name "*.test.ts" -o -name "*.spec.ts" \)
               fi
             } | jq -R . | jq -s -c .
           )

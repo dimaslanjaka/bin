@@ -62,8 +62,8 @@ jobs:
             packages/**/dist/**
             packages/**/*.tgz
 
-  test:
-    name: 🧪 Tests
+  discover:
+    name: 🧪 Discover Tests
     needs: build
     runs-on: ubuntu-latest
 
@@ -100,20 +100,48 @@ jobs:
       #       --detectOpenHandles \
       #       --testPathPatterns="${{ github.workspace }}/test/"
 
-      - name: 🧪 Run tests individually
-        shell: bash
+      - id: discover
         run: |
-          set -euo pipefail
+          TESTS=$(
+            find test tests \
+              -type f \
+              \( -name "*.test.*" -o -name "*.spec.*" \) \
+              | jq -R . \
+              | jq -s -c .
+          )
 
-          find test tests \
-            -type f \
-            \( -name "*.test.*" -o -name "*.spec.*" \) \
-            -print0 |
-          while IFS= read -r -d '' file; do
-            echo "::group::$file"
-            npm test -- "$file"
-            echo "::endgroup::"
-          done
+          echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
+
+  test:
+    needs: discover
+
+    strategy:
+      fail-fast: false
+      matrix:
+        file: ${{ fromJson(needs.discover.outputs.tests) }}
+
+    runs-on: ubuntu-latest
+
+    name: '🧪 Test ${{ matrix.file }}'
+
+    steps:
+      - name: ⬇️ Checkout workflow repository
+        uses: actions/checkout@v6
+      - name: ⬇️ Setup CI & Checkout dependencies
+        uses: ./.github/actions/setup-environments
+        with:
+          node-version: ${{ env.CI_NODE_VERSION }}
+          token: ${{ secrets.ACCESS_TOKEN || github.token }}
+
+      - name: 📥 Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: .
+
+      - name: Run test
+        run: npm test -- "${{ matrix.file }}"
+
   cleanup:
     name: 🧹 Clean GitHub Actions Cache
     needs:

@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { getArgs } = require('./utils/index.cjs');
+const { GITHUB_ACCESS_TOKEN: ACCESS_TOKEN } = require('./binary-collections/config.cjs');
 const { findEnvWithToken } = require('./utils/findEnvFiles.cjs');
 
 require('dotenv').config({
@@ -7,9 +8,6 @@ require('dotenv').config({
   quiet: true,
   overwrite: true
 });
-
-// delete caches leaving single last cache based on creation date
-const ACCESS_TOKEN = process.env.ACCESS_TOKEN || process.env.GITHUB_TOKEN;
 
 if (!ACCESS_TOKEN) {
   throw new Error(

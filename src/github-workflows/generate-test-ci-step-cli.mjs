@@ -4,37 +4,79 @@ import path from 'upath';
 import { fileURLToPath } from 'url';
 import yaml from 'yaml';
 import { execSync } from 'child_process';
+import { glob } from 'glob';
+import minimist from 'minimist';
 import actionObject from './workflow-test-data.cjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const actionFile = path.resolve(__dirname, '../.github/workflows/test.yml');
-async function collectTests() {
-  // Use fast-glob by default; fail fast with a clear message if not present
-  let fg;
-  try {
-    const fgMod = await import('fast-glob');
-    fg = fgMod.default || fgMod;
-  } catch {
-    console.error('Error: fast-glob is required to run this script.');
-    console.error('Install it with: npm install --no-save fast-glob');
-    process.exit(2);
-  }
+let actionFile = path.resolve(process.cwd(), '.github/workflows/test.yml');
 
-  const patterns = [
-    'test/**/*.test.{js,cjs,mjs,ts}',
-    'test/**/*.spec.{js,cjs,mjs,ts}',
-    'tests/**/*.test.{js,cjs,mjs,ts}',
-    'tests/**/*.spec.{js,cjs,mjs,ts}'
-  ];
+const DEFAULT_PATTERNS = [
+  'test/**/*.test.{js,cjs,mjs,ts}',
+  'test/**/*.spec.{js,cjs,mjs,ts}',
+  'tests/**/*.test.{js,cjs,mjs,ts}',
+  'tests/**/*.spec.{js,cjs,mjs,ts}'
+];
 
-  const entries = await fg(patterns, { onlyFiles: true, cwd: process.cwd() });
+function showHelp() {
+  console.log(`\
+Usage: generate-test-ci-step.mjs [options]
+
+Options:
+  -p, --pattern <glob>   Test file patterns to search for (can be specified multiple times)
+      --ignore, --ex <glob>  Ignore patterns to exclude from results (can be specified multiple times)
+  -o, --output <file>    Output YAML file path (default: .github/workflows/test.yml)
+  -h, --help             Show this help message
+
+Examples:
+  $ node src/github-workflows/generate-test-ci-step.mjs
+  $ node src/github-workflows/generate-test-ci-step.mjs -p "test/**/*.test.js"
+  $ node src/github-workflows/generate-test-ci-step.mjs --pattern "test/**/*.test.js" --ignore "**/fixtures/**"
+  $ node src/github-workflows/generate-test-ci-step.mjs -o .github/workflows/ci.yml -p "src/**/*.test.ts" --ignore "**/node_modules/**"
+`);
+}
+
+async function collectTests(patterns, ignorePatterns) {
+  const entries = await glob(patterns, {
+    onlyFiles: true,
+    cwd: process.cwd(),
+    ignore: ignorePatterns
+  });
   return entries.map((p) => p.replace(/\\/g, '/')).sort();
 }
 
 async function main() {
-  const files = await collectTests();
+  const argv = minimist(process.argv.slice(2), {
+    string: ['pattern', 'ignore', 'ex', 'output'],
+    alias: {
+      p: 'pattern',
+      o: 'output',
+      h: 'help'
+    }
+  });
+
+  // Merge --ex into --ignore so both flags work
+  if (argv.ex) {
+    const exList = Array.isArray(argv.ex) ? argv.ex : [argv.ex];
+    argv.ignore = argv.ignore ? [].concat(argv.ignore).concat(exList) : exList;
+  }
+
+  if (argv.help) {
+    showHelp();
+    process.exit(0);
+  }
+
+  if (argv.output) {
+    actionFile = path.resolve(process.cwd(), argv.output);
+  }
+
+  const patterns = argv.pattern ? (Array.isArray(argv.pattern) ? argv.pattern : [argv.pattern]) : DEFAULT_PATTERNS;
+
+  const ignorePatterns = argv.ignore ? (Array.isArray(argv.ignore) ? argv.ignore : [argv.ignore]) : [];
+
+  const files = await collectTests(patterns, ignorePatterns);
   for (const file of files) {
     const ext = (path.extname(file) || '').toLowerCase();
     const filename = path.basename(file);

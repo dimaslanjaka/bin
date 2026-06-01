@@ -4,28 +4,12 @@ import path from 'upath';
 import { fileURLToPath } from 'url';
 import yaml from 'yaml';
 import { execSync } from 'child_process';
+import actionObject from './workflow-test-data.cjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const actionFile = path.resolve(__dirname, '..', '.github', 'actions', 'run-tests', 'action.yml');
-const actionObject = {
-  name: 'Run Tests',
-  description: `Composite action to run tests discovered by ${path.relative(path.join(__dirname, '..'), __filename)}`,
-
-  runs: {
-    using: 'composite',
-    steps: [
-      // {
-      //   name: 'Run tests',
-      //   id: 'run-tests',
-      //   shell: 'bash',
-      //   run: `node scripts/generate-test-ci-step.mjs`
-      // }
-    ]
-  }
-};
-
+const actionFile = path.resolve(__dirname, '../.github/workflows/test.yml');
 async function collectTests() {
   // Use fast-glob by default; fail fast with a clear message if not present
   let fg;
@@ -78,8 +62,8 @@ async function main() {
     if (!/^[A-Za-z_]/.test(safeId)) safeId = `_${safeId}`;
     safeId = (safeId.slice(0, 90) || `test-${Math.random().toString(36).slice(2, 8)}`).replace(/-(test|spec)$/, '');
 
-    actionObject.runs.steps.push({
-      name: `Run tests in ${file}`,
+    actionObject.jobs.ci.steps.push({
+      name: `🧪 Run tests in ${file}`,
       id: `run-${safeId}`,
       shell: 'bash',
       run: runCmd

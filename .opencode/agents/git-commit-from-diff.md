@@ -49,6 +49,24 @@ If multiple files exist:
 
 * use the latest modified file
 
+### Fallback method (if `git-diff` is NOT installed or fails)
+
+If `git-diff` command is missing, unavailable, or errors:
+
+Use native Git instead:
+
+```bash
+git diff --staged
+```
+
+Optionally also gather file list:
+
+```bash
+git diff --staged --name-only
+```
+
+Then treat this output as the diff source for analysis.
+
 ---
 
 ## 3. Load and analyze diff

@@ -2,7 +2,7 @@
 
 A comprehensive toolkit of Node.js CLI utilities designed to streamline everyday development workflows.
 
-It provides fast, lightweight commands for common tasks like git operations, dependency management, submodule handling, and running npm scripts in sequence or parallel—helping you reduce repetitive work and improve terminal productivity.
+It provides fast, lightweight commands for common tasks like git operations, dependency management, submodule handling, conditional execution, CI workflow generation, and running npm scripts in sequence or parallel—helping you reduce repetitive work and improve terminal productivity.
 
 ## ✨ Features
 
@@ -15,14 +15,23 @@ It provides fast, lightweight commands for common tasks like git operations, dep
 * 🔁 **Task Orchestration**
   Run npm scripts sequentially or in parallel with improved control and execution clarity.
 
+* 🔐 **Conditional Execution**
+  Run commands only when file contents change — uses SHA-256 checksums to detect modifications and skip unnecessary re-executions.
+
 * 📁 **Repository & Submodule Automation**
   Simplify initialization, syncing, and maintenance of Git submodules and multi-repository setups.
 
 * 📦 **Build & Package Utilities**
-  Enhance NPM workflows with improved script execution, dependency handling, and resolution helpers.
+  Enhance NPM workflows with improved script execution, dependency handling, resolution helpers, and automatic tarball packaging.
 
 * 🛠️ **Development Helpers**
-  General-purpose utilities for process management, environment setup, and file system operations.
+  General-purpose utilities for process management, environment setup, file system operations, downloads, and archive inspection.
+
+* 🤖 **AI & IDE Tooling**
+  Inspect and manage OpenCode databases, browse VS Code workspace storage, and list Copilot memory tool directories.
+
+* 🔄 **CI/CD Automation**
+  Generate GitHub Actions workflow YAML from test file detection, and clean up stale action caches automatically.
 
 * 🚀 **Performance-Focused CLI Design**
   Lightweight, fast-executing commands designed to reduce friction and speed up everyday development tasks.
@@ -136,16 +145,19 @@ binary-collections list
 
 | Category | Commands | Description | Docs |
 |---|---|---|---|
-| **Git** | `git-purge`, `git-diff`, `git-fix`, `git-reduce-size`, `git-undo` | Git repository management and optimization | [`git-purge.md`](./docs-src/git-purge.md), [`git-diff.md`](./docs-src/git-diff.md), [`git-fix.md`](./docs-src/git-fix.md), [`git-reduce-size.md`](./docs-src/git-reduce-size.md), [`git-undo.md`](./docs-src/git-undo.md) |
-| **Submodules** | `submodule`, `submodule-install`, `submodule-remove`, `submodule-token` | Git submodule operations | [`submodule-install.md`](./docs-src/submodule-install.md), [`submodule-remove.md`](./docs-src/submodule-remove.md), [`submodule-token.md`](./docs-src/submodule-token.md) |
+| **Git** | `git-purge`, `git-diff`, `git-fix`, `git-reduce-size`, `git-undo-commit`, `git-undo-staged` | Git repository management, diff enhancements, undo helpers, and optimization | [`git-purge.md`](./docs-src/git-purge.md), [`git-diff.md`](./docs-src/git-diff.md), [`git-fix.md`](./docs-src/git-fix.md), [`git-reduce-size.md`](./docs-src/git-reduce-size.md), [`git-undo.md`](./docs-src/git-undo.md) |
+| **Submodules** | `submodule-install`, `submodule-remove`, `submodule-token` | Git submodule operations with authentication token injection | [`submodule-install.md`](./docs-src/submodule-install.md), [`submodule-remove.md`](./docs-src/submodule-remove.md), [`submodule-token.md`](./docs-src/submodule-token.md) |
 | **NPM Scripts** | `nrs`, `run-s`, `run-series`, `npm-run-series` | Run npm scripts in series with pattern matching | [`npm-run-series.md`](./docs-src/npm-run-series.md) |
+| **Conditional Execution** | `run-by-checksum`, `run-checksum`, `run-c` | Run commands only when file checksums change (SHA-256 based) | [`run-by-checksum.md`](./docs-src/run-by-checksum.md) |
+| **Build & Package** | `node-package-packer`, `tarball-packer`, `pack-tarball`, `build-tarball`, `build-package` | Automated tarball creation, release packaging, and metadata generation | [`node-package-packer.md`](./docs-src/node-package-packer.md) |
 | **Package Mgmt** | `yarn-reinstall`, `pkg-resolutions-updater`, `pkg-res-updater`, `yarn-install`, `yarn-clean` | Yarn/package resolutions management utilities | [`yarn-reinstall.md`](./docs-src/yarn-reinstall.md), [`yarn-install.md`](./docs-src/yarn-install.md), [`node-cache-cleaner.md`](./docs-src/node-cache-cleaner.md), [`package-resolutions-updater.md`](./docs-src/package-resolutions-updater.md) |
 | **Node.js Dev** | `find-node-modules`, `find-nodemodules`, `dev`, `prod`, `empty`, `node-cache-cleaner`, `node-executor`, `py` | Node.js development helpers | [`find-node-modules.md`](./docs-src/find-node-modules.md), [`env-helpers.md`](./docs-src/env-helpers.md), [`node-cache-cleaner.md`](./docs-src/node-cache-cleaner.md), [`node-executor.md`](./docs-src/node-executor.md), [`py.md`](./docs-src/py.md) |
 | **Process Mgmt** | `kill-process`, `nodekill`, `javakill`, `del-ps`, `kill-night-crows` | Process management and termination | [`del-ps.md`](./docs-src/del-ps.md), [`kill-night-crows.md`](./docs-src/kill-night-crows.md) |
-| **File System** | `rmfind`, `rmpath`, `rmx`, `print-tree`, `dir-tree`, `copy`, `move`, `remove-module` | File system operations | [`copy-move-file.md`](./docs-src/copy-move-file.md), [`rmpath.md`](./docs-src/rmpath.md), [`rmfind-rmx.md`](./docs-src/rmfind-rmx.md), [`print-directory-tree.md`](./docs-src/print-directory-tree.md), [`remove-module.md`](./docs-src/remove-module.md) |
+| **File System** | `rmfind`, `rmx`, `rmpath`, `print-tree`, `dir-tree`, `copy`, `move`, `remove-module`, `downloader`, `download`, `fetch-file`, `print-tarball-tree`, `tarball-tree` | File system operations, URL downloads, archive tree inspection | [`copy-move-file.md`](./docs-src/copy-move-file.md), [`rmpath.md`](./docs-src/rmpath.md), [`rmfind-rmx.md`](./docs-src/rmfind-rmx.md), [`print-directory-tree.md`](./docs-src/print-directory-tree.md), [`remove-module.md`](./docs-src/remove-module.md), [`downloader.md`](./docs-src/downloader.md), [`print-tarball-tree.md`](./docs-src/print-tarball-tree.md) |
 | **Cleanup** | `del-nodemodules`, `del-yarncaches`, `del-gradle`, `del-yarn-caches`, `yarn-clean` | Cache and build directory cleanup | [`node-cache-cleaner.md`](./docs-src/node-cache-cleaner.md), [`del-gradle.md`](./docs-src/del-gradle.md) |
-| **GitHub Actions** | `clean-github-actions-caches`, `clean-github-actions-cache`, `clear-github-actions-cache`, `clear-github-actions-caches`, `clear-gh-caches` | Remove old GitHub Actions caches, keep only latest | [`clean-github-actions-caches.md`](./docs-src/clean-github-actions-caches.md) |
-| **Other** | `binary-collections`, `changelog`, `php-cs-fixer-staged`, `free-chatgpt`, `test-runners` | Miscellaneous utilities and documentation | [`binary-collections.md`](./docs-src/binary-collections.md), [`changelog.md`](./docs-src/changelog.md), [`php-cs-fixer-staged.md`](./docs-src/php-cs-fixer-staged.md), [`free-chatgpt.md`](./docs-src/free-chatgpt.md), [`test-runners.md`](./docs-src/test-runners.md) |
+| **CI/GitHub Actions** | `clean-github-actions-caches`, `clear-gh-caches`, `generate-test-ci` | GitHub Actions cache cleanup and automated CI workflow generation from test file detection | [`clean-github-actions-caches.md`](./docs-src/clean-github-actions-caches.md), [`generate-test-ci.md`](./docs-src/generate-test-ci.md) |
+| **AI & IDE Tooling** | `opc`, `opencode-cli`, `vscode-cli` | OpenCode database management (list/delete sessions and projects) and VS Code workspace inspection with Copilot memory detection | [`opencode-cli.md`](./docs-src/opencode-cli.md), [`vscode-cli.md`](./docs-src/vscode-cli.md) |
+| **Other** | `binary-collections`, `changelog`, `php-cs-fixer-staged`, `free-chatgpt`, `test-runners` | Main dispatcher, changelog generation, PHP CS fixer for staged files, ChatGPT client, and Jest runners for CJS/ESM | [`binary-collections.md`](./docs-src/binary-collections.md), [`changelog.md`](./docs-src/changelog.md), [`php-cs-fixer-staged.md`](./docs-src/php-cs-fixer-staged.md), [`free-chatgpt.md`](./docs-src/free-chatgpt.md), [`test-runners.md`](./docs-src/test-runners.md) |
 
 ---
 

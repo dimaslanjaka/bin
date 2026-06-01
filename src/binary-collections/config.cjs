@@ -17,6 +17,8 @@ const { findEnvWithToken } = require('../utils/findEnvFiles.cjs');
 
 require('dotenv').config({ path: findEnvWithToken(), quiet: true, overwrite: true });
 
+const GITHUB_ACCESS_TOKEN = process.env.ACCESS_TOKEN || process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
+
 /**
  * Get the base temporary directory path
  * Can be overridden via TEMP_DIR environment variable
@@ -43,5 +45,6 @@ const TEMP_BASE_DIR = getTempDir();
 module.exports = {
   getTempDir,
   getTempPath,
-  TEMP_BASE_DIR
+  TEMP_BASE_DIR,
+  GITHUB_ACCESS_TOKEN
 };

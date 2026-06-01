@@ -30,6 +30,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'upath';
 import * as utils from './utils/index.cjs';
+import { GITHUB_ACCESS_TOKEN as ACCESS_TOKEN } from './binary-collections/config.cjs';
 import fetchResponse from './utils/fetchResponse.cjs';
 import { findEnvFiles } from './utils/findEnvFiles.cjs';
 import { parseGitHubUrl } from 'git-command-helper';
@@ -53,8 +54,6 @@ if (!fs.existsSync(envPath)) {
 if (fs.existsSync(envPath)) {
   dotenv.config({ path: envPath, quiet: true, override: true });
 }
-const ACCESS_TOKEN = process.env.ACCESS_TOKEN || process.env.GITHUB_TOKEN;
-
 // Show help if --help/-h is passed
 if (args.help || args.h) {
   showHelp();

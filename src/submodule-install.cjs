@@ -11,6 +11,7 @@ const envPath = path.resolve(process.cwd(), '.env');
 if (fs.existsSync(envPath)) dotenv.config({ path: envPath, override: true, quiet: true });
 
 const { getArgs } = require('./utils/index.cjs');
+const { GITHUB_ACCESS_TOKEN: ACCESS_TOKEN } = require('./binary-collections/config.cjs');
 const args = getArgs();
 const positional = args._ || [];
 
@@ -28,8 +29,6 @@ if (args.help || args.h) {
   console.log();
   process.exit(0);
 }
-
-const ACCESS_TOKEN = process.env.ACCESS_TOKEN || process.env.GITHUB_TOKEN;
 
 let ROOT = runGit(['rev-parse', '--show-toplevel']).trim();
 let REPO_PATH = ROOT;

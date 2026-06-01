@@ -19,3 +19,4 @@ __*
 /docs
 /*.txt
 /*.tgz
+tmp/

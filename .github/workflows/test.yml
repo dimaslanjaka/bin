@@ -1,7 +1,7 @@
 name: Node.js Package Test
 
 concurrency:
-  group: test-${{ github.event.workflow_run.head_sha || github.sha }}
+  group: test
   cancel-in-progress: true
 
 on:

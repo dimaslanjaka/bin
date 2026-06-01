@@ -135,7 +135,7 @@ jobs:
 
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.discover.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.discover.outputs.matrix || '{"file":[]}' ) }}
 
     runs-on: ubuntu-latest
 

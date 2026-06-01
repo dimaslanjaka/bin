@@ -123,6 +123,10 @@ jobs:
 
           MATRIX=$(jq -nc --argjson files "$TESTS" '{file: $files}')
 
+          echo "Discovered test files:"
+          echo "$TESTS" | jq -r '.[]?'
+          echo "Generated matrix: $MATRIX"
+
           echo "tests=$TESTS" >> "$GITHUB_OUTPUT"
           echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
 

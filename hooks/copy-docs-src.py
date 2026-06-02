@@ -33,14 +33,19 @@ def _rewrite_relative_links(content: str) -> str:
 
 
 def _expand_readme_to_index() -> None:
-    """Expand README.md into docs/index.md with rewritten unresolvable links."""
+    """Expand README.md into docs/index.md with rewritten unresolvable links.
+
+    Idempotent: skips writing when docs/index.md is already up-to-date,
+    avoiding infinite rebuild loops in ``mkdocs serve``.
+    """
     readme = Path("README.md")
     index_md = Path("docs") / "index.md"
 
     if not readme.exists():
         return
 
-    content = readme.read_text(encoding="utf-8")
+    content_bytes = readme.read_bytes()
+    content = content_bytes.decode("utf-8")
 
     # Rewrite links that can't resolve inside docs/ tree
     content = _rewrite_relative_links(content)
@@ -49,31 +54,64 @@ def _expand_readme_to_index() -> None:
     content = content.replace("](./build.mjs)", f"]({BASE_URL}/build.mjs)")
     content = content.replace("](./LICENSE)", f"]({BASE_URL}/LICENSE)")
 
-    index_md.write_text(content, encoding="utf-8")
+    content_bytes_rewritten = content.encode("utf-8")
+
+    # Idempotency: binary comparison (avoids CRLF/LF mismatch from text mode)
+    if index_md.exists() and index_md.read_bytes() == content_bytes_rewritten:
+        print(f"  -> Skipped README.md expansion (up-to-date)")
+        return
+
+    index_md.write_bytes(content_bytes_rewritten)
     print(f"  -> Expanded README.md -> docs/index.md with rewritten links")
 
 
 def _copy_and_rewrite_docs_src() -> int:
     """Copy docs-src/ -> docs/docs-src/ and rewrite relative links in copied files.
 
-    Returns the number of .md files copied.
+    Idempotent: skips writing when destination is already up-to-date,
+    avoiding infinite rebuild loops in ``mkdocs serve``.
+
+    Returns the number of .md files copied (or 0 if skipped as up-to-date).
     """
     src = Path("docs-src")
     dst = Path("docs") / "docs-src"
-
-    if dst.exists():
-        shutil.rmtree(dst)
+    count = 0
 
     if not src.exists() or not src.is_dir():
         return 0
 
+    # Idempotency: if destination exists and all files are identical, skip
+    if dst.exists():
+        src_file_names = {f.name for f in src.glob("*.md")}
+        dst_file_names = {f.name for f in dst.glob("*.md")}
+        if src_file_names == dst_file_names:
+            # Binary content comparison (avoids CRLF/LF mismatch from text mode)
+            all_same = True
+            for name in src_file_names:
+                source_bytes = (src / name).read_bytes()
+                # Apply the same rewriting that would happen after copy
+                if name.endswith(".md"):
+                    rewritten = _rewrite_relative_links(source_bytes.decode("utf-8"))
+                    expected_bytes = rewritten.encode("utf-8")
+                else:
+                    expected_bytes = source_bytes
+                if (dst / name).read_bytes() != expected_bytes:
+                    all_same = False
+                    break
+            if all_same:
+                print(f"  -> Skipped docs-src/ copy (up-to-date)")
+                return 0
+        shutil.rmtree(dst)
+    else:
+        dst.parent.mkdir(parents=True, exist_ok=True)
+
     shutil.copytree(src, dst)
-    count = 0
     for md_file in dst.glob("*.md"):
-        original = md_file.read_text(encoding="utf-8")
+        original_bytes = md_file.read_bytes()
+        original = original_bytes.decode("utf-8")
         rewritten = _rewrite_relative_links(original)
         if rewritten != original:
-            md_file.write_text(rewritten, encoding="utf-8")
+            md_file.write_bytes(rewritten.encode("utf-8"))
         count += 1
 
     print(f"  -> Copied docs-src/ -> docs/docs-src/ ({count} files, links rewritten)")

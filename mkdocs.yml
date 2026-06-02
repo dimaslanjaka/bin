@@ -1,0 +1,119 @@
+site_name: Binary Collections
+site_description: Portable binaries and utility scripts
+site_url: https://dimaslanjaka.github.io/bin/
+repo_url: https://github.com/dimaslanjaka/bin
+repo_name: dimaslanjaka/bin
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - toc.follow
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+  palette:
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      primary: blue
+      toggle:
+        icon: material/weather-night
+        name: Dark mode
+
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      primary: blue
+      toggle:
+        icon: material/weather-sunny
+        name: Light mode
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences
+  - admonition
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+
+validation:
+  absolute_links: ignore
+  unrecognized_links: ignore
+
+plugins:
+  - search
+
+hooks:
+  - hooks/copy-docs-src.py
+
+nav:
+  - Home: index.md
+  - Git:
+      - git-purge: docs-src/git-purge.md
+      - git-diff: docs-src/git-diff.md
+      - git-fix: docs-src/git-fix.md
+      - git-reduce-size: docs-src/git-reduce-size.md
+      - git-undo: docs-src/git-undo.md
+  - Submodules:
+      - submodule-install: docs-src/submodule-install.md
+      - submodule-remove: docs-src/submodule-remove.md
+      - submodule-token: docs-src/submodule-token.md
+  - NPM Scripts:
+      - npm-run-series: docs-src/npm-run-series.md
+  - Conditional Execution:
+      - run-by-checksum: docs-src/run-by-checksum.md
+  - Build & Package:
+      - node-package-packer: docs-src/node-package-packer.md
+  - Package Mgmt:
+      - yarn-reinstall: docs-src/yarn-reinstall.md
+      - yarn-install: docs-src/yarn-install.md
+      - node-cache-cleaner: docs-src/node-cache-cleaner.md
+      - package-resolutions-updater: docs-src/package-resolutions-updater.md
+  - Node.js Dev:
+      - find-node-modules: docs-src/find-node-modules.md
+      - env-helpers: docs-src/env-helpers.md
+      - node-executor: docs-src/node-executor.md
+      - py: docs-src/py.md
+  - Process Mgmt:
+      - del-ps: docs-src/del-ps.md
+      - kill-night-crows: docs-src/kill-night-crows.md
+  - File System:
+      - copy-move-file: docs-src/copy-move-file.md
+      - rmpath: docs-src/rmpath.md
+      - rmfind-rmx: docs-src/rmfind-rmx.md
+      - print-directory-tree: docs-src/print-directory-tree.md
+      - remove-module: docs-src/remove-module.md
+      - downloader: docs-src/downloader.md
+      - print-tarball-tree: docs-src/print-tarball-tree.md
+  - Cleanup:
+      - del-gradle: docs-src/del-gradle.md
+  - CI/GitHub Actions:
+      - clean-github-actions-caches: docs-src/clean-github-actions-caches.md
+      - generate-test-ci: docs-src/generate-test-ci.md
+      - get-latest-workflow-status: docs-src/get-latest-workflow-status.md
+      - workflow-badge: docs-src/workflow-badge.md
+      - upload-backend: docs-src/upload-backend.md
+  - AI & IDE Tooling:
+      - opencode-cli: docs-src/opencode-cli.md
+      - vscode-cli: docs-src/vscode-cli.md
+  - Other:
+      - binary-collections: docs-src/binary-collections.md
+      - changelog: docs-src/changelog.md
+      - php-cs-fixer-staged: docs-src/php-cs-fixer-staged.md
+      - free-chatgpt: docs-src/free-chatgpt.md
+      - test-runners: docs-src/test-runners.md

@@ -20,3 +20,4 @@ __*
 /*.txt
 /*.tgz
 tmp/
+.vscode/sftp.json

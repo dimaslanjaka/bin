@@ -13,7 +13,7 @@ describe('git-fix utility - help functionality', () => {
   let consoleLogSpy;
   let consoleErrorSpy;
   let processExitSpy;
-  const gitFixPath = path.resolve(__dirname, '../src/git-fix.cjs');
+  const gitFixPath = path.resolve(__dirname, '../src/git/git-fix.cjs');
 
   beforeAll(() => {
     // Change working directory to the test repo
@@ -36,14 +36,14 @@ describe('git-fix utility - help functionality', () => {
 
   it('should show help with --help flag', () => {
     process.argv = ['node', gitFixPath, '--help'];
-    require('../src/git-fix.cjs');
+    require('../src/git/git-fix.cjs');
     expect(processExitSpy).toHaveBeenCalledWith(0);
     expect(consoleLogSpy).toHaveBeenCalledWith('Git Fix Utility');
   });
 
   it('should show help with -h flag', () => {
     process.argv = ['node', gitFixPath, '-h'];
-    require('../src/git-fix.cjs');
+    require('../src/git/git-fix.cjs');
     expect(processExitSpy).toHaveBeenCalledWith(0);
     expect(consoleLogSpy).toHaveBeenCalledWith('Git Fix Utility');
   });

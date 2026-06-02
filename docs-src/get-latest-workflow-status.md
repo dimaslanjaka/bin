@@ -23,6 +23,7 @@ This command is available under several names (all invoke the same CLI):
 | :--- | :--- | :--- |
 | `--owner` | `string` | GitHub repository owner (default: auto-detect from git remote or `GH_OWNER` env) |
 | `--repo` | `string` | GitHub repository name (default: auto-detect from git remote or `GH_REPO` env) |
+| `--token` | `string` | GitHub access token (overrides `ACCESS_TOKEN` / `GITHUB_TOKEN` / `GH_TOKEN` env vars) |
 | `-h`, `--help` | `boolean` | Show help message |
 
 ### Environment Variables

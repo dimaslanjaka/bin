@@ -13,11 +13,17 @@
  */
 
 const path = require('upath');
+const minimistLib = require('minimist');
 const { findEnvWithToken } = require('../utils/findEnvFiles.cjs');
 
 require('dotenv').config({ path: findEnvWithToken(), quiet: true, overwrite: true });
 
-const GITHUB_ACCESS_TOKEN = process.env.ACCESS_TOKEN || process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
+// Support --token CLI argument to override GITHUB_ACCESS_TOKEN
+const cliArgv = minimistLib(process.argv.slice(2), {
+  string: ['token']
+});
+const GITHUB_ACCESS_TOKEN =
+  cliArgv.token || process.env.ACCESS_TOKEN || process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
 
 /**
  * Get the base temporary directory path

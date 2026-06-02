@@ -28,6 +28,7 @@ Print the latest GitHub Actions workflow run with its jobs and steps.
 Options:
   --owner <owner>       GitHub repository owner (default: auto-detect from git)
   --repo <repo>         GitHub repository name (default: auto-detect from git)
+  --token <token>       GitHub access token (overrides env: ACCESS_TOKEN, GITHUB_TOKEN, GH_TOKEN)
   -h, --help            Show this help message
 `;
 

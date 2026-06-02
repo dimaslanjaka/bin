@@ -59,7 +59,8 @@
     "test-watch": "npm test --watch",
     "update:ncu": "npx npm-check-updates -u --enginesNode --root -x jest -x @types/jest -x babel-jest -x @babel/core -x @babel/preset-env -x @babel/preset-typescript -x ts-jest -x eslint -x @eslint/eslintrc -x @eslint/js -x @typescript-eslint/eslint-plugin -x @typescript-eslint/parser -x eslint-config-prettier -x eslint-plugin-prettier -x typescript-eslint -x prettier -x typescript -x ts-node -x @yarnpkg/core",
     "update:packer": "curl -L https://github.com/dimaslanjaka/nodejs-package-types/raw/main/packer.js > packer.cjs",
-    "serve": "php -S 0.0.0.0:8490"
+    "serve": "php -S 0.0.0.0:8490",
+    "upload": "node scripts/upload-backend.mjs"
   },
   "repository": {
     "type": "git",

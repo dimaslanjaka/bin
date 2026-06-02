@@ -3,7 +3,7 @@ const env = require('./env.cjs');
 const path = require('upath');
 
 describe('git-fix utility - summary messages', () => {
-  const gitFixPath = path.resolve(__dirname, '../src/git-fix.cjs');
+  const gitFixPath = path.resolve(__dirname, '../src/git/git-fix.cjs');
 
   beforeAll(() => {
     // Prepare test repo and install CLI

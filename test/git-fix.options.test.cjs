@@ -16,7 +16,7 @@ describe('git-fix utility - individual options', () => {
   let mockConfigureGitUser;
   let mockNormalizeLineEndings;
   let consoleLogSpy;
-  const gitFixPath = path.resolve(__dirname, '../src/git-fix.cjs');
+  const gitFixPath = path.resolve(__dirname, '../src/git/git-fix.cjs');
 
   beforeEach(() => {
     process.cwd = () => repoDir; // Set working directory to test repo
@@ -47,7 +47,7 @@ describe('git-fix utility - individual options', () => {
 
   it('should only force LF line endings with --lf-only', () => {
     process.argv = ['node', gitFixPath, '--lf-only'];
-    require('../src/git-fix.cjs');
+    require('../src/git/git-fix.cjs');
     expect(consoleLogSpy).toHaveBeenCalledWith('[i] Current working directory:', repoDir);
     expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('[✓] Detected git repository'));
     expect(mockForceLfLineEndings).toHaveBeenCalled();
@@ -59,7 +59,7 @@ describe('git-fix utility - individual options', () => {
 
   it('should only ignore file permissions with --permissions', () => {
     process.argv = ['node', gitFixPath, '--permissions'];
-    require('../src/git-fix.cjs');
+    require('../src/git/git-fix.cjs');
     expect(mockForceLfLineEndings).not.toHaveBeenCalled();
     expect(mockIgnoreFilePermissions).toHaveBeenCalled();
     expect(mockSetPullStrategy).not.toHaveBeenCalled();
@@ -69,7 +69,7 @@ describe('git-fix utility - individual options', () => {
 
   it('should only normalize line endings with --normalize', () => {
     process.argv = ['node', gitFixPath, '--normalize'];
-    require('../src/git-fix.cjs');
+    require('../src/git/git-fix.cjs');
     expect(mockForceLfLineEndings).not.toHaveBeenCalled();
     expect(mockIgnoreFilePermissions).not.toHaveBeenCalled();
     expect(mockSetPullStrategy).not.toHaveBeenCalled();
@@ -81,7 +81,7 @@ describe('git-fix utility - individual options', () => {
     process.env.GITHUB_USER = 'testuser';
     process.env.GITHUB_EMAIL = 'test@example.com';
     process.argv = ['node', gitFixPath, '--user'];
-    require('../src/git-fix.cjs');
+    require('../src/git/git-fix.cjs');
     expect(mockForceLfLineEndings).not.toHaveBeenCalled();
     expect(mockIgnoreFilePermissions).not.toHaveBeenCalled();
     expect(mockSetPullStrategy).not.toHaveBeenCalled();

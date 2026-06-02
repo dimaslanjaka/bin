@@ -22,5 +22,6 @@ tmp/
 .vscode/sftp.json
 bin/composer*
 vendor/
+docs/index.md
 docs/docs-src/
 site/

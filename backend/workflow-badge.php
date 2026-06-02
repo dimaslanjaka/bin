@@ -74,32 +74,46 @@ if (!empty($maxSteps)) {
     $maxStepsArg = ['--max-steps', $maxSteps];
 }
 
-// ─── Locate the Node CLI script or fall back to npx ───────────────
-$projectRoot    = dirname(__DIR__);
-$cliScript      = $projectRoot . '/src/workflow-badge-cli.mjs';
-$NPX_TARBALL_URL = 'https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz';
-
-if (file_exists($cliScript)) {
-    // Local Node CLI — invoke directly
-    $cmd  = 'node';
-    $args = [
-        '--no-warnings=ExperimentalWarning',
-        $cliScript,
-        '--owner', $owner,
-        '--repo',  $repo,
-    ];
-} else {
-    // Fallback: npx from remote tarball
-    $cmd  = 'npx';
-    $args = [
-        '--legacy-peer-deps',
-        '-y',
-        'binary-collections@' . $NPX_TARBALL_URL,
-        'workflow-badge',
-        '--owner', $owner,
-        '--repo',  $repo,
-    ];
+// ─── Extend PATH for common install locations (NVM, etc.) ──────────
+$nodeExtraPaths = array_filter([
+    glob('/usr/local/nvm/versions/node/*/bin')[0] ?? null,
+    glob('/usr/local/lib/nodejs/*/bin')[0] ?? null,
+    '/usr/local/nvm/versions/node/v22.18.0/bin',
+]);
+if (!empty($nodeExtraPaths)) {
+    putenv('PATH=' . implode(':', $nodeExtraPaths) . ':' . ($_SERVER['PATH'] ?? getenv('PATH')));
 }
+
+// ─── Locate the Node CLI script ───────────────────────────────────
+$projectRoot = dirname(__DIR__);
+$cliScripts = [
+    $projectRoot . '/src/workflow-badge-cli.mjs',
+    $projectRoot . '/workflow-badge-cli.mjs',
+    $projectRoot . '/lib/workflow-badge-cli.cjs',
+    $projectRoot . '/node_modules/binary-collections/lib/workflow-badge-cli.cjs',
+];
+$cliScript   = $projectRoot . '/src/workflow-badge-cli.mjs';
+foreach ($cliScripts as $script) {
+    if (file_exists($script)) {
+        $cliScript = $script;
+        break;
+    }
+}
+
+if (!file_exists($cliScript)) {
+    http_response_code(500);
+    header('Content-Type: text/plain; charset=utf-8');
+    echo "Server error: workflow-badge CLI not found (deploy the full project or run upload-backend)\n";
+    exit(1);
+}
+
+$cmd  = 'node';
+$args = [
+    '--no-warnings=ExperimentalWarning',
+    $cliScript,
+    '--owner', $owner,
+    '--repo',  $repo,
+];
 if (!empty($widthArg)) {
     $args = array_merge($args, $widthArg);
 }
@@ -114,12 +128,12 @@ $descriptorSpec = [
     2 => ['pipe', 'w'],  // stderr → pipe (diagnostics, we log it)
 ];
 
-$process = proc_open([$cmd, ...$args], $descriptorSpec, $pipes, $projectRoot);
+$process = @proc_open([$cmd, ...$args], $descriptorSpec, $pipes, $projectRoot);
 
 if (!is_resource($process)) {
     http_response_code(500);
     header('Content-Type: text/plain; charset=utf-8');
-    echo "Server error: failed to start badge generator\n";
+    echo "Server error: failed to start badge generator (command: $cmd)\n";
     exit(1);
 }
 

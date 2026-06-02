@@ -8,8 +8,8 @@
  */
 
 import fs from 'fs-extra';
-import path from 'upath';
 import SftpClient from 'ssh2-sftp-client';
+import path from 'upath';
 
 const SFTP_CONFIG_PATH = path.resolve('.vscode/sftp.json');
 const BACKEND_DIR = path.resolve('backend');

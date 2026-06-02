@@ -64,7 +64,7 @@ plugins:
   - search
 
 hooks:
-  - hooks/copy-docs-src.py
+  - hooks/copy_docs_src.py
 
 nav:
   - Home: index.md

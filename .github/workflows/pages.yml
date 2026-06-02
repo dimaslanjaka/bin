@@ -31,8 +31,10 @@ jobs:
       - name: Generate Site
         shell: bash
         run: |
-          mkdir -p docs
           pip install mkdocs-material
+          # Pre-generate docs/index.md from README.md before mkdocs validates nav
+          python3 hooks/pre-generate-docs.py
+          # Then build the site
           mkdocs build
 
       - uses: actions/upload-pages-artifact@v4

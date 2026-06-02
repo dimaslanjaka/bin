@@ -16,10 +16,11 @@
 **/coverage
 __*
 /binaries
-/docs
 /*.txt
 /*.tgz
 tmp/
 .vscode/sftp.json
 bin/composer*
 vendor/
+docs/docs-src/
+site/

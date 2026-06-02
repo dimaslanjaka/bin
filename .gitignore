@@ -21,3 +21,4 @@ __*
 /*.tgz
 tmp/
 .vscode/sftp.json
+bin/composer*

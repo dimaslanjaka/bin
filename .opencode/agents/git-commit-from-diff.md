@@ -111,6 +111,18 @@ If uncertain:
 
 * prefer a single commit
 
+### Additional Rule
+
+When multiple commit contexts are detected from currently staged files:
+
+- unstage all files first
+- regroup files by logical commit context
+- stage only files belonging to the current commit
+- create commits sequentially
+- use interactive staging when a single file contains changes for multiple commit contexts
+
+The agent must never assume the user's current staged set already matches commit boundaries.
+
 ---
 
 ## 5. Conventional Commit Rules
@@ -235,7 +247,7 @@ fix(proxy): resolve invalid timeout handling
 
 ## 7. Multi-Commit Output Format
 
-If multiple commits are required:
+When multiple commits are required, the current staged set is assumed to contain files from unrelated contexts. The agent MUST therefore unstage everything first (see Execution Phase Step A), then process each commit group independently.
 
 ```text
 COMMIT 1:
@@ -258,62 +270,193 @@ Each commit MUST include:
 
 ## 8. Execution Phase
 
-### Step A: Stage relevant changes
+### Commit Grouping Strategy
 
-Use selective staging when splitting commits.
+After analyzing the staged diff, determine commit groups.
 
-Preferred:
+Each group should contain files belonging to a single logical change:
 
-```bash
-git add <files>
+* feature
+* fix
+* refactor
+* test
+* docs
+* tooling
+* CI
+* performance
+
+Example:
+
+```text
+Group A
+- src/parser/*
+- test/parser/*
+
+Group B
+- docs/*
+- README.md
+
+Group C
+- .github/workflows/*
 ```
 
-Optional:
+If only one logical group exists:
 
-```bash
-git add -p
-```
+* keep current staging
+* create a single commit
 
-Only include relevant files per commit.
+If multiple logical groups exist:
+
+* split commits using selective staging
 
 ---
 
-### Step B: Commit
+### Step A: Unstage Everything
 
-NEVER use:
-
-```bash
-git commit -m "<full multiline message>"
-```
-
-because many environments truncate multiline content.
-
-#### 1. Create a text file for the commit message.
-
-Example `commit.txt`:
-
-```text
-feat(api): redesign parser interface
-
-- simplify plugin integration flow
-- refactor parser lifecycle
-- rename parser hooks
-- simplify initialization behavior
-- update migration documentation
-
-BREAKING CHANGE: parser hooks renamed
-```
-
-Then commit using:
+Before creating multiple commits:
 
 ```bash
-git commit -F commit.txt
+git restore --staged .
+```
+
+Fallback:
+
+```bash
+git reset HEAD .
+```
+
+This must preserve working-tree changes.
+
+Never discard modifications.
+
+---
+
+### Step B: Create Commits Per Group
+
+For each commit group:
+
+#### Stage only files belonging to that group
+
+```bash
+git add <file1> <file2> ...
 ```
 
 Or:
 
 ```bash
-git commit --file commit.txt
+git add <directory>
 ```
 
-This is the simplest and most cross-platform method for long multiline commits.
+Verify:
+
+```bash
+git diff --cached --name-only
+```
+
+Only files relevant to the current commit may be staged.
+
+---
+
+#### Generate Commit Message
+
+Create commit message according to Conventional Commit rules.
+
+Example:
+
+```text
+refactor(parser): simplify token normalization
+
+- simplify parser normalization pipeline
+- remove duplicated token handling logic
+- improve internal parser maintainability
+- update related tests
+```
+
+---
+
+#### Write Message To File
+
+Create:
+
+```text
+commit.txt
+```
+
+Then:
+
+```bash
+git commit -F commit.txt
+```
+
+---
+
+#### Continue With Remaining Groups
+
+Repeat:
+
+```bash
+git add ...
+git commit -F commit.txt
+```
+
+Until all groups are committed.
+
+---
+
+### Partial File Changes
+
+If a single file contains changes belonging to multiple commit contexts:
+
+Use interactive staging:
+
+```bash
+git add -p <file>
+```
+
+or
+
+```bash
+git restore --staged <file>
+git add -p <file>
+```
+
+The agent should split hunks when practical.
+
+Only use file-level grouping when the entire file belongs to one logical change.
+
+---
+
+### Validation
+
+Before each commit:
+
+```bash
+git diff --cached --name-only
+```
+
+Confirm:
+
+* staged files belong to one logical change
+* commit message matches staged content
+* unrelated files are not included
+
+---
+
+### Final Verification
+
+After all commits:
+
+```bash
+git status --short
+```
+
+Confirm:
+
+* intended commits were created
+* no accidentally staged files remain
+
+If uncommitted changes remain:
+
+* leave them untouched
+* do not auto-stage them
+* do not auto-discard them

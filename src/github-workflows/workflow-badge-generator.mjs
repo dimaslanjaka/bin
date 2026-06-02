@@ -4,7 +4,7 @@
  * Produces a polished card-style SVG showing workflow run metadata,
  * per-job step breakdown, and aggregated status counts.
  *
- * @module workflow-badge/generator
+ * @module github-workflows/workflow-badge-generator
  */
 
 const COLORS = {

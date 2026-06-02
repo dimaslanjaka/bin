@@ -7,18 +7,18 @@
  * to the terminal.
  *
  * Usage:
- *   node src/get-latest-workflow-status-cli.mjs
- *   node src/get-latest-workflow-status-cli.mjs --help
+ *   node src/github-workflows/get-latest-workflow-status-cli.mjs
+ *   node src/github-workflows/get-latest-workflow-status-cli.mjs --help
  */
 
-import { getArgs } from './utils/index.cjs';
+import { getArgs } from '../utils/index.cjs';
 import {
   getLatestRun,
   getJobs,
   getCurrentOwner,
   getCurrentRepo,
   printReport
-} from './github-workflows/get-latest-workflow-status.mjs';
+} from './get-latest-workflow-status.mjs';
 
 const HELP = `
 Usage: get-latest-workflow-status [options]

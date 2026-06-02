@@ -1,7 +1,7 @@
 const { spawnAsync } = require('cross-spawn');
 const glob = require('glob');
 const path = require('upath');
-const { delay } = require('./utils/index.cjs');
+const { delay } = require('../utils/index.cjs');
 
 /** @type {string[]} */
 const dirs = [];

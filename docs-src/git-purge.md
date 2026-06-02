@@ -14,4 +14,4 @@ Aggressively prunes the git reflog in all `.git` directories, helping reduce rep
 
 ### Source
 
-See [`src/git-purge.cjs`](../src/git-purge.cjs)
+See [`src/git/git-purge.cjs`](../src/git/git-purge.cjs)

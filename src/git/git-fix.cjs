@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-const { isGitRepository } = require('./git/utils.cjs');
-const { forceLfLineEndings } = require('./git/line-endings.cjs');
-const { ignoreFilePermissions } = require('./git/permissions.cjs');
-const { setPullStrategy } = require('./git/pull-strategy.cjs');
-const { configureGitUser } = require('./git/user-config.cjs');
-const { normalizeLineEndings } = require('./git/normalize.cjs');
-const { getArgs } = require('./utils/index.cjs');
+const { isGitRepository } = require('./utils.cjs');
+const { forceLfLineEndings } = require('./line-endings.cjs');
+const { ignoreFilePermissions } = require('./permissions.cjs');
+const { setPullStrategy } = require('./pull-strategy.cjs');
+const { configureGitUser } = require('./user-config.cjs');
+const { normalizeLineEndings } = require('./normalize.cjs');
+const { getArgs } = require('../utils/index.cjs');
 const path = require('upath');
 
 require('dotenv').config({ path: path.join(process.cwd(), '.env'), quiet: true, override: true });

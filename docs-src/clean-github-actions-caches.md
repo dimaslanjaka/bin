@@ -37,7 +37,7 @@ This command is available under several aliases (all invoke the same CLI):
 2. Ensure you have access to the repository's cache management
 
 ### Source
-See [`src/clean-github-actions-caches.cjs`](../src/clean-github-actions-caches.cjs) & [`src/clean-github-actions-caches-cli.cjs`](../src/clean-github-actions-caches-cli.cjs)
+See [`src/github-workflows/clean-github-actions-caches.cjs`](../src/github-workflows/clean-github-actions-caches.cjs) & [`src/github-workflows/clean-github-actions-caches-cli.cjs`](../src/github-workflows/clean-github-actions-caches-cli.cjs)
 
 ### Github CI Examples
 

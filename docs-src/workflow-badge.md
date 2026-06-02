@@ -79,7 +79,7 @@ A PHP script is available at [`backend/workflow-badge.php`](../backend/workflow-
 
 **Requirements:**
 - PHP 7.4+ with `proc_open` enabled
-- The project's Node CLI script deployed on the server (`src/workflow-badge-cli.mjs` or `lib/workflow-badge-cli.cjs`)
+- The project's Node CLI script deployed on the server (`src/github-workflows/workflow-badge-cli.mjs` or `lib/github-workflows/workflow-badge-cli.cjs`)
 - `ACCESS_TOKEN` (or `GITHUB_TOKEN` / `GH_TOKEN`) environment variable set on the server, or pass `&token=...` per request
 
 **Usage as `<img>` tag:**
@@ -98,4 +98,4 @@ The script validates all parameters before passing them to the Node CLI, separat
 
 ## Source
 
-See [`src/workflow-badge-cli.mjs`](../src/workflow-badge-cli.mjs) (CLI), [`src/workflow-badge/generator.mjs`](../src/workflow-badge/generator.mjs) (SVG generator), and [`backend/workflow-badge.php`](../backend/workflow-badge.php) (PHP backend).
+See [`src/github-workflows/workflow-badge-cli.mjs`](../src/github-workflows/workflow-badge-cli.mjs) (CLI), [`src/github-workflows/workflow-badge-generator.mjs`](../src/github-workflows/workflow-badge-generator.mjs) (SVG generator), and [`backend/workflow-badge.php`](../backend/workflow-badge.php) (PHP backend).

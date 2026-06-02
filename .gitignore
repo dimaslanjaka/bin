@@ -11,6 +11,7 @@
 .env
 *.tsbuildinfo
 **/.cache/**
+**/*.cache
 **/tmp/**
 **/lib/**
 **/coverage

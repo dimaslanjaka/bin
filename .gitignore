@@ -1,6 +1,6 @@
-yarn*.lock
-package-lock.json
-node_modules
+**/*.lock
+**/package-lock.json
+**/node_modules
 **/.yarn/cache*
 **/.yarn/install*
 **/.yarn/versions
@@ -22,3 +22,4 @@ __*
 tmp/
 .vscode/sftp.json
 bin/composer*
+vendor/

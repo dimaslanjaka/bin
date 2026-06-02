@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import moment from 'moment';
 import minimist from 'minimist';
 import {
   checkDatabase,
@@ -19,7 +20,7 @@ function printHelp(): void {
 Usage: opc <command> [options]
 
 Commands:
-  list session            List all sessions
+  list session            List all sessions grouped by directory
   list project            List all projects
   delete session <id>     Delete a single session by ID
   delete sessions         Delete all sessions (irreversible)
@@ -46,19 +47,34 @@ async function main(): Promise<void> {
     const sub = argv._[1];
     if (sub === 'session') {
       const sessions = await loadSessions();
-      console.log(`Sessions (${sessions.length}):\n`);
-      const rows = sessions.map((s) => ({
-        slug: s.slug,
-        title: s.title || '-',
-        version: s.version
-      }));
-      const slugWidth = Math.max(...rows.map((r) => r.slug.length), 4);
-      const titleWidth = Math.max(...rows.map((r) => r.title.length), 5);
-      const sep = '─'.repeat(slugWidth + titleWidth + 13);
-      console.log(`  ${'Slug'.padEnd(slugWidth)}  ${'Title'.padEnd(titleWidth)}  Version`);
-      console.log(`  ${sep}`);
-      for (const r of rows) {
-        console.log(`  ${r.slug.padEnd(slugWidth)}  ${r.title.padEnd(titleWidth)}  ${r.version}`);
+      const grouped = new Map<string, typeof sessions>();
+      for (const s of sessions) {
+        const dir = s.directory || '(no directory)';
+        if (!grouped.has(dir)) grouped.set(dir, []);
+        grouped.get(dir)!.push(s);
+      }
+      console.log(`Sessions (${sessions.length} total, ${grouped.size} directories):\n`);
+      for (const [dir, dirSessions] of grouped) {
+        console.log(`  ${dir}`);
+        const slugWidth = Math.max(...dirSessions.map((s) => s.slug.length), 4);
+        const titleWidth = Math.max(...dirSessions.map((s) => (s.title || '-').length), 5);
+        const dateWidth = Math.max(
+          ...dirSessions.map((s) => moment(s.time.created).format('YYYY-MM-DDTHH:mm:ssZ').length),
+          25
+        );
+        const sep = '─'.repeat(Math.max(dir.length, slugWidth + titleWidth + dateWidth + 15));
+        console.log(`  ${sep}`);
+        console.log(
+          `    ${'Slug'.padEnd(slugWidth)}  ${'Title'.padEnd(titleWidth)}  ${'Date'.padEnd(dateWidth)}  Version`
+        );
+        const rowSep = '─'.repeat(slugWidth + titleWidth + dateWidth + 17);
+        console.log(`    ${rowSep}`);
+        for (const s of dirSessions) {
+          console.log(
+            `    ${s.slug.padEnd(slugWidth)}  ${(s.title || '-').padEnd(titleWidth)}  ${moment(s.time.created).format('YYYY-MM-DDTHH:mm:ssZ').padEnd(dateWidth)}  ${s.version}`
+          );
+        }
+        console.log();
       }
     } else if (sub === 'project') {
       const projects = await loadProjects();

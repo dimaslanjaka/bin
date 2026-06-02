@@ -6,7 +6,7 @@ const { removeAnsi } = require('sbg-utility');
 
 const TEST_REPO = env.repoDir;
 const PROJECT_DIR = env.originalCwd;
-const cliPath = path.resolve(__dirname, '../src/git-diff-cli.js');
+const cliPath = path.resolve(__dirname, '../src/git/git-diff-cli.js');
 
 const exec = (cmd, args, opts = {}) =>
   cp.spawnSync(cmd, args, {

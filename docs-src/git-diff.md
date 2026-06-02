@@ -30,4 +30,4 @@ git-diff --ai              # Generate commit message with ChatGPT
 
 ### Source
 
-See [`src/git-diff.js`](../src/git-diff.js) & [`src/git-diff-cli.js`](../src/git-diff-cli.js)
+See [`src/git/git-diff.js`](../src/git/git-diff.js) & [`src/git/git-diff-cli.js`](../src/git/git-diff-cli.js)

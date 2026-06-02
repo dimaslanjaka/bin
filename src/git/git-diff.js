@@ -6,9 +6,9 @@ import fs from 'fs-extra';
 import { md5, writefile } from 'sbg-utility';
 import path from 'upath';
 import { fileURLToPath } from 'url';
-import { getTempPath } from './binary-collections/config.cjs';
-import { runChatGpt } from './utils/chatgpt.js';
-import { getArgs } from './utils/index.cjs';
+import { getTempPath } from '../binary-collections/config.cjs';
+import { runChatGpt } from '../utils/chatgpt.js';
+import { getArgs } from '../utils/index.cjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

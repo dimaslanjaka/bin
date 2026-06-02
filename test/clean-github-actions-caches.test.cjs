@@ -4,7 +4,7 @@ const {
   groupCachesByPrefix,
   isChecksumSegment,
   normalizePrefixDepth
-} = require('../src/clean-github-actions-caches.cjs');
+} = require('../src/github-workflows/clean-github-actions-caches.cjs');
 
 describe('clean-github-actions-caches prefix grouping', () => {
   it('defaults to three segments when the depth is missing or invalid', () => {

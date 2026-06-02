@@ -16,9 +16,9 @@ import fs from 'fs';
 import path from 'upath';
 import axios from 'axios';
 import { spawn } from 'cross-spawn';
-import { getArgs } from './utils/index.cjs';
-import { generateBadge } from './workflow-badge/generator.mjs';
-import { GITHUB_ACCESS_TOKEN as TOKEN } from './binary-collections/config.cjs';
+import { getArgs } from '../utils/index.cjs';
+import { generateBadge } from './workflow-badge-generator.mjs';
+import { GITHUB_ACCESS_TOKEN as TOKEN } from '../binary-collections/config.cjs';
 
 // ─── Auth ───────────────────────────────────────────────────────────
 if (!TOKEN) {

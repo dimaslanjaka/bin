@@ -85,8 +85,12 @@ async function getOwnerRepo() {
   throw new Error('Unable to determine owner/repo from git remote.origin.url');
 }
 
-async function getLatestRun(owner, repo) {
-  const data = await api(`${BASE}/repos/${owner}/${repo}/actions/runs?per_page=1`);
+async function getLatestRun(owner, repo, workflowId) {
+  let url = `${BASE}/repos/${owner}/${repo}/actions/runs?per_page=1`;
+  if (workflowId) {
+    url += `&workflow_id=${encodeURIComponent(workflowId)}`;
+  }
+  const data = await api(url);
   return data.workflow_runs?.[0];
 }
 
@@ -106,6 +110,7 @@ Options:
   -o, --output <file>   Write SVG to file instead of stdout
   --owner <owner>       GitHub repository owner (default: auto-detect from git)
   --repo <repo>         GitHub repository name (default: auto-detect from git)
+  --workflow <name>     Filter by workflow filename (e.g. "test.yml") or workflow ID
   --token <token>       GitHub access token (overrides env: ACCESS_TOKEN, GITHUB_TOKEN, GH_TOKEN)
   --width <px>          SVG width in pixels (default: 520)
   --max-steps <n>       Max steps to show per job (default: all)
@@ -119,7 +124,7 @@ Examples:
 
 async function main() {
   const argv = getArgs({
-    string: ['output', 'owner', 'repo', 'width', 'max-steps'],
+    string: ['output', 'owner', 'repo', 'workflow', 'width', 'max-steps'],
     boolean: ['help'],
     alias: { o: 'output', h: 'help', w: 'width' }
   });
@@ -143,10 +148,12 @@ async function main() {
 
   const finalOwner = argv.owner || owner;
   const finalRepo = argv.repo || repo;
+  const workflowId = argv.workflow;
 
-  console.error(`[workflow-badge] Fetching latest workflow for ${finalOwner}/${finalRepo} ...`);
+  const target = workflowId ? `${finalOwner}/${finalRepo} (workflow: ${workflowId})` : `${finalOwner}/${finalRepo}`;
+  console.error(`[workflow-badge] Fetching latest workflow for ${target} ...`);
 
-  const run = await getLatestRun(finalOwner, finalRepo);
+  const run = await getLatestRun(finalOwner, finalRepo, workflowId);
   if (!run) {
     console.error('[workflow-badge] No workflow runs found.');
     process.exit(1);

@@ -8,6 +8,7 @@
  * Query parameters (GET or POST):
  *   --owner     GitHub repository owner (required)
  *   --repo      GitHub repository name (required)
+ *   --workflow  Workflow filename or ID to filter by (optional, e.g. "test.yml")
  *   --token     GitHub access token (optional, overrides server env)
  *   --width     SVG width in pixels (optional, default: 520)
  *   --max-steps Max steps shown per job (optional, default: all)
@@ -27,6 +28,7 @@
 // ─── Read input parameters ────────────────────────────────────────
 $owner    = trim($_GET['owner']    ?? $_POST['owner']    ?? '');
 $repo     = trim($_GET['repo']     ?? $_POST['repo']     ?? '');
+$workflow = trim($_GET['workflow'] ?? $_POST['workflow'] ?? '');
 $width    = trim($_GET['width']    ?? $_POST['width']    ?? '');
 $maxSteps = trim($_GET['max-steps'] ?? $_POST['max-steps'] ?? '');
 $token    = trim($_GET['token']    ?? $_POST['token']    ?? '');
@@ -51,6 +53,18 @@ if (!preg_match('/^[a-zA-Z0-9._-]+$/', $repo)) {
     header('Content-Type: text/plain; charset=utf-8');
     echo "Invalid --repo parameter\n";
     exit(1);
+}
+
+// ─── Validate optional workflow filter ────────────────────────────
+$workflowArg = [];
+if (!empty($workflow)) {
+    if (!preg_match('/^[a-zA-Z0-9._\/-]+$/', $workflow)) {
+        http_response_code(400);
+        header('Content-Type: text/plain; charset=utf-8');
+        echo "Invalid --workflow parameter\n";
+        exit(1);
+    }
+    $workflowArg = ['--workflow', $workflow];
 }
 
 // ─── Validate optional numeric parameters ─────────────────────────
@@ -89,12 +103,11 @@ if (!empty($nodeExtraPaths)) {
 // ─── Locate the Node CLI script ───────────────────────────────────
 $projectRoot = dirname(__DIR__);
 $cliScripts = [
-    $projectRoot . '/src/workflow-badge-cli.mjs',
-    $projectRoot . '/workflow-badge-cli.mjs',
-    $projectRoot . '/lib/workflow-badge-cli.cjs',
-    $projectRoot . '/node_modules/binary-collections/lib/workflow-badge-cli.cjs',
+    $projectRoot . '/src/github-workflows/workflow-badge-cli.mjs',
+    $projectRoot . '/lib/github-workflows/workflow-badge-cli.cjs',
+    $projectRoot . '/node_modules/binary-collections/lib/github-workflows/workflow-badge-cli.cjs',
 ];
-$cliScript   = $projectRoot . '/src/workflow-badge-cli.mjs';
+$cliScript   = $projectRoot . '/src/github-workflows/workflow-badge-cli.mjs';
 foreach ($cliScripts as $script) {
     if (file_exists($script)) {
         $cliScript = $script;
@@ -124,6 +137,9 @@ if (!empty($widthArg)) {
 }
 if (!empty($maxStepsArg)) {
     $args = array_merge($args, $maxStepsArg);
+}
+if (!empty($workflowArg)) {
+    $args = array_merge($args, $workflowArg);
 }
 
 // ─── Execute via proc_open (capture stdout separately from stderr) ─

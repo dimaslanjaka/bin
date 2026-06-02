@@ -23,6 +23,7 @@ This command is available under several names (all invoke the same CLI):
 | :--- | :--- | :--- |
 | `--owner` | `string` | GitHub repository owner (default: auto-detect from git remote or `GH_OWNER` env) |
 | `--repo` | `string` | GitHub repository name (default: auto-detect from git remote or `GH_REPO` env) |
+| `--workflow` | `string` | Filter by workflow filename (e.g. `"test.yml"`) or numeric workflow ID |
 | `--token` | `string` | GitHub access token (overrides `ACCESS_TOKEN` / `GITHUB_TOKEN` / `GH_TOKEN` env vars) |
 | `-h`, `--help` | `boolean` | Show help message |
 
@@ -46,6 +47,13 @@ Show for a specific repository:
 
 ```bash
 get-latest-workflow-status --owner dimaslanjaka --repo bin
+```
+
+Filter by a specific workflow YAML file:
+
+```bash
+get-latest-workflow-status --workflow test.yml
+get-latest-workflow-status --owner dimaslanjaka --repo bin --workflow deploy.yml
 ```
 
 Show help:
@@ -83,7 +91,7 @@ URL       : https://github.com/dimaslanjaka/bin/actions/runs/26797771514
 
 1. **Authenticate** — Uses `ACCESS_TOKEN` / `GITHUB_TOKEN` / `GH_TOKEN` to call the GitHub API.
 2. **Detect repository** — Owner and repo are auto-detected from the `git remote.origin.url`, or can be overridden with `--owner`/`--repo` flags or `GH_OWNER`/`GH_REPO` environment variables.
-3. **Fetch latest run** — Calls `GET /repos/{owner}/{repo}/actions/runs?per_page=1` to get the most recent workflow run.
+3. **Fetch latest run** — Calls `GET /repos/{owner}/{repo}/actions/runs?per_page=1` to get the most recent workflow run. If `--workflow` is specified, appends `&workflow_id=<name>` to filter by workflow filename or ID.
 4. **Fetch jobs** — Calls `GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs` to retrieve all jobs and their steps.
 5. **Print report** — Renders a formatted terminal report with color-coded icons (✅ success, ❌ failure, ⏭️ skipped, ⚪ pending/in progress).
 

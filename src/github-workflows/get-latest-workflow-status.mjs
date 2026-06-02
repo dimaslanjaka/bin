@@ -120,8 +120,12 @@ async function getCurrentRepo() {
 }
 
 // 1. Get latest workflow run
-async function getLatestRun(owner, repo) {
-  const url = `${BASE}/repos/${owner}/${repo}/actions/runs?per_page=1`;
+// workflowId can be a workflow filename (e.g. "test.yml") or numeric workflow ID
+async function getLatestRun(owner, repo, workflowId) {
+  let url = `${BASE}/repos/${owner}/${repo}/actions/runs?per_page=1`;
+  if (workflowId) {
+    url += `&workflow_id=${encodeURIComponent(workflowId)}`;
+  }
   const data = await request(url);
   return data.workflow_runs?.[0];
 }

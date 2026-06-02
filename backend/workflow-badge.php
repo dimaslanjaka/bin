@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Workflow Badge PHP Backend
  *
@@ -26,136 +27,136 @@
 // if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 
 // ─── Read input parameters ────────────────────────────────────────
-$owner    = trim($_GET['owner']    ?? $_POST['owner']    ?? '');
-$repo     = trim($_GET['repo']     ?? $_POST['repo']     ?? '');
+$owner    = trim($_GET['owner'] ?? $_POST['owner'] ?? '');
+$repo     = trim($_GET['repo'] ?? $_POST['repo'] ?? '');
 $workflow = trim($_GET['workflow'] ?? $_POST['workflow'] ?? '');
-$width    = trim($_GET['width']    ?? $_POST['width']    ?? '');
+$width    = trim($_GET['width'] ?? $_POST['width'] ?? '');
 $maxSteps = trim($_GET['max-steps'] ?? $_POST['max-steps'] ?? '');
-$token    = trim($_GET['token']    ?? $_POST['token']    ?? '');
+$token    = trim($_GET['token'] ?? $_POST['token'] ?? '');
 
 // ─── Validate required parameters ─────────────────────────────────
 if (empty($owner) || empty($repo)) {
-    http_response_code(400);
-    header('Content-Type: text/plain; charset=utf-8');
-    echo "Missing required parameters: --owner and --repo\n";
-    exit(1);
+  http_response_code(400);
+  header('Content-Type: text/plain; charset=utf-8');
+  echo "Missing required parameters: --owner and --repo\n";
+  exit(1);
 }
 
 // Only allow safe characters in owner/repo (GitHub usernames + hyphens/dots)
 if (!preg_match('/^[a-zA-Z0-9._-]+$/', $owner)) {
-    http_response_code(400);
-    header('Content-Type: text/plain; charset=utf-8');
-    echo "Invalid --owner parameter\n";
-    exit(1);
+  http_response_code(400);
+  header('Content-Type: text/plain; charset=utf-8');
+  echo "Invalid --owner parameter\n";
+  exit(1);
 }
 if (!preg_match('/^[a-zA-Z0-9._-]+$/', $repo)) {
-    http_response_code(400);
-    header('Content-Type: text/plain; charset=utf-8');
-    echo "Invalid --repo parameter\n";
-    exit(1);
+  http_response_code(400);
+  header('Content-Type: text/plain; charset=utf-8');
+  echo "Invalid --repo parameter\n";
+  exit(1);
 }
 
 // ─── Validate optional workflow filter ────────────────────────────
 $workflowArg = [];
 if (!empty($workflow)) {
-    if (!preg_match('/^[a-zA-Z0-9._\/-]+$/', $workflow)) {
-        http_response_code(400);
-        header('Content-Type: text/plain; charset=utf-8');
-        echo "Invalid --workflow parameter\n";
-        exit(1);
-    }
-    $workflowArg = ['--workflow', $workflow];
+  if (!preg_match('/^[a-zA-Z0-9._\/-]+$/', $workflow)) {
+    http_response_code(400);
+    header('Content-Type: text/plain; charset=utf-8');
+    echo "Invalid --workflow parameter\n";
+    exit(1);
+  }
+  $workflowArg = ['--workflow', $workflow];
 }
 
 // ─── Validate optional numeric parameters ─────────────────────────
 $widthArg = [];
 if (!empty($width)) {
-    if (!ctype_digit($width) || intval($width) < 200 || intval($width) > 2000) {
-        http_response_code(400);
-        header('Content-Type: text/plain; charset=utf-8');
-        echo "Invalid --width (must be 200-2000)\n";
-        exit(1);
-    }
-    $widthArg = ['--width', $width];
+  if (!ctype_digit($width) || intval($width) < 200 || intval($width) > 2000) {
+    http_response_code(400);
+    header('Content-Type: text/plain; charset=utf-8');
+    echo "Invalid --width (must be 200-2000)\n";
+    exit(1);
+  }
+  $widthArg = ['--width', $width];
 }
 
 $maxStepsArg = [];
 if (!empty($maxSteps)) {
-    if (!ctype_digit($maxSteps) || intval($maxSteps) < 1 || intval($maxSteps) > 200) {
-        http_response_code(400);
-        header('Content-Type: text/plain; charset=utf-8');
-        echo "Invalid --max-steps (must be 1-200)\n";
-        exit(1);
-    }
-    $maxStepsArg = ['--max-steps', $maxSteps];
+  if (!ctype_digit($maxSteps) || intval($maxSteps) < 1 || intval($maxSteps) > 200) {
+    http_response_code(400);
+    header('Content-Type: text/plain; charset=utf-8');
+    echo "Invalid --max-steps (must be 1-200)\n";
+    exit(1);
+  }
+  $maxStepsArg = ['--max-steps', $maxSteps];
 }
 
 // ─── Extend PATH for common install locations (NVM, etc.) ──────────
 $nodeExtraPaths = array_filter([
-    glob('/usr/local/nvm/versions/node/*/bin')[0] ?? null,
-    glob('/usr/local/lib/nodejs/*/bin')[0] ?? null,
-    '/usr/local/nvm/versions/node/v22.18.0/bin',
+  glob('/usr/local/nvm/versions/node/*/bin')[0] ?? null,
+  glob('/usr/local/lib/nodejs/*/bin')[0]        ?? null,
+  '/usr/local/nvm/versions/node/v22.18.0/bin',
 ]);
 if (!empty($nodeExtraPaths)) {
-    putenv('PATH=' . implode(':', $nodeExtraPaths) . ':' . ($_SERVER['PATH'] ?? getenv('PATH')));
+  putenv('PATH=' . implode(':', $nodeExtraPaths) . ':' . ($_SERVER['PATH'] ?? getenv('PATH')));
 }
 
 // ─── Locate the Node CLI script ───────────────────────────────────
 $projectRoot = dirname(__DIR__);
-$cliScripts = [
-    $projectRoot . '/src/github-workflows/workflow-badge-cli.mjs',
-    $projectRoot . '/lib/github-workflows/workflow-badge-cli.cjs',
-    $projectRoot . '/node_modules/binary-collections/lib/github-workflows/workflow-badge-cli.cjs',
+$cliScripts  = [
+  $projectRoot . '/src/github-workflows/workflow-badge-cli.mjs',
+  $projectRoot . '/lib/github-workflows/workflow-badge-cli.cjs',
+  $projectRoot . '/node_modules/binary-collections/lib/github-workflows/workflow-badge-cli.cjs',
 ];
-$cliScript   = $projectRoot . '/src/github-workflows/workflow-badge-cli.mjs';
+$cliScript = $projectRoot . '/src/github-workflows/workflow-badge-cli.mjs';
 foreach ($cliScripts as $script) {
-    if (file_exists($script)) {
-        $cliScript = $script;
-        break;
-    }
+  if (file_exists($script)) {
+    $cliScript = $script;
+    break;
+  }
 }
 
 if (!file_exists($cliScript)) {
-    http_response_code(500);
-    header('Content-Type: text/plain; charset=utf-8');
-    echo "Server error: workflow-badge CLI not found (deploy the full project or run upload-backend)\n";
-    exit(1);
+  http_response_code(500);
+  header('Content-Type: text/plain; charset=utf-8');
+  echo "Server error: workflow-badge CLI not found (deploy the full project or run upload-backend)\n";
+  exit(1);
 }
 
 $cmd  = 'node';
 $args = [
-    '--no-warnings=ExperimentalWarning',
-    $cliScript,
-    '--owner', $owner,
-    '--repo',  $repo,
+  '--no-warnings=ExperimentalWarning',
+  $cliScript,
+  '--owner', $owner,
+  '--repo',  $repo,
 ];
 if (!empty($token)) {
-    $args = array_merge($args, ['--token', $token]);
+  $args = array_merge($args, ['--token', $token]);
 }
 if (!empty($widthArg)) {
-    $args = array_merge($args, $widthArg);
+  $args = array_merge($args, $widthArg);
 }
 if (!empty($maxStepsArg)) {
-    $args = array_merge($args, $maxStepsArg);
+  $args = array_merge($args, $maxStepsArg);
 }
 if (!empty($workflowArg)) {
-    $args = array_merge($args, $workflowArg);
+  $args = array_merge($args, $workflowArg);
 }
 
 // ─── Execute via proc_open (capture stdout separately from stderr) ─
 $descriptorSpec = [
-    0 => ['pipe', 'r'],  // stdin  → pipe (we close immediately)
-    1 => ['pipe', 'w'],  // stdout → pipe (SVG output)
-    2 => ['pipe', 'w'],  // stderr → pipe (diagnostics, we log it)
+  0 => ['pipe', 'r'],  // stdin  → pipe (we close immediately)
+  1 => ['pipe', 'w'],  // stdout → pipe (SVG output)
+  2 => ['pipe', 'w'],  // stderr → pipe (diagnostics, we log it)
 ];
 
 $process = @proc_open([$cmd, ...$args], $descriptorSpec, $pipes, $projectRoot);
 
 if (!is_resource($process)) {
-    http_response_code(500);
-    header('Content-Type: text/plain; charset=utf-8');
-    echo "Server error: failed to start badge generator (command: $cmd)\n";
-    exit(1);
+  http_response_code(500);
+  header('Content-Type: text/plain; charset=utf-8');
+  echo "Server error: failed to start badge generator (command: $cmd)\n";
+  exit(1);
 }
 
 // Close stdin immediately (nothing to send to the process)
@@ -173,23 +174,23 @@ $returnCode = proc_close($process);
 
 // ─── Validate output ──────────────────────────────────────────────
 if ($returnCode !== 0) {
-    http_response_code(502);
-    header('Content-Type: text/plain; charset=utf-8');
-    echo "Badge generator exited with code $returnCode\n";
-    if (!empty(trim($stderr))) {
-        echo "Error: " . trim($stderr) . "\n";
-    }
-    exit(1);
+  http_response_code(502);
+  header('Content-Type: text/plain; charset=utf-8');
+  echo "Badge generator exited with code $returnCode\n";
+  if (!empty(trim($stderr))) {
+    echo 'Error: ' . trim($stderr) . "\n";
+  }
+  exit(1);
 }
 
 if (empty($stdout) || strpos($stdout, '<svg') === false) {
-    http_response_code(502);
-    header('Content-Type: text/plain; charset=utf-8');
-    echo "Badge generator returned unexpected output\n";
-    if (!empty(trim($stderr))) {
-        echo "Diagnostics: " . trim($stderr) . "\n";
-    }
-    exit(1);
+  http_response_code(502);
+  header('Content-Type: text/plain; charset=utf-8');
+  echo "Badge generator returned unexpected output\n";
+  if (!empty(trim($stderr))) {
+    echo 'Diagnostics: ' . trim($stderr) . "\n";
+  }
+  exit(1);
 }
 
 // ─── Serve the SVG ────────────────────────────────────────────────

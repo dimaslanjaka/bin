@@ -175,22 +175,13 @@ function printReport(run, jobs) {
   }
 }
 
-async function main() {
-  try {
-    const owner = process.env.GH_OWNER || (await getCurrentOwner());
-    const repo = process.env.GH_REPO || (await getCurrentRepo());
-    const run = await getLatestRun(owner, repo);
-    if (!run) {
-      console.log('No workflow runs found.');
-      return;
-    }
-
-    const jobs = await getJobs(owner, repo, run.id);
-    printReport(run, jobs);
-  } catch (err) {
-    console.error('Error:', err.message);
-    process.exit(1);
-  }
-}
-
-main();
+export {
+  request,
+  getLatestRun,
+  getJobs,
+  getCurrentOwner,
+  getCurrentRepo,
+  getOwnerFromRemoteUrl,
+  getRepoFromRemoteUrl,
+  printReport
+};

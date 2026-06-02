@@ -70,7 +70,15 @@ const defaultBin = {
   'tarball-tree': 'lib/print-tarball-tree.cjs',
   'opencode-cli': 'lib/opencode-cli.cjs',
   opc: 'lib/opencode-cli.cjs',
-  'generate-test-ci': 'src/github-workflows/generate-test-ci-step-cli.mjs'
+  'generate-test-ci': 'src/github-workflows/generate-test-ci-step-cli.mjs',
+  'get-latest-workflow-status': 'lib/get-latest-workflow-status-cli.cjs',
+  'get-latest-workflow': 'lib/get-latest-workflow-status-cli.cjs',
+  'latest-workflow': 'lib/get-latest-workflow-status-cli.cjs',
+  'wf-status': 'lib/get-latest-workflow-status-cli.cjs',
+  'workflow-badge': 'lib/workflow-badge-cli.cjs',
+  'wf-badge': 'lib/workflow-badge-cli.cjs',
+  'gh-status-badge': 'lib/workflow-badge-cli.cjs',
+  'actions-badge': 'lib/workflow-badge-cli.cjs'
 };
 
 /**

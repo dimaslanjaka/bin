@@ -2,7 +2,7 @@
 ## Releases
 | version | tarball url |
 | :--- | :--- |
-| latest | https://github.com/dimaslanjaka/bin/raw/a4e9d9e/releases/bin.tgz |
+| latest | https://github.com/dimaslanjaka/bin/raw/ec43429/releases/bin.tgz |
 | latest | https://github.com/dimaslanjaka/bin/raw/master/releases/bin.tgz |
 
 use this tarball with `resolutions`:

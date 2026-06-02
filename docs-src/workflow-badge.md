@@ -24,6 +24,7 @@ This command is available under several aliases (all invoke the same CLI):
 | `-o`, `--output` | `string` | Write SVG to file instead of stdout |
 | `--owner` | `string` | GitHub repository owner (default: auto-detect from git remote) |
 | `--repo` | `string` | GitHub repository name (default: auto-detect from git remote) |
+| `--token` | `string` | GitHub access token (overrides `ACCESS_TOKEN` / `GITHUB_TOKEN` / `GH_TOKEN` env vars) |
 | `--width` | `number` | SVG width in pixels (default: `520`) |
 | `--max-steps` | `number` | Max steps to show per job (default: all). Use to keep badge compact |
 | `-h`, `--help` | `boolean` | Show help message |
@@ -74,12 +75,12 @@ The generated SVG is a card-style badge with:
 
 ### PHP Backend
 
-A PHP script is available at [`backend/workflow-badge.php`](../backend/workflow-badge.php) that serves the badge as a live image via HTTP. It spawns the Node CLI, captures the SVG output, and serves it with the correct `image/svg+xml` content type.
+A PHP script is available at [`backend/workflow-badge.php`](../backend/workflow-badge.php) that serves the badge as a live image via HTTP. It spawns the Node CLI, captures the SVG output, and serves it with the correct `image/svg+xml` content type. The PHP backend requires the full project (with the CLI script under `src/` or `lib/`) to be deployed on the server — it does not fall back to a remote tarball.
 
 **Requirements:**
 - PHP 7.4+ with `proc_open` enabled
-- Node.js installed and available in the server's `PATH`
-- `ACCESS_TOKEN` (or `GITHUB_TOKEN` / `GH_TOKEN`) environment variable set on the server
+- The project's Node CLI script deployed on the server (`src/workflow-badge-cli.mjs` or `lib/workflow-badge-cli.cjs`)
+- `ACCESS_TOKEN` (or `GITHUB_TOKEN` / `GH_TOKEN`) environment variable set on the server, or pass `&token=...` per request
 
 **Usage as `<img>` tag:**
 
@@ -91,7 +92,7 @@ A PHP script is available at [`backend/workflow-badge.php`](../backend/workflow-
 
 ![badge sample](http://sh.webmanajemen.com/php_backend/workflow-badge.php?owner=dimaslanjaka&repo=bin)
 
-You can optionally add `&width=600` or `&max-steps=5` to customize the badge appearance.
+You can optionally add `&width=600`, `&max-steps=5`, or `&token=ghp_xxx` to customize the badge appearance or override the server's GitHub token for a single request.
 
 The script validates all parameters before passing them to the Node CLI, separates `stdout` (SVG) from `stderr` (diagnostics) via `proc_open`, and returns appropriate HTTP error codes for invalid inputs or CLI failures.
 

@@ -8,6 +8,7 @@
  * Query parameters (GET or POST):
  *   --owner     GitHub repository owner (required)
  *   --repo      GitHub repository name (required)
+ *   --token     GitHub access token (optional, overrides server env)
  *   --width     SVG width in pixels (optional, default: 520)
  *   --max-steps Max steps shown per job (optional, default: all)
  *
@@ -28,6 +29,7 @@ $owner    = trim($_GET['owner']    ?? $_POST['owner']    ?? '');
 $repo     = trim($_GET['repo']     ?? $_POST['repo']     ?? '');
 $width    = trim($_GET['width']    ?? $_POST['width']    ?? '');
 $maxSteps = trim($_GET['max-steps'] ?? $_POST['max-steps'] ?? '');
+$token    = trim($_GET['token']    ?? $_POST['token']    ?? '');
 
 // ─── Validate required parameters ─────────────────────────────────
 if (empty($owner) || empty($repo)) {
@@ -114,6 +116,9 @@ $args = [
     '--owner', $owner,
     '--repo',  $repo,
 ];
+if (!empty($token)) {
+    $args = array_merge($args, ['--token', $token]);
+}
 if (!empty($widthArg)) {
     $args = array_merge($args, $widthArg);
 }

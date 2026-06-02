@@ -106,6 +106,7 @@ Options:
   -o, --output <file>   Write SVG to file instead of stdout
   --owner <owner>       GitHub repository owner (default: auto-detect from git)
   --repo <repo>         GitHub repository name (default: auto-detect from git)
+  --token <token>       GitHub access token (overrides env: ACCESS_TOKEN, GITHUB_TOKEN, GH_TOKEN)
   --width <px>          SVG width in pixels (default: 520)
   --max-steps <n>       Max steps to show per job (default: all)
   -h, --help            Show this help message

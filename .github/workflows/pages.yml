@@ -28,7 +28,10 @@ jobs:
         with:
           python-version: '3.x'
 
-      - run: |
+      - name: Generate Site
+        shell: bash
+        run: |
+          mkdir -p docs
           pip install mkdocs-material
           mkdocs build
 

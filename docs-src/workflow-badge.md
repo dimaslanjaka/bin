@@ -85,9 +85,11 @@ A PHP script is available at [`backend/workflow-badge.php`](../backend/workflow-
 
 ```html
 <img src="https://your-domain.com/backend/workflow-badge.php?owner=dimaslanjaka&repo=bin" />
+<!-- or using our server -->
+<img src="http://sh.webmanajemen.com/php_backend/workflow-badge.php?owner=dimaslanjaka&repo=bin" />
 ```
 
-![badge sample](http://localhost:8490/backend/workflow-badge.php?owner=dimaslanjaka&repo=bin)
+![badge sample](http://sh.webmanajemen.com/php_backend/workflow-badge.php?owner=dimaslanjaka&repo=bin)
 
 You can optionally add `&width=600` or `&max-steps=5` to customize the badge appearance.
 

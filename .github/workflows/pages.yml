@@ -46,13 +46,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-docs-
 
-      - name: Generate Site
+      - name: Install Dependencies
         shell: bash
         run: |
           pip install mkdocs-material
-          # Pre-generate docs/index.md from README.md before mkdocs validates nav
-          python3 hooks/pre-generate-docs.py
-          # Then build the site
+
+      - name: Pre-Process Docs
+        shell: bash
+        run: |
+          # Pre-process docs in-place before mkdocs validates nav
+          python3 hooks/pre-process-docs.py
+
+      - name: Generate Site
+        shell: bash
+        run: |
           mkdocs build
 
       - uses: actions/upload-pages-artifact@v4

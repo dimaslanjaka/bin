@@ -1,4 +1,4 @@
-import { getAllFiles, buildChecksum } from './hash.js';
+import { getAllFiles, buildChecksum } from './hash.cjs';
 import { loadCache, saveCache, getCacheFile } from './cache.js';
 import { spawn } from 'child_process';
 

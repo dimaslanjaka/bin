@@ -1,5 +1,5 @@
 import color from 'ansi-colors';
-import { getAllFiles, buildChecksum } from './src/run-by-checksum/hash.js';
+import { getAllFiles, buildChecksum } from './src/run-by-checksum/hash.cjs';
 import fs from 'fs-extra';
 import * as glob from 'glob';
 import path from 'upath';

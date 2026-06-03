@@ -2,11 +2,10 @@
  * Utility functions for validate-tarball tests.
  */
 const { repoDir, ensureRepoExists } = require('./env.cjs');
-const CryptoJS = require('crypto-js');
-const { globSync } = require('glob');
 const path = require('upath');
 const fs = require('fs-extra');
 const { writefile } = require('sbg-utility');
+const { getAllFiles, buildChecksum } = require('../src/run-by-checksum/hash.cjs');
 
 // Define lock file paths used by the original implementation
 const npmLockFile = path.join(repoDir, 'package-lock.json');
@@ -19,7 +18,7 @@ const nodeModules = path.join(repoDir, 'node_modules');
 const mainPkg = require(path.resolve(__dirname, '../package.json'));
 const binEntries = mainPkg.bin ? (typeof mainPkg.bin === 'string' ? [mainPkg.bin] : Object.keys(mainPkg.bin)) : [];
 
-const { spawnSync, execSync } = require('child_process');
+const { spawnSync } = require('child_process');
 
 /**
  * Path to the checksum cache file used to skip rebuilds when nothing changed.
@@ -27,47 +26,19 @@ const { spawnSync, execSync } = require('child_process');
 const CHECKSUM_CACHE_FILE = path.resolve(__dirname, '../tmp/.buildAndPack-checksum');
 
 /**
- * Compute a composite checksum from:
- * - current git short hash
- * - contents of releases/*.tgz files
- * - contents of src/**\/*.{js,ts,cjs,mjs} files
+ * Compute a composite SHA-256 checksum from all src/**\/*.{js,ts,cjs,mjs} files.
+ * Delegates to buildChecksum from hash.cjs for content normalization and hashing.
  *
  * @param {string} cwd - workspace directory
  * @returns {string} hex sha-256 digest
  */
 function computeBuildChecksum(cwd) {
-  const hash = CryptoJS.algo.SHA256.create();
-
-  // 1. Git short hash
-  try {
-    const gitHash = execSync('git rev-parse --short HEAD', { cwd, encoding: 'utf8' }).trim();
-    hash.update('git:' + gitHash);
-  } catch {
-    // If git is unavailable, force a rebuild by making checksum unpredictable
-    hash.update('git:unknown:' + Date.now());
-  }
-
-  // 2. releases/*.tgz files — binary content, preserve bytes via Latin1
-  const tgzFiles = globSync('releases/*.tgz', { cwd, nodir: true }).sort();
-  for (const file of tgzFiles) {
-    const absPath = path.resolve(cwd, file);
-    if (fs.existsSync(absPath)) {
-      hash.update('tgz:' + file);
-      hash.update(CryptoJS.enc.Latin1.parse(fs.readFileSync(absPath, 'latin1')));
-    }
-  }
-
-  // 3. src/**/*.{js,ts,cjs,mjs} files — text content, UTF-8
-  const srcFiles = globSync('src/**/*.{js,ts,cjs,mjs}', { cwd, nodir: true }).sort();
-  for (const file of srcFiles) {
-    const absPath = path.resolve(cwd, file);
-    if (fs.existsSync(absPath)) {
-      hash.update('src:' + file);
-      hash.update(fs.readFileSync(absPath, 'utf8'));
-    }
-  }
-
-  return hash.finalize().toString(CryptoJS.enc.Hex);
+  const files = getAllFiles({
+    patterns: ['src/**/*.{js,ts,cjs,mjs}'],
+    ignore: [],
+    cwd
+  });
+  return buildChecksum(files);
 }
 
 /**

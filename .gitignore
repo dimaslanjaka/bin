@@ -27,4 +27,4 @@ docs/index.md
 docs/docs-src/
 site/
 .opencode.keys.json*
-.binary-collections.config.js
+binary-collections.config.js

@@ -93,29 +93,49 @@ git clone -b master https://github.com/dimaslanjaka/bin bin
 
 ## Configuration
 
-Binary Collections supports project-level configuration via `getConfig()` — a cosmiconfig-powered loader that searches for a `binary-collections` config in your project root.
+Binary Collections supports project-level configuration via a `binary-collections.config` file in your project root. Only the name `binary-collections.config` is supported — no `.rc`, JSON, or YAML variants.
 
-### Boilerplate Config (ESM)
+### Supported Extensions
+
+| Extension | Module System |
+|-----------|---------------|
+| `.js`     | ESM (project must have `"type": "module"` in `package.json`) |
+| `.cjs`    | CommonJS (always works) |
+| `.mjs`    | ESM (always works) |
+
+### Boilerplate Config
 
 A ready-to-use example is provided in the project root:
 
 ```
-.binary-collections.config-example.js
+binary-collections.config-example.js
 ```
 
 Copy and rename it to start configuring:
 
 ```bash
-# For ESM projects (package.json with "type": "module")
-cp .binary-collections.config-example.js .binary-collectionsrc.js
-
-# Or as an .mjs file (always treated as ESM)
-cp .binary-collections.config-example.js .binary-collectionsrc.mjs
+cp binary-collections.config-example.js binary-collections.config.js
 ```
 
-### Example — package.json
+### Example — CJS Config (`binary-collections.config.cjs`)
 
-Add a `binary-collections` key to your `package.json`:
+```js
+module.exports = {
+  tempDir: './.my-cache'
+};
+```
+
+### Example — ESM Config (`binary-collections.config.mjs`)
+
+```js
+export default {
+  tempDir: './.my-cache'
+};
+```
+
+### Example — `package.json`
+
+Add a `binary-collections` property to your `package.json`:
 
 ```json
 {

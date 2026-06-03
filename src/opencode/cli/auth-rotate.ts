@@ -3,13 +3,13 @@ import { checkOpenCodeApi } from '../utils/check-api.js';
 import { getConfig } from '../../binary-collections/config.cjs';
 
 export async function handleAuthRotate(): Promise<void> {
-  // Load keys from project config (binary-collectionsrc / package.json)
+  // Load keys from project config (binary-collections.config.{js,cjs,mjs} / package.json)
   const config = await getConfig();
   const keys: Array<{ name: string; key: string }> | undefined = config?.opencode?.keys;
   if (!keys || !Array.isArray(keys) || keys.length === 0) {
     console.error(
       'No opencode.keys found in project config. ' +
-        'Add an "opencode" section with a "keys" array to your .binary-collectionsrc file.'
+        'Add an "opencode" section with a "keys" array to your binary-collections.config.{js,cjs,mjs} file.'
     );
     process.exit(1);
   }

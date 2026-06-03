@@ -42,8 +42,7 @@ const workflow = {
         },
         {
           name: '📦 Install dependencies',
-          run: `touch yarn.lock
-corepack yarn install`
+          run: `touch yarn.lock && corepack yarn install`
         },
         {
           name: '🔨 Build project',
@@ -69,11 +68,7 @@ corepack yarn install`
             GH_TOKEN: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN || github.token }}'
           },
           shell: 'bash',
-          run: `npx --legacy-peer-deps -y \
-  binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz \
-  clean-github-actions-caches \
-  --repo "\${{ github.repository }}" \
-  --sha "\${{ github.sha }}"`
+          run: `npx --legacy-peer-deps -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz clean-github-actions-caches --repo "\${{ github.repository }}" --sha "\${{ github.sha }}"`
         }
       ]
     }

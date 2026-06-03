@@ -105,21 +105,36 @@ opc auth rotate
 1. **Database check**: On every command except `--help`, the tool first verifies the OpenCode database is accessible via `checkDatabase()`.
 2. **List**: Queries the `session` or `project` table and displays results in formatted tables with dynamic column widths.
 3. **Delete**: Uses recursive SQL (Common Table Expressions) to delete sessions and their descendants, or cascading deletes for project sessions.
-4. **Auth rotate**: Reads `.opencode.keys.jsonc` (or `.opencode.keys.json` as fallback) from the current directory, filters out the currently active key, tests each remaining key via `checkOpenCodeApi()`, and sets the first one that responds successfully.
+4. **Auth rotate**: Reads `opencode.keys` from the project config (via `getConfig()`), filters out the currently active key, tests each remaining key via `checkOpenCodeApi()`, and sets the first one that responds successfully.
 
 ### Requirements
 
-For `auth rotate`, create a `.opencode.keys.jsonc` file in your project root:
+For `auth rotate`, add an `opencode.keys` array to your [project config](../readme.md#configuration). For example, in `.binary-collectionsrc.js`:
 
-```jsonc
-[
-  // Each key must have a unique name and the actual API key value.
-  // Add this file to .gitignore to keep it private.
-  {
-    "name": "unique name for the key, e.g. email or username",
-    "key": "the actual key, e.g. sk-xxxxxx"
+```js
+// .binary-collectionsrc.js
+export default {
+  opencode: {
+    keys: [
+      { name: 'primary', key: 'sk-xxxxxx' },
+      { name: 'backup', key: 'sk-yyyyyy' }
+    ]
   }
-]
+};
+```
+
+Or in `package.json`:
+
+```json
+{
+  "binary-collections": {
+    "opencode": {
+      "keys": [
+        { "name": "primary", "key": "sk-xxxxxx" }
+      ]
+    }
+  }
+}
 ```
 
 ## Source

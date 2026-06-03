@@ -1,17 +1,16 @@
-import path from 'upath';
-import { getOpenCodeAuth, saveOpenCodeAuth, readJson } from '../storage.js';
+import { getOpenCodeAuth, saveOpenCodeAuth } from '../storage.js';
 import { checkOpenCodeApi } from '../utils/check-api.js';
+import { getConfig } from '../../binary-collections/config.cjs';
 
 export async function handleAuthRotate(): Promise<void> {
-  // Try reading .opencode.keys.jsonc first, fallback to .opencode.keys.json
-  let keysFile = path.join(process.cwd(), '.opencode.keys.jsonc');
-  let keys = await readJson<Array<{ name: string; key: string }>>(keysFile);
-  if (!keys) {
-    keysFile = path.join(process.cwd(), '.opencode.keys.json');
-    keys = await readJson<Array<{ name: string; key: string }>>(keysFile);
-  }
+  // Load keys from project config (binary-collectionsrc / package.json)
+  const config = await getConfig();
+  const keys: Array<{ name: string; key: string }> | undefined = config?.opencode?.keys;
   if (!keys || !Array.isArray(keys) || keys.length === 0) {
-    console.error('No valid .opencode.keys.json or .opencode.keys.jsonc found in current directory');
+    console.error(
+      'No opencode.keys found in project config. ' +
+        'Add an "opencode" section with a "keys" array to your .binary-collectionsrc file.'
+    );
     process.exit(1);
   }
   const auth = await getOpenCodeAuth();

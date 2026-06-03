@@ -1,21 +1,12 @@
 /**
  * Centralized configuration for binary-collections
- * This module provides a consistent way to handle temporary directories and other configuration across the project.
- *
- * Usage:
- * const { getTempDir, getTempPath } = require('./binary-collections-config');
- *
- * // Get base temp directory
- * const tempDir = getTempDir();
- *
- * // Get specific temp path
- * const myTempPath = getTempPath('my-module', 'output.txt');
  */
 
 const path = require('upath');
 const minimistLib = require('minimist');
 const { findEnvWithToken } = require('../utils/findEnvFiles.cjs');
 const dotenv = require('dotenv');
+const { cosmiconfig } = require('cosmiconfig');
 
 /**
  * Load .env file containing a token variable.
@@ -37,32 +28,46 @@ const GITHUB_ACCESS_TOKEN =
   cliArgv.token || process.env.ACCESS_TOKEN || process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
 
 /**
- * Get the base temporary directory path
- * Can be overridden via TEMP_DIR environment variable
- * @returns {string} The base temporary directory path
- */
-function getTempDir() {
-  return process.env.TEMP_DIR || path.join(process.cwd(), 'tmp');
-}
-
-/**
  * Get a temporary file or directory path
  * @param {...string} segments - Path segments to join with the temp directory
  * @returns {string} The full temporary path
  */
 function getTempPath(...segments) {
-  return path.join(getTempDir(), ...segments);
+  return path.join(process.env.TEMP_DIR || path.join(process.cwd(), 'tmp'), ...segments);
 }
 
 /**
- * Legacy aliases for backward compatibility
+ * Search for project configuration using cosmiconfig (async).
+ *
+ * Supports all config file formats including `.mjs` and ESM `.js` files.
+ *
+ * Looks for configuration files such as:
+ * - A `binary-collections` property in `package.json`
+ * - `.binary-collectionsrc` (JSON, YAML, JS, MJS, CJS)
+ * - `binary-collections.config.js` / `.cjs` / `.mjs`
+ *
+ * @param {object} [options] - Optional configuration overrides.
+ * @param {string} [options.searchFrom] - Directory to start searching from (default: process.cwd()).
+ * @param {string} [options.stopDir] - Directory to stop searching upwards (e.g., project root).
+ * @returns {Promise<import('./config-types').BinaryCollectionsConfig|null>} The parsed configuration object, or `null` if no config found.
  */
-const TEMP_BASE_DIR = getTempDir();
+async function getConfig(options = {}) {
+  const explorer = cosmiconfig('binary-collections', {
+    searchStrategy: 'project',
+    stopDir: options.stopDir
+  });
+
+  try {
+    const result = await explorer.search(options.searchFrom);
+    return result ? result.config : null;
+  } catch {
+    return null;
+  }
+}
 
 module.exports = {
-  getTempDir,
   getTempPath,
-  TEMP_BASE_DIR,
   GITHUB_ACCESS_TOKEN,
-  loadDotenv
+  loadDotenv,
+  getConfig
 };

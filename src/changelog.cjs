@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('upath');
 const { EOL } = require('os');
 const { getArgs } = require('./utils/index.cjs');
+const { getTempPath } = require('./binary-collections/config.cjs');
 const spawn = require('child_process').spawn;
 
 const pkgPath = path.join(process.cwd(), 'package.json');
@@ -224,9 +225,9 @@ function extractVersions(str) {
     }
   }
 
-  fs.mkdirSync(path.join(__dirname, 'tmp'), { recursive: true });
-  fs.writeFileSync(path.join(__dirname, 'tmp/original.md'), log);
-  fs.writeFileSync(path.join(__dirname, 'CHANGELOG.md'), markdown);
-  console.log(`Original log written to tmp/original.md`);
+  const originalLogPath = getTempPath('original.md');
+  fs.mkdirSync(getTempPath(), { recursive: true });
+  fs.writeFileSync(originalLogPath, log);
+  console.log(`Original log written to ${originalLogPath}`);
   console.log(`Changelog updated successfully. You can find it at CHANGELOG.md`);
 })();

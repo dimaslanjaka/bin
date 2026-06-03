@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const { loadDotenv } = require('../binary-collections/config.cjs');
 const { isGitRepository } = require('./utils.cjs');
 const { forceLfLineEndings } = require('./line-endings.cjs');
 const { ignoreFilePermissions } = require('./permissions.cjs');
@@ -9,7 +10,7 @@ const { normalizeLineEndings } = require('./normalize.cjs');
 const { getArgs } = require('../utils/index.cjs');
 const path = require('upath');
 
-require('dotenv').config({ path: path.join(process.cwd(), '.env'), quiet: true, override: true });
+loadDotenv(); // Load .env to ensure environment variables are available
 
 function showHelp() {
   console.log('Git Fix Utility');

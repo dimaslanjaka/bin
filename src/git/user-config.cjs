@@ -1,8 +1,9 @@
+const { loadDotenv } = require('../binary-collections/config.cjs');
 const gch = require('git-command-helper');
 const { runGitCommand, runGitCommandOutput } = require('./utils.cjs');
 const { getArgs } = require('../utils/index.cjs');
 
-require('dotenv').config({ path: require('upath').join(process.cwd(), '.env'), quiet: true });
+loadDotenv(); // Load .env to ensure environment variables are available
 
 /**
  * Configure Git user from CLI arguments or environment variables

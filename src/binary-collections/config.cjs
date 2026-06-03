@@ -15,8 +15,19 @@
 const path = require('upath');
 const minimistLib = require('minimist');
 const { findEnvWithToken } = require('../utils/findEnvFiles.cjs');
+const dotenv = require('dotenv');
 
-require('dotenv').config({ path: findEnvWithToken(), quiet: true, overwrite: true });
+/**
+ * Load .env file containing a token variable.
+ * Searches for `.env*` files and picks the first one matching the given token key.
+ *
+ * @param {string|RegExp} [tokenKey=/ACCESS_TOKEN|GITHUB_TOKEN/] - Token name or regex to search for.
+ *   Passed as second argument to `findEnvWithToken()`.
+ * @returns {void}
+ */
+const loadDotenv = (tokenKey = /ACCESS_TOKEN|GITHUB_TOKEN/) =>
+  dotenv.config({ path: findEnvWithToken(undefined, tokenKey), quiet: true, overwrite: true });
+loadDotenv(); // Load .env file if it exists to populate process.env with tokens
 
 // Support --token CLI argument to override GITHUB_ACCESS_TOKEN
 const cliArgv = minimistLib(process.argv.slice(2), {
@@ -52,5 +63,6 @@ module.exports = {
   getTempDir,
   getTempPath,
   TEMP_BASE_DIR,
-  GITHUB_ACCESS_TOKEN
+  GITHUB_ACCESS_TOKEN,
+  loadDotenv
 };

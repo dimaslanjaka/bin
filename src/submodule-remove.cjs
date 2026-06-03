@@ -1,12 +1,9 @@
 const { spawnAsync } = require('cross-spawn');
 const path = require('upath');
 const fs = require('fs-extra');
-const dotenv = require('dotenv');
+const { loadDotenv } = require('./binary-collections/config.cjs');
 
-const envPath = path.resolve(process.cwd(), '.env');
-if (fs.existsSync(envPath)) {
-  dotenv.config({ path: envPath, override: true, quiet: true });
-}
+loadDotenv();
 
 async function removeSubmodule(submodulePath) {
   // Deinitialize the submodule

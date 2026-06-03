@@ -23,4 +23,4 @@ kill-night-crows
 
 ### Source
 
-See [`src/kill-night-crows.mjs`](../src/kill-night-crows.mjs) & [`bin/kill-night-crows.ps1`](../bin/kill-night-crows.ps1)
+See [`src/kill-night-crows.mjs`](../src/kill-night-crows.mjs) & [`bin/kill-night-crows.ps1`](../bin/kill-night-crows.ps1).

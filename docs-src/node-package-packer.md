@@ -45,4 +45,4 @@ This command is available under the following aliases:
 
 ### Source
 
-See [`src/node-package-packer-cli.mjs`](../src/node-package-packer-cli.mjs) (CLI entry point) and [`src/node-package-packer/build-tarball.mjs`](../src/node-package-packer/build-tarball.mjs) (pack workflow).
+See [`src/node-package-packer-cli.mjs`](../src/node-package-packer-cli.mjs).

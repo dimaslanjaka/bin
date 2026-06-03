@@ -14,4 +14,4 @@ Finds and prints all `node_modules` directories under the current working direct
 
 ### Source
 
-See [`src/find-node-modules.cjs`](../src/find-node-modules.cjs) & [`src/find-node-modules-cli.js`](../src/find-node-modules-cli.js)
+See [`src/find-node-modules-cli.cjs`](../src/find-node-modules-cli.cjs).

@@ -26,5 +26,4 @@ If no PHP files are found, the script exits with a notice.
 
 ## Source
 
-- Script: [`scripts/upload-backend.mjs`](../scripts/upload-backend.mjs)
-- Backend files: [`backend/`](../backend/)
+See [`scripts/upload-backend.mjs`](../scripts/upload-backend.mjs).

@@ -53,7 +53,4 @@ move ./src ./dist
 
 ### Source
 
-See [`src/file/copy-cli.mjs`](../src/file/copy-cli.mjs),
-[`src/file/copy.mjs`](../src/file/copy.mjs),
-[`src/file/move-cli.mjs`](../src/file/move-cli.mjs),
-[`src/file/move.mjs`](../src/file/move.mjs)
+See [`src/file/copy-cli.mjs`](../src/file/copy-cli.mjs) and [`src/file/move-cli.mjs`](../src/file/move-cli.mjs).

@@ -19,4 +19,4 @@ Scans `package.json` resolutions for GitHub tarball URLs (raw.githubusercontent.
 
 ### Source
 
-See [`src/package-resolutions-updater.mjs`](../src/package-resolutions-updater.mjs) & [`src/package-resolutions-updater-cli.mjs`](../src/package-resolutions-updater-cli.mjs)
+See [`src/package-resolutions-updater-cli.mjs`](../src/package-resolutions-updater-cli.mjs).

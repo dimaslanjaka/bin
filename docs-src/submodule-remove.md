@@ -19,4 +19,4 @@ Performs a complete removal of a git submodule:
 
 ### Source
 
-See [`src/submodule-remove.cjs`](../src/submodule-remove.cjs) & [`src/submodule-remove-cli.js`](../src/submodule-remove-cli.js)
+See [`src/submodule-remove-cli.js`](../src/submodule-remove-cli.js).

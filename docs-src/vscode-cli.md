@@ -81,4 +81,4 @@ const projects = await listWorkspaceProjects();
 
 ## Source
 
-See [`src/vscode-cli.ts`](../src/vscode-cli.ts) (CLI) and [`src/vscode/storage.ts`](../src/vscode/storage.ts) (workspace scanning logic).
+See [`src/vscode-cli.ts`](../src/vscode-cli.ts).

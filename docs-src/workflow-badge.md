@@ -117,4 +117,4 @@ The script validates all parameters before passing them to the Node CLI, separat
 
 ## Source
 
-See [`src/github-workflows/workflow-badge-cli.mjs`](../src/github-workflows/workflow-badge-cli.mjs) (CLI), [`src/github-workflows/workflow-badge-generator.mjs`](../src/github-workflows/workflow-badge-generator.mjs) (SVG generator), and [`backend/workflow-badge.php`](../backend/workflow-badge.php) (PHP backend).
+See [`src/github-workflows/workflow-badge-cli.mjs`](../src/github-workflows/workflow-badge-cli.mjs).

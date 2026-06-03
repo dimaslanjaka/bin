@@ -51,8 +51,6 @@ generate-test-ci -o .github/workflows/ci.yml -p "src/**/*.test.ts" --ignore "**/
 4. **Generate**: A GitHub Actions workflow YAML is produced, with each test file as a separate `run` step.
 5. **Write**: The YAML is written to the specified output path (default `.github/workflows/test.yml`).
 
-The base workflow template (triggers, environment, checkout, setup, build, pack) is defined in [`src/github-workflows/workflow-test-data.cjs`](../src/github-workflows/workflow-test-data.cjs).
-
 ## Source
 
-See [`src/github-workflows/generate-test-ci-step-cli.mjs`](../src/github-workflows/generate-test-ci-step-cli.mjs) (CLI) and [`src/github-workflows/workflow-test-data.cjs`](../src/github-workflows/workflow-test-data.cjs) (workflow template).
+See [`src/github-workflows/generate-test-ci-step-cli.mjs`](../src/github-workflows/generate-test-ci-step-cli.mjs).

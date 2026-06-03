@@ -7,6 +7,7 @@
  * Uploads all PHP files from backend/ into {remotePath}/php_backend on the server.
  */
 
+import { execSync } from 'child_process';
 import fs from 'fs-extra';
 import SftpClient from 'ssh2-sftp-client';
 import { Client as SSHClient } from 'ssh2';
@@ -75,6 +76,19 @@ async function main() {
     process.exit(1);
   }
 
+  // Resolve latest remote origin commit hash for provenance tracking
+  let LATEST_REMOTE_COMMIT_HASH;
+  try {
+    LATEST_REMOTE_COMMIT_HASH = execSync('git ls-remote origin HEAD', {
+      encoding: 'utf8',
+      timeout: 15000
+    }).split(/\s+/)[0];
+    console.log(`Remote origin HEAD: ${LATEST_REMOTE_COMMIT_HASH}`);
+  } catch (err) {
+    console.error(`Failed to resolve remote origin commit hash: ${err.message}`);
+    process.exit(1);
+  }
+
   // 2. Discover PHP files
   let phpFiles;
   try {
@@ -103,7 +117,7 @@ async function main() {
   const setupCommands = [
     'npx --legacy-peer-deps -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz pkg-res-updater',
     'touch yarn.lock',
-    'yarn install',
+    `yarn add -D binary-collections@https://github.com/dimaslanjaka/bin/raw/${LATEST_REMOTE_COMMIT_HASH}/releases/bin.tgz`,
     'git restore package.json .vscode'
   ];
   console.log(`\nRunning setup commands on ${sftpConfig.host}:${sftpConfig.remotePath}...`);

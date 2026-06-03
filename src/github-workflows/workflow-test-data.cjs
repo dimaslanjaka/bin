@@ -7,10 +7,6 @@ const workflow = {
   },
 
   on: {
-    workflow_run: {
-      workflows: ['Build Release'],
-      types: ['completed']
-    },
     workflow_dispatch: {},
     push: {
       paths: ['**/test*/**', '**/test*', '**/src/**']
@@ -27,7 +23,6 @@ const workflow = {
   jobs: {
     ci: {
       name: '🔨 Build, Pack & Test',
-      if: "github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'",
       'runs-on': 'ubuntu-latest',
 
       steps: [
@@ -74,17 +69,11 @@ corepack yarn install`
             GH_TOKEN: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN || github.token }}'
           },
           shell: 'bash',
-          run: `SHA="\${{ github.sha }}"
-
-if [ "\${{ github.event_name }}" = "workflow_run" ]; then
-  SHA="\${{ github.event.workflow_run.head_sha }}"
-fi
-
-npx --legacy-peer-deps -y \
+          run: `npx --legacy-peer-deps -y \
   binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz \
   clean-github-actions-caches \
   --repo "\${{ github.repository }}" \
-  --sha "$SHA"`
+  --sha "\${{ github.sha }}"`
         }
       ]
     }

@@ -3,11 +3,6 @@ concurrency:
   group: test-${{ github.event_name }}
   cancel-in-progress: true
 on:
-  workflow_run:
-    workflows:
-      - Build Release
-    types:
-      - completed
   workflow_dispatch: {}
   push:
     paths:
@@ -22,8 +17,6 @@ env:
 jobs:
   ci:
     name: 🔨 Build, Pack & Test
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion
-      == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: ⬇️ Checkout workflow repository
@@ -48,14 +41,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN || github.token }}
         shell: bash
-        run: |-
-          SHA="${{ github.sha }}"
-
-          if [ "${{ github.event_name }}" = "workflow_run" ]; then
-            SHA="${{ github.event.workflow_run.head_sha }}"
-          fi
-
-          npx --legacy-peer-deps -y   binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz   clean-github-actions-caches   --repo "${{ github.repository }}"   --sha "$SHA"
+        run: npx --legacy-peer-deps
+          -y   binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz   clean-github-actions-caches   --repo
+          "${{ github.repository }}"   --sha "${{ github.sha }}"
       - name: 🧪 Run tests in test/clean-github-actions-caches.test.cjs
         id: run-test-clean-github-actions-caches-test-cjs
         shell: bash

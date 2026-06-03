@@ -5,6 +5,7 @@ import path from 'upath';
 import { fileURLToPath } from 'url';
 import pkg from './package.json' with { type: 'json' };
 import { defaultBin, generateMapping } from './build.config.cjs';
+import * as cp from 'cross-spawn';
 
 // Polyfill __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -47,10 +48,32 @@ const binFiles = glob
     const filename = path.basename(file, path.extname(file));
     // Copy binary file to binaries directory
     fs.copySync(absolute, destination);
-    console.log(`${color.yellow(file)} copied to ${color.greenBright(destination)}`);
-    // Copy binary-executor.cjs for each binary
+    console.log(`${color.yellow(file)} bundled to ${color.greenBright(destination)}`);
+    // Build binary-executor.cjs for each binary via rollup (synchronous)
     const executorDestination = path.join(__dirname, `binaries/${filename}.cjs`);
-    fs.copySync(path.resolve(__dirname, 'bin/binary-executor.cjs'), executorDestination);
+    const executorSource = path.resolve(__dirname, 'bin/binary-executor.cjs');
+    const rollupBin = path.resolve(__dirname, 'node_modules/rollup/dist/bin/rollup');
+    const result = cp.spawnSync('node', [rollupBin, '-c', path.resolve(__dirname, 'rollup.executor.js')], {
+      stdio: 'inherit',
+      env: {
+        BUNDLE_INPUT: executorSource,
+        BUNDLE_OUTPUT: executorDestination,
+        ...process.env
+      }
+    });
+    if (result.error) {
+      console.error(
+        `${color.redBright('Rollup failed for')} ${color.yellow(executorDestination)}: ${result.error.message}`
+      );
+      process.exit(1);
+    }
+    if (result.status !== 0) {
+      console.error(
+        `${color.redBright('Rollup exited with code')} ${result.status} ${color.yellow('for')} ${color.yellow(executorDestination)}`
+      );
+      process.exit(1);
+    }
+    // fs.copySync(path.resolve(__dirname, 'bin/binary-executor.cjs'), executorDestination);
     return { filename, executorDestination };
   });
 

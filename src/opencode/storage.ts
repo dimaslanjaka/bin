@@ -1,6 +1,8 @@
 import path from 'upath';
 import os from 'os';
 import fs from 'fs-extra';
+import { parse as parseJsonc } from 'jsonc-parser';
+import { OpenCodeAuthData } from './types.js';
 
 /** Root data directory (`~/.local/share/opencode`). */
 export const OPCODE_DIR = path.join(os.homedir(), '.local/share/opencode');
@@ -58,17 +60,24 @@ export async function scanDirs(dir: string): Promise<string[]> {
 export async function readJson<T>(filePath: string): Promise<T | null> {
   try {
     const content = await fs.readFile(filePath, 'utf-8');
-    return JSON.parse(content);
+    return parseJsonc(content) as T;
   } catch {
     return null;
   }
 }
 
-export async function exists(filePath: string): Promise<boolean> {
-  try {
-    await fs.access(filePath);
-    return true;
-  } catch {
-    return false;
-  }
+export function getSessionFileById(sessionId: string): string {
+  return path.join(SESSION_DIFF_DIR, `${sessionId}.json`);
+}
+
+export function getOpenCodeAuth() {
+  const file = path.join(OPCODE_DIR, 'auth.json');
+  if (!fs.existsSync(file)) return null;
+  return readJson<OpenCodeAuthData>(file);
+}
+
+export async function saveOpenCodeAuth(auth: OpenCodeAuthData): Promise<void> {
+  const file = path.join(OPCODE_DIR, 'auth.json');
+  await fs.ensureFile(file);
+  await fs.writeFile(file, JSON.stringify(auth, null, 2), 'utf-8');
 }

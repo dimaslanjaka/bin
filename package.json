@@ -79,6 +79,7 @@
     "glob": "^13.0.6",
     "minimatch": "^10.2.5",
     "minimist": "^1.2.8",
+    "openai": "^6.41.0",
     "ps-node": "^0.1.6",
     "puppeteer": "^25.0.4",
     "puppeteer-extra": "^3.3.6",

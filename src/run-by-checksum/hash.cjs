@@ -2,7 +2,7 @@ const fs = require('fs-extra');
 const glob = require('glob');
 const upath = require('upath');
 const path = require('upath');
-const crypto = require('crypto');
+const CryptoJS = require('crypto-js');
 
 /**
  * Get all files matching the given glob patterns, ignoring specified paths.
@@ -61,11 +61,14 @@ function hashFile(file) {
     const content = fs.readFileSync(file, { encoding: 'utf-8' });
     // remove whitespaces and newlines for text files to avoid irrelevant changes affecting the checksum
     const normalized = content.toString().replace(/\s+/g, ' ').trim();
-    return crypto.createHash('sha256').update(normalized).digest('hex');
+    return CryptoJS.SHA256(normalized).toString(CryptoJS.enc.Hex);
   } else {
     // For binary files, hash the file path and size instead of content
     const stats = fs.statSync(file);
-    return crypto.createHash('sha256').update(file).update(String(stats.size)).digest('hex');
+    const binHash = CryptoJS.algo.SHA256.create();
+    binHash.update(file);
+    binHash.update(String(stats.size));
+    return binHash.finalize().toString(CryptoJS.enc.Hex);
   }
 }
 
@@ -76,14 +79,14 @@ function hashFile(file) {
  * @returns {string}
  */
 function buildChecksum(files) {
-  const hash = crypto.createHash('sha256');
+  const hash = CryptoJS.algo.SHA256.create();
 
   for (const file of files) {
     hash.update(file);
     hash.update(hashFile(file));
   }
 
-  return hash.digest('hex');
+  return hash.finalize().toString(CryptoJS.enc.Hex);
 }
 
 module.exports = { getAllFiles, buildChecksum };

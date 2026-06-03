@@ -8,5 +8,5 @@ else
   git add .github/workflows/test.yml
 fi
 
-# Run lint-staged as before
-npx lint-staged
+# Run lint-staged through Yarn so the local binary is resolved consistently
+corepack yarn exec lint-staged --config lint-staged.config.js

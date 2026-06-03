@@ -129,7 +129,7 @@ function generateMapping() {
     } else {
       // If local bin exists, log and use lib/*.cjs
       console.log(
-        `[${fnName}] ${color.yellow(filename)} contains local bin: [${color.blueBright(bins.join(', '))}] use ${color.greenBright(file)} instead`
+        `[${color.cyanBright(fnName)}] ${color.yellow(filename)} contains local bin: [${color.blueBright(bins.join(', '))}] use ${color.greenBright(file)} instead`
       );
       binBuilder[filename] = file;
     }
@@ -144,12 +144,12 @@ function generateMapping() {
     if (!binBuilder[filename]) {
       if (filename.includes('-cli')) {
         console.warn(
-          `[${fnName}] ${color.yellowBright('Warning:')} Binary for ${color.yellow(filename)} (CLI) already has another binary assigned for ${color.yellow(filename.replace('-cli', ''))}. Skipping ${color.yellow(filename)}.`
+          `[${color.yellow(fnName)}] ${color.yellowBright('Warning:')} Binary for ${color.yellow(filename)} (CLI) already has another binary assigned for ${color.yellow(filename.replace('-cli', ''))}. Skipping ${color.yellow(filename)}.`
         );
         continue;
       }
       console.warn(
-        `[${fnName}] ${color.redBright('Warning:')} No binary assigned for ${color.yellow(filename)}. Please check the lib/ and bin/ directories.`
+        `[${color.yellow(fnName)}] ${color.redBright('Warning:')} No binary assigned for ${color.yellow(filename)}. Please check the lib/ and bin/ directories.`
       );
       continue;
     }
@@ -157,10 +157,12 @@ function generateMapping() {
     // Convert to unix-style path for consistent logging
     binBuilder[filename] = path.toUnix(binBuilder[filename]);
 
-    console.log(`[${fnName}] Processed ${color.cyan(filename)}: assigned ${color.greenBright(binBuilder[filename])}`);
+    console.log(
+      `[${color.greenBright(fnName)}] Processed ${color.cyan(filename)}: assigned ${color.greenBright(binBuilder[filename])}`
+    );
   }
 
-  console.log(`[${fnName}] Final binary mapping:`, binBuilder);
+  console.log(`[${color.green(fnName)}] Final binary mapping:`, binBuilder);
   return binBuilder;
 }
 

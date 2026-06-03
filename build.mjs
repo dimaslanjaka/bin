@@ -1,4 +1,5 @@
 import color from 'ansi-colors';
+import { getAllFiles, buildChecksum } from './src/run-by-checksum/hash.js';
 import fs from 'fs-extra';
 import * as glob from 'glob';
 import path from 'upath';
@@ -18,6 +19,66 @@ const binBuilder = generateMapping();
 fs.ensureDirSync(path.resolve(__dirname, 'binaries'));
 fs.emptyDirSync(path.resolve(__dirname, 'binaries'));
 
+// Bundle binary-executor.cjs via rollup once (shared by all binaries)
+// Only rebuild when source checksum (executor + deps + config) changes or output is missing
+const executorSource = path.resolve(__dirname, 'bin/binary-executor.cjs');
+const executorDestination = path.join(__dirname, 'tmp/build/binary-executor.cjs');
+const executorCache = path.join(__dirname, 'tmp/.checksum/build-executor.json');
+
+const checksumFiles = getAllFiles({
+  patterns: ['bin/binary-executor.cjs', 'src/**/*.{js,cjs,mjs,ts}', 'rollup.executor.js'],
+  ignore: ['**/node_modules/**', '**/*.{runner,test,spec,direct}.{js,cjs,mjs,ts}'],
+  cwd: __dirname
+});
+const currentHash = buildChecksum(checksumFiles);
+let shouldBundle = !fs.existsSync(executorDestination);
+if (!shouldBundle) {
+  try {
+    const cached = fs.readJsonSync(executorCache);
+    shouldBundle = cached.hash !== currentHash;
+  } catch {
+    shouldBundle = true;
+  }
+}
+
+if (shouldBundle) {
+  console.log(
+    `${color.dim('[')}${color.magenta('rollup')}${color.dim(']')} ${color.cyanBright('Bundling')} ${color.yellow(path.relative(__dirname, executorDestination))} ${color.dim('(checksum changed)')}`
+  );
+  fs.ensureDirSync(path.dirname(executorDestination));
+  const rollupBin = path.resolve(__dirname, 'node_modules/rollup/dist/bin/rollup');
+  const result = cp.spawnSync('node', [rollupBin, '-c', path.resolve(__dirname, 'rollup.executor.js')], {
+    stdio: 'inherit',
+    env: {
+      BUNDLE_INPUT: executorSource,
+      BUNDLE_OUTPUT: executorDestination,
+      ...process.env
+    }
+  });
+  if (result.error) {
+    console.error(
+      `${color.dim('[')}${color.magenta('rollup')}${color.dim(']')} ${color.redBright('Failed for')} ${color.yellow(executorDestination)}: ${result.error.message}`
+    );
+    process.exit(1);
+  }
+  if (result.status !== 0) {
+    console.error(
+      `${color.dim('[')}${color.magenta('rollup')}${color.dim(']')} ${color.redBright('Exited with code')} ${result.status} ${color.yellow('for')} ${color.yellow(executorDestination)}`
+    );
+    process.exit(1);
+  }
+  // Persist checksum after successful build
+  fs.ensureDirSync(path.dirname(executorCache));
+  fs.writeJsonSync(executorCache, { hash: currentHash }, { spaces: 2 });
+  console.log(
+    `${color.dim('[')}${color.magenta('rollup')}${color.dim(']')} ${color.greenBright('Bundled')} ${color.yellow(path.relative(__dirname, executorDestination))}`
+  );
+} else {
+  console.log(
+    `${color.dim('[')}${color.magenta('rollup')}${color.dim(']')} ${color.cyanBright('Skipped')} ${color.yellow(path.relative(__dirname, executorDestination))} ${color.dim('(unchanged)')}`
+  );
+}
+
 // Copy supporting scripts referenced by lib/* commands
 const requiredBinFiles = ['bin/kill-night-crows.ps1', 'bin/kill-night-crows.bat'];
 for (const file of requiredBinFiles) {
@@ -34,31 +95,6 @@ for (const file of requiredBinFiles) {
 const binIgnores = Object.keys({ ...binBuilder, ...defaultBin })
   .map((key) => `bin/${key}*`)
   .concat('**/*.txt', '**/*dummy*', '**/bc*');
-
-// Bundle binary-executor.cjs via rollup once (shared by all binaries)
-const executorSource = path.resolve(__dirname, 'bin/binary-executor.cjs');
-const executorDestination = path.join(__dirname, 'binaries/binary-executor.cjs');
-const rollupBin = path.resolve(__dirname, 'node_modules/rollup/dist/bin/rollup');
-const result = cp.spawnSync('node', [rollupBin, '-c', path.resolve(__dirname, 'rollup.executor.js')], {
-  stdio: 'inherit',
-  env: {
-    BUNDLE_INPUT: executorSource,
-    BUNDLE_OUTPUT: executorDestination,
-    ...process.env
-  }
-});
-if (result.error) {
-  console.error(
-    `${color.redBright('Rollup failed for')} ${color.yellow(executorDestination)}: ${result.error.message}`
-  );
-  process.exit(1);
-}
-if (result.status !== 0) {
-  console.error(
-    `${color.redBright('Rollup exited with code')} ${result.status} ${color.yellow('for')} ${color.yellow(executorDestination)}`
-  );
-  process.exit(1);
-}
 
 // Copy remaining bin/* to binaries/ alongside a named executor copy
 const binFiles = glob

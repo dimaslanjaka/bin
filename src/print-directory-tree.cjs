@@ -6,13 +6,11 @@ const { execSync } = require('child_process');
 const glob = require('glob');
 const { getArgs } = require('./utils/index.cjs');
 const sbgUtil = require('sbg-utility');
-const dotenv = require('dotenv');
+const { loadDotenv } = require('./binary-collections/config.cjs');
 
 const projectDir = process.cwd();
-const envPath = path.join(projectDir, '.env');
 
-// Load the .env file using dotenv (ESM import)
-if (fs.existsSync(envPath)) dotenv.config({ path: envPath, quiet: true, override: true });
+loadDotenv(); // Load .env file if it exists to populate process.env with tokens
 
 // Parse CLI arguments
 const argv = getArgs();

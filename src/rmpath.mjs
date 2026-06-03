@@ -1,21 +1,18 @@
 // Fast huge folder deleter for Node.js
 // Usage: node rmpath.js <file-or-folder-path>
 
-import dotenv from 'dotenv';
 import fs from 'fs-extra';
 import * as glob from 'glob';
 import path from 'upath';
 import { fileURLToPath } from 'url';
+import { loadDotenv } from './binary-collections/config.cjs';
 
 // Polyfill __filename and __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load .env if present
-const dotenvPath = path.resolve(process.cwd(), '.env');
-if (fs.existsSync(dotenvPath)) {
-  dotenv.config({ path: dotenvPath, override: true, quiet: true });
-}
+loadDotenv();
 
 const deletePatterns = [];
 

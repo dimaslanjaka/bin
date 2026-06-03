@@ -4,12 +4,6 @@ const { spawnSync } = require('child_process');
 const color = require('ansi-colors');
 const fs = require('fs');
 const path = require('upath');
-const dotenv = require('dotenv');
-
-// Load .env using dotenv from process.cwd()
-const envPath = path.resolve(process.cwd(), '.env');
-if (fs.existsSync(envPath)) dotenv.config({ path: envPath, override: true, quiet: true });
-
 const { getArgs } = require('./utils/index.cjs');
 const { GITHUB_ACCESS_TOKEN: ACCESS_TOKEN } = require('./binary-collections/config.cjs');
 const args = getArgs();

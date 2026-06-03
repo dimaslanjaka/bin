@@ -18,43 +18,22 @@
  *
  * 🧩 Dependencies:
  * - `ansi-colors` – for styled terminal output
- * - `dotenv` – to load GitHub token from `.env`
  *
  * ✅ Use case:
  * - Ensures package resolutions always use immutable SHAs instead of mutable branch names.
  * - Helps achieve deterministic builds in monorepos or projects with internal GitHub packages.
  */
 
-import * as dotenv from 'dotenv';
 import fs from 'fs';
+import { parseGitHubUrl } from 'git-command-helper';
 import os from 'os';
 import path from 'upath';
-import * as utils from './utils/index.cjs';
 import { GITHUB_ACCESS_TOKEN as ACCESS_TOKEN } from './binary-collections/config.cjs';
 import fetchResponse from './utils/fetchResponse.cjs';
-import { findEnvFiles } from './utils/findEnvFiles.cjs';
-import { parseGitHubUrl } from 'git-command-helper';
+import * as utils from './utils/index.cjs';
 
-const projectDir = process.cwd();
-let envPath = path.join(projectDir, '.env');
-const args = utils.getArgs();
-
-if (!fs.existsSync(envPath)) {
-  const envFiles = findEnvFiles(projectDir, (file) => {
-    // only pick file with GITHUB_TOKEN or ACCESS_TOKEN
-    const content = fs.readFileSync(file, 'utf-8');
-    return /GITHUB_TOKEN|ACCESS_TOKEN/.test(content);
-  });
-  if (envFiles.length > 0) {
-    envPath = envFiles[0];
-  }
-}
-
-// Load the .env file using dotenv (ESM import)
-if (fs.existsSync(envPath)) {
-  dotenv.config({ path: envPath, quiet: true, override: true });
-}
 // Show help if --help/-h is passed
+const args = utils.getArgs();
 if (args.help || args.h) {
   showHelp();
 }
@@ -70,7 +49,7 @@ Options:\n  --help, -h           Show this help message\n\
 Description:\n  Updates the commit hashes in package.json's 'resolutions' field for GitHub tarball URLs to point to the latest commit SHA of the corresponding repository and branch.\n\
 Features:\n  - Parses GitHub URLs to extract repository owner, name, and branch.\n  - Fetches the latest commit SHA across all branches using GitHub's API.\n  - Replaces the old branch or commit in the URL with the latest SHA.\n  - Overwrites package.json with the updated URLs.\n\
 Requirements:\n  - GitHub Personal Access Token (GITHUB_TOKEN) via .env\n  - ESM support (type: "module" in package.json)\n  - Node.js v18+ recommended\n\
-Dependencies:\n  - ansi-colors – for styled terminal output\n  - dotenv – to load GitHub token from .env\n\
+Dependencies:\n  - ansi-colors – for styled terminal output\n\
 Examples:\n  node src/package-resolutions-updater.mjs\n  node src/package-resolutions-updater.mjs --help\n\n`;
   console.log(helpText);
   process.exit(0);

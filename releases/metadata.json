@@ -1,11 +1,11 @@
 {
   "/releases/bin.tgz": {
     "integrity": {
-      "sha1": "47c78f8ddacdb75ba03849c52f1e83a2526f4389",
-      "sha256": "RphaRGhWm7ma7nfaqvfRNh0PpkX+hAIKYwXFicYy78M=",
-      "md5": "daa2852e39031cf6389232878efd76e7",
-      "sha512": "wGjemfCMoIsJHaJj8RG03vv+TYHLvdrdOsu0Ry1+hlEMPTTDS/pshrFTKZCfWjuIGXCUoWUUiK0FaNUidQ3Bjg=="
+      "sha1": "9b8034b040f704da0dff67243aca0d3f55e85667",
+      "sha256": "EPbxekqyFV7NUF0GihmceukyU/xCMBLDVjDUeI6OblE=",
+      "md5": "6d70d630f95b06c0f2a254228f940971",
+      "sha512": "WQ1BMAs+SC3pWVdCGfqNQKBHeMEDVqYg66f31w08VcM9cMkHipMlkWz4FVzBcUSwig1kohi3An6Jsz+iUXR6rw=="
     },
-    "size": "366.89 KB"
+    "size": "365.77 KB"
   }
 }

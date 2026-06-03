@@ -30,14 +30,43 @@ export function getAllFiles({ patterns, ignore, cwd }) {
 }
 
 /**
- * Compute the SHA-256 hex digest of a file's contents.
+ * Check if a file is binary by scanning for null bytes in the first N bytes.
+ * @param {string} filePath - Absolute path to the file
+ * @param {number} [bytesToCheck=8000] - Number of bytes to scan from the start
+ * @returns {boolean}
+ */
+function isBinaryFile(filePath, bytesToCheck = 8000) {
+  const buffer = fs.readFileSync(filePath, { length: bytesToCheck });
+  for (let i = 0; i < buffer.length; i++) {
+    if (buffer[i] === 0) {
+      // Null byte is a strong indicator of binary
+      return true;
+    }
+  }
+  // Optionally, check if it decodes as UTF-8
+  return false;
+}
+
+/**
+ * Compute a SHA-256 hex digest for a file. For text files, the content is
+ * normalized (whitespace collapsed) before hashing. For binary files, the path
+ * and size are hashed instead of content.
  * @private
  * @param {string} file - Absolute path to the file
  * @returns {string}
  */
 function hashFile(file) {
-  const content = fs.readFileSync(file);
-  return crypto.createHash('sha256').update(content).digest('hex');
+  const isBin = isBinaryFile(file);
+  if (!isBin) {
+    const content = fs.readFileSync(file, { encoding: 'utf-8' });
+    // remove whitespaces and newlines for text files to avoid irrelevant changes affecting the checksum
+    const normalized = content.toString().replace(/\s+/g, ' ').trim();
+    return crypto.createHash('sha256').update(normalized).digest('hex');
+  } else {
+    // For binary files, hash the file path and size instead of content
+    const stats = fs.statSync(file);
+    return crypto.createHash('sha256').update(file).update(String(stats.size)).digest('hex');
+  }
 }
 
 /**

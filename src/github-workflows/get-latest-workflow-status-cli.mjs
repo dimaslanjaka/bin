@@ -12,7 +12,8 @@
  */
 
 import { getArgs } from '../utils/index.cjs';
-import { getLatestRun, getJobs, getCurrentOwner, getCurrentRepo, printReport } from './get-latest-workflow-status.mjs';
+import { getLatestRun, getJobs, getCurrentOwner, getCurrentRepo } from './utils.cjs';
+import { printReport } from './get-latest-workflow-status.mjs';
 
 const HELP = `
 Usage: get-latest-workflow-status [options]

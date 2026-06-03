@@ -14,90 +14,9 @@
 
 import fs from 'fs';
 import path from 'upath';
-import axios from 'axios';
-import { spawn } from 'cross-spawn';
 import { getArgs } from '../utils/index.cjs';
 import { generateBadge } from './workflow-badge-generator.mjs';
-import { GITHUB_ACCESS_TOKEN as TOKEN } from '../binary-collections/config.cjs';
-
-// ─── Auth ───────────────────────────────────────────────────────────
-if (!TOKEN) {
-  console.error('Missing env var: ACCESS_TOKEN or GITHUB_TOKEN');
-  process.exit(1);
-}
-
-const BASE = 'https://api.github.com';
-const HEADERS = {
-  Authorization: `Bearer ${TOKEN}`,
-  Accept: 'application/vnd.github+json',
-  'X-GitHub-Api-Version': '2022-11-28'
-};
-
-// ─── GitHub API helpers ─────────────────────────────────────────
-async function api(url) {
-  const res = await axios.get(url, { headers: HEADERS });
-  return res.data;
-}
-
-async function runGit(args) {
-  return new Promise((resolve, reject) => {
-    const child = spawn('git', args, {
-      cwd: process.cwd(),
-      stdio: ['ignore', 'pipe', 'pipe']
-    });
-    let stdout = '';
-    let stderr = '';
-    child.stdout?.on('data', (chunk) => {
-      stdout += chunk.toString();
-    });
-    child.stderr?.on('data', (chunk) => {
-      stderr += chunk.toString();
-    });
-    child.on('error', reject);
-    child.on('close', (code) => {
-      if (code === 0) return resolve(stdout.trim());
-      reject(new Error(stderr.trim() || `git ${args.join(' ')} exited with code ${code}`));
-    });
-  });
-}
-
-function parseOwner(remoteUrl) {
-  const m = remoteUrl
-    .trim()
-    .replace(/\.git$/i, '')
-    .match(/github\.com[:/](?<owner>[^/]+)\/(?<repo>[^/]+)$/i);
-  return m?.groups || null;
-}
-
-async function getOwnerRepo() {
-  for (const args of [
-    ['config', '--local', '--get', 'remote.origin.url'],
-    ['remote', 'get-url', 'origin']
-  ]) {
-    try {
-      const url = await runGit(args);
-      const parsed = parseOwner(url);
-      if (parsed) return parsed;
-    } catch {
-      /* try next */
-    }
-  }
-  throw new Error('Unable to determine owner/repo from git remote.origin.url');
-}
-
-async function getLatestRun(owner, repo, workflowId) {
-  let url = `${BASE}/repos/${owner}/${repo}/actions/runs?per_page=1`;
-  if (workflowId) {
-    url += `&workflow_id=${encodeURIComponent(workflowId)}`;
-  }
-  const data = await api(url);
-  return data.workflow_runs?.[0];
-}
-
-async function getJobs(owner, repo, runId) {
-  const data = await api(`${BASE}/repos/${owner}/${repo}/actions/runs/${runId}/jobs`);
-  return data.jobs || [];
-}
+import { getLatestRun, getJobs, getOwnerRepo } from './utils.cjs';
 
 // ─── CLI ────────────────────────────────────────────────────────────
 

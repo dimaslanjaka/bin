@@ -5,6 +5,7 @@ import path from 'upath';
 import crypto from 'crypto';
 
 /**
+ * Get all files matching the given glob patterns, ignoring specified paths.
  * @param {{ patterns: string[], ignore: string[], cwd?: string }} options
  * @returns {string[]}
  */
@@ -29,7 +30,9 @@ export function getAllFiles({ patterns, ignore, cwd }) {
 }
 
 /**
- * @param {string} file
+ * Compute the SHA-256 hex digest of a file's contents.
+ * @private
+ * @param {string} file - Absolute path to the file
  * @returns {string}
  */
 function hashFile(file) {
@@ -38,7 +41,9 @@ function hashFile(file) {
 }
 
 /**
- * @param {string[]} files
+ * Build a combined SHA-256 checksum from an ordered list of files.
+ * For each file, both its path and content hash are fed into the digest.
+ * @param {string[]} files - Ordered list of absolute file paths
  * @returns {string}
  */
 export function buildChecksum(files) {

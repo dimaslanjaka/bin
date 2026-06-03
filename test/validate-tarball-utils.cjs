@@ -179,7 +179,8 @@ function validateBinaries(packageManager) {
     { cmd: 'submodule-install', args: ['--help'] },
     { cmd: 'kill-night-crows', args: ['--help'] },
     { cmd: 'node-executor', args: ['--help'] },
-    { cmd: 'py', args: ['--help'] }
+    { cmd: 'py', args: ['--help'] },
+    { cmd: 'git-diff', args: ['--help'] }
   ];
 
   for (const { cmd, args } of checks) {

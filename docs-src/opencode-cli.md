@@ -109,10 +109,10 @@ opc auth rotate
 
 ### Requirements
 
-For `auth rotate`, add an `opencode.keys` array to your [project config](../readme.md#configuration). For example, in `.binary-collectionsrc.js`:
+For `auth rotate`, add an `opencode.keys` array to your [project config](../readme.md#configuration). Create a `binary-collections.config.{js,cjs,mjs}` file:
 
 ```js
-// .binary-collectionsrc.js
+// binary-collections.config.js (ESM) or .cjs (CJS)
 export default {
   opencode: {
     keys: [

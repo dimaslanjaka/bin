@@ -39,12 +39,11 @@ function getTempPath(...segments) {
 /**
  * Search for project configuration using cosmiconfig (async).
  *
- * Supports all config file formats including `.mjs` and ESM `.js` files.
+ * Only `binary-collections.config.js` / `.cjs` / `.mjs` are supported (no `.rc`, JSON, or YAML).
  *
- * Looks for configuration files such as:
+ * Looks for configuration in:
+ * - `binary-collections.config.js` / `.cjs` / `.mjs` (searched from project root upward)
  * - A `binary-collections` property in `package.json`
- * - `.binary-collectionsrc` (JSON, YAML, JS, MJS, CJS)
- * - `binary-collections.config.js` / `.cjs` / `.mjs`
  *
  * @param {object} [options] - Optional configuration overrides.
  * @param {string} [options.searchFrom] - Directory to start searching from (default: process.cwd()).

@@ -1,4 +1,4 @@
-// rename to .binary-collections.config.js and update paths in imports
+// rename to binary-collections.config.js and update paths in imports
 
 import path from 'node:path';
 

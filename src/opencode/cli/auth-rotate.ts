@@ -26,6 +26,12 @@ export async function handleAuthRotate(): Promise<void> {
     process.exit(1);
   }
 
+  // shuffle candidates to avoid always picking the same one if multiple are valid
+  for (let i = candidates.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+  }
+
   // Test each candidate key in order and pick the first one that responds
   let chosen: { name: string; key: string } | null = null;
   for (const candidate of candidates) {

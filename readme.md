@@ -1,5 +1,9 @@
 # 🚀 Binary Collections
 
+![Build Release](http://sh.webmanajemen.com/php_backend/workflow-badge.php?owner=dimaslanjaka&repo=bin&workflow=build-release.yml)
+![Pages](http://sh.webmanajemen.com/php_backend/workflow-badge.php?owner=dimaslanjaka&repo=bin&workflow=pages.yml)
+![Test](http://sh.webmanajemen.com/php_backend/workflow-badge.php?owner=dimaslanjaka&repo=bin&workflow=test.yml)
+
 A comprehensive toolkit of Node.js CLI utilities designed to streamline everyday development workflows.
 
 It provides fast, lightweight commands for common tasks like git operations, dependency management, submodule handling, conditional execution, CI workflow generation, and running npm scripts in sequence or parallel—helping you reduce repetitive work and improve terminal productivity.
@@ -31,7 +35,7 @@ It provides fast, lightweight commands for common tasks like git operations, dep
   Inspect and manage OpenCode databases, browse VS Code workspace storage, and list Copilot memory tool directories.
 
 * 🔄 **CI/CD Automation**
-  Generate GitHub Actions workflow YAML from test file detection, and clean up stale action caches automatically.
+  Generate GitHub Actions workflow YAML from test file detection, query latest workflow run status, generate live SVG status badges, and clean up stale action caches automatically.
 
 * 🚀 **Performance-Focused CLI Design**
   Lightweight, fast-executing commands designed to reduce friction and speed up everyday development tasks.
@@ -155,7 +159,7 @@ binary-collections list
 | **Process Mgmt** | `kill-process`, `nodekill`, `javakill`, `del-ps`, `kill-night-crows` | Process management and termination | [`del-ps.md`](./docs-src/del-ps.md), [`kill-night-crows.md`](./docs-src/kill-night-crows.md) |
 | **File System** | `rmfind`, `rmx`, `rmpath`, `print-tree`, `dir-tree`, `copy`, `move`, `remove-module`, `downloader`, `download`, `fetch-file`, `print-tarball-tree`, `tarball-tree` | File system operations, URL downloads, archive tree inspection | [`copy-move-file.md`](./docs-src/copy-move-file.md), [`rmpath.md`](./docs-src/rmpath.md), [`rmfind-rmx.md`](./docs-src/rmfind-rmx.md), [`print-directory-tree.md`](./docs-src/print-directory-tree.md), [`remove-module.md`](./docs-src/remove-module.md), [`downloader.md`](./docs-src/downloader.md), [`print-tarball-tree.md`](./docs-src/print-tarball-tree.md) |
 | **Cleanup** | `del-nodemodules`, `del-yarncaches`, `del-gradle`, `del-yarn-caches`, `yarn-clean` | Cache and build directory cleanup | [`node-cache-cleaner.md`](./docs-src/node-cache-cleaner.md), [`del-gradle.md`](./docs-src/del-gradle.md) |
-| **CI/GitHub Actions** | `clean-github-actions-caches`, `clear-gh-caches`, `generate-test-ci` | GitHub Actions cache cleanup and automated CI workflow generation from test file detection | [`clean-github-actions-caches.md`](./docs-src/clean-github-actions-caches.md), [`generate-test-ci.md`](./docs-src/generate-test-ci.md) |
+| **CI/GitHub Actions** | `clean-github-actions-caches`, `clear-gh-caches`, `generate-test-ci`, `get-latest-workflow-status`, `get-latest-workflow`, `latest-workflow`, `wf-status`, `workflow-badge`, `wf-badge`, `gh-status-badge`, `actions-badge` | GitHub Actions cache cleanup, automated CI workflow generation, workflow status inspection, and live SVG badge generation | [`clean-github-actions-caches.md`](./docs-src/clean-github-actions-caches.md), [`generate-test-ci.md`](./docs-src/generate-test-ci.md), [`get-latest-workflow-status.md`](./docs-src/get-latest-workflow-status.md), [`workflow-badge.md`](./docs-src/workflow-badge.md) |
 | **AI & IDE Tooling** | `opc`, `opencode-cli`, `vscode-cli` | OpenCode database management (list/delete sessions and projects) and VS Code workspace inspection with Copilot memory detection | [`opencode-cli.md`](./docs-src/opencode-cli.md), [`vscode-cli.md`](./docs-src/vscode-cli.md) |
 | **Other** | `binary-collections`, `changelog`, `php-cs-fixer-staged`, `free-chatgpt`, `test-runners` | Main dispatcher, changelog generation, PHP CS fixer for staged files, ChatGPT client, and Jest runners for CJS/ESM | [`binary-collections.md`](./docs-src/binary-collections.md), [`changelog.md`](./docs-src/changelog.md), [`php-cs-fixer-staged.md`](./docs-src/php-cs-fixer-staged.md), [`free-chatgpt.md`](./docs-src/free-chatgpt.md), [`test-runners.md`](./docs-src/test-runners.md) |
 

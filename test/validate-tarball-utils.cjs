@@ -69,7 +69,7 @@ function buildAndPack(workspaceDir) {
   }
   // ---- end checksum guard ----------------------------------------------
   // Build
-  const build = spawnSync('yarn', ['build'], { cwd: workspaceDir, stdio: 'pipe', shell: true });
+  const build = spawnSync('corepack', ['yarn', 'build'], { cwd: workspaceDir, stdio: 'pipe', shell: true });
   if (build.error || build.status !== 0) {
     const out = (build.stdout || Buffer.from('')).toString();
     const err = (build.stderr || Buffer.from('')).toString();
@@ -77,7 +77,7 @@ function buildAndPack(workspaceDir) {
   }
 
   // Pack
-  const pack = spawnSync('yarn', ['run', 'pack'], { cwd: workspaceDir, stdio: 'pipe', shell: true });
+  const pack = spawnSync('corepack', ['yarn', 'run', 'pack'], { cwd: workspaceDir, stdio: 'pipe', shell: true });
   if (pack.error || pack.status !== 0) {
     const out = (pack.stdout || Buffer.from('')).toString();
     const err = (pack.stderr || Buffer.from('')).toString();

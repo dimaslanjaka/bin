@@ -3,6 +3,35 @@ import { writefile } from 'sbg-utility';
 import { getTempPath } from '../../binary-collections/config.cjs';
 import { isDebug } from '../../utils/isDebug.cjs';
 import { sha256 } from '../../run-by-checksum/hash.cjs';
+import { ProxyAgent } from 'proxy-agent';
+
+function getProxyUrl(proxyUrl?: string): string | undefined {
+  return (
+    proxyUrl ||
+    process.env.OPENCODE_PROXY ||
+    process.env.ALL_PROXY ||
+    process.env.all_proxy ||
+    process.env.HTTPS_PROXY ||
+    process.env.https_proxy ||
+    process.env.HTTP_PROXY ||
+    process.env.http_proxy
+  );
+}
+
+function maskProxyUrl(proxyUrl: string): string {
+  try {
+    const url = new URL(proxyUrl);
+
+    if (url.username || url.password) {
+      url.username = '***';
+      url.password = '***';
+    }
+
+    return url.toString();
+  } catch {
+    return proxyUrl.replace(/:\/\/.*@/, '://***@');
+  }
+}
 
 /**
  * Checks whether the OpenCode API returns a non-empty response for a given prompt.
@@ -13,16 +42,36 @@ import { sha256 } from '../../run-by-checksum/hash.cjs';
  * @param prompt - The user message to send to the model.
  * @param apiKey - Bearer token for API authentication.
  * @param model  - Model identifier (defaults to `'deepseek-v4-flash-free'`).
+ * @param proxyUrl - Optional proxy URL. e.g: `http://127.0.0.1:8080, https://127.0.0.1:8443, socks4://127.0.0.1:1080, socks5://127.0.0.1:1080, socks5://user:pass@127.0.0.1:1080`
  * @returns `true` if the response contains non-empty content, `false` otherwise.
+ *
+ * @example
+ * await checkOpenCodeApi('Hello', apiKey, 'deepseek-v4-flash-free', 'socks5://127.0.0.1:1080');
  */
 export async function checkOpenCodeApi(
   prompt: string,
   apiKey: string,
-  model: string = 'deepseek-v4-flash-free'
+  model: string = 'deepseek-v4-flash-free',
+  proxyUrl?: string
 ): Promise<boolean> {
   const debug = isDebug();
+  const resolvedProxyUrl = getProxyUrl(proxyUrl);
+
+  let proxyAgent: ProxyAgent | undefined;
+
+  if (resolvedProxyUrl) {
+    const proxyUrlValue = resolvedProxyUrl;
+
+    proxyAgent = new ProxyAgent({
+      getProxyForUrl: () => proxyUrlValue
+    });
+  }
 
   try {
+    if (debug && resolvedProxyUrl) {
+      console.log(`Using proxy: ${maskProxyUrl(resolvedProxyUrl)}`);
+    }
+
     const res = await axios.post(
       'https://opencode.ai/zen/v1/chat/completions',
       {
@@ -36,7 +85,10 @@ export async function checkOpenCodeApi(
           'Content-Type': 'application/json'
         },
         validateStatus: () => true,
-        timeout: 30000
+        timeout: 30000,
+        proxy: false,
+        httpAgent: proxyAgent,
+        httpsAgent: proxyAgent
       }
     );
 

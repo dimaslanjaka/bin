@@ -2,7 +2,7 @@ import { getOpenCodeAuth, saveOpenCodeAuth } from '../storage.js';
 import { checkOpenCodeApi } from '../utils/check-api.js';
 import { getConfig } from '../../binary-collections/config.cjs';
 
-export async function handleAuthRotate(): Promise<void> {
+export async function handleAuthRotate(options?: { proxy?: string }): Promise<void> {
   // Load keys from project config (binary-collections.config.{js,cjs,mjs} / package.json)
   const config = await getConfig();
   const keys: Array<{ name: string; key: string }> | undefined = config?.opencode?.keys;
@@ -35,7 +35,7 @@ export async function handleAuthRotate(): Promise<void> {
   let chosen: { name: string; key: string } | null = null;
   for (const candidate of candidates) {
     try {
-      const ok = await checkOpenCodeApi('Hello', candidate.key);
+      const ok = await checkOpenCodeApi('Hello', candidate.key, 'deepseek-v4-flash-free', options?.proxy);
       if (ok) {
         chosen = candidate;
         break;

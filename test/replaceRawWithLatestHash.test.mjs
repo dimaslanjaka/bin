@@ -38,11 +38,11 @@ describe('resolvePackageResolutionUpdates', () => {
     const results = await updater.resolvePackageResolutionUpdates(resolutions);
 
     expect(results).toHaveLength(4);
-    results.forEach(r => {
+    results.forEach((r) => {
       expect(r.skipped).toBe(true);
       expect(r.error.message).toContain('Version is not a URL');
     });
 
-    expect(results.map(r => r.currentPkgName)).toEqual(['pkg-a', 'pkg-b', 'pkg-c', 'pkg-d']);
+    expect(results.map((r) => r.currentPkgName)).toEqual(['pkg-a', 'pkg-b', 'pkg-c', 'pkg-d']);
   });
 });

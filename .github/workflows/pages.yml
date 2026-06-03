@@ -55,7 +55,7 @@ jobs:
         shell: bash
         run: |
           # Pre-process docs in-place before mkdocs validates nav
-          python3 hooks/pre-process-docs.py
+          python3 hooks/pre-generate-docs.py
 
       - name: Generate Site
         shell: bash

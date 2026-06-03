@@ -1,33 +1,85 @@
 # Agent Instructions for binary-collections
 
-## Project Shape
-- This repository is a Node.js CLI toolkit. Source lives in [src/](src), command docs live in [docs-src/](docs-src), and generated runtime artifacts are written to [lib/](lib) and [binaries/](binaries).
-- Treat [build.config.cjs](build.config.cjs) and [build.mjs](build.mjs) as the source of truth for binary mapping and packaging behavior.
-- The package `bin` map is generated, not hand-maintained. If command entrypoints change, update the source and rerun the build pipeline instead of editing generated output directly.
+Compact CLI toolkit repo. Every line here answers "would an agent miss this without help?"
 
-## DO NOT EDIT generated folders
-- **Never edit files inside [lib/](lib) or [binaries/](binaries).** These are build artifacts, written exclusively by `yarn build`.
-- All source code lives in [src/](src) — edit there, then run `yarn build` to regenerate `lib/` and `binaries/`.
+## Build Pipeline
 
-## Working Rules
-- Prefer small, targeted edits in [src/](src), [bin/](bin), or [packages/](packages) depending on the feature area.
-- Do not duplicate command documentation in this file; link to the existing docs in [docs-src/](docs-src) instead.
-- When changing CLI commands, check whether the command is covered by an existing docs page before adding new prose.
-- Keep Windows-specific launcher behavior in mind: several commands are distributed through wrapper scripts under [bin/](bin) and copied into [binaries/](binaries) by the build.
+- **`yarn build`** = `tsc -b tsconfig.build.json` → `build.tsup.js` (tsup) → `node build.mjs` (bin gen + shebangs)
+- Build outputs: `lib/` (compiled), `binaries/` (bundled wrappers). **Never edit these folders** — edit in `src/`, then rebuild.
+- `build.mjs` regenerates the `package.json` `bin` field from `lib/*.cjs` + `bin/*` + `build.config.cjs` `defaultBin`. The bin field is **auto-generated** — do not hand-edit.
+- `yarn clean` removes `lib/`, `tmp/dist`, `binaries/`.
+- `yarn pack` creates a release tarball in `releases/`.
+- `build.config.cjs` contains `defaultBin` (alias mappings) and `generateMapping()` used by the build.
 
-## Build And Test
-- Build with `npm run build` (or `yarn build`).
-- After editing any file in `src/`, always run `yarn build` **before** running any test shell command.
-- Regenerate the package `bin` field with `npm run build-exports` or `node build.mjs`.
-- Run tests with `npm test`, `npm run test-esm`, or `npm run test-coverage`.
-- Use `test-cjs` for the CommonJS test runner and `test-esm` for the ESM path.
+## Pre-Commit Hook
 
-## Implementation Notes
-- `build.mjs` copies selected scripts from [bin/](bin) into [binaries/](binaries), adds `.cjs` wrappers, and ensures `.cjs` files have a Node shebang when needed.
-- `build.config.cjs` contains the default binary mappings and the `generateMapping()` logic used during packaging.
-- Package resolution URLs are intentionally pinned in `package.json`; use the dedicated package-resolution updater flow when those references need to change.
+`.husky/pre-commit` runs two things in order:
+1. `node src/github-workflows/generate-test-ci-step-cli.mjs` — regenerates `.github/workflows/test.yml` from test files. Staged for commit automatically (unless CI).
+2. `npx lint-staged` — runs eslint (`ESLINT_USE_FLAT_CONFIG=true`) on JS/TS, prettier on JSON/YAML/MD/SQL, php-cs-fixer on PHP, black on Python.
 
-## Documentation Links
-- Main overview: [readme.md](readme.md)
-- Binary generation and packaging details: [docs-src/package-resolutions-updater.md](docs-src/package-resolutions-updater.md)
-- CLI reference entries: [docs-src/](docs-src)
+## Testing
+
+Three runner modes for different file types:
+
+| Test file type | Use |
+|---|---|
+| `.ts` | `node node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --testPathPatterns="<pattern>"` |
+| `.cjs` | `bash bin/test-cjs --testPathPatterns="<pattern>"` |
+| `.mjs` | `bash bin/test-esm --testPathPatterns="<pattern>"` |
+
+- Run all: `yarn test` (or `npm test`)
+- Jest config: `jest.config.js` (ESM), roots in `test/` and `packages/`
+- **Always run `yarn build` before running tests** — tests require the built `lib/` files.
+- `test/env.cjs` loads `.env`, provides shared helpers (`ensureRepoExists`, `ensureYarnProject`, `installTarball`). Read before writing new tests.
+- `test-project/` is a separate yarn workspace for integration tests. Run `cd test-project && yarn install --no-immutable` if module resolution errors occur.
+- Cache directory `tmp/` is used for test artifacts.
+
+## Source Layout
+
+```
+src/
+  git/              — git-purge, git-diff, git-fix, undo-*, gitattributes, etc.
+  github-workflows/ — workflow badge, status checker, cache cleaner, test CI generator
+  opencode/         — OpenCode DB management CLI
+  file/             — copy, move CLI
+  utils/            — shared utilities
+  run-by-checksum/  — SHA-256 conditional execution
+  packs/            — node cache cleaner
+  ps/               — process management
+  vscode/           — VS Code workspace utilities
+  binary-collections.cjs  — main entry point
+```
+
+## Package Structure
+
+- Yarn Berry workspace (`yarn@4.9.2`): 2 sub-packages in `packages/`:
+  - `cross-spawn/` — patched cross-spawn fork
+  - `git-command-helper/` — patched git-command-helper fork
+- Workspace commands: `yarn workspaces foreach --worktree --exclude=binary-collections --no-private run build`
+
+## ESLint
+
+- Flat config (`eslint.config.mjs`), extends `@dimaslanjaka/eslint-base-config`.
+- Always set `ESLINT_USE_FLAT_CONFIG=true` when running eslint (lint-staged does this automatically).
+
+## CI Workflows
+
+| File | Trigger | Purpose |
+|---|---|---|
+| `test.yml` | push to `src/` or `test*` paths | Build, pack, run all tests |
+| `pages.yml` | push to master/main | Build mkdocs site, deploy to GitHub Pages |
+| `build-release.yml` | push (ignoring tests/docs) | Build, version, create release |
+| `clean-logs.yml` | periodic | Housekeeping |
+
+- Cache keys in CI use `binaries/`, `databases/`, `coverage/` dirs (added recently).
+- `test.yml` is auto-generated by `generate-test-ci-step-cli.mjs` during pre-commit.
+- The `setup-environments` composite action (`.github/actions/setup-environments/`) bundles Node/Python setup + caching.
+
+## Specific Gotchas
+
+- **Package resolution URLs are intentionally pinned** in `package.json`. Use the `package-resolutions-updater` CLI to update them, not manual edits.
+- **Windows launcher scripts** in `bin/` are copied to `binaries/` by the build. `.cmd` wrappers are generated for Windows compatibility.
+- **`docs-src/`** has 41 markdown files documenting each CLI command. Link to these instead of duplicating docs.
+- **Mkdocs docs** use Python hooks (`hooks/pre-generate-docs.py`, `hooks/copy_docs_src.py`) to copy `docs-src/` → `docs/` and expand README → index.md before mkdocs validates nav.
+- **ESM/CJS dual builds**: tsup outputs `.cjs` and `.mjs` variants for each source file. The main entry is `lib/index.js` (ESM), with CJS fallback via `lib/index.cjs`.
+- The `.env` file is loaded by `test/env.cjs` and some scripts. Check it for local config.

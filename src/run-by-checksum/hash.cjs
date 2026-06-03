@@ -1,15 +1,15 @@
-import fs from 'fs-extra';
-import * as glob from 'glob';
-import upath from 'upath';
-import path from 'upath';
-import crypto from 'crypto';
+const fs = require('fs-extra');
+const glob = require('glob');
+const upath = require('upath');
+const path = require('upath');
+const crypto = require('crypto');
 
 /**
  * Get all files matching the given glob patterns, ignoring specified paths.
  * @param {{ patterns: string[], ignore: string[], cwd?: string }} options
  * @returns {string[]}
  */
-export function getAllFiles({ patterns, ignore, cwd }) {
+function getAllFiles({ patterns, ignore, cwd }) {
   const files = new Set();
   const root = cwd || process.cwd();
 
@@ -75,7 +75,7 @@ function hashFile(file) {
  * @param {string[]} files - Ordered list of absolute file paths
  * @returns {string}
  */
-export function buildChecksum(files) {
+function buildChecksum(files) {
   const hash = crypto.createHash('sha256');
 
   for (const file of files) {
@@ -85,3 +85,5 @@ export function buildChecksum(files) {
 
   return hash.digest('hex');
 }
+
+module.exports = { getAllFiles, buildChecksum };

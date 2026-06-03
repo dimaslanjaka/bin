@@ -1,6 +1,6 @@
 ---
 id: project-analyzer
-name: ProjectAnalyzer
+name: "Project Analyzer Agent"
 description: "Expert in analyzing codebases, identifying patterns, and providing insights"
 category: development
 mode: primary

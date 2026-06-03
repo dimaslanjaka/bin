@@ -107,7 +107,7 @@ function findEnvFiles(startDir = process.cwd(), filter) {
  * Find the first `.env*` file containing a token variable.
  *
  * @param {string} [startDir=process.cwd()] Starting directory.
- * @param {string} [tokenName="GITHUB_TOKEN"] Environment variable name.
+ * @param {string|RegExp} [tokenName="GITHUB_TOKEN"] Environment variable name or regex.
  * @returns {string | undefined} Matching file path.
  */
 function findEnvWithToken(startDir = process.cwd(), tokenName = 'GITHUB_TOKEN') {
@@ -116,6 +116,11 @@ function findEnvWithToken(startDir = process.cwd(), tokenName = 'GITHUB_TOKEN') 
   return envFiles.find((file) => {
     try {
       const content = fs.readFileSync(file, 'utf-8');
+
+      if (tokenName instanceof RegExp) {
+        return tokenName.test(content);
+      }
+
       const regex = new RegExp(`^\\s*${tokenName}\\s*=`, 'm');
 
       return regex.test(content);

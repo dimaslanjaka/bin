@@ -116,7 +116,7 @@ function prepareInstallation(type) {
   // Remove binary-collections and .bin from node_modules to ensure a clean slate for installation
   for (const dir of ['binary-collections', '.bin']) {
     const target = path.join(nodeModules, dir);
-    if (fs.existsSync(target)) fs.removeSync(target);
+    forceRemoveSync(target);
     expect(fs.existsSync(target)).toBe(false);
   }
 
@@ -134,6 +134,50 @@ function prepareInstallation(type) {
     'binary-collections': `file:${path.resolve(__dirname, '../releases/bin.tgz')}`
   };
   fs.writeFileSync(pkgJson, JSON.stringify(pkgObj, null, 2));
+}
+
+/**
+ * Cross-platform force removal of a file or directory.
+ *
+ * On Linux, Yarn Berry's node-modules linker may create files with read-only
+ * permissions inside `node_modules/`.  `fs.removeSync()` then fails with
+ * EACCES because it cannot unlink read-only files.  This function fixes
+ * permissions before removal, using `rm -rf` on non-Windows as a fast path
+ * (it handles read-only files natively) and falling back to a recursive
+ * chmod + remove on Windows.
+ *
+ * @param {string} dir - path to remove
+ */
+function forceRemoveSync(dir) {
+  if (!fs.existsSync(dir)) return;
+
+  if (process.platform !== 'win32') {
+    const result = spawnSync('rm', ['-rf', dir], { stdio: 'pipe' });
+    if (result.status === 0 || !fs.existsSync(dir)) return;
+  }
+
+  // Fallback: recursively make everything writable then remove
+  const walkAndFix = (d) => {
+    try {
+      const stat = fs.statSync(d);
+      if (stat.isDirectory()) {
+        try {
+          fs.chmodSync(d, 0o755);
+        } catch {}
+        fs.readdirSync(d).forEach(function (child) {
+          walkAndFix(path.join(d, child));
+        });
+      } else {
+        try {
+          fs.chmodSync(d, 0o644);
+        } catch {}
+      }
+    } catch {
+      // skip entries we cannot access
+    }
+  };
+  walkAndFix(dir);
+  if (fs.existsSync(dir)) fs.removeSync(dir);
 }
 
 /**
@@ -223,6 +267,7 @@ function validateBinaries(packageManager) {
 }
 
 module.exports = {
+  forceRemoveSync,
   prepareInstallation,
   npmLockFile,
   yarnLockFile,

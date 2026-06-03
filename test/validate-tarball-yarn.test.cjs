@@ -3,6 +3,7 @@ const { spawnSync } = require('child_process');
 const fs = require('fs-extra');
 const path = require('upath');
 const {
+  forceRemoveSync,
   prepareInstallation,
   nodeModules,
   checkBinLinks,
@@ -23,7 +24,7 @@ describe('Test binary-collections tarball', () => {
   beforeAll(() => {
     // Clean up node_modules and lock files if they exist
     for (const dir of [pkgDir]) {
-      if (fs.existsSync(dir)) fs.removeSync(dir);
+      forceRemoveSync(dir);
     }
     // Build the workspace and create the tarball to install
     buildAndPack(workspaceDir);

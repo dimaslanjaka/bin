@@ -38,7 +38,10 @@ def _expand_readme_to_index() -> None:
     Idempotent: skips writing when docs/index.md is already up-to-date,
     avoiding infinite rebuild loops in ``mkdocs serve``.
     """
+    # Try uppercase first (Linux convention), fallback to lowercase (git-tracked name)
     readme = Path("README.md")
+    if not readme.exists():
+        readme = Path("readme.md")
     index_md = Path("docs") / "index.md"
 
     if not readme.exists():

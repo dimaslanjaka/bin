@@ -24,7 +24,7 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: '24.x'
 
       - uses: actions/configure-pages@v5
 
@@ -39,7 +39,7 @@ jobs:
             docs
             site
             node_modules
-          key: ${{ runner.os }}-docs-${{ hashFiles('docs-src/**', 'mkdocs.yml', 'hooks/**', 'README.md') }}
+          key: ${{ runner.os }}-docs-${{ hashFiles('docs-src/**', 'mkdocs.yml', 'hooks/**', '[Rr][Ee]adme.md') }}
           restore-keys: |
             ${{ runner.os }}-docs-
 

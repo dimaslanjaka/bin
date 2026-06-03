@@ -1,4 +1,5 @@
 ---
+name: "Create CLI Documentation"
 description: >-
   Use this agent when you need to create a documentation for command/sub command binary-collections project.
 mode: all

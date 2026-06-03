@@ -258,5 +258,5 @@ jobs:
           fi
 
       - name: '🧹 Clean GitHub Actions cache (npx)'
-        run: npx clean-github-actions-cache
+        run: npx --legacy-peer-deps -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz clean-github-actions-caches --repo "${{ github.repository }}" --sha "${{ github.sha }}"
         continue-on-error: true

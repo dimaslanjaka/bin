@@ -212,17 +212,29 @@ export { parseGitHubUrl };
 export async function resolvePackageResolutionUpdates(resolutions, specialPackageOverrides = []) {
   const updates = [];
 
-  for (const [currentPkgName, url] of Object.entries(resolutions || {})) {
+  for (const [currentPkgName, version] of Object.entries(resolutions || {})) {
+    // Check if the version is a URL; skip semver strings like ^x.y.z, ~x.y.z, x.y.z
+    const isUrl = typeof version === 'string' && (version.startsWith('http://') || version.startsWith('https://'));
+    if (!isUrl) {
+      updates.push({
+        skipped: true,
+        currentPkgName,
+        url: version,
+        error: new Error('Version is not a URL, skipping')
+      });
+      continue;
+    }
+
     // Validate if URL is a GitHub URL
     let repo;
 
     try {
-      repo = parseGitHubUrl(url);
+      repo = parseGitHubUrl(version);
     } catch (error) {
       updates.push({
         skipped: true,
         currentPkgName,
-        url,
+        url: version,
         error
       });
 
@@ -236,7 +248,7 @@ export async function resolvePackageResolutionUpdates(resolutions, specialPackag
         ? await getLatestCommit(override.owner, override.repo, override.branch)
         : await getLatestCommitAcrossBranches(repo.owner, repo.repo);
 
-      const new_url = replaceRawWithLatestHash(url, latest.sha);
+      const new_url = replaceRawWithLatestHash(version, latest.sha);
 
       // verify the new URL is can be accessed
       const response = await fetchResponse(new_url);
@@ -245,18 +257,18 @@ export async function resolvePackageResolutionUpdates(resolutions, specialPackag
         updates.push({
           failed: true,
           currentPkgName,
-          url,
+          url: version,
           new_url,
           repo,
           latest,
-          error: new Error(`New URL not accessible (status ${response.status}).\noriginal: ${url}\nnew: ${new_url}`)
+          error: new Error(`New URL not accessible (status ${response.status}).\noriginal: ${version}\nnew: ${new_url}`)
         });
         continue;
       }
 
       updates.push({
         currentPkgName,
-        url,
+        url: version,
         new_url,
         repo,
         latest
@@ -265,7 +277,7 @@ export async function resolvePackageResolutionUpdates(resolutions, specialPackag
       updates.push({
         failed: true,
         currentPkgName,
-        url,
+        url: version,
         repo,
         error
       });

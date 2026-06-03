@@ -1,8 +1,25 @@
 # 🚀 Binary Collections
 
+<details>
+<summary>Build Release CI</summary>
+
 ![Build Release](http://sh.webmanajemen.com/php_backend/workflow-badge.php?owner=dimaslanjaka&repo=bin&workflow=build-release.yml)
+
+</details>
+
+<details>
+<summary>Pages CI</summary>
+
 ![Pages](http://sh.webmanajemen.com/php_backend/workflow-badge.php?owner=dimaslanjaka&repo=bin&workflow=pages.yml)
+
+</details>
+
+<details>
+<summary>Test CI</summary>
+
 ![Test](http://sh.webmanajemen.com/php_backend/workflow-badge.php?owner=dimaslanjaka&repo=bin&workflow=test.yml)
+
+</details>
 
 A comprehensive toolkit of Node.js CLI utilities designed to streamline everyday development workflows.
 

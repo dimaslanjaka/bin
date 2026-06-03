@@ -3,11 +3,13 @@ const fs = require('fs');
 const path = require('upath');
 
 const cli = path.resolve(__dirname, '../src/node-executor.cjs');
+const distCli = path.resolve(__dirname, '../lib/node-executor.cjs');
 
 function run(args) {
-  return spawnSync('node', [cli, ...args], {
-    encoding: 'utf8'
-  });
+  return {
+    src: spawnSync('node', [cli, ...args], { encoding: 'utf8' }),
+    dist: spawnSync('node', [distCli, ...args], { encoding: 'utf8' })
+  };
 }
 
 describe('node-executor.cjs CLI executor', () => {
@@ -30,48 +32,61 @@ describe('node-executor.cjs CLI executor', () => {
   test('prints help', () => {
     const res = run(['--help']);
 
-    expect(res.status).toBe(0);
-    expect(res.stdout).toMatch(/Usage:/);
+    expect(res.src.status).toBe(0);
+    expect(res.dist.status).toBe(0);
+    expect(res.src.stdout).toMatch(/Usage:/);
+    expect(res.dist.stdout).toMatch(/Usage:/);
   });
 
   test('fails when no file provided', () => {
     const res = run([]);
 
-    expect(res.status).not.toBe(0);
-    expect(res.stderr).toMatch(/No file specified/);
+    expect(res.src.status).not.toBe(0);
+    expect(res.dist.status).not.toBe(0);
+    expect(res.src.stderr).toMatch(/No file specified/);
+    expect(res.dist.stderr).toMatch(/No file specified/);
   });
 
   test('runs javascript file via node', () => {
     const res = run([tmpJs]);
 
-    expect(res.status).toBe(0);
-    expect(res.stdout).toContain('JS OK');
+    expect(res.src.status).toBe(0);
+    expect(res.dist.status).toBe(0);
+    expect(res.src.stdout).toContain('JS OK');
+    expect(res.dist.stdout).toContain('JS OK');
   });
 
   test('runs python file via python', () => {
     const res = run([tmpPy]);
 
-    expect(res.status).toBe(0);
-    expect(res.stdout).toContain('PY OK');
+    expect(res.src.status).toBe(0);
+    expect(res.dist.status).toBe(0);
+    expect(res.src.stdout).toContain('PY OK');
+    expect(res.dist.stdout).toContain('PY OK');
   });
 
   test('rejects unknown extension', () => {
     const res = run([tmpUnknown]);
 
-    expect(res.status).not.toBe(0);
-    expect(res.stderr).toMatch(/No executor registered/);
+    expect(res.src.status).not.toBe(0);
+    expect(res.dist.status).not.toBe(0);
+    expect(res.src.stderr).toMatch(/No executor registered/);
+    expect(res.dist.stderr).toMatch(/No executor registered/);
   });
 
   test('file not found error', () => {
     const res = run(['not-exists.php']);
 
-    expect(res.status).not.toBe(0);
-    expect(res.stderr).toMatch(/File not found/);
+    expect(res.src.status).not.toBe(0);
+    expect(res.dist.status).not.toBe(0);
+    expect(res.src.stderr).toMatch(/File not found/);
+    expect(res.dist.stderr).toMatch(/File not found/);
   });
 
   test('custom exit code option works', () => {
     const res = run(['not-exists.php', '--exit-code=0']);
 
-    expect(res.status).toBe(0);
+    expect(res.src.status).toBe(0);
+    expect(res.dist.status).toBe(0);
   });
 });

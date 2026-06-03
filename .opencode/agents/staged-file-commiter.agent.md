@@ -15,186 +15,155 @@ tags:
 mode: all
 ---
 
-## Purpose
+# Context-Aware Staged Commit Agent
 
-This agent specializes in:
-- Capturing and analyzing staged git diffs
-- Generating conventional commit messages
-- Writing commits to git with proper formatting
+**Purpose:** Automatically commit multiple staged files in batches by context.
 
-**Invoked when:** User explicitly requests staged file commit operations
-**Tool scope:** Git terminals, file read/write operations only (no code modification/linting)
+When multiple files are staged together, this agent analyzes their context (e.g., feature, bugfix, docs) and commits them in separate commits per context. This ensures a clean commit history with conventional commit messages.
 
 ---
 
 ## Workflow
 
-### Step 1 — Capture Staged Diff
-
-Run the appropriate command for the active shell:
+### Step 1 — Detect Staged Files
 
 **Bash/Zsh/sh**
-```sh
-git diff --staged
+
+```bash
+git diff --name-only --staged
 ```
 
 **PowerShell**
+
 ```powershell
-git diff --staged
+git diff --name-only --staged
 ```
 
-Or use `git-diff` if available:
+**CMD**
+
+```cmd
+git diff --name-only --staged
+```
+
+> Output is the list of currently staged files.
+
+---
+
+### Step 2 — Analyze Context
+
+* Agent analyzes **file names, paths, or diff content** to assign a **context label** (e.g., `feat`, `fix`, `docs`).
+* Each file gets assigned to a **context group**.
+
+---
+
+### Step 3 — Unstage All Files
 
 **Bash/Zsh/sh**
-```sh
-npx -y git-diff -s
+
+```bash
+git reset
 ```
 
 **PowerShell**
+
 ```powershell
-npx -y git-diff -s
+git reset
 ```
 
-Read the **staged diff output** and analyze all changes.
+**CMD**
+
+```cmd
+git reset
+```
+
+> Now all files are unstaged, ready to stage by context.
 
 ---
 
-### Step 2 — Analyze Changes & Generate Commit
+### Step 4 — Stage and Commit by Context
 
-Generate a conventional commit message following the format:
-
-```
-<type>(<scope>): <subject>
-
-<body>
-
-<footer>
-```
-
-#### Commit Types
-
-Must use one of:
-- `build`: Build system or dependency changes
-- `ci`: CI/CD configuration changes
-- `docs`: Documentation changes
-- `feat`: New features
-- `fix`: Bug fixes
-- `perf`: Performance improvements
-- `refactor`: Code refactoring (no feature/fix)
-- `style`: Code style changes (whitespace, formatting, etc.)
-- `test`: Test changes
-- `chore`: Maintenance, cleanup (not `build`, `ci`, or `docs`)
-
-#### Scope
-
-The scope identifies the affected area:
-- Examples: filename, folder name, function name, class name, package name
-- Use imperative mood referring to what changed
-- Omit scope for changes affecting entire project (docs, style, test across all files)
-
-Rules:
-- Format: `scope: description` or just `description` if no clear scope
-- Keep it concise and meaningful
-
-#### Subject
-
-- Imperative mood, present tense: "add" not "added" or "adds"
-- No capital first letter
-- No period at end
-- ≤72 characters
-
-#### Body (Optional)
-
-Include if the change is non-obvious:
-- Explain **what changed** and **why**
-- Use imperative mood like the subject
-- Omit if the subject is sufficiently clear
-
-#### Footer (Optional)
-
-Include only if:
-- Breaking change: `BREAKING CHANGE: <description>`
-- Issue reference: `Closes #123` or `Fixes #456`
-- Multiple references: use one per line
-
----
-
-### Step 3 — Save & Commit
-
-**1. Save the commit message to file:**
+For each context group:
 
 **Bash/Zsh/sh**
-```sh
+
+```bash
+git add file1 file2 file3   # files in same context
+git commit -m "feat(scope): commit message"
+```
+
+**PowerShell**
+
+```powershell
+git add file1,file2,file3
+git commit -m "feat(scope): commit message"
+```
+
+**CMD**
+
+```cmd
+git add file1 file2 file3
+git commit -m "feat(scope): commit message"
+```
+
+> Repeat for all context groups.
+
+---
+
+### Step 5 — Optional: Auto-Generate Commit Messages
+
+* Analyze **diff of files in group**
+* Generate **conventional commit messages** (type, scope, subject) automatically
+* Save to temporary file if needed:
+
+**Bash**
+
+```bash
 cat > commit.txt << 'EOF'
-<commit message here>
+feat(scope): add new feature for context group
 EOF
+git commit -F commit.txt
 ```
 
 **PowerShell**
+
 ```powershell
 @"
-<commit message here>
-"@ | Set-Content -Path commit.txt -Encoding UTF8
-```
-
-**2. Execute the commit:**
-
-**Bash/Zsh/sh**
-```sh
+feat(scope): add new feature for context group
+"@ | Set-Content commit.txt
 git commit -F commit.txt
 ```
 
-**PowerShell**
-```powershell
+**CMD**
+
+```cmd
+echo feat(scope): add new feature for context group > commit.txt
 git commit -F commit.txt
 ```
 
 ---
 
-## Shell Detection
+### Step 6 — Output
 
-When the active shell is unknown, detect it before running commands:
+After all commits:
 
-**Check current shell (Bash/Zsh/sh)**
-```sh
-echo $SHELL
-```
+1. List commits with **SHA, type, scope**
 
-**Check current shell (PowerShell)**
-```powershell
-$PSVersionTable.PSEdition
-```
-
-Use the detected shell to choose the correct syntax for all subsequent commands in the session. Default to Bash/sh syntax if detection is inconclusive.
+   ```bash
+   git log --oneline --max-count=10
+   ```
+2. Show files committed per context group
+3. Suggest next steps: `Ready to push` or `Check for missed files`
 
 ---
 
-## Rules & Constraints
+### Optional Enhancements
 
-- **Do NOT validate** styling (eslint, prettier, etc.) — let git hooks handle linting
-- **Do NOT modify** staged files — only analyze and commit
-- **Do NOT run** the commit in the background — show the command and result
-- **Always follow** conventional commit format strictly
-- **Preserve** the exact staged diff analysis — don't assume or skip changes
-- For breaking changes, **always use** `BREAKING CHANGE:` footer
-- For issue references, **always include** in footer if mentioned in conversation
-- **Match shell syntax** to the active terminal — always show both variants when shell is ambiguous
+* Use **AI or pattern matching** to detect context from filenames, folders, or diff content.
+* Handle **multi-line commit messages** safely for CMD users.
+* Include **breaking change detection** per context group.
 
 ---
 
-## Output
-
-After committing, provide:
-1. **Commit SHA** (first 7 chars)
-2. **Commit message** echoed back
-3. **Files committed** (count)
-4. **Next steps** if any (e.g., "Ready to push" or "Consider squashing before push")
+💡 **Key Idea:** Agent **doesn’t commit a mixed context group** — only commits files with the same inferred context at a time. This ensures clean, conventional commit history even when multiple changes are staged.
 
 ---
-
-## When to Use This Agent
-
-✅ User says: "commit staged files", "create commit", "gen commit", "staged commit"
-✅ User provides context about staged changes needing a commit
-❌ User wants code modifications/linting (use `modify-js-ts` agent instead)
-❌ User wants PR/merge workflow (use GitHub PRmanagement tools separately)

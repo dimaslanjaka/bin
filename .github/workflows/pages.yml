@@ -49,7 +49,7 @@ jobs:
       - name: Install Dependencies
         shell: bash
         run: |
-          pip install mkdocs-material
+          pip install mkdocs-material markdown-it-py
 
       - name: Pre-Process Docs
         shell: bash

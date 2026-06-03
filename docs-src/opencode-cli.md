@@ -51,7 +51,9 @@ opc delete sessions
 
 #### `delete project <id>`
 
-Deletes a project and all its associated sessions.
+Deletes a project's sessions and project record from the OpenCode database (not the real project folder on disk).
+
+The `<id>` is the project UUID shown in the first column of `opc list project`. Run that command first to find the project ID you want to delete.
 
 ```bash
 opc delete project <project-id>
@@ -85,7 +87,7 @@ Delete a specific session:
 opc delete session abc123
 ```
 
-Delete an entire project and its sessions:
+Delete a project's sessions and project record from the OpenCode database (ID obtained from `opc list project`):
 
 ```bash
 opc delete project 9a3bb589

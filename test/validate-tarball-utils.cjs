@@ -204,8 +204,11 @@ function validateBinaries(packageManager) {
   const checks = [
     { cmd: 'git-diff', args: ['--help'] },
     { cmd: 'pkg-resolutions-updater', args: ['--help'] },
+    { cmd: 'pkg-res-updater', args: ['--help'] },
     { cmd: 'submodule-install', args: ['--help'] },
-    { cmd: 'kill-night-crows', args: ['--help'] }
+    { cmd: 'kill-night-crows', args: ['--help'] },
+    { cmd: 'node-executor', args: ['--help'] },
+    { cmd: 'py', args: ['--help'] }
   ];
 
   for (const { cmd, args } of checks) {

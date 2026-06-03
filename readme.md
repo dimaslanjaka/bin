@@ -91,6 +91,49 @@ For development or manual setup.
 git clone -b master https://github.com/dimaslanjaka/bin bin
 ```
 
+## Configuration
+
+Binary Collections supports project-level configuration via `getConfig()` — a cosmiconfig-powered loader that searches for a `binary-collections` config in your project root.
+
+### Boilerplate Config (ESM)
+
+A ready-to-use example is provided in the project root:
+
+```
+.binary-collections.config-example.js
+```
+
+Copy and rename it to start configuring:
+
+```bash
+# For ESM projects (package.json with "type": "module")
+cp .binary-collections.config-example.js .binary-collectionsrc.js
+
+# Or as an .mjs file (always treated as ESM)
+cp .binary-collections.config-example.js .binary-collectionsrc.mjs
+```
+
+### Example — package.json
+
+Add a `binary-collections` key to your `package.json`:
+
+```json
+{
+  "name": "my-project",
+  "binary-collections": {
+    "tempDir": "./.my-cache"
+  }
+}
+```
+
+### Configurable Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `tempDir` | `string` | Base directory for temporary files |
+| `githubToken` | `string` | GitHub API token override |
+| `opencode.keys` | `Array<{name, key}>` | OpenCode API keys for `auth rotate` and other commands |
+
 ## VSCode Integration
 
 To make these tools available directly in your VSCode terminal, create or update `.vscode/settings.json`:

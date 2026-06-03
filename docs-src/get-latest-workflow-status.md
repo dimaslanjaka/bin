@@ -97,4 +97,4 @@ URL       : https://github.com/dimaslanjaka/bin/actions/runs/26797771514
 
 ## Source
 
-See [`src/github-workflows/get-latest-workflow-status-cli.mjs`](../src/github-workflows/get-latest-workflow-status-cli.mjs) (CLI entry) and [`src/github-workflows/get-latest-workflow-status.mjs`](../src/github-workflows/get-latest-workflow-status.mjs) (library module).
+See [`src/github-workflows/get-latest-workflow-status-cli.mjs`](../src/github-workflows/get-latest-workflow-status-cli.mjs).

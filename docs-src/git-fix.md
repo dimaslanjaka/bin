@@ -31,4 +31,4 @@ Options can be combined: `git-fix --lf-only --permissions`
 
 ### Source
 
-See [`src/git/git-fix.cjs`](../src/git/git-fix.cjs) & submodules in [`src/git/`](../src/git/)
+See [`src/git/git-fix.cjs`](../src/git/git-fix.cjs).

@@ -84,4 +84,4 @@ The function returns:
 
 ## Source
 
-See [`src/run-by-checksum-cli.js`](../src/run-by-checksum-cli.js) (CLI) and [`src/run-by-checksum/`](../src/run-by-checksum/) (core logic).
+See [`src/run-by-checksum-cli.js`](../src/run-by-checksum-cli.js).

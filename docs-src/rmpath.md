@@ -35,4 +35,4 @@ rmpath C:\temp\huge-folder
 
 ## Source
 
-See [`src/rmpath-cli.mjs`](../src/rmpath-cli.mjs) (CLI entry point) and [`src/rmpath.mjs`](../src/rmpath.mjs) (core logic).
+See [`src/rmpath-cli.mjs`](../src/rmpath-cli.mjs).

@@ -24,7 +24,7 @@ node-cache-cleaner [options]
 
 ### Source
 
-See [`src/node-cache-cleaner-cli.ts`](../src/node-cache-cleaner-cli.ts) and [`src/node-cache-cleaner/`](../src/node-cache-cleaner/)
+See [`src/node-cache-cleaner-cli.ts`](../src/node-cache-cleaner-cli.ts).
 
 ---
 
@@ -178,5 +178,5 @@ yarn run rm-node-modules
 
 ### Source
 
-See [`src/rm-node-module-cli.cjs`](../src/rm-node-module-cli.cjs) & [`src/rm-node-modules.cjs`](../src/rm-node-modules.cjs)
+See [`src/rm-node-module-cli.cjs`](../src/rm-node-module-cli.cjs).
 

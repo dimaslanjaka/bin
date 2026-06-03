@@ -25,4 +25,4 @@ javakill               # Kill all java.exe processes (Windows)
 
 ### Source
 
-See [`src/del-ps.js`](../src/del-ps.js) and shell wrappers in [`bin/`](../bin/)
+See [`src/del-ps-cli.mjs`](../src/del-ps-cli.mjs) and shell wrappers in [`bin/`](../bin/).

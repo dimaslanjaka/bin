@@ -1,6 +1,6 @@
 # OpenCode CLI
 
-CLI tool for inspecting and managing an OpenCode database. Connects to the local OpenCode SQLite database (`~/.local/share/opencode/opencode.db`) to list sessions and projects, and to delete sessions or projects.
+CLI tool for inspecting and managing an OpenCode database. Connects to the local OpenCode SQLite database (`~/.local/share/opencode/opencode.db`) to list sessions and projects, and to delete sessions or projects. Also supports API key rotation from a local keys file.
 
 ## Usage
 
@@ -57,6 +57,14 @@ Deletes a project and all its associated sessions.
 opc delete project <project-id>
 ```
 
+#### `auth rotate`
+
+Rotates the active OpenCode API key by picking the first working key from a local keys file. Iterates through available keys (excluding the current one) and tests each against the OpenCode API, selecting the first that returns a valid response.
+
+```bash
+opc auth rotate
+```
+
 ### Options
 
 | Flag | Description |
@@ -83,12 +91,35 @@ Delete an entire project and its sessions:
 opc delete project 9a3bb589
 ```
 
+Rotate to a working API key:
+
+```bash
+opc auth rotate
+# → Rotated OpenCode API key to: my-backup-key
+```
+
 ### How it works
 
 1. **Database check**: On every command except `--help`, the tool first verifies the OpenCode database is accessible via `checkDatabase()`.
 2. **List**: Queries the `session` or `project` table and displays results in formatted tables with dynamic column widths.
 3. **Delete**: Uses recursive SQL (Common Table Expressions) to delete sessions and their descendants, or cascading deletes for project sessions.
+4. **Auth rotate**: Reads `.opencode.keys.jsonc` (or `.opencode.keys.json` as fallback) from the current directory, filters out the currently active key, tests each remaining key via `checkOpenCodeApi()`, and sets the first one that responds successfully.
+
+### Requirements
+
+For `auth rotate`, create a `.opencode.keys.jsonc` file in your project root:
+
+```jsonc
+[
+  // Each key must have a unique name and the actual API key value.
+  // Add this file to .gitignore to keep it private.
+  {
+    "name": "unique name for the key, e.g. email or username",
+    "key": "the actual key, e.g. sk-xxxxxx"
+  }
+]
+```
 
 ## Source
 
-See [`src/opencode-cli.ts`](../src/opencode-cli.ts) (CLI) and [`src/opencode/database.ts`](../src/opencode/database.ts) (database layer).
+See [`src/opencode-cli.ts`](../src/opencode-cli.ts).

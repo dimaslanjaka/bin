@@ -31,4 +31,4 @@ When developing locally, use `bc <commandName>` (`bin/bc` on Unix or `bin/bc.cmd
 
 ### Source
 
-See [`src/binary-collections.cjs`](../src/binary-collections.cjs) & [`bin/bc`](../bin/bc)
+See [`src/binary-collections.cjs`](../src/binary-collections.cjs) & [`bin/bc`](../bin/bc).

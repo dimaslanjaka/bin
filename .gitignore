@@ -26,3 +26,4 @@ vendor/
 docs/index.md
 docs/docs-src/
 site/
+.opencode.keys.json*

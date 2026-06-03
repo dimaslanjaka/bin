@@ -22,11 +22,26 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 20
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
+
+      - name: Setup Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            docs
+            site
+            node_modules
+          key: ${{ runner.os }}-docs-${{ hashFiles('docs-src/**', 'mkdocs.yml', 'hooks/**', 'README.md') }}
+          restore-keys: |
+            ${{ runner.os }}-docs-
 
       - name: Generate Site
         shell: bash

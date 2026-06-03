@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { writefile } from 'sbg-utility';
 
 /**
  * Checks whether the OpenCode API returns a non-empty response for a given prompt.
@@ -27,6 +28,10 @@ export async function checkOpenCodeApi(
       headers: { Authorization: `Bearer ${apiKey}` }
     }
   );
+
+  // dump the full response for debugging
+  const filePath = `tmp/logs/opencode-api-check-${Date.now()}.json`;
+  writefile(filePath, JSON.stringify(res.data, null, 2));
 
   const message = res.data.choices[0].message;
   const output = message.content || message.reasoning_content;

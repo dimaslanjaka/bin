@@ -1,6 +1,6 @@
 {
   "name": "binary-collections",
-  "version": "2.0.14",
+  "version": "2.0.15",
   "description": "Utility to clean any programming caches and more",
   "keywords": [
     "cache",
@@ -221,7 +221,7 @@
     "pkg-res-updater": "lib/package-resolutions-updater-cli.cjs",
     "pkg-resolutions-updater": "lib/package-resolutions-updater-cli.cjs",
     "print-directory-tree": "lib/print-directory-tree.cjs",
-    "print-tarball-tree": "lib/print-tarball-tree.cjs",
+    "print-tarball-tree": "lib/print-tarball-tree-cli.cjs",
     "print-tree": "lib/print-directory-tree.cjs",
     "prod": "binaries/prod.cjs",
     "py": "binaries/py.cjs",
@@ -242,7 +242,7 @@
     "submodule-remove": "lib/submodule-remove-cli.cjs",
     "submodule-token": "binaries/submodule-token.cjs",
     "tarball-packer": "lib/node-package-packer-cli.cjs",
-    "tarball-tree": "lib/print-tarball-tree.cjs",
+    "tarball-tree": "lib/print-tarball-tree-cli.cjs",
     "test-cjs": "binaries/test-cjs.cjs",
     "test-esm": "binaries/test-esm.cjs",
     "undo-commit": "lib/git/undo-commit.cjs",

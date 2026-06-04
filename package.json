@@ -82,6 +82,7 @@
     "minimatch": "^10.2.5",
     "minimist": "^1.2.8",
     "openai": "^6.41.0",
+    "proxy-agent": "^8.0.1",
     "ps-node": "^0.1.6",
     "puppeteer": "^25.0.4",
     "puppeteer-extra": "^3.3.6",
@@ -91,8 +92,7 @@
     "upath": "^3.0.7",
     "which": "^7.0.0",
     "yaml": "^2.9.0",
-    "yarn": "^1.22.22",
-    "zlib": "^1.0.5"
+    "yarn": "^1.22.22"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
@@ -148,7 +148,7 @@
     "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/eb82c8e0e60ce425fdf6e89cd53f4391bb8c77cd/release/cross-spawn.tgz",
     "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/7a28dad83c17abfc4b6ccd2b7327c39ff67adfe5/release/git-command-helper.tgz",
     "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/44e5c7b79b4e60f8c2d34857c27b8ce677d7493e/packages/sbg-utility/release/sbg-utility.tgz",
-    "@dimaslanjaka/eslint-base-config": "https://github.com/dimaslanjaka/eslint-base-config/raw/9741b4feac89f303ea585e3ecac2b0e768434135/release/dimaslanjaka-eslint-base-config.tgz"
+    "@dimaslanjaka/eslint-base-config": "https://github.com/dimaslanjaka/eslint-base-config/raw/822b872f18985462f0da358579cd6493472a2ee0/release/dimaslanjaka-eslint-base-config.tgz"
   },
   "bin": {
     "actions-badge": "lib/github-workflows/workflow-badge-cli.cjs",

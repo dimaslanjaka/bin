@@ -67,11 +67,18 @@ Rotates the active OpenCode API key by picking the first working key from a loca
 opc auth rotate
 ```
 
+Use `--proxy` to route API requests through a proxy server:
+
+```bash
+opc auth rotate --proxy socks5://127.0.0.1:1080
+```
+
 ### Options
 
 | Flag | Description |
 | :--- | :--- |
 | `-h`, `--help` | Show help message |
+| `-p`, `--proxy <url>` | Proxy URL for API requests. Supports `http://`, `https://`, `socks4://`, `socks5://` protocols. Format: `protocol://ip:port` or `protocol://user:pass@ip:port` |
 
 ### Examples
 
@@ -100,12 +107,18 @@ opc auth rotate
 # → Rotated OpenCode API key to: my-backup-key
 ```
 
+Rotate through a SOCKS5 proxy:
+
+```bash
+opc auth rotate --proxy socks5://127.0.0.1:1080
+```
+
 ### How it works
 
 1. **Database check**: On every command except `--help`, the tool first verifies the OpenCode database is accessible via `checkDatabase()`.
 2. **List**: Queries the `session` or `project` table and displays results in formatted tables with dynamic column widths.
 3. **Delete**: Uses recursive SQL (Common Table Expressions) to delete sessions and their descendants, or cascading deletes for project sessions.
-4. **Auth rotate**: Reads `opencode.keys` from the project config (via `getConfig()`), filters out the currently active key, tests each remaining key via `checkOpenCodeApi()`, and sets the first one that responds successfully.
+4. **Auth rotate**: Reads `opencode.keys` from the project config (via `getConfig()`), filters out the currently active key, tests each remaining key via `checkOpenCodeApi()`, and sets the first one that responds successfully. If `--proxy` is provided, it's passed through to `checkOpenCodeApi()` which creates a `ProxyAgent` for the HTTP/SOCKS proxy.
 
 ### Requirements
 

@@ -7,7 +7,7 @@ import { handleListProjects } from './opencode/cli/list-projects.js';
 import { handleListSessions } from './opencode/cli/list-sessions.js';
 
 const argv = minimist(process.argv.slice(2), {
-  alias: { h: 'help' }
+  alias: { h: 'help', p: 'proxy' }
 });
 
 function printHelp(): void {
@@ -24,6 +24,7 @@ Commands:
 
 Options:
   -h, --help          Show this help message
+  -p, --proxy <url>   Proxy URL for API requests (format: protocol://ip:port or protocol://user:pass@ip:port)
 `);
 }
 
@@ -82,7 +83,7 @@ async function main(): Promise<void> {
   } else if (command === 'auth') {
     const sub = argv._[1];
     if (sub === 'rotate') {
-      await handleAuthRotate();
+      await handleAuthRotate({ proxy: argv.proxy });
     } else {
       console.error(`Unknown subcommand: auth ${sub || ''}`);
       printHelp();

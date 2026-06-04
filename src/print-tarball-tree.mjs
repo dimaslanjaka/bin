@@ -1,74 +1,60 @@
-import fs from 'fs';
-import zlib from 'zlib';
+import fs from 'node:fs';
+import * as zlib from 'node:zlib';
+import { pipeline } from 'node:stream/promises';
 import tar from 'tar-stream';
-import path from 'upath';
-import { getArgs } from './utils/index.cjs';
 
-function addToTree(tree, parts) {
+export function addToTree(tree, parts) {
   let node = tree;
 
   for (const part of parts) {
     if (!node[part]) node[part] = {};
     node = node[part];
   }
+
+  return tree;
 }
 
-function printTree(node, prefix = '') {
+export function formatTree(node, prefix = '') {
+  const lines = [];
   const entries = Object.keys(node).sort();
 
-  entries.forEach((key, index) => {
+  entries.forEach(function (key, index) {
     const isLast = index === entries.length - 1;
-    console.log(prefix + (isLast ? '└── ' : '├── ') + key);
-
     const child = node[key];
+    const line = prefix + (isLast ? '└── ' : '├── ') + key;
     const newPrefix = prefix + (isLast ? '    ' : '│   ');
-    printTree(child, newPrefix);
+
+    lines.push(line);
+    lines.push(...formatTree(child, newPrefix));
   });
+
+  return lines;
 }
 
-function printTgzTree(filePath) {
+export function printTree(node, prefix = '', logger = console.log) {
+  for (const line of formatTree(node, prefix)) {
+    logger(line);
+  }
+}
+
+export async function printTgzTree(filePath, options = {}) {
+  const logger = options.logger || console.log;
   const extract = tar.extract();
   const tree = {};
 
-  extract.on('entry', (header, stream, next) => {
+  extract.on('entry', function (header, stream, next) {
     const parts = header.name.split('/').filter(Boolean);
 
     if (parts.length) addToTree(tree, parts);
 
-    stream.on('end', next);
+    stream.once('end', next);
+    stream.once('error', next);
     stream.resume();
   });
 
-  extract.on('finish', () => {
-    printTree(tree);
-  });
+  await pipeline(fs.createReadStream(filePath), zlib.createGunzip(), extract);
 
-  fs.createReadStream(filePath).pipe(zlib.createGunzip()).pipe(extract);
+  printTree(tree, '', logger);
+
+  return tree;
 }
-
-const argv = getArgs({ string: ['file'], alias: { f: 'file', h: 'help' } });
-
-if (argv.help) {
-  console.log(`
-Usage: node src/print-tarball-tree.mjs [options]
-
-Options:
-  -f, --file <path>    Path to the tarball file (default: package.tgz)
-  -h, --help           Show this help message
-`);
-  process.exit(0);
-}
-
-const filePath = argv.file ? (path.isAbsolute(argv.file) ? argv.file : path.resolve(process.cwd(), argv.file)) : null;
-
-if (!filePath) {
-  console.error('Error: No file specified');
-  process.exit(1);
-}
-
-if (!fs.existsSync(filePath)) {
-  console.error(`Error: File not found at ${filePath}`);
-  process.exit(1);
-}
-
-printTgzTree(filePath);

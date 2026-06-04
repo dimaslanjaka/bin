@@ -37,7 +37,6 @@
     "binaries/**/*",
     "lib/**/*",
     "docs-src/*.md",
-    "readme.md",
     ".puppeterrc.cjs",
     "requirements.txt",
     ".github/**/*"

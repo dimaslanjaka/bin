@@ -1,32 +1,34 @@
 const fs = require('fs-extra');
 const glob = require('glob');
-const upath = require('upath');
 const path = require('upath');
 const CryptoJS = require('crypto-js');
+
+const globSync = typeof glob.sync === 'function' ? glob.sync : glob.globSync;
 
 /**
  * Get all files matching the given glob patterns, ignoring specified paths.
  * @param {{ patterns: string[], ignore: string[], cwd?: string }} options
  * @returns {string[]}
  */
-function getAllFiles({ patterns, ignore, cwd }) {
+function getAllFiles({ patterns = [], ignore = [], cwd } = {}) {
   const files = new Set();
-  const root = cwd || process.cwd();
+  const root = path.resolve(cwd || process.cwd());
 
   for (const pattern of patterns) {
-    const matched = glob.sync(pattern, {
+    const matched = globSync(pattern, {
       cwd: root,
       nodir: true,
-      ignore
+      ignore,
+      absolute: false
     });
 
     for (const f of matched) {
       // Resolve to absolute path for consistent hashing
-      files.add(upath.normalize(path.resolve(root, f)));
+      files.add(path.normalize(path.resolve(root, f)));
     }
   }
 
-  return [...files].sort();
+  return Array.from(files).sort();
 }
 
 /**
@@ -36,15 +38,31 @@ function getAllFiles({ patterns, ignore, cwd }) {
  * @returns {boolean}
  */
 function isBinaryFile(filePath, bytesToCheck = 8000) {
-  const buffer = fs.readFileSync(filePath, { length: bytesToCheck });
-  for (let i = 0; i < buffer.length; i++) {
-    if (buffer[i] === 0) {
-      // Null byte is a strong indicator of binary
-      return true;
-    }
+  const size = Math.max(0, Number(bytesToCheck) || 0);
+
+  if (size === 0) {
+    // Optionally, check if it decodes as UTF-8
+    return false;
   }
-  // Optionally, check if it decodes as UTF-8
-  return false;
+
+  const fd = fs.openSync(filePath, 'r');
+
+  try {
+    const buffer = Buffer.allocUnsafe(size);
+    const bytesRead = fs.readSync(fd, buffer, 0, size, 0);
+
+    for (let i = 0; i < bytesRead; i++) {
+      if (buffer[i] === 0) {
+        // Null byte is a strong indicator of binary
+        return true;
+      }
+    }
+
+    // Optionally, check if it decodes as UTF-8
+    return false;
+  } finally {
+    fs.closeSync(fd);
+  }
 }
 
 /**
@@ -56,20 +74,22 @@ function isBinaryFile(filePath, bytesToCheck = 8000) {
  * @returns {string}
  */
 function hashFile(file) {
-  const isBin = isBinaryFile(file);
-  if (!isBin) {
-    const content = fs.readFileSync(file, { encoding: 'utf-8' });
+  if (!isBinaryFile(file)) {
+    const content = fs.readFileSync(file, 'utf8');
     // remove whitespaces and newlines for text files to avoid irrelevant changes affecting the checksum
-    const normalized = content.toString().replace(/\s+/g, ' ').trim();
+    const normalized = content.replace(/\s+/g, ' ').trim();
+
     return CryptoJS.SHA256(normalized).toString(CryptoJS.enc.Hex);
-  } else {
-    // For binary files, hash the file path and size instead of content
-    const stats = fs.statSync(file);
-    const binHash = CryptoJS.algo.SHA256.create();
-    binHash.update(file);
-    binHash.update(String(stats.size));
-    return binHash.finalize().toString(CryptoJS.enc.Hex);
   }
+
+  // For binary files, hash the file path and size instead of content
+  const stats = fs.statSync(file);
+  const binHash = CryptoJS.algo.SHA256.create();
+
+  binHash.update(file);
+  binHash.update(String(stats.size));
+
+  return binHash.finalize().toString(CryptoJS.enc.Hex);
 }
 
 /**
@@ -78,7 +98,7 @@ function hashFile(file) {
  * @param {string[]} files - Ordered list of absolute file paths
  * @returns {string}
  */
-function buildChecksum(files) {
+function buildChecksum(files = []) {
   const hash = CryptoJS.algo.SHA256.create();
 
   for (const file of files) {
@@ -89,4 +109,15 @@ function buildChecksum(files) {
   return hash.finalize().toString(CryptoJS.enc.Hex);
 }
 
-module.exports = { getAllFiles, buildChecksum };
+/**
+ * Compute a SHA-256 hash of the given data, optionally trimming the output to a specified length.
+ * @param {string} data
+ * @param {number} trim
+ * @returns {string}
+ */
+function sha256(data, trim = 128) {
+  const hash = CryptoJS.SHA256(String(data)).toString(CryptoJS.enc.Hex);
+  return trim ? hash.substring(0, trim) : hash;
+}
+
+module.exports = { getAllFiles, buildChecksum, sha256 };

@@ -70,7 +70,10 @@ async function extractApiKey(
     Array.isArray(keys.opencode.keys) &&
     keys.opencode.keys.length > 0
   ) {
-    const pick = await findWorkingKey(keys.opencode.keys, proxy);
+    const pick = await findWorkingKey(keys.opencode.keys, { proxy });
+    if (!pick) {
+      return undefined;
+    }
     return { opencode: { type: 'binary-collections', key: pick.key } } as OpenCodeAuthData;
   }
 

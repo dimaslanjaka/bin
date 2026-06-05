@@ -3,8 +3,7 @@ import { spawn } from 'cross-spawn';
 export function yarnVersion() {
   return new Promise<string>((resolve, reject) => {
     const process = spawn('yarn', ['--version'], {
-      stdio: 'pipe',
-      shell: true
+      stdio: 'pipe'
     });
 
     let version = '';
@@ -36,8 +35,7 @@ export async function cleanYarnCache() {
 
   return new Promise((resolve, reject) => {
     const process = spawn('yarn', args, {
-      stdio: 'inherit',
-      shell: true
+      stdio: 'inherit'
     });
 
     process.on('close', (code) => {

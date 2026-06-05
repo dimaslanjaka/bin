@@ -1,4 +1,4 @@
-export interface OpencodeKey {
+export interface KeyData {
   name: string;
   key: string;
 }
@@ -12,8 +12,11 @@ export interface BinaryCollectionsConfig {
 
   // Opencode API keys
   opencode?: {
-    keys: OpencodeKey[];
+    keys: KeyData[];
   };
 
-  // You can add other configuration options here as needed
+  // NVIDIA API keys
+  nvidia?: {
+    keys: KeyData[];
+  };
 }

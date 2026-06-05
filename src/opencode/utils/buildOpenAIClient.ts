@@ -117,14 +117,17 @@ function buildProxyOptions(proxy: string): {
  *   3. If no compatible saved credentials are available, fall back to
  *      `OPENAI_API_KEY`.
  *
- * Provider priority from the resolved auth data:
+ * Provider priority:
  *   1. OpenCode via `https://opencode.ai/zen/v1`
  *   2. Google Gemini via OpenAI-compatible endpoint
- *   3. Standard OpenAI using `OPENAI_API_KEY`
+ *   3. NVIDIA via `https://integrate.api.nvidia.com/v1` (from auth data)
+ *   4. NVIDIA via `https://integrate.api.nvidia.com/v1` (from `NVIDIA_API_KEY` env var)
+ *   5. Standard OpenAI using `OPENAI_API_KEY`
  *
  * Default models:
  *   - OpenCode: `deepseek-v4-flash-free`
  *   - Google Gemini: `gemini-2.0-flash`
+ *   - NVIDIA: `nvidia/nemotron-3-ultra-550b-a55b`
  *   - OpenAI: `gpt-4o-mini`
  *
  * @param modelOrOptions - A model name string for backward compatibility, or a
@@ -134,7 +137,7 @@ function buildProxyOptions(proxy: string): {
  * @returns An object containing the configured OpenAI client, the resolved model
  * name, and the optional undici `ProxyAgent` dispatcher created from `proxy`.
  *
- * @throws If no OpenCode, Google, or `OPENAI_API_KEY` credential is available.
+ * @throws If no OpenCode, Google, NVIDIA, or `OPENAI_API_KEY` credential is available.
  */
 export async function buildOpenAIClient(
   modelOrOptions?: string | BuildOpenAIClientOptions
@@ -177,7 +180,27 @@ export async function buildOpenAIClient(
     };
   }
 
-  // 3. Fallback: standard OpenAI from env
+  // 3. Try NVIDIA via OpenAI-compatible endpoint
+  if (auth?.nvidia?.key) {
+    return {
+      client: createClient('https://integrate.api.nvidia.com/v1', auth.nvidia.key),
+      model: model || 'nvidia/nemotron-3-ultra-550b-a55b',
+      dispatcher
+    };
+  }
+
+  // 4. Fallback: NVIDIA from env
+  const nvidiaApiKey = process.env.NVIDIA_API_KEY;
+  if (nvidiaApiKey) {
+    return {
+      client: createClient('https://integrate.api.nvidia.com/v1', nvidiaApiKey),
+      model: model || 'nvidia/nemotron-3-ultra-550b-a55b',
+      dispatcher,
+      proxy
+    };
+  }
+
+  // 5. Fallback: standard OpenAI from env
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {

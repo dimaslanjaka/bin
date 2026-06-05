@@ -182,13 +182,11 @@ export function bundle() {
   const child = !withYarn
     ? crossSpawn.spawn('npm', ['pack'], {
         cwd: process.cwd(),
-        shell: true,
         stdio: 'ignore',
         env: { PATH: process.env.PATH }
       })
     : crossSpawn.spawn('yarn', ['pack'], {
         cwd: process.cwd(),
-        shell: true,
         stdio: 'ignore',
         env: { PATH: process.env.PATH }
       });

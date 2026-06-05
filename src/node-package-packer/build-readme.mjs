@@ -66,11 +66,10 @@ export async function buildReadme(dirname, packagejson, releaseDir, argv, isCI) 
         continue;
       } else {
         await git.add(relativeTarball);
-        const args = ['status', '-uno', '--porcelain', '--', relativeTarball, '|', 'wc', '-l'];
         const isChanged =
           parseInt(
             (
-              await spawnAsync('git', args, {
+              await spawnAsync('git status -uno --porcelain -- "' + relativeTarball.replace(/"/g, '\\"') + '" | wc -l', {
                 cwd: dirname,
                 shell: true
               })

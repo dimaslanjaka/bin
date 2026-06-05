@@ -9,8 +9,7 @@ import { spawn } from 'cross-spawn';
 function getNpmCacheDir(): Promise<string> {
   return new Promise((resolve, reject) => {
     const child = spawn('npm', ['config', 'get', 'cache'], {
-      stdio: ['ignore', 'pipe', 'pipe'],
-      shell: true
+      stdio: ['ignore', 'pipe', 'pipe']
     });
 
     let output = '';

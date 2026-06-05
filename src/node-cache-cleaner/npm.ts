@@ -3,8 +3,7 @@ import { spawn } from 'cross-spawn';
 export function npmVersion() {
   return new Promise<string>((resolve, reject) => {
     const process = spawn('npm', ['--version'], {
-      stdio: 'pipe',
-      shell: true
+      stdio: 'pipe'
     });
 
     let version = '';
@@ -25,8 +24,7 @@ export function npmVersion() {
 export function cleanNpmCache() {
   return new Promise((resolve, reject) => {
     const process = spawn('npm', ['cache', 'clean', '--force'], {
-      stdio: 'inherit',
-      shell: true
+      stdio: 'inherit'
     });
 
     process.on('close', (code) => {

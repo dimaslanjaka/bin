@@ -31,13 +31,13 @@ export function formatTree(node, prefix = '') {
   return lines;
 }
 
-export function printTree(node, prefix = '', logger = console.log) {
+export function printTgzTree(node, prefix = '', logger = console.log) {
   for (const line of formatTree(node, prefix)) {
     logger(line);
   }
 }
 
-export async function printTgzTree(filePath, options = {}) {
+export async function mainPrintTgzTree(filePath, options = {}) {
   const logger = options.logger || console.log;
   const extract = tar.extract();
   const tree = {};
@@ -54,7 +54,7 @@ export async function printTgzTree(filePath, options = {}) {
 
   await pipeline(fs.createReadStream(filePath), zlib.createGunzip(), extract);
 
-  printTree(tree, '', logger);
+  printTgzTree(tree, '', logger);
 
   return tree;
 }

@@ -28,3 +28,4 @@ docs/docs-src/
 site/
 .opencode.keys.json*
 binary-collections.config.js
+opencode_exports/

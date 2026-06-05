@@ -4,7 +4,6 @@ Generates a directory tree structure with file SHA-256 hashes.
 
 ### Aliases
 
-- `print-tree` (default)
 - `dir-tree`
 - `print-directory-tree`
 

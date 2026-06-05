@@ -15,7 +15,7 @@ const defaultBin = {
   'del-gradle': 'lib/del-gradle.cjs',
   'git-purge': 'lib/git/git-purge.cjs',
   'git-fix': 'lib/git/git-fix.cjs',
-  'print-tree': 'lib/print-directory-tree-cli.cjs',
+  'print-tree': 'lib/print-tree-cli.cjs',
   'dir-tree': 'lib/print-directory-tree-cli.cjs',
   'pkg-resolutions-updater': 'lib/package-resolutions-updater-cli.cjs',
   'pkg-res-updater': 'lib/package-resolutions-updater-cli.cjs',

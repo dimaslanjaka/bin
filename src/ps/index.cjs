@@ -1,4 +1,4 @@
-var ChildProcess = require('child_process');
+var { spawn } = require('cross-spawn');
 var IS_WIN = require('../utils/isWindows.js').isWindows();
 var TableParser = require('./table-parser.js');
 
@@ -27,8 +27,6 @@ var Exec =
   (module.exports =
   exports =
     function (args, callback) {
-      var spawn = ChildProcess.spawn;
-
       // on windows, if use ChildProcess.exec(`wmic process get`), the stdout will gives you nothing
       // that's why I use `cmd` instead
       if (IS_WIN) {

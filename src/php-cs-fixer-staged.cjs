@@ -1,5 +1,5 @@
 const { exec } = require('child_process');
-const { spawn, spawnSync } = require('child_process');
+const { spawn, spawnSync } = require('cross-spawn');
 const util = require('util');
 const fs = require('fs');
 const path = require('upath');

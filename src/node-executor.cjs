@@ -3,7 +3,7 @@
 const fs = require('fs-extra');
 const path = require('upath');
 const { getArgs } = require('./utils/index.cjs');
-const { spawn } = require('child_process');
+const { spawn } = require('cross-spawn');
 
 const argv = getArgs({
   boolean: ['help', 'h'],

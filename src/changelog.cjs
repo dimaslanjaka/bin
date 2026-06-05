@@ -3,7 +3,7 @@ const path = require('upath');
 const { EOL } = require('os');
 const { getArgs } = require('./utils/index.cjs');
 const { getTempPath } = require('./binary-collections/config.cjs');
-const spawn = require('child_process').spawn;
+const { spawn } = require('cross-spawn');
 
 const pkgPath = path.join(process.cwd(), 'package.json');
 if (!fs.existsSync(pkgPath)) {

@@ -64,13 +64,13 @@ interface SessionRow {
   time_archived: number | null;
 }
 
-interface MessageRow {
+export interface MessageRow {
   id: string;
   session_id: string;
   data: string;
 }
 
-interface PartRow {
+export interface PartRow {
   id: string;
   message_id: string;
   session_id: string;
@@ -270,12 +270,36 @@ export async function loadSessions(): Promise<Session[]> {
   return rows.map(toSession);
 }
 
-export async function loadMessages(sessionID: string): Promise<Message[]> {
-  const rows = query<MessageRow>(
-    `SELECT id, session_id, data FROM message WHERE session_id = '${escapeSql(sessionID)}' ORDER BY id ASC`
+/** Load all messages for a session, ordered chronologically (sync, reuse DB connection). */
+export function loadMessages(sessionId: string): MessageRow[];
+export function loadMessages(db: SQLite, sessionId: string): MessageRow[];
+export function loadMessages(db: SQLite | string, sessionId?: string): MessageRow[] {
+  if (db instanceof SQLite) {
+    return db.all<MessageRow>(
+      `SELECT id, session_id, data FROM message WHERE session_id = '${escapeSql(sessionId!)}' ORDER BY id ASC`
+    );
+  }
+  return query<MessageRow>(
+    `SELECT id, session_id, data FROM message WHERE session_id = '${escapeSql(db)}' ORDER BY id ASC`
   );
+}
 
-  return rows.map((row) => toMessage(row.id, row.session_id, row.data));
+/** Load all parts for a set of message IDs (sync, reuse DB connection). */
+export function loadPartsForMessages(messageIds: string[]): PartRow[];
+export function loadPartsForMessages(db: SQLite, messageIds: string[]): PartRow[];
+export function loadPartsForMessages(db: SQLite | string[], messageIds?: string[]): PartRow[] {
+  // When called as single-arg: db is the messageIds array
+  const ids = Array.isArray(db) ? db : messageIds!;
+  if (ids.length === 0) return [];
+  const placeholders = ids.map((id) => `'${escapeSql(id)}'`).join(', ');
+  if (db instanceof SQLite) {
+    return db.all<PartRow>(
+      `SELECT id, message_id, session_id, data FROM part WHERE message_id IN (${placeholders}) ORDER BY id ASC`
+    );
+  }
+  return query<PartRow>(
+    `SELECT id, message_id, session_id, data FROM part WHERE message_id IN (${placeholders}) ORDER BY id ASC`
+  );
 }
 
 export async function loadParts(messageID: string): Promise<Part[]> {

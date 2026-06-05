@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import path from 'upath';
 import { getArgs } from './utils/index.cjs';
-import { printTgzTree } from './print-tarball-tree.mjs';
+import { mainPrintTgzTree } from './print-tarball-tree.mjs';
 
 export async function main() {
   const argv = getArgs({ string: ['file'], alias: { f: 'file', h: 'help' } });
@@ -32,7 +32,7 @@ Options:
   }
 
   try {
-    await printTgzTree(filePath);
+    await mainPrintTgzTree(filePath);
   } catch (error) {
     console.error(`Error: Failed to read tarball ${filePath}`);
     console.error(error instanceof Error ? error.message : error);

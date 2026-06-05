@@ -6,7 +6,7 @@ import * as zlib from 'node:zlib';
 import { pipeline } from 'node:stream/promises';
 import tar from 'tar-stream';
 import { jest } from '@jest/globals';
-import { addToTree, formatTree, printTree, printTgzTree } from '../src/print-tarball-tree.mjs';
+import { addToTree, formatTree, printTgzTree, mainPrintTgzTree } from '../src/print-tarball-tree.mjs';
 
 function appendTarEntry(pack, entry) {
   return new Promise(function (resolve, reject) {
@@ -120,7 +120,7 @@ describe('print-tarball-tree', function () {
       }
     };
 
-    printTree(tree, '', logger);
+    printTgzTree(tree, '', logger);
 
     expect(
       logger.mock.calls.map(function (call) {
@@ -132,7 +132,7 @@ describe('print-tarball-tree', function () {
   test('printTree does not call logger for empty tree', function () {
     const logger = jest.fn();
 
-    printTree({}, '', logger);
+    printTgzTree({}, '', logger);
 
     expect(logger).not.toHaveBeenCalled();
   });
@@ -156,7 +156,7 @@ describe('print-tarball-tree', function () {
       }
     ]);
 
-    const tree = await printTgzTree(tgzPath, { logger });
+    const tree = await mainPrintTgzTree(tgzPath, { logger });
 
     expect(tree).toEqual({
       package: {
@@ -203,7 +203,7 @@ describe('print-tarball-tree', function () {
       }
     ]);
 
-    const tree = await printTgzTree(tgzPath, { logger });
+    const tree = await mainPrintTgzTree(tgzPath, { logger });
 
     expect(tree).toEqual({
       package: {
@@ -236,12 +236,12 @@ describe('print-tarball-tree', function () {
 
     await fsp.writeFile(invalidPath, 'this is not a valid tgz file');
 
-    await expect(printTgzTree(invalidPath, { logger: jest.fn() })).rejects.toThrow();
+    await expect(mainPrintTgzTree(invalidPath, { logger: jest.fn() })).rejects.toThrow();
   });
 
   test('printTgzTree rejects missing tgz file', async function () {
     const missingPath = path.join(tempDir, 'missing.tgz');
 
-    await expect(printTgzTree(missingPath, { logger: jest.fn() })).rejects.toThrow();
+    await expect(mainPrintTgzTree(missingPath, { logger: jest.fn() })).rejects.toThrow();
   });
 });

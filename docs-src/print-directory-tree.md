@@ -18,6 +18,7 @@ print-tree [options]
 
 | Option | Description |
 |--------|-------------|
+| `--cwd <dir>` | Working directory to scan (default: current directory) |
 | `-o, --output <file>` | Output file (default: `tmp/directory-structure.txt`) |
 | `--ext <exts>` | Comma-separated list of file extensions to include |
 | `--pattern <glob>` | Glob pattern to include (repeatable) |

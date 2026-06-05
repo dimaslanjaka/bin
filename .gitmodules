@@ -6,3 +6,7 @@
 	path = packages/cross-spawn
 	url = https://github.com/dimaslanjaka/node-cross-spawn.git
 	branch = private
+[submodule "packages/ai-toolkit"]
+	path = packages/ai-toolkit
+	url = https://github.com/dimaslanjaka/ai-toolkit.git
+	branch = master

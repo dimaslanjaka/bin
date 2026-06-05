@@ -1,6 +1,6 @@
 import { getAllFiles, buildChecksum } from './hash.cjs';
 import { loadCache, saveCache, getCacheFile } from './cache.js';
-import { spawn } from 'child_process';
+import { spawn } from 'cross-spawn';
 
 /**
  * @param {{

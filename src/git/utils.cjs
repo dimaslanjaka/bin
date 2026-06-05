@@ -1,4 +1,5 @@
-const { execSync, spawnSync } = require('child_process');
+const { execSync } = require('child_process');
+const { spawnSync } = require('cross-spawn');
 /**
  * Execute a git command with proper error handling and logging
  * @param {string[]} args - Git command arguments

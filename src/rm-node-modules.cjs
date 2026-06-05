@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const path = require('upath');
 const ansiColors = require('ansi-colors');
-const child_process = require('child_process');
+const { spawnSync } = require('cross-spawn');
 const os = require('os');
 
 /**
@@ -122,7 +122,7 @@ async function cleanUp(rootDir, options = {}) {
     }
 
     // execute with `bash` so the script semantics are preserved
-    const result = child_process.spawnSync('bash', [scriptPath], {
+    const result = spawnSync('bash', [scriptPath], {
       cwd: rootDir,
       env: process.env,
       encoding: 'utf8',

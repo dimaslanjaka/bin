@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { spawnSync } = require('child_process');
+const { spawnSync } = require('cross-spawn');
 const color = require('ansi-colors');
 const fs = require('fs');
 const path = require('upath');

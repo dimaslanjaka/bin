@@ -21,6 +21,17 @@ export default {
       }
       // Add more keys as needed
     ]
+  },
+
+  // NVIDIA API keys (replace with your actual keys)
+  nvidia: {
+    keys: [
+      {
+        name: '<unique-identifier>',
+        key: 'nvapi-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+      }
+      // Add more keys as needed
+    ]
   }
 
   // Other configuration options can go here

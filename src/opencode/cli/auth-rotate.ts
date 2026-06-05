@@ -1,7 +1,7 @@
 import { getOpenCodeAuth, saveOpenCodeAuth } from '../storage.js';
 import { checkOpenCodeApi } from '../utils/check-api.js';
 import { getConfig } from '../../binary-collections/config.cjs';
-import { OpencodeKey } from '../../binary-collections/config-types.js';
+import { KeyData } from '../../binary-collections/config-types.js';
 
 const WORKING_KEY_CACHE_TTL_MS = 5 * 60 * 1000;
 
@@ -21,7 +21,7 @@ export interface FindWorkingKeyOptions {
 
 let workingKeyCache: WorkingKeyCache | null = null;
 
-function getCachedWorkingKey(candidates: OpencodeKey[], proxy?: string): OpencodeKey | null {
+function getCachedWorkingKey(candidates: KeyData[], proxy?: string): KeyData | null {
   if (!workingKeyCache) {
     return null;
   }
@@ -38,7 +38,7 @@ function getCachedWorkingKey(candidates: OpencodeKey[], proxy?: string): Opencod
   return candidates.find((candidate) => candidate.key === workingKeyCache?.key) ?? null;
 }
 
-function setCachedWorkingKey(candidate: OpencodeKey, proxy?: string): void {
+function setCachedWorkingKey(candidate: KeyData, proxy?: string): void {
   workingKeyCache = {
     key: candidate.key,
     proxy,
@@ -57,10 +57,7 @@ function setCachedWorkingKey(candidate: OpencodeKey, proxy?: string): void {
  * @param options    - Optional proxy and cache controls.
  * @returns The first working key entry, or `null` if none respond.
  */
-export async function findWorkingKey(
-  candidates: OpencodeKey[],
-  options?: FindWorkingKeyOptions
-): Promise<OpencodeKey | null> {
+export async function findWorkingKey(candidates: KeyData[], options?: FindWorkingKeyOptions): Promise<KeyData | null> {
   const proxy = options?.proxy;
 
   if (!options?.noCache) {
@@ -98,7 +95,7 @@ export async function findWorkingKey(
 export async function handleAuthRotate(options?: { proxy?: string; noCache?: boolean }): Promise<void> {
   // Load keys from project config (binary-collections.config.{js,cjs,mjs} / package.json)
   const config = await getConfig();
-  const keys: Array<OpencodeKey> | undefined = config?.opencode?.keys;
+  const keys: Array<KeyData> | undefined = config?.opencode?.keys;
   if (!keys || !Array.isArray(keys) || keys.length === 0) {
     console.error(
       'No opencode.keys found in project config. ' +
@@ -114,7 +111,7 @@ export async function handleAuthRotate(options?: { proxy?: string; noCache?: boo
   }
 
   const currentKey = auth.opencode.key;
-  const candidates = keys.filter((k: OpencodeKey) => k.key !== currentKey);
+  const candidates = keys.filter((k: KeyData) => k.key !== currentKey);
   if (candidates.length === 0) {
     console.error('No other keys available to rotate to');
     process.exit(1);

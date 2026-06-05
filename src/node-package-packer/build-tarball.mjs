@@ -160,9 +160,9 @@ export async function bundleWithNpm(dirname, packagejson, releaseDir, argv, isCI
  * Resolve CLI context and run the pack workflow.
  * @returns {Promise<void>}
  */
-export function bundle() {
+export async function bundle() {
   const args = getArgs();
-  const withYarn = args._.includes('-yarn') || args._.includes('--yarn');
+  const withYarn = args.yarn || args._.includes('-yarn') || args._.includes('--yarn');
   const releaseDir1 = path.join(process.cwd(), 'release');
   const releaseDir2 = path.join(process.cwd(), 'releases');
   const releaseDir = !fs.existsSync(releaseDir2) ? releaseDir1 : releaseDir2;
@@ -179,33 +179,21 @@ export function bundle() {
     fs.mkdirpSync(releaseDir, { recursive: true });
   }
 
-  const child = !withYarn
-    ? crossSpawn.spawn('npm', ['pack'], {
-        cwd: process.cwd(),
-        stdio: 'ignore',
-        env: { PATH: process.env.PATH }
-      })
-    : crossSpawn.spawn('yarn', ['pack'], {
-        cwd: process.cwd(),
-        stdio: 'ignore',
-        env: { PATH: process.env.PATH }
-      });
-
-  return new Promise((resolve, reject) => {
-    child.once('error', reject);
-    child.once('close', async () => {
-      try {
-        if (isYarn) {
-          await bundleWithYarn(process.cwd(), packagejson, releaseDir, args, withFilename, isCI);
-        } else {
-          await bundleWithNpm(process.cwd(), packagejson, releaseDir, args, isCI);
-        }
-        resolve();
-      } catch (error) {
-        reject(error);
-      }
-    });
+  const result = crossSpawn.sync(withYarn ? 'yarn' : 'npm', ['pack'], {
+    cwd: process.cwd(),
+    stdio: 'ignore',
+    env: { PATH: process.env.PATH }
   });
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  if (isYarn) {
+    await bundleWithYarn(process.cwd(), packagejson, releaseDir, args, withFilename, isCI);
+  } else {
+    await bundleWithNpm(process.cwd(), packagejson, releaseDir, args, isCI);
+  }
 }
 
 export default {

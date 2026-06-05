@@ -5,6 +5,9 @@ import { checkDatabase, deleteSessionById, deleteAllSessions, deleteAllProjectSe
 import { handleAuthRotate } from './opencode/cli/auth-rotate.js';
 import { handleListProjects } from './opencode/cli/list-projects.js';
 import { handleListSessions } from './opencode/cli/list-sessions.js';
+import { loadDotenv } from './binary-collections/config.cjs';
+
+loadDotenv();
 
 const argv = getArgs({
   alias: { h: 'help', p: 'proxy' }

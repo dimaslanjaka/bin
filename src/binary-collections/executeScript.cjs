@@ -1,4 +1,4 @@
-const { spawn } = require('child_process');
+const { spawn } = require('cross-spawn');
 
 /**
  * Executes a script file using Node.js with the provided arguments
@@ -10,8 +10,7 @@ const { spawn } = require('child_process');
 function executeScript(scriptPath, args) {
   console.log(`🔧 Executing script: ${scriptPath} args: ${args.join(' ')}\n`);
   const child = spawn('node', [scriptPath, ...args], {
-    stdio: 'inherit',
-    shell: true
+    stdio: 'inherit'
   });
 
   child.on('error', (error) => {

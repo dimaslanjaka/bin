@@ -14,7 +14,7 @@ const { cosmiconfig } = require('cosmiconfig');
  *
  * @param {string|RegExp} [tokenKey=/ACCESS_TOKEN|GITHUB_TOKEN/] - Token name or regex to search for.
  *   Passed as second argument to `findEnvWithToken()`.
- * @returns {void}
+ * @returns {import('dotenv').DotenvConfigOutput}
  */
 const loadDotenv = (tokenKey = /ACCESS_TOKEN|GITHUB_TOKEN/) =>
   dotenv.config({ path: findEnvWithToken(undefined, tokenKey), quiet: true, overwrite: true });

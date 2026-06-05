@@ -222,7 +222,7 @@
     "pkg-resolutions-updater": "lib/package-resolutions-updater-cli.cjs",
     "print-directory-tree": "lib/print-directory-tree-cli.cjs",
     "print-tarball-tree": "lib/print-tarball-tree-cli.cjs",
-    "print-tree": "lib/print-directory-tree-cli.cjs",
+    "print-tree": "lib/print-tree-cli.cjs",
     "prod": "binaries/prod.cjs",
     "py": "binaries/py.cjs",
     "remove-module": "lib/remove-module.cjs",

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-import minimist from 'minimist';
+import { getArgs } from './utils/index.cjs';
 import { listWorkspaceProjects } from './vscode/storage.js';
 
-const argv = minimist(process.argv.slice(2), {
+const argv = getArgs({
   alias: { h: 'help', 'copilot-memory': ['copilotMemory', 'cm'] }
 });
 

@@ -1,4 +1,4 @@
-interface OpencodeKey {
+export interface OpencodeKey {
   name: string;
   key: string;
 }

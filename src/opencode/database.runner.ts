@@ -1,5 +1,5 @@
 import { checkDatabase, loadProjects, loadSessions } from './database.js';
-import { SQLite } from './sqlite.js';
+import { SQLite } from '../utils/sqlite/index.js';
 import { DATABASE_PATH, getSessionFileById } from './storage.js';
 
 async function _checks(): Promise<void> {

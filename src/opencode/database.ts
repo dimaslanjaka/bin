@@ -1,5 +1,5 @@
 import { DATABASE_PATH } from './storage.js';
-import { SQLite } from './sqlite.js';
+import { SQLite } from '../utils/sqlite/index.js';
 import fs from 'fs-extra';
 import { execSync } from 'node:child_process';
 

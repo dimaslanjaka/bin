@@ -36,31 +36,45 @@ function getTempPath(...segments) {
   return path.join(process.env.TEMP_DIR || path.join(process.cwd(), 'tmp'), ...segments);
 }
 
+const CONFIG_SEARCH_PLACES = Object.freeze([
+  'binary-collections.config.js',
+  'binary-collections.config.cjs',
+  'binary-collections.config.mjs'
+]);
+
 /**
- * Search for project configuration using cosmiconfig (async).
+ * Search for project configuration using cosmiconfig.
  *
- * Only `binary-collections.config.js` / `.cjs` / `.mjs` are supported (no `.rc`, JSON, or YAML).
+ * Only these files are supported:
+ * - `binary-collections.config.js`
+ * - `binary-collections.config.cjs`
+ * - `binary-collections.config.mjs`
  *
- * Looks for configuration in:
- * - `binary-collections.config.js` / `.cjs` / `.mjs` (searched from project root upward)
- * - A `binary-collections` property in `package.json`
+ * No `.rc`, JSON, YAML, or `package.json` config is supported.
  *
  * @param {object} [options] - Optional configuration overrides.
- * @param {string} [options.searchFrom] - Directory to start searching from (default: process.cwd()).
- * @param {string} [options.stopDir] - Directory to stop searching upwards (e.g., project root).
- * @returns {Promise<import('./config-types').BinaryCollectionsConfig|null>} The parsed configuration object, or `null` if no config found.
+ * @param {string} [options.searchFrom] - Directory to start searching from.
+ * @param {string} [options.stopDir] - Directory to stop searching upwards.
+ * @returns {Promise<import('./config-types').BinaryCollectionsConfig|null>}
  */
 async function getConfig(options = {}) {
+  const from = path.resolve(options.searchFrom || process.env.INIT_CWD || process.cwd());
+
   const explorer = cosmiconfig('binary-collections', {
     searchStrategy: 'project',
-    stopDir: options.stopDir
+    stopDir: options.stopDir,
+    searchPlaces: CONFIG_SEARCH_PLACES
   });
 
   try {
-    const result = await explorer.search(options.searchFrom);
-    return result ? result.config : null;
-  } catch {
-    return null;
+    const result = await explorer.search(from);
+    return result?.config || null;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+
+    throw new Error(`Failed to load binary-collections config from "${from}": ${message}`, {
+      cause: error
+    });
   }
 }
 

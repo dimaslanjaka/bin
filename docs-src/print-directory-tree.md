@@ -32,4 +32,4 @@ Scans the current directory recursively, generates a structured tree with SHA-25
 
 ### Source
 
-See [`src/print-directory-tree.cjs`](../src/print-directory-tree.cjs)
+See [`src/print-directory-tree-cli.cjs`](../src/print-directory-tree-cli.cjs)

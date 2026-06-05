@@ -27,7 +27,7 @@ const executorCache = path.join(__dirname, 'tmp/.checksum/build-executor.json');
 
 const checksumFiles = getAllFiles({
   patterns: ['bin/binary-executor.cjs', 'src/**/*.{js,cjs,mjs,ts}', 'rollup.executor.js'],
-  ignore: ['**/node_modules/**', '**/*.{runner,test,spec,direct}.{js,cjs,mjs,ts}'],
+  ignore: ['**/node_modules/**', '**/*.{runner,test,spec,direct,builder}.{js,cjs,mjs,ts}'],
   cwd: __dirname
 });
 const currentHash = buildChecksum(checksumFiles);

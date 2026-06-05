@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import yaml from 'yaml';
 import { execSync } from 'child_process';
 import { glob } from 'glob';
-import minimist from 'minimist';
+import { getArgs } from '../utils/index.cjs';
 import actionObject from './workflow-test-data.cjs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -48,7 +48,7 @@ async function collectTests(patterns, ignorePatterns) {
 }
 
 async function main() {
-  const argv = minimist(process.argv.slice(2), {
+  const argv = getArgs({
     string: ['pattern', 'ignore', 'ex', 'output'],
     alias: {
       p: 'pattern',

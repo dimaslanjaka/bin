@@ -3,7 +3,7 @@
  */
 
 const path = require('upath');
-const minimistLib = require('minimist');
+const { getArgs } = require('../utils/index.cjs');
 const { findEnvWithToken } = require('../utils/findEnvFiles.cjs');
 const dotenv = require('dotenv');
 const { cosmiconfig } = require('cosmiconfig');
@@ -21,7 +21,7 @@ const loadDotenv = (tokenKey = /ACCESS_TOKEN|GITHUB_TOKEN/) =>
 loadDotenv(); // Load .env file if it exists to populate process.env with tokens
 
 // Support --token CLI argument to override GITHUB_ACCESS_TOKEN
-const cliArgv = minimistLib(process.argv.slice(2), {
+const cliArgv = getArgs({
   string: ['token']
 });
 const GITHUB_ACCESS_TOKEN =

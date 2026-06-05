@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-import minimist from 'minimist';
+import { getArgs } from './utils/index.cjs';
 import { checkDatabase, deleteSessionById, deleteAllSessions, deleteAllProjectSessions } from './opencode/database.js';
 import { handleAuthRotate } from './opencode/cli/auth-rotate.js';
 import { handleListProjects } from './opencode/cli/list-projects.js';
 import { handleListSessions } from './opencode/cli/list-sessions.js';
 
-const argv = minimist(process.argv.slice(2), {
+const argv = getArgs({
   alias: { h: 'help', p: 'proxy' }
 });
 

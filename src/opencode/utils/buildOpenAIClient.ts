@@ -1,6 +1,8 @@
 import OpenAI from 'openai';
 import { getOpenCodeAuth } from '../storage.js';
 import { ProxyAgent } from 'undici';
+import { OpenCodeAuthData } from '../types.js';
+import { BinaryCollectionsConfig } from '../../binary-collections/config-types.js';
 
 export interface BuildOpenAIClientOptions {
   /** The model name to use. Default varies by provider. */
@@ -19,8 +21,65 @@ export interface BuildOpenAIClientOptions {
    * `HTTP_PROXY` / `HTTPS_PROXY` environment variables at the process level.
    */
   proxy?: string;
+
+  /**
+   * Pre-resolved auth data.
+   *
+   * Accepts either:
+   *   - `OpenCodeAuthData` — auth shape from `getOpenCodeAuth()` with
+   *     `{ opencode: { key } }`, `{ google: { key } }`, etc.
+   *   - `BinaryCollectionsConfig` — config file shape with
+   *     `{ opencode: { keys: [{ name, key }] } }`. The first key in the
+   *     array is extracted automatically.
+   *
+   * When provided, `buildOpenAIClient` skips `getOpenCodeAuth()` and uses
+   * these keys directly (useful when auth is already loaded by the caller).
+   */
+  apiKeys?: OpenCodeAuthData | BinaryCollectionsConfig;
 }
 
+/**
+ * Extract an `opencode` key token from a pre-resolved auth object.
+ *
+ * Supports two runtime shapes:
+ *   1. **OpenCodeAuthData** — detected by `opencode.key` → returned as-is.
+ *   2. **BinaryCollectionsConfig** — detected by `opencode.keys` (array) →
+ *      the first item is extracted into an `OpenCodeAuthData`-shaped object
+ *      with only the `opencode` field populated.
+ *
+ * @param keys - Auth data in either supported shape.
+ * @returns An `OpenCodeAuthData`-shaped object with just the `opencode` token,
+ *          or `undefined` if neither shape matched.
+ */
+function extractApiKey(keys: OpenCodeAuthData | BinaryCollectionsConfig): OpenCodeAuthData | undefined {
+  // OpenCodeAuthData shape: { opencode: { key: string } }
+  if ('opencode' in keys && typeof keys.opencode === 'object' && keys.opencode !== null && 'key' in keys.opencode) {
+    return keys as OpenCodeAuthData;
+  }
+
+  // BinaryCollectionsConfig shape: { opencode: { keys: OpencodeKey[] } }
+  if (
+    'opencode' in keys &&
+    typeof keys.opencode === 'object' &&
+    keys.opencode !== null &&
+    'keys' in keys.opencode &&
+    Array.isArray(keys.opencode.keys) &&
+    keys.opencode.keys.length > 0
+  ) {
+    const first = keys.opencode.keys[0];
+    return { opencode: { type: 'binary-collections', key: first.key } } as OpenCodeAuthData;
+  }
+
+  return undefined;
+}
+
+/**
+ * Build fetch options from a proxy URL using undici `ProxyAgent`.
+ *
+ * @param proxy - HTTP/HTTPS proxy URL (SOCKS5 throws).
+ * @returns An object with `fetchOptions` (for the OpenAI constructor) and
+ *          the raw `dispatcher` (for per-request overrides).
+ */
 function buildProxyOptions(proxy: string): {
   fetchOptions: { dispatcher: ProxyAgent };
   dispatcher: ProxyAgent;
@@ -40,7 +99,23 @@ function buildProxyOptions(proxy: string): {
   };
 }
 
-/** Build an OpenAI client from the OpenCode auth file or OPENAI_API_KEY env var. */
+/**
+ * Build an OpenAI client (and resolved model name) from available credentials.
+ *
+ * Priority order:
+ *   1. `apiKeys` option (pre-resolved auth, if provided — only the `opencode`
+ *      token is extracted from either `OpenCodeAuthData` or `BinaryCollectionsConfig`)
+ *   2. OpenCode auth file (`opencode.ai/zen` endpoint)
+ *   3. Google Gemini (OpenAI-compatible endpoint)
+ *   4. `OPENAI_API_KEY` env var (standard OpenAI)
+ *
+ * @param modelOrOptions - Either a model name string (backward-compatible) or
+ *                         a `BuildOpenAIClientOptions` object with `model`,
+ *                         `proxy`, and/or `apiKeys` (accepts both
+ *                         `OpenCodeAuthData` and `BinaryCollectionsConfig`).
+ * @returns The OpenAI client instance, the resolved model name, and an optional
+ *          undici `ProxyAgent` dispatcher for per-request fetch overrides.
+ */
 export async function buildOpenAIClient(
   modelOrOptions?: string | BuildOpenAIClientOptions
 ): Promise<{ client: OpenAI; model: string; dispatcher?: ProxyAgent }> {
@@ -50,13 +125,13 @@ export async function buildOpenAIClient(
   const opts: BuildOpenAIClientOptions =
     typeof modelOrOptions === 'string' ? { model: modelOrOptions } : { ...modelOrOptions };
 
-  const { model, proxy } = opts;
+  const { model, proxy, apiKeys } = opts;
   const proxyResult = proxy ? buildProxyOptions(proxy) : undefined;
   const proxyConfig = proxyResult;
   const dispatcher = proxyResult?.dispatcher;
 
   // 1. Try OpenCode auth (opencode.ai/zen endpoint)
-  const auth = await getOpenCodeAuth();
+  const auth = apiKeys ? extractApiKey(apiKeys) : await getOpenCodeAuth();
   if (auth?.opencode?.key) {
     return {
       client: new OpenAI({

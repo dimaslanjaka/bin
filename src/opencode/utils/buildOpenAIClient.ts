@@ -56,20 +56,17 @@ async function extractApiKey(
   keys: OpenCodeAuthData | BinaryCollectionsConfig,
   proxy?: string
 ): Promise<OpenCodeAuthData | undefined> {
+  if (!('opencode' in keys) || typeof keys.opencode !== 'object' || keys.opencode === null) {
+    return undefined;
+  }
+
   // OpenCodeAuthData shape: { opencode: { key: string } }
-  if ('opencode' in keys && typeof keys.opencode === 'object' && keys.opencode !== null && 'key' in keys.opencode) {
+  if ('key' in keys.opencode) {
     return keys as OpenCodeAuthData;
   }
 
-  // BinaryCollectionsConfig shape: { opencode: { keys: OpencodeKey[] } }
-  if (
-    'opencode' in keys &&
-    typeof keys.opencode === 'object' &&
-    keys.opencode !== null &&
-    'keys' in keys.opencode &&
-    Array.isArray(keys.opencode.keys) &&
-    keys.opencode.keys.length > 0
-  ) {
+  // BinaryCollectionsConfig shape: { opencode: { keys: KeyData[] } }
+  if ('keys' in keys.opencode && Array.isArray(keys.opencode.keys) && keys.opencode.keys.length > 0) {
     const pick = await findWorkingKey(keys.opencode.keys, { proxy });
     if (!pick) {
       return undefined;
@@ -120,9 +117,8 @@ function buildProxyOptions(proxy: string): {
  * Provider priority:
  *   1. OpenCode via `https://opencode.ai/zen/v1`
  *   2. Google Gemini via OpenAI-compatible endpoint
- *   3. NVIDIA via `https://integrate.api.nvidia.com/v1` (from auth data)
- *   4. NVIDIA via `https://integrate.api.nvidia.com/v1` (from `NVIDIA_API_KEY` env var)
- *   5. Standard OpenAI using `OPENAI_API_KEY`
+ *   3. NVIDIA via `https://integrate.api.nvidia.com/v1` (auth key > env var)
+ *   4. Standard OpenAI using `OPENAI_API_KEY`
  *
  * Default models:
  *   - OpenCode: `deepseek-v4-flash-free`
@@ -157,17 +153,18 @@ export async function buildOpenAIClient(
     new OpenAI({
       ...(baseURL ? { baseURL } : {}),
       apiKey,
-      ...proxyOptions
+      ...(dispatcher ? { dispatcher } : {})
     });
 
-  const auth = apiKeys ? await extractApiKey(apiKeys, proxyOptions?.proxy) : await getOpenCodeAuth();
+  const auth = apiKeys ? await extractApiKey(apiKeys, proxy) : await getOpenCodeAuth();
 
   // 1. Try OpenCode auth via opencode.ai/zen
   if (auth?.opencode?.key) {
     return {
       client: createClient('https://opencode.ai/zen/v1', auth.opencode.key),
       model: model || 'deepseek-v4-flash-free',
-      dispatcher
+      dispatcher,
+      proxy
     };
   }
 
@@ -176,31 +173,23 @@ export async function buildOpenAIClient(
     return {
       client: createClient('https://generativelanguage.googleapis.com/v1beta/openai', auth.google.key),
       model: model || 'gemini-2.0-flash',
-      dispatcher
+      dispatcher,
+      proxy
     };
   }
 
-  // 3. Try NVIDIA via OpenAI-compatible endpoint
-  if (auth?.nvidia?.key) {
+  // 3. NVIDIA via OpenAI-compatible endpoint (auth takes priority over env)
+  const nvidiaKey = auth?.nvidia?.key || process.env.NVIDIA_API_KEY;
+  if (nvidiaKey) {
     return {
-      client: createClient('https://integrate.api.nvidia.com/v1', auth.nvidia.key),
-      model: model || 'nvidia/nemotron-3-ultra-550b-a55b',
-      dispatcher
-    };
-  }
-
-  // 4. Fallback: NVIDIA from env
-  const nvidiaApiKey = process.env.NVIDIA_API_KEY;
-  if (nvidiaApiKey) {
-    return {
-      client: createClient('https://integrate.api.nvidia.com/v1', nvidiaApiKey),
+      client: createClient('https://integrate.api.nvidia.com/v1', nvidiaKey),
       model: model || 'nvidia/nemotron-3-ultra-550b-a55b',
       dispatcher,
       proxy
     };
   }
 
-  // 5. Fallback: standard OpenAI from env
+  // 4. Fallback: standard OpenAI from env
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {

@@ -120,4 +120,4 @@ function sha256(data, trim = 128) {
   return trim ? hash.substring(0, trim) : hash;
 }
 
-module.exports = { getAllFiles, buildChecksum, sha256 };
+module.exports = { getAllFiles, buildChecksum, sha256, isBinaryFile };

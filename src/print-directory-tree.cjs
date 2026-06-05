@@ -1,12 +1,10 @@
 const fs = require('fs');
 const fsp = require('fs').promises;
 const path = require('upath');
-const CryptoJS = require('crypto-js');
 const { execSync } = require('child_process');
+const { sha256 } = require('./run-by-checksum/hash.cjs');
 const glob = require('glob');
 const sbgUtil = require('sbg-utility');
-
-const projectDir = process.cwd();
 
 /**
  * Generates a directory/file tree string from a hash array of file paths and hashes.
@@ -66,6 +64,9 @@ function getFileTreeString(hashArray) {
  * @param {object} argv - Parsed CLI arguments.
  */
 async function mainPrintDirectoryTree(argv) {
+  // Determine project directory from CLI args (default: current working directory)
+  const projectDir = argv.cwd || process.cwd();
+
   // Determine output file from CLI args
   let relativeOutputFile = 'tmp/directory-structure.txt';
   if (argv.output || argv.o) {
@@ -143,8 +144,8 @@ async function mainPrintDirectoryTree(argv) {
     try {
       const stats = await fsp.stat(file);
       const pseudoHash = `${stats.size}-${stats.mtimeMs}`;
-      const hash = CryptoJS.SHA256(pseudoHash).toString(CryptoJS.enc.Hex);
-      hashArray.push(`${relativePath} ${hash.slice(0, 8)}`);
+      const hash = sha256(pseudoHash, 8);
+      hashArray.push(`${relativePath} ${hash}`);
     } catch (err) {
       console.error(`Error processing file: ${file}`, err instanceof Error ? err.message : '<unknown error>');
       if (err && err.code === 'ENOENT') {

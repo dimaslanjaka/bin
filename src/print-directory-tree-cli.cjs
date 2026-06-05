@@ -12,6 +12,7 @@ if (argv.help || argv.h) {
 Usage: print-directory-tree [options]
 
 Options:
+  --cwd <dir>                   Working directory to scan (default: current directory)
   --output, -o <file>           Output file path (default: tmp/directory-structure.txt)
   --ext <exts>                  Comma-separated list of file extensions (no dot, e.g. js,ts)
   --pattern <glob>              Glob pattern(s) for files (can be repeated)
@@ -25,6 +26,7 @@ Examples:
   print-directory-tree --pattern=src/**/*.js --pattern=test/**/*.js
   print-directory-tree --exclude=dist,build
   print-directory-tree --output=tmp/tree.txt
+  print-directory-tree --cwd=/path/to/project
 `);
   process.exit(0);
 }

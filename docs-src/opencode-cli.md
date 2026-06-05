@@ -136,20 +136,6 @@ export default {
 };
 ```
 
-Or in `package.json`:
-
-```json
-{
-  "binary-collections": {
-    "opencode": {
-      "keys": [
-        { "name": "primary", "key": "sk-xxxxxx" }
-      ]
-    }
-  }
-}
-```
-
 ## Source
 
 See [`src/opencode-cli.ts`](../src/opencode-cli.ts).

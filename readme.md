@@ -105,11 +105,7 @@ Binary Collections supports project-level configuration via a `binary-collection
 
 ### Boilerplate Config
 
-A ready-to-use example is provided in the project root:
-
-```
-binary-collections.config-example.js
-```
+A ready-to-use example is provided in the project root: [binary-collections.config-example.js](./binary-collections.config-example.js)
 
 Copy and rename it to start configuring:
 

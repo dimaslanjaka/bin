@@ -3,6 +3,13 @@ import * as zlib from 'node:zlib';
 import { pipeline } from 'node:stream/promises';
 import tar from 'tar-stream';
 
+/**
+ * Adds path parts to a nested tree object.
+ * Creates intermediate nodes as needed and returns the same (mutated) tree.
+ * @param {Record<string, object>} tree - The tree object to mutate.
+ * @param {string[]} parts - Path segments to insert (e.g. ['package', 'index.js']).
+ * @returns {Record<string, object>} The mutated tree with the path parts inserted.
+ */
 export function addToTree(tree, parts) {
   let node = tree;
 
@@ -14,6 +21,13 @@ export function addToTree(tree, parts) {
   return tree;
 }
 
+/**
+ * Recursively formats a tree node into an array of tree-drawing lines.
+ * Uses Unicode box-drawing characters (└──, ├──, │, ────).
+ * @param {Record<string, object>} node - The tree node to format.
+ * @param {string} [prefix=''] - Prefix string for the current depth level.
+ * @returns {string[]} Array of formatted lines representing the tree.
+ */
 export function formatTree(node, prefix = '') {
   const lines = [];
   const entries = Object.keys(node).sort();
@@ -31,12 +45,24 @@ export function formatTree(node, prefix = '') {
   return lines;
 }
 
+/**
+ * Prints a formatted tree to the given logger (defaults to console.log).
+ * @param {Record<string, object>} node - The tree node to print.
+ * @param {string} [prefix=''] - Prefix string for the current depth level.
+ * @param {Console['log']} [logger=console.log] - Logging function to output lines.
+ */
 export function printTgzTree(node, prefix = '', logger = console.log) {
   for (const line of formatTree(node, prefix)) {
     logger(line);
   }
 }
 
+/**
+ * Main entry point: reads a .tgz archive and prints its directory tree.
+ * @param {string} filePath - Path to the .tgz file.
+ * @param {{ logger?: Console['log'] }} [options] - Optional overrides (e.g. a custom logger).
+ * @returns {Promise<Record<string, object>>} The parsed directory tree.
+ */
 export async function mainPrintTgzTree(filePath, options = {}) {
   const logger = options.logger || console.log;
   const extract = tar.extract();

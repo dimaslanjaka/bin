@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { spawnSync } = require('child_process');
+const { spawnSync } = require('cross-spawn');
 const fs = require('fs');
 const path = require('upath');
 const { Minimatch } = require('minimatch');
@@ -15,7 +15,6 @@ const usingYarn = args['yarn'];
 function runCommand(command, commandArgs) {
   const result = spawnSync(command, commandArgs, {
     cwd,
-    shell: true,
     stdio: 'inherit'
   });
 

@@ -37,8 +37,8 @@ async function start() {
 
     const cwd = dirs.shift();
     console.log('pruning reflog', cwd);
-    await spawnAsync('git', ['reflog', 'expire', '--expire=all', '--all'], { cwd, stdio: 'pipe' }).catch(
-      (e) => console.log('failed prune reflog', e.message)
+    await spawnAsync('git', ['reflog', 'expire', '--expire=all', '--all'], { cwd, stdio: 'pipe' }).catch((e) =>
+      console.log('failed prune reflog', e.message)
     );
     // git gc --prune=now --aggressive
 

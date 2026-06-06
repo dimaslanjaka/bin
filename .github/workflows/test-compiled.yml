@@ -1,7 +1,7 @@
 name: Test Compiled Output
 concurrency:
   group: test-compiled-${{ github.event.workflow_run.head_branch || github.event_name }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 on:
   workflow_dispatch:

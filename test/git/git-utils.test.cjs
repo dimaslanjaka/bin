@@ -1,4 +1,4 @@
-const { runGitCommand } = require('../src/git/utils.cjs');
+const { runGitCommand } = require('../../src/git/utils.cjs');
 const { spawnSync } = require('child_process');
 
 // Mock child_process

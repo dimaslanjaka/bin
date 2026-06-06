@@ -1,15 +1,15 @@
 
 // Load .env file for project environment
-require("dotenv").config({ path: require("upath").join(__dirname, "../.env") });
-require("./env.js"); // Ensure environment is set up
+require("dotenv").config({ path: require("upath").join(__dirname, "../../.env") });
+require("../env.js"); // Ensure environment is set up
 
 // Mock all git modules
-jest.mock("../src/git/utils.cjs");
-jest.mock("../src/git/line-endings.cjs");
-jest.mock("../src/git/permissions.cjs");
-jest.mock("../src/git/pull-strategy.cjs");
-jest.mock("../src/git/user-config.cjs");
-jest.mock("../src/git/normalize.cjs");
+jest.mock("../../src/git/utils.cjs");
+jest.mock("../../src/git/line-endings.cjs");
+jest.mock("../../src/git/permissions.cjs");
+jest.mock("../../src/git/pull-strategy.cjs");
+jest.mock("../../src/git/user-config.cjs");
+jest.mock("../../src/git/normalize.cjs");
 
 // Mock child_process
 jest.mock("child_process");
@@ -37,12 +37,12 @@ describe("git-fix utility", () => {
     processExitSpy = jest.spyOn(process, "exit").mockImplementation();
 
     // Setup module mocks
-    mockIsGitRepository = require("../src/git/utils.cjs").isGitRepository;
-    mockForceLfLineEndings = require("../src/git/line-endings.cjs").forceLfLineEndings;
-    mockIgnoreFilePermissions = require("../src/git/permissions.cjs").ignoreFilePermissions;
-    mockSetPullStrategy = require("../src/git/pull-strategy.cjs").setPullStrategy;
-    mockConfigureGitUser = require("../src/git/user-config.cjs").configureGitUser;
-    mockNormalizeLineEndings = require("../src/git/normalize.cjs").normalizeLineEndings;
+    mockIsGitRepository = require("../../src/git/utils.cjs").isGitRepository;
+    mockForceLfLineEndings = require("../../src/git/line-endings.cjs").forceLfLineEndings;
+    mockIgnoreFilePermissions = require("../../src/git/permissions.cjs").ignoreFilePermissions;
+    mockSetPullStrategy = require("../../src/git/pull-strategy.cjs").setPullStrategy;
+    mockConfigureGitUser = require("../../src/git/user-config.cjs").configureGitUser;
+    mockNormalizeLineEndings = require("../../src/git/normalize.cjs").normalizeLineEndings;
 
     // Default mock implementations
     mockIsGitRepository.mockReturnValue(true);

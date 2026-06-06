@@ -1,11 +1,11 @@
 // Load .env file for project environment
-require('dotenv').config({ path: require('upath').join(__dirname, '../.env'), quiet: true, override: true });
-require('./env.cjs'); // Ensure environment is set up
+require('dotenv').config({ path: require('upath').join(__dirname, '../../.env'), quiet: true, override: true });
+require('../env.cjs'); // Ensure environment is set up
 const fs = require('fs');
 const path = require('upath');
 const os = require('os');
 const { execSync } = require('child_process');
-const { forceLfLineEndings } = require('../src/git/line-endings.cjs');
+const { forceLfLineEndings } = require('../../src/git/line-endings.cjs');
 
 describe('git-fix focused integration tests', () => {
   let tempDir;

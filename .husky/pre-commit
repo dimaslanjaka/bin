@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Update submodules to latest
+# Auto-stage submodule pointer changes in parent repo
+git submodule status | awk '{print $2}' | xargs -r git add
+
 # Generate composite run-tests action and stage it for commit
 node src/github-workflows/generate-test-ci-step-cli.mjs
 if [ -n "$GITHUB_ACTIONS" ] || [ -n "$CI" ]; then

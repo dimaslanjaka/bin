@@ -1,33 +1,33 @@
-import { beforeAll, describe, expect, it, beforeEach, afterEach } from '@jest/globals';
+import { describe, expect, it, beforeEach, afterEach } from '@jest/globals';
 import fs from 'fs-extra';
 import path from 'upath';
 import os from 'os';
 
-// Import the built module (requires `yarn build` first)
-let mod;
-
-beforeAll(async () => {
-  mod = await import('../../src/node-package-packer/build-tarball.mjs');
-});
+import {
+  slugifyPkgName,
+  resolveWorkspaceVersions,
+  transformWorkspaceProtocols,
+  resolveNewestTarball
+} from '../../src/node-package-packer/build-tarball.mjs';
 
 // ---------------------------------------------------------------------------
 // slugifyPkgName
 // ---------------------------------------------------------------------------
 describe('slugifyPkgName()', () => {
   it('replaces @ and / for scoped packages', () => {
-    expect(mod.slugifyPkgName('@scope/name')).toBe('scope-name');
+    expect(slugifyPkgName('@scope/name')).toBe('scope-name');
   });
 
   it('keeps unscoped names unchanged', () => {
-    expect(mod.slugifyPkgName('simple-package')).toBe('simple-package');
+    expect(slugifyPkgName('simple-package')).toBe('simple-package');
   });
 
   it('handles names with version strings', () => {
-    expect(mod.slugifyPkgName('my-pkg-1.0.0')).toBe('my-pkg-1.0.0');
+    expect(slugifyPkgName('my-pkg-1.0.0')).toBe('my-pkg-1.0.0');
   });
 
   it('handles deeply scoped names', () => {
-    expect(mod.slugifyPkgName('@a/b/c')).toBe('a-b-c');
+    expect(slugifyPkgName('@a/b/c')).toBe('a-b-c');
   });
 });
 
@@ -65,7 +65,7 @@ describe('resolveWorkspaceVersions()', () => {
       version: '3.0.0-beta'
     });
 
-    const result = mod.resolveWorkspaceVersions(tmpDir);
+    const result = resolveWorkspaceVersions(tmpDir);
     expect(result).toEqual({
       'pkg-a': '2.1.0',
       '@scope/pkg-b': '3.0.0-beta'
@@ -77,7 +77,7 @@ describe('resolveWorkspaceVersions()', () => {
       name: 'test-no-ws'
     });
 
-    expect(mod.resolveWorkspaceVersions(tmpDir)).toEqual({});
+    expect(resolveWorkspaceVersions(tmpDir)).toEqual({});
   });
 
   it('skips workspace dirs without package.json', () => {
@@ -89,7 +89,7 @@ describe('resolveWorkspaceVersions()', () => {
     fs.mkdirpSync(path.join(tmpDir, 'packages', 'empty-dir'));
     // No package.json inside empty-dir
 
-    expect(mod.resolveWorkspaceVersions(tmpDir)).toEqual({});
+    expect(resolveWorkspaceVersions(tmpDir)).toEqual({});
   });
 
   it('skips workspace packages missing name or version', () => {
@@ -104,7 +104,7 @@ describe('resolveWorkspaceVersions()', () => {
       // no version field
     });
 
-    const result = mod.resolveWorkspaceVersions(tmpDir);
+    const result = resolveWorkspaceVersions(tmpDir);
     expect(result).toEqual({});
   });
 });
@@ -156,12 +156,12 @@ describe('transformWorkspaceProtocols()', () => {
     return rootPkg;
   }
 
-  it('transforms workspace:^ to ^version', () => {
+  it('transforms workspace:^ to ^version', async () => {
     const rootPkg = setupWorkspaces();
     rootPkg.dependencies['pkg-a'] = 'workspace:^';
     fs.writeJsonSync(path.join(tmpDir, 'package.json'), rootPkg);
 
-    const restore = mod.transformWorkspaceProtocols(tmpDir);
+    const restore = await transformWorkspaceProtocols(tmpDir);
 
     const updated = fs.readJsonSync(path.join(tmpDir, 'package.json'));
     expect(updated.dependencies['pkg-a']).toBe('^1.0.0');
@@ -169,12 +169,12 @@ describe('transformWorkspaceProtocols()', () => {
     restore();
   });
 
-  it('transforms workspace:* to plain version', () => {
+  it('transforms workspace:* to plain version', async () => {
     const rootPkg = setupWorkspaces();
     rootPkg.dependencies['pkg-a'] = 'workspace:*';
     fs.writeJsonSync(path.join(tmpDir, 'package.json'), rootPkg);
 
-    const restore = mod.transformWorkspaceProtocols(tmpDir);
+    const restore = await transformWorkspaceProtocols(tmpDir);
 
     const updated = fs.readJsonSync(path.join(tmpDir, 'package.json'));
     expect(updated.dependencies['pkg-a']).toBe('1.0.0');
@@ -182,12 +182,12 @@ describe('transformWorkspaceProtocols()', () => {
     restore();
   });
 
-  it('transforms workspace:~ to ~version', () => {
+  it('transforms workspace:~ to ~version', async () => {
     const rootPkg = setupWorkspaces();
     rootPkg.dependencies['pkg-a'] = 'workspace:~';
     fs.writeJsonSync(path.join(tmpDir, 'package.json'), rootPkg);
 
-    const restore = mod.transformWorkspaceProtocols(tmpDir);
+    const restore = await transformWorkspaceProtocols(tmpDir);
 
     const updated = fs.readJsonSync(path.join(tmpDir, 'package.json'));
     expect(updated.dependencies['pkg-a']).toBe('~1.0.0');
@@ -195,13 +195,13 @@ describe('transformWorkspaceProtocols()', () => {
     restore();
   });
 
-  it('transforms custom semver after workspace: prefix', () => {
+  it('transforms custom semver after workspace: prefix', async () => {
     const rootPkg = setupWorkspaces();
     rootPkg.dependencies['pkg-a'] = 'workspace:1.2.3';
     // pkg-a has version 1.0.0, but custom semver after workspace: should be used as-is
     fs.writeJsonSync(path.join(tmpDir, 'package.json'), rootPkg);
 
-    const restore = mod.transformWorkspaceProtocols(tmpDir);
+    const restore = await transformWorkspaceProtocols(tmpDir);
 
     const updated = fs.readJsonSync(path.join(tmpDir, 'package.json'));
     // Custom semver passes through directly
@@ -210,7 +210,7 @@ describe('transformWorkspaceProtocols()', () => {
     restore();
   });
 
-  it('handles all four dependency fields', () => {
+  it('handles all four dependency fields', async () => {
     const rootPkg = setupWorkspaces([{ dir: 'pkg-c', name: 'pkg-c', version: '3.0.0' }]);
     rootPkg.dependencies['pkg-a'] = 'workspace:^';
     rootPkg.devDependencies['@scope/pkg-b'] = 'workspace:*';
@@ -218,7 +218,7 @@ describe('transformWorkspaceProtocols()', () => {
     rootPkg.optionalDependencies['pkg-a'] = 'workspace:*';
     fs.writeJsonSync(path.join(tmpDir, 'package.json'), rootPkg);
 
-    const restore = mod.transformWorkspaceProtocols(tmpDir);
+    const restore = await transformWorkspaceProtocols(tmpDir);
 
     const updated = fs.readJsonSync(path.join(tmpDir, 'package.json'));
     expect(updated.dependencies['pkg-a']).toBe('^1.0.0');
@@ -229,14 +229,14 @@ describe('transformWorkspaceProtocols()', () => {
     restore();
   });
 
-  it('does not modify non-workspace dependencies', () => {
+  it('does not modify non-workspace dependencies', async () => {
     const rootPkg = setupWorkspaces();
     rootPkg.dependencies['express'] = '^4.18.0';
     rootPkg.dependencies['lodash'] = '4.17.21';
     rootPkg.devDependencies['jest'] = '^29.0.0';
     fs.writeJsonSync(path.join(tmpDir, 'package.json'), rootPkg);
 
-    const restore = mod.transformWorkspaceProtocols(tmpDir);
+    const restore = await transformWorkspaceProtocols(tmpDir);
 
     const updated = fs.readJsonSync(path.join(tmpDir, 'package.json'));
     expect(updated.dependencies['express']).toBe('^4.18.0');
@@ -246,12 +246,12 @@ describe('transformWorkspaceProtocols()', () => {
     restore();
   });
 
-  it('leaves unknown workspace names unchanged with a warning', () => {
+  it('leaves unknown workspace names unchanged with a warning', async () => {
     const rootPkg = setupWorkspaces();
     rootPkg.dependencies['unknown-ws'] = 'workspace:^';
     fs.writeJsonSync(path.join(tmpDir, 'package.json'), rootPkg);
 
-    const restore = mod.transformWorkspaceProtocols(tmpDir);
+    const restore = await transformWorkspaceProtocols(tmpDir);
 
     const updated = fs.readJsonSync(path.join(tmpDir, 'package.json'));
     expect(updated.dependencies['unknown-ws']).toBe('workspace:^');
@@ -259,24 +259,24 @@ describe('transformWorkspaceProtocols()', () => {
     restore();
   });
 
-  it('returns noop restore when nothing is modified', () => {
+  it('returns noop restore when nothing is modified', async () => {
     const rootPkg = setupWorkspaces();
     rootPkg.dependencies['express'] = '^4.18.0';
     fs.writeJsonSync(path.join(tmpDir, 'package.json'), rootPkg);
 
-    const restore = mod.transformWorkspaceProtocols(tmpDir);
+    const restore = await transformWorkspaceProtocols(tmpDir);
     expect(typeof restore).toBe('function');
 
     // Calling noop should not throw
     expect(() => restore()).not.toThrow();
   });
 
-  it('creates .package.json.bak backup file', () => {
+  it('creates .package.json.bak backup file', async () => {
     const rootPkg = setupWorkspaces();
     rootPkg.dependencies['pkg-a'] = 'workspace:^';
     fs.writeJsonSync(path.join(tmpDir, 'package.json'), rootPkg);
 
-    const restore = mod.transformWorkspaceProtocols(tmpDir);
+    const restore = await transformWorkspaceProtocols(tmpDir);
 
     const bakPath = path.join(tmpDir, '.package.json.bak');
     expect(fs.existsSync(bakPath)).toBe(true);
@@ -287,12 +287,12 @@ describe('transformWorkspaceProtocols()', () => {
     restore();
   });
 
-  it('restores original after calling restore', () => {
+  it('restores original after calling restore', async () => {
     const rootPkg = setupWorkspaces();
     rootPkg.dependencies['pkg-a'] = 'workspace:^';
     fs.writeJsonSync(path.join(tmpDir, 'package.json'), rootPkg);
 
-    const restore = mod.transformWorkspaceProtocols(tmpDir);
+    const restore = await transformWorkspaceProtocols(tmpDir);
 
     // Verify transformed
     const transformed = fs.readJsonSync(path.join(tmpDir, 'package.json'));
@@ -309,14 +309,14 @@ describe('transformWorkspaceProtocols()', () => {
     expect(fs.existsSync(path.join(tmpDir, '.package.json.bak'))).toBe(false);
   });
 
-  it('does not modify dependencies without workspace: prefix', () => {
+  it('does not modify dependencies without workspace: prefix', async () => {
     const rootPkg = setupWorkspaces();
     rootPkg.dependencies['pkg-a'] = 'workspace:^';
     // pkg-c is not in workspaces but has a normal dep
     rootPkg.dependencies['pkg-c'] = 'npm:^1.0.0';
     fs.writeJsonSync(path.join(tmpDir, 'package.json'), rootPkg);
 
-    const restore = mod.transformWorkspaceProtocols(tmpDir);
+    const restore = await transformWorkspaceProtocols(tmpDir);
 
     const updated = fs.readJsonSync(path.join(tmpDir, 'package.json'));
     // pkg-a is workspace, pkg-c is not
@@ -342,14 +342,14 @@ describe('resolveNewestTarball()', () => {
   });
 
   it('returns null when no tarballs exist', () => {
-    expect(mod.resolveNewestTarball(tmpDir, ['package.tgz'])).toBeNull();
+    expect(resolveNewestTarball(tmpDir, ['package.tgz'])).toBeNull();
   });
 
   it('returns the named candidate if it exists', () => {
     const tarball = path.join(tmpDir, 'package.tgz');
     fs.writeFileSync(tarball, 'fake-tarball');
 
-    const result = mod.resolveNewestTarball(tmpDir, ['package.tgz']);
+    const result = resolveNewestTarball(tmpDir, ['package.tgz']);
     expect(result).toBe(tarball);
   });
 
@@ -364,7 +364,7 @@ describe('resolveNewestTarball()', () => {
     fs.utimesSync(oldTarball, new Date(now - 60000), new Date(now - 60000));
     fs.utimesSync(newTarball, new Date(now), new Date(now));
 
-    const result = mod.resolveNewestTarball(tmpDir, []);
+    const result = resolveNewestTarball(tmpDir, []);
     expect(result).toBe(newTarball);
   });
 });

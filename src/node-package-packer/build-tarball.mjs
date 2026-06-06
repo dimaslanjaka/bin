@@ -5,6 +5,8 @@ import buildReadme from './build-readme.mjs';
 import { getArgs } from '../utils/index.cjs';
 import * as crossSpawn from 'cross-spawn';
 import { globSync } from 'glob';
+import { getWorkspacesInfo } from './get-workspaces.cjs';
+import { getGithubRawUrl } from 'git-command-helper';
 
 function slugifyPkgName(str) {
   return str.replace(/\//g, '-').replace(/@/g, '');
@@ -50,15 +52,23 @@ function resolveWorkspaceVersions(dirname) {
  * Returns a restore function to undo the changes.
  *
  * @param {string} dirname Repository root directory.
- * @returns {() => void} Restore function to revert package.json.
+ * @returns {Promise<() => void>} Restore function to revert package.json.
  */
-function transformWorkspaceProtocols(dirname) {
+async function transformWorkspaceProtocols(dirname) {
   const pkgPath = path.join(dirname, 'package.json');
-  const original = fs.readFileSync(pkgPath, 'utf-8');
+  const original = await fs.readFile(pkgPath, 'utf-8');
   const pkg = JSON.parse(original);
   const versionMap = resolveWorkspaceVersions(dirname);
   const workspaceDepFields = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'];
   let modified = false;
+
+  const info = await getWorkspacesInfo(process.cwd(), { absolutePaths: false });
+  const workspaces = info.workspaces.map((i) => {
+    return {
+      path: i.path,
+      name: i.name
+    };
+  });
 
   for (const field of workspaceDepFields) {
     const deps = pkg[field];
@@ -68,6 +78,37 @@ function transformWorkspaceProtocols(dirname) {
 
       const match = version.match(/^workspace:(.+)$/);
       if (!match) continue;
+
+      // check if package in local workspace
+      if (workspaces.length > 0) {
+        const find = workspaces.find((w) => w.name === name);
+        if (find) {
+          const isGit = fs.existsSync(path.join(find.path, '.git')) || fs.existsSync(path.join(process.cwd(), '.git'));
+          if (isGit) {
+            // whenever git folder (root or workspace), get github raw url of release(s)/${name}.tgz
+            const tarballPath = [
+              path.join(find.path, 'releases', `${name}.tgz`),
+              path.join(find.path, 'release', `${name}.tgz`)
+            ].filter(fs.existsSync)[0];
+            if (tarballPath) {
+              console.log('found tarball', tarballPath);
+              try {
+                // get tarball github raw url
+                const rawUrl = await getGithubRawUrl(tarballPath);
+                deps[name] = rawUrl;
+                modified = true;
+                console.log(`[info] transformed "${name}" from "${version}" to "${rawUrl}"`);
+                continue;
+              } catch (err) {
+                console.warn(
+                  `[warn] failed to resolve GitHub URL for "${name}" tarball, falling back to version range`,
+                  err
+                );
+              }
+            }
+          }
+        }
+      }
 
       const wsProtocol = match[1]; // e.g. "*" or "^" or "~"
       const actualVersion = versionMap[name];
@@ -102,10 +143,10 @@ function transformWorkspaceProtocols(dirname) {
 
   // Write backup
   const bakPath = path.join(dirname, '.package.json.bak');
-  fs.writeFileSync(bakPath, original, 'utf-8');
+  await fs.writeFile(bakPath, original, 'utf-8');
 
   // Write transformed
-  fs.writeJsonSync(pkgPath, pkg, { spaces: 2, EOL: '\n' });
+  await fs.writeJson(pkgPath, pkg, { spaces: 2, EOL: '\n' });
 
   return () => {
     if (fs.existsSync(bakPath)) {
@@ -287,7 +328,7 @@ export async function bundle(customArgs = {}) {
 
   // Transform workspace protocol references (workspace:^, workspace:*, workspace:~)
   // to real version ranges before packing, then restore after.
-  const restorePkg = transformWorkspaceProtocols(process.cwd());
+  const restorePkg = await transformWorkspaceProtocols(process.cwd());
 
   try {
     const result = crossSpawn.sync(withYarn ? 'yarn' : 'npm', ['pack'], {

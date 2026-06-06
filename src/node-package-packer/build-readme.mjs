@@ -69,10 +69,13 @@ export async function buildReadme(dirname, packagejson, releaseDir, argv, isCI) 
         const isChanged =
           parseInt(
             (
-              await spawnAsync('git status -uno --porcelain -- "' + relativeTarball.replace(/"/g, '\\"') + '" | wc -l', {
-                cwd: dirname,
-                shell: true
-              })
+              await spawnAsync(
+                'git status -uno --porcelain -- "' + relativeTarball.replace(/"/g, '\\"') + '" | wc -l',
+                {
+                  cwd: dirname,
+                  shell: true
+                }
+              )
             ).output.trim()
           ) > 0;
         if (isChanged) {

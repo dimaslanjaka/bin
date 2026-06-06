@@ -140,6 +140,8 @@ echo feat(scope): add new feature for context group > commit.txt
 git commit -F commit.txt
 ```
 
+> after commit, **do not delete commit.txt** to save time
+
 ---
 
 ### Step 6 — Output

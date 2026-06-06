@@ -1,11 +1,11 @@
 // Load .env file for project environment
-require('dotenv').config({ path: require('upath').join(__dirname, '../.env'), quiet: true, override: true });
-require('./env.cjs'); // Ensure environment is set up
-const { configureGitUser } = require('../src/git/user-config.cjs');
-const { runGitCommand } = require('../src/git/utils.cjs');
+require('dotenv').config({ path: require('upath').join(__dirname, '../../.env'), quiet: true, override: true });
+require('../env.cjs'); // Ensure environment is set up
+const { configureGitUser } = require('../../src/git/user-config.cjs');
+const { runGitCommand } = require('../../src/git/utils.cjs');
 
 // Mock the utils module
-jest.mock('../src/git/utils.cjs');
+jest.mock('../../src/git/utils.cjs');
 
 describe('git-user-config', () => {
   let consoleLogSpy;
@@ -57,8 +57,8 @@ describe('git-user-config', () => {
         jest.doMock('git-command-helper', () => ({
           parseGitHubUrl: () => ({ owner: 'otheruser', repo: 'repo' })
         }));
-        jest.doMock('../src/git/utils.cjs', () => {
-          const original = jest.requireActual('../src/git/utils.cjs');
+        jest.doMock('../../src/git/utils.cjs', () => {
+          const original = jest.requireActual('../../src/git/utils.cjs');
           return {
             ...original,
             runGitCommand: jest.fn(() => true),
@@ -68,9 +68,9 @@ describe('git-user-config', () => {
         consoleLogSpyInteractive = jest.spyOn(console, 'log').mockImplementation();
         consoleWarnSpyInteractive = jest.spyOn(console, 'warn').mockImplementation();
         originalArgv = process.argv;
-        ({ configureGitUser: configureGitUserInteractive } = require('../src/git/user-config.cjs'));
-        mockRunGitCommandInteractive = require('../src/git/utils.cjs').runGitCommand;
-        runGitCommandOutputSpy = require('../src/git/utils.cjs').runGitCommandOutput;
+        ({ configureGitUser: configureGitUserInteractive } = require('../../src/git/user-config.cjs'));
+        mockRunGitCommandInteractive = require('../../src/git/utils.cjs').runGitCommand;
+        runGitCommandOutputSpy = require('../../src/git/utils.cjs').runGitCommandOutput;
       });
 
       afterEach(() => {
@@ -114,8 +114,8 @@ describe('git-user-config', () => {
         jest.doMock('git-command-helper', () => ({
           parseGitHubUrl: () => ({ owner: 'otheruser', repo: 'repo' })
         }));
-        jest.doMock('../src/git/utils.cjs', () => {
-          const original = jest.requireActual('../src/git/utils.cjs');
+        jest.doMock('../../src/git/utils.cjs', () => {
+          const original = jest.requireActual('../../src/git/utils.cjs');
           return {
             ...original,
             runGitCommand: jest.fn(() => true),
@@ -123,9 +123,9 @@ describe('git-user-config', () => {
           };
         });
         const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
-        const { configureGitUser } = require('../src/git/user-config.cjs');
-        const mockRunGitCommand = require('../src/git/utils.cjs').runGitCommand;
-        const runGitCommandOutput = require('../src/git/utils.cjs').runGitCommandOutput;
+        const { configureGitUser } = require('../../src/git/user-config.cjs');
+        const mockRunGitCommand = require('../../src/git/utils.cjs').runGitCommand;
+        const runGitCommandOutput = require('../../src/git/utils.cjs').runGitCommandOutput;
         configureGitUser('testuser', 'test@example.com');
         expect(runGitCommandOutput).toHaveBeenCalledWith(
           ['remote', 'get-url', 'origin'],

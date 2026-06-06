@@ -88,68 +88,68 @@ jobs:
           else
             echo "Skipping missing test file: test/getLatestCommit.test.mjs"
           fi
-      - name: 🧪 Run tests in test/git-diff.test.cjs
-        id: run-test-git-diff-test-cjs
+      - name: 🧪 Run tests in test/git/git-diff.test.cjs
+        id: run-test-git-git-diff-test-cjs
         shell: bash
         run: |-
-          if [ -f "test/git-diff.test.cjs" ]; then
+          if [ -f "test/git/git-diff.test.cjs" ]; then
             bash bin/test-cjs --testPathPatterns="git-diff.test.cjs"
           else
-            echo "Skipping missing test file: test/git-diff.test.cjs"
+            echo "Skipping missing test file: test/git/git-diff.test.cjs"
           fi
-      - name: 🧪 Run tests in test/git-fix-focused.test.cjs
-        id: run-test-git-fix-focused-test-cjs
+      - name: 🧪 Run tests in test/git/git-fix-focused.test.cjs
+        id: run-test-git-git-fix-focused-test-cjs
         shell: bash
         run: |-
-          if [ -f "test/git-fix-focused.test.cjs" ]; then
+          if [ -f "test/git/git-fix-focused.test.cjs" ]; then
             bash bin/test-cjs --testPathPatterns="git-fix-focused.test.cjs"
           else
-            echo "Skipping missing test file: test/git-fix-focused.test.cjs"
+            echo "Skipping missing test file: test/git/git-fix-focused.test.cjs"
           fi
-      - name: 🧪 Run tests in test/git-fix.help.test.cjs
-        id: run-test-git-fix-help-test-cjs
+      - name: 🧪 Run tests in test/git/git-fix.help.test.cjs
+        id: run-test-git-git-fix-help-test-cjs
         shell: bash
         run: |-
-          if [ -f "test/git-fix.help.test.cjs" ]; then
+          if [ -f "test/git/git-fix.help.test.cjs" ]; then
             bash bin/test-cjs --testPathPatterns="git-fix.help.test.cjs"
           else
-            echo "Skipping missing test file: test/git-fix.help.test.cjs"
+            echo "Skipping missing test file: test/git/git-fix.help.test.cjs"
           fi
-      - name: 🧪 Run tests in test/git-fix.options.test.cjs
-        id: run-test-git-fix-options-test-cjs
+      - name: 🧪 Run tests in test/git/git-fix.options.test.cjs
+        id: run-test-git-git-fix-options-test-cjs
         shell: bash
         run: |-
-          if [ -f "test/git-fix.options.test.cjs" ]; then
+          if [ -f "test/git/git-fix.options.test.cjs" ]; then
             bash bin/test-cjs --testPathPatterns="git-fix.options.test.cjs"
           else
-            echo "Skipping missing test file: test/git-fix.options.test.cjs"
+            echo "Skipping missing test file: test/git/git-fix.options.test.cjs"
           fi
-      - name: 🧪 Run tests in test/git-fix.summary.test.cjs
-        id: run-test-git-fix-summary-test-cjs
+      - name: 🧪 Run tests in test/git/git-fix.summary.test.cjs
+        id: run-test-git-git-fix-summary-test-cjs
         shell: bash
         run: |-
-          if [ -f "test/git-fix.summary.test.cjs" ]; then
+          if [ -f "test/git/git-fix.summary.test.cjs" ]; then
             bash bin/test-cjs --testPathPatterns="git-fix.summary.test.cjs"
           else
-            echo "Skipping missing test file: test/git-fix.summary.test.cjs"
+            echo "Skipping missing test file: test/git/git-fix.summary.test.cjs"
           fi
-      - name: 🧪 Run tests in test/git-user-config.test.cjs
-        id: run-test-git-user-config-test-cjs
+      - name: 🧪 Run tests in test/git/git-user-config.test.cjs
+        id: run-test-git-git-user-config-test-cjs
         shell: bash
         run: |-
-          if [ -f "test/git-user-config.test.cjs" ]; then
+          if [ -f "test/git/git-user-config.test.cjs" ]; then
             bash bin/test-cjs --testPathPatterns="git-user-config.test.cjs"
           else
-            echo "Skipping missing test file: test/git-user-config.test.cjs"
+            echo "Skipping missing test file: test/git/git-user-config.test.cjs"
           fi
-      - name: 🧪 Run tests in test/git-utils.test.cjs
-        id: run-test-git-utils-test-cjs
+      - name: 🧪 Run tests in test/git/git-utils.test.cjs
+        id: run-test-git-git-utils-test-cjs
         shell: bash
         run: |-
-          if [ -f "test/git-utils.test.cjs" ]; then
+          if [ -f "test/git/git-utils.test.cjs" ]; then
             bash bin/test-cjs --testPathPatterns="git-utils.test.cjs"
           else
-            echo "Skipping missing test file: test/git-utils.test.cjs"
+            echo "Skipping missing test file: test/git/git-utils.test.cjs"
           fi
       - name: 🧪 Run tests in test/gitattributes-parse.test.cjs
         id: run-test-gitattributes-parse-test-cjs

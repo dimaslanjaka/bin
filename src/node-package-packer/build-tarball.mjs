@@ -4,9 +4,115 @@ import path from 'upath';
 import buildReadme from './build-readme.mjs';
 import { getArgs } from '../utils/index.cjs';
 import * as crossSpawn from 'cross-spawn';
+import { globSync } from 'glob';
 
 function slugifyPkgName(str) {
   return str.replace(/\//g, '-').replace(/@/g, '');
+}
+
+/**
+ * Build a map of workspace package name → version from the monorepo workspaces.
+ * @param {string} dirname Repository root directory.
+ * @returns {Record<string, string>}
+ */
+function resolveWorkspaceVersions(dirname) {
+  const rootPkg = fs.readJsonSync(path.join(dirname, 'package.json'));
+  const workspacePatterns = rootPkg.workspaces || [];
+  const versionMap = {};
+
+  for (const pattern of workspacePatterns) {
+    const matches = globSync(pattern, { cwd: dirname, absolute: true });
+    for (const wsDir of matches) {
+      const wsPkgPath = path.join(wsDir, 'package.json');
+      if (fs.existsSync(wsPkgPath)) {
+        try {
+          const wsPkg = fs.readJsonSync(wsPkgPath);
+          if (wsPkg.name && wsPkg.version) {
+            versionMap[wsPkg.name] = wsPkg.version;
+          }
+        } catch {
+          // skip invalid package.json
+        }
+      }
+    }
+  }
+
+  return versionMap;
+}
+
+/**
+ * Transform workspace protocol references in package.json dependency fields.
+ * Yarn uses `workspace:*`, `workspace:^`, `workspace:~` to reference sibling
+ * workspace packages. These must be replaced with real version ranges before
+ * running `npm pack` or `yarn pack` to avoid "Workspace not found" errors.
+ *
+ * Creates a backup at `.package.json.bak` and writes the transformed file.
+ * Returns a restore function to undo the changes.
+ *
+ * @param {string} dirname Repository root directory.
+ * @returns {() => void} Restore function to revert package.json.
+ */
+function transformWorkspaceProtocols(dirname) {
+  const pkgPath = path.join(dirname, 'package.json');
+  const original = fs.readFileSync(pkgPath, 'utf-8');
+  const pkg = JSON.parse(original);
+  const versionMap = resolveWorkspaceVersions(dirname);
+  const workspaceDepFields = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'];
+  let modified = false;
+
+  for (const field of workspaceDepFields) {
+    const deps = pkg[field];
+    if (!deps) continue;
+    for (const [name, version] of Object.entries(deps)) {
+      if (typeof version !== 'string') continue;
+
+      const match = version.match(/^workspace:(.+)$/);
+      if (!match) continue;
+
+      const wsProtocol = match[1]; // e.g. "*" or "^" or "~"
+      const actualVersion = versionMap[name];
+
+      if (!actualVersion) {
+        console.warn(`[warn] workspace package "${name}" not found, keeping "${version}"`);
+        continue;
+      }
+
+      let replacement;
+      if (wsProtocol === '*') {
+        replacement = actualVersion;
+      } else if (wsProtocol === '^') {
+        replacement = `^${actualVersion}`;
+      } else if (wsProtocol === '~') {
+        replacement = `~${actualVersion}`;
+      } else {
+        // custom semver range after workspace: (e.g. workspace:1.2.3)
+        replacement = wsProtocol;
+      }
+
+      deps[name] = replacement;
+      modified = true;
+      console.log(`[info] transformed "${name}" from "${version}" to "${replacement}"`);
+    }
+  }
+
+  if (!modified) {
+    // no changes needed, return noop restore
+    return () => {};
+  }
+
+  // Write backup
+  const bakPath = path.join(dirname, '.package.json.bak');
+  fs.writeFileSync(bakPath, original, 'utf-8');
+
+  // Write transformed
+  fs.writeJsonSync(pkgPath, pkg, { spaces: 2, EOL: '\n' });
+
+  return () => {
+    if (fs.existsSync(bakPath)) {
+      fs.copyFileSync(bakPath, pkgPath);
+      fs.rmSync(bakPath, { force: true });
+    }
+  };
 }
 
 function resolveNewestTarball(dirname, candidateNames) {
@@ -160,8 +266,8 @@ export async function bundleWithNpm(dirname, packagejson, releaseDir, argv, isCI
  * Resolve CLI context and run the pack workflow.
  * @returns {Promise<void>}
  */
-export async function bundle() {
-  const args = getArgs();
+export async function bundle(customArgs = {}) {
+  const args = Object.assign(customArgs, getArgs());
   const withYarn = args.yarn || args._.includes('-yarn') || args._.includes('--yarn');
   const releaseDir1 = path.join(process.cwd(), 'release');
   const releaseDir2 = path.join(process.cwd(), 'releases');
@@ -179,14 +285,23 @@ export async function bundle() {
     fs.mkdirpSync(releaseDir, { recursive: true });
   }
 
-  const result = crossSpawn.sync(withYarn ? 'yarn' : 'npm', ['pack'], {
-    cwd: process.cwd(),
-    stdio: 'ignore',
-    env: { PATH: process.env.PATH }
-  });
+  // Transform workspace protocol references (workspace:^, workspace:*, workspace:~)
+  // to real version ranges before packing, then restore after.
+  const restorePkg = transformWorkspaceProtocols(process.cwd());
 
-  if (result.error) {
-    throw result.error;
+  try {
+    const result = crossSpawn.sync(withYarn ? 'yarn' : 'npm', ['pack'], {
+      cwd: process.cwd(),
+      stdio: 'ignore',
+      env: { PATH: process.env.PATH }
+    });
+
+    if (result.error) {
+      throw result.error;
+    }
+  } finally {
+    // Restore original package.json regardless of pack success/failure
+    restorePkg();
   }
 
   if (isYarn) {
@@ -196,8 +311,14 @@ export async function bundle() {
   }
 }
 
+export { slugifyPkgName, resolveWorkspaceVersions, transformWorkspaceProtocols, resolveNewestTarball };
+
 export default {
   bundleWithYarn,
   bundleWithNpm,
-  getPackageHashes
+  getPackageHashes,
+  slugifyPkgName,
+  resolveWorkspaceVersions,
+  transformWorkspaceProtocols,
+  resolveNewestTarball
 };

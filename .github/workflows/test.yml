@@ -187,6 +187,15 @@ jobs:
           else
             echo "Skipping missing test file: test/node-executor.test.cjs"
           fi
+      - name: 🧪 Run tests in test/node-package-packer/build-tarball.test.mjs
+        id: run-test-node-package-packer-build-tarball-test-mjs
+        shell: bash
+        run: >-
+          if [ -f "test/node-package-packer/build-tarball.test.mjs" ]; then
+            bash bin/test-esm --testPathPatterns="build-tarball.test.mjs"
+          else
+            echo "Skipping missing test file: test/node-package-packer/build-tarball.test.mjs"
+          fi
       - name: 🧪 Run tests in test/print-tree-tarball.test.mjs
         id: run-test-print-tree-tarball-test-mjs
         shell: bash

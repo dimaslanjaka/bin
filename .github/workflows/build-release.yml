@@ -170,6 +170,18 @@ jobs:
             fi
           fi
 
+      - name: '📦 Upload compiled artifacts'
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiled-output
+          path: |
+            lib/
+            binaries/
+            dist/
+            *.lock
+            package-lock.json
+          if-no-files-found: error
+
       - name: '📦 Pack project'
         shell: bash
         run: |

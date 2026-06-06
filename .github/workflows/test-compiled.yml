@@ -36,15 +36,39 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - uses: seepine/hash-files@v1
+        id: get-hash
+        with:
+          gitignore: true
+          ignoreFiles: |
+            !**/node_modules
+            !**/packages
+          patterns: |
+            package.json
+            test/test-compiled.cjs
+            **/*build*
+            **/*rollup*
+            **/*tsconfig*
+            requirements.txt
+
+      - name: 🗃️ Restore Cache
+        uses: actions/cache@v5
+        with:
+          path: |
+            **/node_modules/**
+          key: ${{ runner.os }}-test-${{ steps.get-hash.outputs.hash }}
+
       - name: 🟢 Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
 
       - name: 📥 Install dependencies
+        shell: bash
         run: |
+          touch yarn.lock
           corepack enable
-          corepack yarn install --immutable
+          corepack yarn install
 
       - name: ✅ Verify compiled output
         run: node test/test-compiled.cjs

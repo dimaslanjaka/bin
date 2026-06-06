@@ -77,8 +77,8 @@ jobs:
         id: setup
         uses: ./.github/actions/setup-environments
         with:
-          node-version: ${{ env.CI_NODE_VERSION }}
-          python-version: ${{ env.CI_PYTHON_VERSION }}
+          node-version: '24.x'
+          python-version: '3.11'
           token: ${{ secrets.ACCESS_TOKEN || github.token }}
           prefix-cache-key: '${{ runner.os }}-'
 

@@ -48,7 +48,8 @@ const external = externalDeps.filter((dep) => !path.toUnix(dep).includes('/tsup/
 const baseOption = {
   outDir: 'lib',
   entry: ['./src/**/*.ts', './src/**/*.js', './src/**/*.cjs', './src/**/*.mjs'],
-  target: 'node14',
+  // Targets node18 → node24 (esbuild downlevels to the lowest target for broad compatibility)
+  target: ['node18'],
   // dts: true,
   shims: true,
   // Explicitly exclude tsup shims from being marked as external

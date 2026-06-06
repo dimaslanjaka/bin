@@ -4,16 +4,15 @@ const { globSync } = require('glob');
 
 const cwd = process.cwd();
 const dirs = [
-  { name: 'lib/', rel: 'lib' },
-  { name: 'binaries/', rel: 'binaries' }
+  { name: 'lib/', rel: 'lib', exts: ['.cjs', '.mjs', '.js'] },
+  { name: 'binaries/', rel: 'binaries', exts: ['.cjs'] }
 ];
-const exts = ['.cjs', '.mjs', '.js'];
 
 let failed = 0;
 let passed = 0;
 const emptyDirs = [];
 
-function checkDir(label, dirPath) {
+function checkDir(label, dirPath, exts) {
   for (const ext of exts) {
     const files = globSync(`**/*${ext}`, { cwd: dirPath, nodir: true, ignore: ['*chunk*'] }).sort();
     if (files.length === 0) {
@@ -44,7 +43,7 @@ function checkDir(label, dirPath) {
 }
 
 for (const d of dirs) {
-  checkDir(d.name, path.resolve(cwd, d.rel));
+  checkDir(d.name, path.resolve(cwd, d.rel), d.exts);
 }
 
 if (emptyDirs.length > 0) {

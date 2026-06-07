@@ -20,6 +20,7 @@ const defaultBin = {
   'pkg-resolutions-updater': 'lib/package-resolutions-updater-cli.cjs',
   'pkg-res-updater': 'lib/package-resolutions-updater-cli.cjs',
   'git-diff': 'lib/git/git-diff-cli.cjs',
+  'git-diff-staged-ai': 'lib/git/git-diff-staged-ai-cli.cjs',
   'clean-github-actions-caches': 'lib/github-workflows/clean-github-actions-caches-cli.cjs',
   'clean-github-actions-cache': 'lib/github-workflows/clean-github-actions-caches-cli.cjs',
   'clear-github-actions-cache': 'lib/github-workflows/clean-github-actions-caches-cli.cjs',

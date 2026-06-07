@@ -225,7 +225,7 @@ binary-collections list
 
 | Category | Commands | Description | Docs |
 |---|---|---|---|
-| **Git** | `git-purge`, `git-diff`, `git-fix`, `git-reduce-size`, `git-undo-commit`, `git-undo-staged` | Git repository management, diff enhancements, undo helpers, and optimization | [`git-purge.md`](./docs-src/git-purge.md), [`git-diff.md`](./docs-src/git-diff.md), [`git-fix.md`](./docs-src/git-fix.md), [`git-reduce-size.md`](./docs-src/git-reduce-size.md), [`git-undo.md`](./docs-src/git-undo.md) |
+| **Git** | `git-purge`, `git-diff`, `git-diff-staged-ai`, `git-fix`, `git-reduce-size`, `git-undo-commit`, `git-undo-staged` | Git repository management, diff enhancements, AI commit messages, undo helpers, and optimization | [`git-purge.md`](./docs-src/git-purge.md), [`git-diff.md`](./docs-src/git-diff.md), [`git-diff-staged-ai.md`](./docs-src/git-diff-staged-ai.md), [`git-fix.md`](./docs-src/git-fix.md), [`git-reduce-size.md`](./docs-src/git-reduce-size.md), [`git-undo.md`](./docs-src/git-undo.md) |
 | **Submodules** | `submodule-install`, `submodule-remove`, `submodule-token` | Git submodule operations with authentication token injection | [`submodule-install.md`](./docs-src/submodule-install.md), [`submodule-remove.md`](./docs-src/submodule-remove.md), [`submodule-token.md`](./docs-src/submodule-token.md) |
 | **NPM Scripts** | `nrs`, `run-s`, `run-series`, `npm-run-series` | Run npm scripts in series with pattern matching | [`npm-run-series.md`](./docs-src/npm-run-series.md) |
 | **Conditional Execution** | `run-by-checksum`, `run-checksum`, `run-c` | Run commands only when file checksums change (SHA-256 based) | [`run-by-checksum.md`](./docs-src/run-by-checksum.md) |

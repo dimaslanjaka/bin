@@ -88,6 +88,15 @@ jobs:
           else
             echo "Skipping missing test file: test/getLatestCommit.test.mjs"
           fi
+      - name: 🧪 Run tests in test/git/git-diff-staged-ai.test.mjs
+        id: run-test-git-git-diff-staged-ai-test-mjs
+        shell: bash
+        run: >-
+          if [ -f "test/git/git-diff-staged-ai.test.mjs" ]; then
+            bash bin/test-esm --testPathPatterns="git-diff-staged-ai.test.mjs"
+          else
+            echo "Skipping missing test file: test/git/git-diff-staged-ai.test.mjs"
+          fi
       - name: 🧪 Run tests in test/git/git-diff.test.cjs
         id: run-test-git-git-diff-test-cjs
         shell: bash

@@ -74,9 +74,13 @@ function main() {
   Object.keys(args).forEach((key) => {
     if (key !== '_') {
       const value = args[key];
-      if (typeof value === 'boolean' && value) {
-        // Add boolean flags like -s, --help, -h
-        scriptArgs.push(key.length === 1 ? `-${key}` : `--${key}`);
+      if (typeof value === 'boolean') {
+        // Handle boolean flags: --headless, --no-headless, -h, etc.
+        if (value) {
+          scriptArgs.push(key.length === 1 ? `-${key}` : `--${key}`);
+        } else {
+          scriptArgs.push(`--no-${key}`);
+        }
       } else if (value !== true && value !== false) {
         // Add flags with values like --output=file.txt
         scriptArgs.push(key.length === 1 ? `-${key}` : `--${key}`);

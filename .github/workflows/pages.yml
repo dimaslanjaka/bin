@@ -23,19 +23,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - name: '⬇️ Checkout'
+        uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v6
+      - name: '🟢 Setup Node.js'
+        uses: actions/setup-node@v6
         with:
           node-version: '24.x'
 
-      - uses: actions/configure-pages@v6
+      - name: '⚙️ Configure Pages'
+        uses: actions/configure-pages@v6
 
-      - uses: actions/setup-python@v6
+      - name: '🐍 Setup Python'
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
 
-      - name: Setup Cache
+      - name: '📦 Setup Cache'
         uses: actions/cache@v5
         with:
           path: |
@@ -46,23 +50,24 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-docs-
 
-      - name: Install Dependencies
+      - name: '📥 Install Dependencies'
         shell: bash
         run: |
           pip install mkdocs-material markdown-it-py
 
-      - name: Pre-Process Docs
+      - name: '⚙️ Pre-Process Docs'
         shell: bash
         run: |
           # Pre-process docs in-place before mkdocs validates nav
           python3 hooks/pre-generate-docs.py
 
-      - name: Generate Site
+      - name: '🔨 Generate Site'
         shell: bash
         run: |
           mkdocs build
 
-      - uses: actions/upload-pages-artifact@v4
+      - name: '📤 Upload Pages Artifact'
+        uses: actions/upload-pages-artifact@v4
         with:
           path: site
 
@@ -75,5 +80,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - id: deployment
+      - name: '🚀 Deploy to GitHub Pages'
+        id: deployment
         uses: actions/deploy-pages@v5

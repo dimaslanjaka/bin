@@ -37,7 +37,8 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: seepine/hash-files@v1
+      - name: '🔑 Hash source files for cache key'
+        uses: seepine/hash-files@v1
         id: get-hash
         with:
           gitignore: true

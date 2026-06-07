@@ -50,11 +50,19 @@ src/
   binary-collections.cjs  — main entry point
 ```
 
-## Package Structure
+## Workspace Packages (Submodules)
 
-- Yarn Berry workspace (`yarn@4.9.2`): 2 sub-packages in `packages/`:
-  - `cross-spawn/` — patched cross-spawn fork
-  - `git-command-helper/` — patched git-command-helper fork
+All packages under `packages/` are **git submodules**. Do not modify them from the parent repo — enter each submodule directory and work there directly.
+
+| Package | Remote | Branch |
+|---|---|---|
+| `packages/ai-toolkit` | `https://github.com/dimaslanjaka/ai-toolkit.git` | `master` |
+| `packages/cross-spawn` | `https://github.com/dimaslanjaka/node-cross-spawn.git` | `private` |
+| `packages/git-command-helper` | `https://github.com/dimaslanjaka/git-command-helper.git` | `pre-release` |
+
+**Submodule workflow:**
+- `cd packages/<name>` then `git status` / `git diff` / `git commit` / `git push` inside each submodule
+- Parent repo tracks the submodule commit pointer — it will show as modified when the submodule HEAD changes
 - Workspace commands: `yarn workspaces foreach --worktree --exclude=binary-collections --no-private run build`
 
 ## ESLint

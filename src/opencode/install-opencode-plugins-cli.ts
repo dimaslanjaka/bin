@@ -46,7 +46,10 @@ async function runCommand({ cmd, args, skipIfExists }: Command): Promise<void> {
 
   console.log(`\nRunning: ${cmd} ${args.join(' ')}`);
   await new Promise<void>((resolve, reject) => {
-    const child = spawn(cmd + ' ' + args.map(a => '"' + a.replace(/"/g, '\\"') + '"').join(' '), { stdio: 'inherit', shell: true });
+    const child = spawn(cmd + ' ' + args.map((a) => '"' + a.replace(/"/g, '\\"') + '"').join(' '), {
+      stdio: 'inherit',
+      shell: true
+    });
 
     child.on('close', (code: number) => {
       if (code === 0) resolve();

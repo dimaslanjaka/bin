@@ -12,14 +12,17 @@ node-cache-cleaner [options]
 
 | Option | Description |
 |--------|-------------|
-| `-h, --help` | Show help message |
+| `-h, --help` | Show this help message |
+| `-g, --global` | Also clean NPM, Yarn, and NPX global caches |
 
 ### Description
 
-- Runs `npm cache clean --force` to clean the NPM cache
-- Runs `yarn cache clean` (or `yarn cache clean --all` for Yarn Berry) to clean the Yarn cache
-- Removes `_npx`, `_cacache`, and `.cache/npx` directories to clean the NPX cache
-- All cache cleaning operations run in parallel via `Promise.allSettled`
+- **Default mode** (no flags): Removes project-level Yarn Berry offline cache files (`.yarn/cache*`, `.yarn/*.gz`) only
+- **With `-g` / `--global`**: Runs all global cache cleaners in parallel after the project-level Yarn clean:
+  - `npm cache clean --force` to clean the NPM cache
+  - `yarn cache clean` (or `yarn cache clean --all` for Yarn Berry) to clean the Yarn global cache
+  - NPX cache cleanup (`_npx`, `_cacache`, `.cache/npx` directories)
+- All operations run in parallel via `Promise.allSettled`
 - Exits with code 0 on success, or 1 if any cache clean operation fails
 
 ### Source

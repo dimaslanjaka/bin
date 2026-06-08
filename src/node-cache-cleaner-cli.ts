@@ -3,7 +3,7 @@
 import { getArgs } from './utils/index.cjs';
 import { cleanNpmCache } from './cache-cleaner/npm';
 import { cleanNpxCache } from './cache-cleaner/npx';
-import { cleanYarnCache } from './cache-cleaner/yarn';
+import { cleanYarnCache, cleanProjectYarnCaches } from './cache-cleaner/yarn';
 
 function printHelp() {
   console.log(`
@@ -11,20 +11,25 @@ Usage: cache-cleaner [options]
 
 Options:
   -h, --help     Show this help message
+  -g, --global   Also clean NPM, Yarn, and NPX global caches
 
 Description:
-  Cleans NPM, Yarn, and NPX caches in parallel.
+  By default, removes project-level Yarn Berry offline cache files
+  (.yarn/cache*, .yarn/*.gz). Pass --global to additionally clean global
+  NPM, Yarn, and NPX caches.
 `);
 }
 
 async function run() {
   const argv = getArgs({
-    boolean: ['help'],
+    boolean: ['help', 'global'],
     alias: {
-      h: 'help'
+      h: 'help',
+      g: 'global'
     },
     default: {
-      help: false
+      help: false,
+      global: false
     }
   });
 
@@ -33,9 +38,15 @@ async function run() {
     process.exit(0);
   }
 
-  const results = await Promise.allSettled([cleanNpmCache(), cleanYarnCache(), cleanNpxCache()]);
+  const cleaners: Promise<unknown>[] = [cleanProjectYarnCaches()];
+  const labels: string[] = ['Yarn (project cache)'];
 
-  const labels = ['NPM', 'Yarn', 'NPX'];
+  if (argv.global) {
+    cleaners.push(cleanNpmCache(), cleanYarnCache(), cleanNpxCache());
+    labels.push('NPM', 'Yarn (global)', 'NPX');
+  }
+
+  const results = await Promise.allSettled(cleaners);
 
   results.forEach((result, i) => {
     if (result.status === 'fulfilled') {

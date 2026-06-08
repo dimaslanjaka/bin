@@ -115,9 +115,9 @@ async function main() {
 
   // 4. Run pre-upload setup commands on remote server
   const setupCommands = [
-    'npx --legacy-peer-deps -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz pkg-res-updater',
+    `npx --legacy-peer-deps -y binary-collections@https://github.com/dimaslanjaka/bin/raw/${LATEST_REMOTE_COMMIT_HASH}/releases/bin.tgz pkg-res-updater`,
     'touch yarn.lock',
-    `yarn add -D binary-collections@https://github.com/dimaslanjaka/bin/raw/${LATEST_REMOTE_COMMIT_HASH}/releases/bin.tgz`,
+    `yarn add --mode skip-build -D binary-collections@https://github.com/dimaslanjaka/bin/raw/${LATEST_REMOTE_COMMIT_HASH}/releases/bin.tgz`,
     'git restore package.json .vscode'
   ];
   console.log(`\nRunning setup commands on ${sftpConfig.host}:${sftpConfig.remotePath}...`);

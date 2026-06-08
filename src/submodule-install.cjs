@@ -24,168 +24,173 @@ if (args.help || args.h) {
   process.exit(0);
 }
 
-let ROOT = runGit(['rev-parse', '--show-toplevel']).trim();
-let REPO_PATH = ROOT;
+(async () => {
+  let ROOT = runGit(['rev-parse', '--show-toplevel']).trim();
+  let REPO_PATH = ROOT;
 
-if (args.cwd) {
-  ROOT = path.resolve(args.cwd);
-} else if (positional.length > 0) {
-  ROOT = path.resolve(positional[0]);
-}
-
-// Track visited submodules by absolute path to prevent infinite recursion
-const CURRENT_PATH = ROOT;
-
-// Prevent recursion loops
-const VISITED_SUBMODULES = (process.env.VISITED_SUBMODULES || '').split(path.delimiter).filter(Boolean);
-
-if (VISITED_SUBMODULES.includes(CURRENT_PATH)) {
-  console.log(`Skipping ${CURRENT_PATH} (already processed) to avoid recursion.`);
-  process.exit(0);
-}
-
-VISITED_SUBMODULES.push(CURRENT_PATH);
-process.env.VISITED_SUBMODULES = VISITED_SUBMODULES.join(path.delimiter);
-
-console.log(`Installing submodules at ${ROOT}`);
-
-// -------------------------------
-// SAFE .gitmodules CHECK (ROOT)
-// -------------------------------
-const ROOT_GITMODULES = path.join(REPO_PATH, '.gitmodules');
-
-if (!fs.existsSync(ROOT_GITMODULES) || fs.statSync(ROOT_GITMODULES).size === 0) {
-  console.log(`No valid .gitmodules found at ${ROOT_GITMODULES}. Skipping submodule processing.`);
-  process.exit(0);
-}
-
-// -------------------------------
-// SAFE git config read
-// -------------------------------
-let submoduleList = [];
-try {
-  const output = runGit(['-C', REPO_PATH, 'config', '-f', '.gitmodules', '--get-regexp', '^submodule\\..*\\.path$']);
-
-  submoduleList = output.split('\n').filter(Boolean);
-} catch (err) {
-  console.log('No submodules found or .gitmodules invalid. Skipping.', err);
-  process.exit(0);
-}
-
-// -------------------------------
-// PROCESS SUBMODULES
-// -------------------------------
-for (const line of submoduleList) {
-  const [KEY, MODULE_PATH] = line.trim().split(/\s+/);
-  const RELATIVE_MODULE_PATH = path.join(ROOT, MODULE_PATH);
-
-  if (fs.existsSync(RELATIVE_MODULE_PATH)) {
-    console.log(`Deleting ${RELATIVE_MODULE_PATH}`);
-    fs.rmSync(RELATIVE_MODULE_PATH, { recursive: true, force: true });
+  if (args.cwd) {
+    ROOT = path.resolve(args.cwd);
+  } else if (positional.length > 0) {
+    ROOT = path.resolve(positional[0]);
   }
 
-  const NAME = KEY.match(/^submodule\.(.*)\.path$/)[1];
+  // Track visited submodules by absolute path to prevent infinite recursion
+  const CURRENT_PATH = ROOT;
 
-  const URL = runGit(['-C', REPO_PATH, 'config', '-f', '.gitmodules', '--get', `submodule.${NAME}.url`]).trim();
+  // Prevent recursion loops
+  const VISITED_SUBMODULES = (process.env.VISITED_SUBMODULES || '').split(path.delimiter).filter(Boolean);
 
-  let BRANCH;
+  if (VISITED_SUBMODULES.includes(CURRENT_PATH)) {
+    console.log(`Skipping ${CURRENT_PATH} (already processed) to avoid recursion.`);
+    process.exit(0);
+  }
+
+  VISITED_SUBMODULES.push(CURRENT_PATH);
+  process.env.VISITED_SUBMODULES = VISITED_SUBMODULES.join(path.delimiter);
+
+  console.log(`Installing submodules at ${ROOT}`);
+
+  // -------------------------------
+  // SAFE .gitmodules CHECK (ROOT)
+  // -------------------------------
+  const ROOT_GITMODULES = path.join(REPO_PATH, '.gitmodules');
+
+  if (!fs.existsSync(ROOT_GITMODULES) || fs.statSync(ROOT_GITMODULES).size === 0) {
+    console.log(`No valid .gitmodules found at ${ROOT_GITMODULES}. Skipping submodule processing.`);
+    process.exit(0);
+  }
+
+  // -------------------------------
+  // SAFE git config read
+  // -------------------------------
+  let submoduleList = [];
   try {
-    BRANCH = runGit(['-C', REPO_PATH, 'config', '-f', '.gitmodules', '--get', `submodule.${NAME}.branch`]).trim();
-    if (!BRANCH) BRANCH = 'master';
+    const output = runGit(['-C', REPO_PATH, 'config', '-f', '.gitmodules', '--get-regexp', '^submodule\\..*\\.path$']);
+
+    submoduleList = output.split('\n').filter(Boolean);
   } catch (err) {
-    console.log(`Error occurred while fetching branch for submodule ${NAME}:`, err);
-    BRANCH = 'master';
+    console.log('No submodules found or .gitmodules invalid. Skipping.', err);
+    process.exit(0);
   }
 
-  console.log(`Submodule: ${color.cyan(NAME)}`);
-  console.log(`  Location: ${color.magenta(MODULE_PATH)}`);
-  console.log(`  ROOT: ${color.yellow(ROOT)}`);
-  console.log(`  URL: ${color.blue(URL)}`);
-  console.log(`  Branch: ${color.green(BRANCH)}`);
+  // -------------------------------
+  // PROCESS SUBMODULES
+  // -------------------------------
+  for (const line of submoduleList) {
+    const [KEY, MODULE_PATH] = line.trim().split(/\s+/);
+    const RELATIVE_MODULE_PATH = path.join(ROOT, MODULE_PATH);
 
-  const addResult = runGit(
-    ['-C', REPO_PATH, 'submodule', 'add', '--force', '-b', BRANCH, '--name', NAME, URL, MODULE_PATH],
-    true
-  );
+    if (fs.existsSync(RELATIVE_MODULE_PATH)) {
+      console.log(`Deleting ${RELATIVE_MODULE_PATH}`);
+      fs.rmSync(RELATIVE_MODULE_PATH, { recursive: true, force: true });
+    }
 
-  if (addResult.status !== 0) {
-    console.warn(`Cannot add submodule ${MODULE_PATH}`);
-    continue;
-  }
+    const NAME = KEY.match(/^submodule\.(.*)\.path$/)[1];
 
-  if (!fs.existsSync(RELATIVE_MODULE_PATH)) {
-    console.warn(`Submodule directory missing. Attempting manual clone...`);
+    const URL = runGit(['-C', REPO_PATH, 'config', '-f', '.gitmodules', '--get', `submodule.${NAME}.url`]).trim();
+
+    let BRANCH;
     try {
-      runGit(['clone', '--branch', BRANCH, URL, RELATIVE_MODULE_PATH]);
-    } catch (e) {
-      console.error(`Manual clone failed: ${e.message}`);
+      BRANCH = runGit(['-C', REPO_PATH, 'config', '-f', '.gitmodules', '--get', `submodule.${NAME}.branch`]).trim();
+      if (!BRANCH) BRANCH = 'master';
+    } catch (err) {
+      console.log(`Error occurred while fetching branch for submodule ${NAME}:`, err);
+      BRANCH = 'master';
+    }
+
+    console.log(`Submodule: ${color.cyan(NAME)}`);
+    console.log(`  Location: ${color.magenta(MODULE_PATH)}`);
+    console.log(`  ROOT: ${color.yellow(ROOT)}`);
+    console.log(`  URL: ${color.blue(URL)}`);
+    console.log(`  Branch: ${color.green(BRANCH)}`);
+
+    const addResult = runGit(
+      ['-C', REPO_PATH, 'submodule', 'add', '--force', '-b', BRANCH, '--name', NAME, URL, MODULE_PATH],
+      true
+    );
+
+    if (addResult.status !== 0) {
+      console.warn(`Cannot add submodule ${MODULE_PATH}`);
       continue;
     }
 
     if (!fs.existsSync(RELATIVE_MODULE_PATH)) {
-      console.error(`Still missing after clone: ${RELATIVE_MODULE_PATH}`);
+      console.warn(`Submodule directory missing. Attempting manual clone...`);
+      try {
+        runGit(['clone', '--branch', BRANCH, URL, RELATIVE_MODULE_PATH]);
+      } catch (e) {
+        console.error(`Manual clone failed: ${e.message}`);
+        continue;
+      }
+
+      if (!fs.existsSync(RELATIVE_MODULE_PATH)) {
+        console.error(`Still missing after clone: ${RELATIVE_MODULE_PATH}`);
+        continue;
+      }
+    }
+
+    const GIT_MODULES = path.join(RELATIVE_MODULE_PATH, '.gitmodules');
+
+    if (!fs.existsSync(GIT_MODULES)) {
+      console.log(`No .gitmodules in ${RELATIVE_MODULE_PATH}. Skipping nested processing.`);
       continue;
     }
-  }
 
-  const GIT_MODULES = path.join(RELATIVE_MODULE_PATH, '.gitmodules');
-
-  if (!fs.existsSync(GIT_MODULES)) {
-    console.log(`No .gitmodules in ${RELATIVE_MODULE_PATH}. Skipping nested processing.`);
-    continue;
-  }
-
-  if (fs.statSync(GIT_MODULES).size === 0) {
-    console.log(`Empty .gitmodules in ${RELATIVE_MODULE_PATH}. Skipping nested processing.`);
-    continue;
-  }
-
-  const token = getGithubToken();
-  if (token) {
-    let URL_WITH_TOKEN;
-    let repoInfo;
-
-    if (URL.includes('github.com')) {
-      repoInfo = URL.replace('https://github.com/', '');
-      URL_WITH_TOKEN = `https://${token}@github.com/${repoInfo}`;
-    } else if (URL.includes('gitlab.com') && typeof process.env.GITLAB_TOKEN === 'string') {
-      repoInfo = URL.replace('https://gitlab.com/', '');
-      URL_WITH_TOKEN = `https://oauth2:${token}@gitlab.com/${repoInfo}`;
-    } else {
-      const urlObj = new URL(URL);
-      repoInfo = urlObj.pathname.substring(1);
-      URL_WITH_TOKEN = `${urlObj.protocol}//${token}@${urlObj.host}${urlObj.pathname}`;
+    if (fs.statSync(GIT_MODULES).size === 0) {
+      console.log(`Empty .gitmodules in ${RELATIVE_MODULE_PATH}. Skipping nested processing.`);
+      continue;
     }
 
-    if (URL_WITH_TOKEN) {
-      console.log(`Apply token for ${repoInfo} at ${MODULE_PATH}`);
-      runGit(['-C', RELATIVE_MODULE_PATH, 'remote', 'set-url', 'origin', URL_WITH_TOKEN]);
+    const token = await getGithubToken();
+    if (token) {
+      let URL_WITH_TOKEN;
+      let repoInfo;
+
+      if (URL.includes('github.com')) {
+        repoInfo = URL.replace('https://github.com/', '');
+        URL_WITH_TOKEN = `https://${token}@github.com/${repoInfo}`;
+      } else if (URL.includes('gitlab.com') && typeof process.env.GITLAB_TOKEN === 'string') {
+        repoInfo = URL.replace('https://gitlab.com/', '');
+        URL_WITH_TOKEN = `https://oauth2:${token}@gitlab.com/${repoInfo}`;
+      } else {
+        const urlObj = new URL(URL);
+        repoInfo = urlObj.pathname.substring(1);
+        URL_WITH_TOKEN = `${urlObj.protocol}//${token}@${urlObj.host}${urlObj.pathname}`;
+      }
+
+      if (URL_WITH_TOKEN) {
+        console.log(`Apply token for ${repoInfo} at ${MODULE_PATH}`);
+        runGit(['-C', RELATIVE_MODULE_PATH, 'remote', 'set-url', 'origin', URL_WITH_TOKEN]);
+      }
+    }
+
+    runGit(['-C', RELATIVE_MODULE_PATH, 'fetch', '--all']);
+    runGit(['-C', RELATIVE_MODULE_PATH, 'pull', 'origin', BRANCH, '-X', 'theirs']);
+
+    // recursive submodule handling
+    console.log(`${MODULE_PATH} has submodules`);
+    const env = Object.assign({}, process.env, {
+      VISITED_SUBMODULES: process.env.VISITED_SUBMODULES + path.delimiter + path.resolve(RELATIVE_MODULE_PATH)
+    });
+
+    const result = spawnSync('node', [__filename, '-cwd', RELATIVE_MODULE_PATH], {
+      stdio: 'inherit',
+      env,
+      cwd: RELATIVE_MODULE_PATH
+    });
+
+    if (result.status !== 0) {
+      console.error(`Recursive submodule failed for ${RELATIVE_MODULE_PATH}`);
+      process.exit(result.status);
     }
   }
 
-  runGit(['-C', RELATIVE_MODULE_PATH, 'fetch', '--all']);
-  runGit(['-C', RELATIVE_MODULE_PATH, 'pull', 'origin', BRANCH, '-X', 'theirs']);
-
-  // recursive submodule handling
-  console.log(`${MODULE_PATH} has submodules`);
-  const env = Object.assign({}, process.env, {
-    VISITED_SUBMODULES: process.env.VISITED_SUBMODULES + path.delimiter + path.resolve(RELATIVE_MODULE_PATH)
-  });
-
-  const result = spawnSync('node', [__filename, '-cwd', RELATIVE_MODULE_PATH], {
-    stdio: 'inherit',
-    env,
-    cwd: RELATIVE_MODULE_PATH
-  });
-
-  if (result.status !== 0) {
-    console.error(`Recursive submodule failed for ${RELATIVE_MODULE_PATH}`);
-    process.exit(result.status);
-  }
-}
-
-// final sync
-runGit(['-C', REPO_PATH, 'submodule', 'update', '--init', '--recursive']);
+  // final sync
+  runGit(['-C', REPO_PATH, 'submodule', 'update', '--init', '--recursive']);
+})().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
 
 // ---------------------------
 // Helper

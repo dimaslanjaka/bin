@@ -91,7 +91,7 @@ try {
  * @returns {Promise<any>}
  */
 export async function fetchJson(url) {
-  const token = getGithubToken();
+  const token = await getGithubToken();
   const response = await fetchResponse(url, {
     headers: {
       'User-Agent': selectedUserAgent,

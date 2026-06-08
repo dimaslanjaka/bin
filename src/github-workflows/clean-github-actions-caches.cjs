@@ -2,13 +2,6 @@ const axios = require('axios');
 const { getArgs } = require('../utils/index.cjs');
 const { getGithubToken } = require('../binary-collections/config.cjs');
 
-const accessToken = getGithubToken();
-if (!accessToken) {
-  throw new Error(
-    'Access token is not provided. Please set ACCESS_TOKEN or GITHUB_TOKEN in your environment variables.'
-  );
-}
-
 /**
  * Print CLI help message.
  *
@@ -86,32 +79,26 @@ if (argv.help) {
  * @param {string|number} cacheId - The ID of the cache to delete.
  * @returns {Promise<any>} Promise resolving with GitHub API response.
  */
-function deleteGitHubActionsCache(GH_REPO, cacheId) {
-  return new Promise((resolve, reject) => {
-    const url = `https://api.github.com/repos/${GH_REPO}/actions/caches/${cacheId}`;
-    const token = getGithubToken();
+async function deleteGitHubActionsCache(GH_REPO, cacheId) {
+  const token = await getGithubToken();
 
-    if (!token) {
-      return reject(new Error('Access token is not provided'));
-    }
+  if (!token) {
+    throw new Error('Access token is not provided');
+  }
 
-    axios
-      .delete(url, {
-        headers: {
-          Authorization: `token ${token}`,
-          Accept: 'application/vnd.github.v3+json'
-        }
-      })
-      .then((response) => {
-        console.log(`Cache (${cacheId}) deleted successfully`, response.data);
-        resolve(response.data);
-      })
-      .catch((error) => {
-        console.error('Error deleting cache:', error.response?.data || error.message || 'Unknown error');
-
-        reject(error);
-      });
-  });
+  try {
+    const response = await axios.delete(`https://api.github.com/repos/${GH_REPO}/actions/caches/${cacheId}`, {
+      headers: {
+        Authorization: `token ${token}`,
+        Accept: 'application/vnd.github.v3+json'
+      }
+    });
+    console.log(`Cache (${cacheId}) deleted successfully`, response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting cache:', error.response?.data || error.message || 'Unknown error');
+    throw error;
+  }
 }
 
 /**
@@ -216,31 +203,21 @@ function groupCachesByPrefix(caches, prefixDepth = 3) {
  * @param {number} [prefixDepth=3]
  * @returns {Promise<Record<string, Record<string, any>[]>>}
  */
-function get_caches(GH_REPO, prefixDepth = 3) {
+async function get_caches(GH_REPO, prefixDepth = 3) {
+  const token = await getGithubToken();
   const url = `https://api.github.com/repos/${GH_REPO}/actions/caches`;
 
-  return new Promise((resolve, reject) => {
-    axios
-      .get(url, {
-        headers: {
-          Accept: 'application/vnd.github.v3+json',
-          Authorization: `token ${getGithubToken()}`
-        }
-      })
-      .then((response) => {
-        /**
-         * @type {Record<string, any>[]}
-         */
-        const data = response.data.actions_caches;
-        const grouped = groupCachesByPrefix(data, prefixDepth);
-
-        resolve(grouped);
-      })
-      .catch((error) => {
-        // console.error("Error fetching data:", error);
-        reject(error);
-      });
+  const response = await axios.get(url, {
+    headers: {
+      Accept: 'application/vnd.github.v3+json',
+      Authorization: `token ${token}`
+    }
   });
+  /**
+   * @type {Record<string, any>[]}
+   */
+  const data = response.data.actions_caches;
+  return groupCachesByPrefix(data, prefixDepth);
 }
 
 module.exports = {

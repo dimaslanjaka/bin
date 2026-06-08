@@ -9,18 +9,40 @@ const axios = require('axios');
 const { spawn } = require('cross-spawn');
 const { getGithubToken } = require('../binary-collections/config.cjs');
 
-const token = getGithubToken();
-if (!token) {
-  console.error('Missing env var: ACCESS_TOKEN or GITHUB_TOKEN');
-  process.exit(1);
+const BASE = 'https://api.github.com';
+
+/** @type {Promise<string>|null} */
+let _tokenPromise = null;
+
+/**
+ * Lazily resolve and cache the GitHub token.
+ * @returns {Promise<string>}
+ */
+async function getToken() {
+  if (_tokenPromise) return _tokenPromise;
+  _tokenPromise = (async () => {
+    const token = await getGithubToken();
+    if (!token) {
+      console.error('Missing env var: ACCESS_TOKEN or GITHUB_TOKEN');
+      process.exit(1);
+    }
+    return token;
+  })();
+  return _tokenPromise;
 }
 
-const BASE = 'https://api.github.com';
-const HEADERS = {
-  Authorization: `Bearer ${token}`,
-  Accept: 'application/vnd.github+json',
-  'X-GitHub-Api-Version': '2022-11-28'
-};
+/**
+ * Build authorization headers with a lazily-resolved token.
+ * @returns {Promise<object>}
+ */
+async function getHeaders() {
+  const token = await getToken();
+  return {
+    Authorization: `Bearer ${token}`,
+    Accept: 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28'
+  };
+}
 
 // ─── API request ───────────────────────────────────────────
 
@@ -31,7 +53,7 @@ const HEADERS = {
  */
 async function request(url) {
   try {
-    const res = await axios.get(url, { headers: HEADERS });
+    const res = await axios.get(url, { headers: await getHeaders() });
     return res.data;
   } catch (err) {
     if (err?.response) {
@@ -193,7 +215,8 @@ async function getJobs(owner, repo, runId) {
 
 module.exports = {
   BASE,
-  HEADERS,
+  getHeaders,
+  getToken,
   request,
   runGit,
   parseOwnerFromUrl,

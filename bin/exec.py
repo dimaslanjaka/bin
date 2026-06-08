@@ -6,13 +6,13 @@ import subprocess
 from pathlib import Path
 from typing import List, Optional
 
-_SCRIPT = Path(__file__).name
+_SCRIPT = str(Path(__file__).resolve())
 
 
 def _help_text() -> str:
     """Build help text with dynamic script name."""
     return f"""\
-Generic runner wrapper for Node.js, PHP, and Python scripts.
+Generic runner wrapper for Node.js, PHP, Python, Ruby, Go, Deno, Lua, Shell, and Perl scripts.
 
 Usage:
   python {_SCRIPT} [runner-options] <file> [forwarded-args...]
@@ -21,6 +21,11 @@ Examples:
   python {_SCRIPT} folder/script.php --cli-php-script=anyValue
   python {_SCRIPT} folder/script.js --name=test
   python {_SCRIPT} folder/script.py --foo bar
+  python {_SCRIPT} folder/script.rb --verbose
+  python {_SCRIPT} folder/script.go --help
+  python {_SCRIPT} folder/script.ts --debug
+  python {_SCRIPT} folder/script.sh --dry-run
+  python {_SCRIPT} folder/script.pl --foo
 
 Keep new CMD open:
   python {_SCRIPT} -k folder/script.php --cli-php-script=anyValue
@@ -28,24 +33,22 @@ Keep new CMD open:
 Run in same terminal:
   python {_SCRIPT} -s folder/script.js --debug
 
-Force runtime manually:
-  python {_SCRIPT} --runtime node folder/script.js --foo=bar
-  python {_SCRIPT} --runtime php folder/script.php --foo=bar
-  python {_SCRIPT} --runtime python folder/script.py --foo=bar
+Select runtime or override binary:
+  python {_SCRIPT} -l node folder/script.js --foo=bar
+  python {_SCRIPT} -l ruby folder/script.rb --foo=bar
+  python {_SCRIPT} -l go folder/script.go --foo=bar
 
-Use custom binary:
-  python {_SCRIPT} --node node folder/script.js
-  python {_SCRIPT} --php php folder/script.php
-  python {_SCRIPT} --python py folder/script.py
+Select runtime and override binary:
+  python {_SCRIPT} -l node=/usr/bin/node folder/script.js
+  python {_SCRIPT} -l ruby=C:\\Ruby\\bin\\ruby.exe folder/script.rb
+  python {_SCRIPT} --lang go=/usr/local/go/bin/go folder/script.go
 
 Runner options:
   -k, --keep-open          Use cmd /k, keep CMD open after script exits
   --cmd-mode c|k           Use cmd /c or cmd /k
   -s, --same-terminal      Run in current terminal instead of opening new CMD
-  -r, --runtime NAME       auto, node, php, python
-  --node PATH              Node executable, default: node
-  --php PATH               PHP executable, default: php
-  --python PATH            Python executable, default: current Python
+  -l, --lang KEY[=PATH]    Runtime: auto, node, php, python, ruby, go, deno, lua, sh, perl.
+                            With =PATH also overrides the binary for that runtime.
   --cwd DIR                Working directory
   --dry-run                Print command without running
   -h, --help               Show this help
@@ -59,6 +62,27 @@ Important:
 NODE_EXTENSIONS = {".js", ".mjs", ".cjs"}
 PHP_EXTENSIONS = {".php"}
 PYTHON_EXTENSIONS = {".py"}
+RUBY_EXTENSIONS = {".rb"}
+GO_EXTENSIONS = {".go"}
+DENO_EXTENSIONS = {".ts", ".tsx"}
+LUA_EXTENSIONS = {".lua"}
+SHELL_EXTENSIONS = {".sh", ".bash"}
+PERL_EXTENSIONS = {".pl", ".pm"}
+
+_VALID_RUNTIMES = {"auto", "node", "php", "python", "ruby", "go", "deno", "lua", "sh", "perl"}
+
+# Maps runtime name → RunnerArgs attribute for its binary path
+_RUNTIME_BIN_ATTR = {
+    "node": "node_bin",
+    "php": "php_bin",
+    "python": "python_bin",
+    "ruby": "ruby_bin",
+    "go": "go_bin",
+    "deno": "deno_bin",
+    "lua": "lua_bin",
+    "sh": "sh_bin",
+    "perl": "perl_bin",
+}
 
 
 class RunnerArgs:
@@ -70,6 +94,12 @@ class RunnerArgs:
         self.node_bin = os.environ.get("NODE_BIN", "node")
         self.php_bin = os.environ.get("PHP_BIN", "php")
         self.python_bin = os.environ.get("PYTHON_BIN", sys.executable)
+        self.ruby_bin = os.environ.get("RUBY_BIN", "ruby")
+        self.go_bin = os.environ.get("GO_BIN", "go")
+        self.deno_bin = os.environ.get("DENO_BIN", "deno")
+        self.lua_bin = os.environ.get("LUA_BIN", "lua")
+        self.sh_bin = os.environ.get("SH_BIN", "bash")
+        self.perl_bin = os.environ.get("PERL_BIN", "perl")
 
         self.same_terminal = False
         self.keep_open = False
@@ -125,34 +155,6 @@ def parse_args(argv: List[str]) -> RunnerArgs:
             i += 1
             continue
 
-        if arg in ("-r", "--runtime"):
-            i += 1
-
-            if i >= len(argv):
-                print_error("Missing value for --runtime")
-                sys.exit(1)
-
-            runtime = normalize_runtime(argv[i])
-
-            if runtime not in {"auto", "node", "php", "python"}:
-                print_error("Invalid runtime. Use: auto, node, php, python")
-                sys.exit(1)
-
-            parsed.runtime = runtime
-            i += 1
-            continue
-
-        if arg.startswith("--runtime="):
-            runtime = normalize_runtime(arg.split("=", 1)[1])
-
-            if runtime not in {"auto", "node", "php", "python"}:
-                print_error("Invalid runtime. Use: auto, node, php, python")
-                sys.exit(1)
-
-            parsed.runtime = runtime
-            i += 1
-            continue
-
         if arg == "--cmd-mode":
             i += 1
 
@@ -183,51 +185,39 @@ def parse_args(argv: List[str]) -> RunnerArgs:
             i += 1
             continue
 
-        if arg == "--node":
+        # -l/--lang <runtime>[=<path>]  —  select runtime and optionally override binary
+        if arg in ("-l", "--lang"):
             i += 1
 
             if i >= len(argv):
-                print_error("Missing value for --node")
+                print_error("Missing value for --lang")
                 sys.exit(1)
 
-            parsed.node_bin = argv[i]
-            i += 1
-            continue
+            lang_val = argv[i]
 
-        if arg.startswith("--node="):
-            parsed.node_bin = arg.split("=", 1)[1]
-            i += 1
-            continue
+            if "=" in lang_val:
+                # -l ruby=/path  →  select runtime + override binary
+                runtime, path = lang_val.split("=", 1)
+                runtime = normalize_runtime(runtime.strip())
 
-        if arg == "--php":
-            i += 1
+                if runtime not in _RUNTIME_BIN_ATTR:
+                    valid = ", ".join(sorted(_RUNTIME_BIN_ATTR))
+                    print_error(f"Unknown runtime '{runtime}'. Valid: {valid}")
+                    sys.exit(1)
 
-            if i >= len(argv):
-                print_error("Missing value for --php")
-                sys.exit(1)
+                setattr(parsed, _RUNTIME_BIN_ATTR[runtime], path)
+                parsed.runtime = runtime
+            else:
+                # -l ruby  →  just select runtime
+                runtime = normalize_runtime(lang_val)
 
-            parsed.php_bin = argv[i]
-            i += 1
-            continue
+                if runtime not in _VALID_RUNTIMES:
+                    valid = ", ".join(sorted(_VALID_RUNTIMES))
+                    print_error(f"Unknown runtime '{runtime}'. Valid: {valid}")
+                    sys.exit(1)
 
-        if arg.startswith("--php="):
-            parsed.php_bin = arg.split("=", 1)[1]
-            i += 1
-            continue
+                parsed.runtime = runtime
 
-        if arg == "--python":
-            i += 1
-
-            if i >= len(argv):
-                print_error("Missing value for --python")
-                sys.exit(1)
-
-            parsed.python_bin = argv[i]
-            i += 1
-            continue
-
-        if arg.startswith("--python="):
-            parsed.python_bin = arg.split("=", 1)[1]
             i += 1
             continue
 
@@ -266,6 +256,12 @@ def normalize_runtime(runtime: str) -> str:
         "nodejs": "node",
         "py": "python",
         "python3": "python",
+        "rb": "ruby",
+        "pl": "perl",
+        "ts": "deno",
+        "deno": "deno",
+        "bash": "sh",
+        "shell": "sh",
     }
 
     return aliases.get(runtime, runtime)
@@ -287,8 +283,29 @@ def detect_runtime(target_file: str) -> str:
     if ext in PYTHON_EXTENSIONS:
         return "python"
 
+    if ext in RUBY_EXTENSIONS:
+        return "ruby"
+
+    if ext in GO_EXTENSIONS:
+        return "go"
+
+    if ext in DENO_EXTENSIONS:
+        return "deno"
+
+    if ext in LUA_EXTENSIONS:
+        return "lua"
+
+    if ext in SHELL_EXTENSIONS:
+        return "sh"
+
+    if ext in PERL_EXTENSIONS:
+        return "perl"
+
+    valid_exts = (
+        ".js, .mjs, .cjs, .php, .py, .rb, .go, .ts, .tsx, .lua, .sh, .bash, .pl, .pm"
+    )
     print_error(f"Cannot auto-detect runtime from extension: {ext or '(no extension)'}")
-    print("Use --runtime node, --runtime php, or --runtime python.")
+    print(f"Use --lang to specify. Supported extensions: {valid_exts}")
     sys.exit(1)
 
 
@@ -306,6 +323,24 @@ def build_command(parsed: RunnerArgs, target_file: str) -> List[str]:
 
     if runtime == "python":
         return [parsed.python_bin, target_file] + parsed.forwarded_args
+
+    if runtime == "ruby":
+        return [parsed.ruby_bin, target_file] + parsed.forwarded_args
+
+    if runtime == "go":
+        return [parsed.go_bin, "run", target_file] + parsed.forwarded_args
+
+    if runtime == "deno":
+        return [parsed.deno_bin, "run", target_file] + parsed.forwarded_args
+
+    if runtime == "lua":
+        return [parsed.lua_bin, target_file] + parsed.forwarded_args
+
+    if runtime == "sh":
+        return [parsed.sh_bin, target_file] + parsed.forwarded_args
+
+    if runtime == "perl":
+        return [parsed.perl_bin, target_file] + parsed.forwarded_args
 
     print_error(f"Unsupported runtime: {runtime}")
     sys.exit(1)

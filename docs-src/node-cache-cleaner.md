@@ -24,7 +24,7 @@ node-cache-cleaner [options]
 
 ### Source
 
-See [`src/node-cache-cleaner-cli.ts`](../src/node-cache-cleaner-cli.ts).
+See [`src/node-cache-cleaner-cli.ts`](../src/node-cache-cleaner-cli.ts) (modules in [`src/cache-cleaner/`](../src/cache-cleaner/)).
 
 ---
 

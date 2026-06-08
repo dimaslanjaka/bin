@@ -79,7 +79,7 @@ if (shouldBundle) {
   );
 }
 
-// Copy supporting scripts referenced by lib/* commands
+// Copy supporting scripts referenced by lib/* commands into binaries/
 const requiredBinFiles = ['bin/kill-night-crows.ps1', 'bin/kill-night-crows.bat'];
 for (const file of requiredBinFiles) {
   const source = path.resolve(__dirname, file);

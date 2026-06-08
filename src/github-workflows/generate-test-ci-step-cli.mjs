@@ -10,7 +10,6 @@ import actionObject from './ci-yaml-fixtures/workflow-test-data.cjs';
 import setupEnvironmentsObject from './ci-yaml-fixtures/setup-environments-data.cjs';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 let actionFile = path.resolve(process.cwd(), '.github/workflows/test.yml');
 
@@ -21,9 +20,10 @@ const DEFAULT_PATTERNS = [
   'tests/**/*.spec.{js,cjs,mjs,ts}'
 ];
 
+const scriptName = path.toUnix(path.relative(process.cwd(), __filename));
 function showHelp() {
   console.log(`\
-Usage: generate-test-ci-step.mjs [options]
+Usage: ${scriptName} [options]
 
 Options:
   -p, --pattern <glob>   Test file patterns to search for (can be specified multiple times)
@@ -32,10 +32,10 @@ Options:
   -h, --help             Show this help message
 
 Examples:
-  $ node src/github-workflows/generate-test-ci-step.mjs
-  $ node src/github-workflows/generate-test-ci-step.mjs -p "test/**/*.test.js"
-  $ node src/github-workflows/generate-test-ci-step.mjs --pattern "test/**/*.test.js" --ignore "**/fixtures/**"
-  $ node src/github-workflows/generate-test-ci-step.mjs -o .github/workflows/ci.yml -p "src/**/*.test.ts" --ignore "**/node_modules/**"
+  $ node ${scriptName}
+  $ node ${scriptName} -p "test/**/*.test.js"
+  $ node ${scriptName} --pattern "test/**/*.test.js" --ignore "**/fixtures/**"
+  $ node ${scriptName} -o .github/workflows/ci.yml -p "src/**/*.test.ts" --ignore "**/node_modules/**"
 `);
 }
 
@@ -45,7 +45,7 @@ async function collectTests(patterns, ignorePatterns) {
     cwd: process.cwd(),
     ignore: ignorePatterns
   });
-  return entries.map((p) => p.replace(/\\/g, '/')).sort();
+  return entries.map((p) => path.toUnix(p)).sort();
 }
 
 async function main() {
@@ -113,26 +113,22 @@ async function main() {
     });
   }
 
-  const yamlContent = yaml.stringify(actionObject);
-  fs.ensureDirSync(path.dirname(actionFile));
-  fs.writeFileSync(actionFile, yamlContent, 'utf-8');
-  try {
-    execSync(`npx -y prettier@latest -w "${actionFile}"`, { stdio: 'inherit', cwd: process.cwd() });
-  } catch {
-    // prettier is optional — skip formatting if unavailable
+  function writeYamlFile(filePath, obj) {
+    const resolved = path.resolve(process.cwd(), filePath);
+    fs.ensureDirSync(path.dirname(resolved));
+    fs.writeFileSync(resolved, yaml.stringify(obj), 'utf-8');
+    try {
+      execSync(`npx -y prettier@latest -w "${resolved}"`, { stdio: 'inherit', cwd: process.cwd() });
+    } catch {
+      // prettier is optional — skip formatting if unavailable
+    }
+    return resolved;
   }
+
+  writeYamlFile(actionFile, actionObject);
   console.log(`Generated ${actionFile} with ${files.length} test steps.`);
 
-  // Generate .github/actions/setup-environments/action.yml from the JS fixture
-  const setupEnvironmentsFile = path.resolve(process.cwd(), '.github/actions/setup-environments/action.yml');
-  const setupYamlContent = yaml.stringify(setupEnvironmentsObject);
-  fs.ensureDirSync(path.dirname(setupEnvironmentsFile));
-  fs.writeFileSync(setupEnvironmentsFile, setupYamlContent, 'utf-8');
-  try {
-    execSync(`npx -y prettier@latest -w "${setupEnvironmentsFile}"`, { stdio: 'inherit', cwd: process.cwd() });
-  } catch {
-    // prettier is optional — skip formatting if unavailable
-  }
+  const setupEnvironmentsFile = writeYamlFile('.github/actions/setup-environments/action.yml', setupEnvironmentsObject);
   console.log(`Generated ${setupEnvironmentsFile}.`);
 }
 

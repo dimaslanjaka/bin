@@ -21,10 +21,51 @@
  *   <img src="https://your-domain.com/backend/workflow-badge.php?owner=user&repo=project" />
  */
 
-// ─── CORS (optional — uncomment if serving cross-origin) ──────────
-// header('Access-Control-Allow-Origin: *');
-// header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-// if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
+// ─── CORS ───────────────────────────────────────────────────────────
+/**
+ * Allow cross-origin requests with full preflight OPTIONS handling.
+ *
+ * @param bool $disableBrowserCache Also emit no-cache headers (default: false)
+ */
+function allowCors($disableBrowserCache = false) {
+  $isCli = (
+    php_sapi_name() === 'cli'
+    || defined('STDIN')
+    || (empty($_SERVER['REMOTE_ADDR']) && !isset($_SERVER['HTTP_USER_AGENT']) && count($_SERVER['argv']) > 0)
+  );
+  if ($isCli) {
+    return;
+  }
+
+  if ($disableBrowserCache) {
+    header('Expires: Tue, 01 Jan 2000 00:00:00 GMT');
+    header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Cache-Control: post-check=0, pre-check=0', false);
+    header('Pragma: no-cache');
+  }
+
+  if (isset($_SERVER['HTTP_ORIGIN'])) {
+    header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
+    header('Access-Control-Allow-Credentials: true');
+    header('Access-Control-Max-Age: 86400');
+  } else {
+    header('Access-Control-Allow-Origin: *');
+  }
+
+  if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
+      header('Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE');
+    }
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
+      header('Access-Control-Allow-Headers: ' . $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']);
+    }
+    http_response_code(200);
+    exit();
+  }
+}
+
+allowCors();
 
 // ─── Read input parameters ────────────────────────────────────────
 $owner    = trim($_GET['owner'] ?? $_POST['owner'] ?? '');

@@ -1,3 +1,3 @@
 require('./env.cjs');
 
-require('../lib/del-gradle');
+require('../lib/del-gradle.cjs');

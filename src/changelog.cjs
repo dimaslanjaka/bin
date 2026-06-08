@@ -5,6 +5,7 @@ const { getArgs } = require('./utils/index.cjs');
 const { getTempPath } = require('./binary-collections/config.cjs');
 const { spawn } = require('cross-spawn');
 
+const scriptName = path.toUnix(path.relative(process.cwd(), __filename));
 const pkgPath = path.join(process.cwd(), 'package.json');
 if (!fs.existsSync(pkgPath)) {
   throw new Error(`package.json not found at ${pkgPath}`);
@@ -23,7 +24,7 @@ if (args.help || args.h) {
  * Prints help information for the changelog script.
  */
 function showHelp() {
-  console.log(`\nUsage: node changelog.js [options]\n`);
+  console.log(`\nUsage: node ${scriptName} [options]\n`);
   console.log(`Options:`);
   console.log(`  --help, -h        Show this help message and exit`);
   console.log(`\nDescription:`);
@@ -32,7 +33,7 @@ function showHelp() {
   console.log(`  - Skips dependabot and irrelevant commits.`);
   console.log(`  - Outputs the original git log to tmp/original.md for reference.`);
   console.log(`\nExample:`);
-  console.log(`  node changelog.js`);
+  console.log(`  node ${scriptName}`);
   console.log(``);
 }
 
@@ -228,6 +229,7 @@ function extractVersions(str) {
   const originalLogPath = getTempPath('original.md');
   fs.mkdirSync(getTempPath(), { recursive: true });
   fs.writeFileSync(originalLogPath, log);
+  fs.writeFileSync(path.join(process.cwd(), 'CHANGELOG.md'), markdown);
   console.log(`Original log written to ${originalLogPath}`);
   console.log(`Changelog updated successfully. You can find it at CHANGELOG.md`);
 })();

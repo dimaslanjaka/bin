@@ -28,9 +28,12 @@ import fs from 'fs';
 import { parseGitHubUrl } from 'git-command-helper';
 import os from 'os';
 import path from 'upath';
+import { fileURLToPath } from 'url';
 import { getGithubToken } from './binary-collections/config.cjs';
 import fetchResponse from './utils/fetchResponse.cjs';
 import * as utils from './utils/index.cjs';
+
+const scriptName = path.toUnix(path.relative(process.cwd(), fileURLToPath(import.meta.url)));
 
 // Show help if --help/-h is passed
 const args = utils.getArgs();
@@ -44,13 +47,13 @@ if (args.help || args.h) {
 function showHelp() {
   const helpText = `\n\
 GitHub Package Resolutions Updater\n\
-Usage:\n  node src/package-resolutions-updater.mjs [options]\n\
+Usage:\n  node ${scriptName} [options]\n\
 Options:\n  --help, -h           Show this help message\n\
 Description:\n  Updates the commit hashes in package.json's 'resolutions' field for GitHub tarball URLs to point to the latest commit SHA of the corresponding repository and branch.\n\
 Features:\n  - Parses GitHub URLs to extract repository owner, name, and branch.\n  - Fetches the latest commit SHA across all branches using GitHub's API.\n  - Replaces the old branch or commit in the URL with the latest SHA.\n  - Overwrites package.json with the updated URLs.\n\
 Requirements:\n  - GitHub Personal Access Token (GITHUB_TOKEN) via .env\n  - ESM support (type: "module" in package.json)\n  - Node.js v18+ recommended\n\
 Dependencies:\n  - ansi-colors – for styled terminal output\n\
-Examples:\n  node src/package-resolutions-updater.mjs\n  node src/package-resolutions-updater.mjs --help\n\n`;
+Examples:\n  node ${scriptName}\n  node ${scriptName} --help\n\n`;
   console.log(helpText);
   process.exit(0);
 }

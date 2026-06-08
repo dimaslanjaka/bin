@@ -2,15 +2,18 @@
 
 import fs from 'node:fs';
 import path from 'upath';
+import { fileURLToPath } from 'url';
 import { getArgs } from './utils/index.cjs';
 import { mainPrintTgzTree } from './print-tarball-tree.mjs';
+
+const scriptName = path.toUnix(path.relative(process.cwd(), fileURLToPath(import.meta.url)));
 
 export async function main() {
   const argv = getArgs({ string: ['file'], alias: { f: 'file', h: 'help' } });
 
   if (argv.help) {
     console.log(`
-Usage: node src/print-tarball-tree-cli.mjs [options]
+Usage: node ${scriptName} [options]
 
 Options:
   -f, --file <path>    Path to the tarball file

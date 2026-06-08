@@ -1,0 +1,11 @@
+{
+  "/releases/bin.tgz": {
+    "integrity": {
+      "sha1": "981377bc6894a0631b00c1cfe97a6352ef1cea95",
+      "sha256": "lUT0C7z/pQWKgZ28Vx3LH/NryPZziWLO/Ki4fCttZ1A=",
+      "md5": "05951fcef565c2ee2ba17cbb11e6cd9b",
+      "sha512": "0a3svfaEyGeT0xv3U7DSh7UM1GnPZw/IhWWE/9t8qo55JBsYHOpRpmGjfSlavQinGXJPZ9N5at80xTOxT30p2w=="
+    },
+    "size": "1059.33 KB"
+  }
+}

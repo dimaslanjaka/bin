@@ -18,7 +18,7 @@
  *   ACCESS_TOKEN | GITHUB_TOKEN | GH_TOKEN  GitHub token with actions:read scope
  *
  * Usage:
- *   <img src="https://your-domain.com/backend/workflow-badge.php?owner=user&repo=project" />
+ *   <img src="https://your-domain.com/php_backend/workflow-badge.php?owner=user&repo=project" />
  */
 
 // ─── CORS ───────────────────────────────────────────────────────────

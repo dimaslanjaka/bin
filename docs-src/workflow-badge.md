@@ -83,7 +83,7 @@ The generated SVG is a card-style badge with:
 
 ### PHP Backend
 
-A PHP script is available at [`backend/workflow-badge.php`](../backend/workflow-badge.php) that serves the badge as a live image via HTTP. It spawns the Node CLI, captures the SVG output, and serves it with the correct `image/svg+xml` content type. The PHP backend requires the full project (with the CLI script under `src/` or `lib/`) to be deployed on the server — it does not fall back to a remote tarball.
+A PHP script is available at [`php_backend/workflow-badge.php`](../php_backend/workflow-badge.php) that serves the badge as a live image via HTTP. It spawns the Node CLI, captures the SVG output, and serves it with the correct `image/svg+xml` content type. The PHP backend requires the full project (with the CLI script under `src/` or `lib/`) to be deployed on the server — it does not fall back to a remote tarball.
 
 **Query parameters:**
 
@@ -104,7 +104,7 @@ A PHP script is available at [`backend/workflow-badge.php`](../backend/workflow-
 **Usage as `<img>` tag:**
 
 ```html
-<img src="https://your-domain.com/backend/workflow-badge.php?owner=dimaslanjaka&repo=bin" />
+<img src="https://your-domain.com/php_backend/workflow-badge.php?owner=dimaslanjaka&repo=bin" />
 <!-- or using our server -->
 <img src="http://sh.webmanajemen.com/php_backend/workflow-badge.php?owner=dimaslanjaka&repo=bin" />
 ```

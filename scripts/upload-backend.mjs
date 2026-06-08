@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 /**
- * Upload backend/*.php files to remote server via SFTP.
+ * Upload php_backend/*.php files to remote server via SFTP.
  *
  * Reads connection details from .vscode/sftp.json.
- * Uploads all PHP files from backend/ into {remotePath}/php_backend on the server.
+ * Uploads all PHP files from php_backend/ into {remotePath}/php_backend on the server.
  */
 
 import { execSync } from 'child_process';
@@ -14,19 +14,19 @@ import { Client as SSHClient } from 'ssh2';
 import path from 'upath';
 
 const SFTP_CONFIG_PATH = path.resolve('.vscode/sftp.json');
-const BACKEND_DIR = path.resolve('backend');
+const BACKEND_DIR = path.resolve('php_backend');
 
 /**
  * Run multiple shell commands on a remote server via SSH.
  * Each command runs independently — failure of one does not block the next.
  * Extends PATH with common Node.js binary directories (NVM, etc.) — mirrors the
- * pattern from backend/workflow-badge.php.
+ * pattern from php_backend/workflow-badge.php.
  */
 function execRemoteCommands(connectConfig, cwd, commands) {
   return new Promise((resolve, reject) => {
     const conn = new SSHClient();
 
-    // Build PATH extension (same pattern as backend/workflow-badge.php)
+    // Build PATH extension (same pattern as php_backend/workflow-badge.php)
     const pathSetup = `
 # Extend PATH with common Node.js install locations
 for _dir in /usr/local/nvm/versions/node/*/bin /usr/local/lib/nodejs/*/bin; do
@@ -99,7 +99,7 @@ async function main() {
   }
 
   if (phpFiles.length === 0) {
-    console.log('No PHP files found in backend/ — nothing to upload.');
+    console.log('No PHP files found in php_backend/ — nothing to upload.');
     process.exit(0);
   }
 

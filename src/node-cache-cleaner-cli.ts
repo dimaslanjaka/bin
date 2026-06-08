@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 import { getArgs } from './utils/index.cjs';
-import { cleanNpmCache } from './node-cache-cleaner/npm';
-import { cleanNpxCache } from './node-cache-cleaner/npx';
-import { cleanYarnCache } from './node-cache-cleaner/yarn';
+import { cleanNpmCache } from './cache-cleaner/npm';
+import { cleanNpxCache } from './cache-cleaner/npx';
+import { cleanYarnCache } from './cache-cleaner/yarn';
 
 function printHelp() {
   console.log(`

@@ -10,6 +10,7 @@ const defaultBin = {
   'run-series': 'lib/npm-run-series.cjs',
   'npm-run-series': 'lib/npm-run-series.cjs',
   'del-nodemodules': 'lib/del-node-modules.cjs',
+  'del-yarn-caches': 'lib/del-yarn-caches.cjs',
   'del-yarncaches': 'lib/del-yarn-caches.cjs',
   'del-ps': 'lib/del-ps-cli.cjs',
   'del-gradle': 'lib/del-gradle.cjs',

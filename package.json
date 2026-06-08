@@ -148,7 +148,8 @@
     "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/e48db3235351bbcb9394b21766b2d477cc6b7dd2/release/cross-spawn.tgz",
     "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/4e7f8475eafa0974c170893de354026967a71776/release/git-command-helper.tgz",
     "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/44e5c7b79b4e60f8c2d34857c27b8ce677d7493e/packages/sbg-utility/release/sbg-utility.tgz",
-    "@dimaslanjaka/eslint-base-config": "https://github.com/dimaslanjaka/eslint-base-config/raw/94dc3bed894d019a216b47d9bf0413f7cfdcd45c/release/dimaslanjaka-eslint-base-config.tgz"
+    "@dimaslanjaka/eslint-base-config": "https://github.com/dimaslanjaka/eslint-base-config/raw/94dc3bed894d019a216b47d9bf0413f7cfdcd45c/release/dimaslanjaka-eslint-base-config.tgz",
+    "ai-toolkit": "https://github.com/dimaslanjaka/ai-toolkit/raw/24df6d3/release/ai-toolkit.tgz"
   },
   "bin": {
     "actions-badge": "lib/github-workflows/workflow-badge-cli.cjs",

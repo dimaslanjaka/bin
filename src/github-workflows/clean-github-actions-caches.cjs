@@ -1,8 +1,9 @@
 const axios = require('axios');
 const { getArgs } = require('../utils/index.cjs');
-const { GITHUB_ACCESS_TOKEN: ACCESS_TOKEN } = require('../binary-collections/config.cjs');
+const { getGithubToken } = require('../binary-collections/config.cjs');
 
-if (!ACCESS_TOKEN) {
+const accessToken = getGithubToken();
+if (!accessToken) {
   throw new Error(
     'Access token is not provided. Please set ACCESS_TOKEN or GITHUB_TOKEN in your environment variables.'
   );
@@ -88,7 +89,7 @@ if (argv.help) {
 function deleteGitHubActionsCache(GH_REPO, cacheId) {
   return new Promise((resolve, reject) => {
     const url = `https://api.github.com/repos/${GH_REPO}/actions/caches/${cacheId}`;
-    const token = ACCESS_TOKEN;
+    const token = getGithubToken();
 
     if (!token) {
       return reject(new Error('Access token is not provided'));
@@ -223,7 +224,7 @@ function get_caches(GH_REPO, prefixDepth = 3) {
       .get(url, {
         headers: {
           Accept: 'application/vnd.github.v3+json',
-          Authorization: `token ${ACCESS_TOKEN}`
+          Authorization: `token ${getGithubToken()}`
         }
       })
       .then((response) => {

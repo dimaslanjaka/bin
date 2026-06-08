@@ -7,16 +7,17 @@
 
 const axios = require('axios');
 const { spawn } = require('cross-spawn');
-const { GITHUB_ACCESS_TOKEN: TOKEN } = require('../binary-collections/config.cjs');
+const { getGithubToken } = require('../binary-collections/config.cjs');
 
-if (!TOKEN) {
+const token = getGithubToken();
+if (!token) {
   console.error('Missing env var: ACCESS_TOKEN or GITHUB_TOKEN');
   process.exit(1);
 }
 
 const BASE = 'https://api.github.com';
 const HEADERS = {
-  Authorization: `Bearer ${TOKEN}`,
+  Authorization: `Bearer ${token}`,
   Accept: 'application/vnd.github+json',
   'X-GitHub-Api-Version': '2022-11-28'
 };

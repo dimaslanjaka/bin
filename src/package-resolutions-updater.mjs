@@ -28,7 +28,7 @@ import fs from 'fs';
 import { parseGitHubUrl } from 'git-command-helper';
 import os from 'os';
 import path from 'upath';
-import { GITHUB_ACCESS_TOKEN as ACCESS_TOKEN } from './binary-collections/config.cjs';
+import { getGithubToken } from './binary-collections/config.cjs';
 import fetchResponse from './utils/fetchResponse.cjs';
 import * as utils from './utils/index.cjs';
 
@@ -91,12 +91,13 @@ try {
  * @returns {Promise<any>}
  */
 export async function fetchJson(url) {
+  const token = getGithubToken();
   const response = await fetchResponse(url, {
     headers: {
       'User-Agent': selectedUserAgent,
       Accept: 'application/vnd.github.v3+json',
       'X-GitHub-Api-Version': '2022-11-28',
-      ...(ACCESS_TOKEN ? { Authorization: `token ${ACCESS_TOKEN}` } : {})
+      ...(token ? { Authorization: `token ${token}` } : {})
     },
     responseType: 'json'
   });

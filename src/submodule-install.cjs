@@ -5,7 +5,7 @@ const color = require('ansi-colors');
 const fs = require('fs');
 const path = require('upath');
 const { getArgs } = require('./utils/index.cjs');
-const { GITHUB_ACCESS_TOKEN: ACCESS_TOKEN } = require('./binary-collections/config.cjs');
+const { getGithubToken } = require('./binary-collections/config.cjs');
 const args = getArgs();
 const positional = args._ || [];
 
@@ -140,20 +140,21 @@ for (const line of submoduleList) {
     continue;
   }
 
-  if (ACCESS_TOKEN) {
+  const token = getGithubToken();
+  if (token) {
     let URL_WITH_TOKEN;
     let repoInfo;
 
     if (URL.includes('github.com')) {
       repoInfo = URL.replace('https://github.com/', '');
-      URL_WITH_TOKEN = `https://${ACCESS_TOKEN}@github.com/${repoInfo}`;
+      URL_WITH_TOKEN = `https://${token}@github.com/${repoInfo}`;
     } else if (URL.includes('gitlab.com') && typeof process.env.GITLAB_TOKEN === 'string') {
       repoInfo = URL.replace('https://gitlab.com/', '');
-      URL_WITH_TOKEN = `https://oauth2:${ACCESS_TOKEN}@gitlab.com/${repoInfo}`;
+      URL_WITH_TOKEN = `https://oauth2:${token}@gitlab.com/${repoInfo}`;
     } else {
       const urlObj = new URL(URL);
       repoInfo = urlObj.pathname.substring(1);
-      URL_WITH_TOKEN = `${urlObj.protocol}//${ACCESS_TOKEN}@${urlObj.host}${urlObj.pathname}`;
+      URL_WITH_TOKEN = `${urlObj.protocol}//${token}@${urlObj.host}${urlObj.pathname}`;
     }
 
     if (URL_WITH_TOKEN) {

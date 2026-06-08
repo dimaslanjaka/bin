@@ -18,15 +18,6 @@ const { cosmiconfig } = require('cosmiconfig');
  */
 const loadDotenv = (tokenKey = /ACCESS_TOKEN|GITHUB_TOKEN/) =>
   dotenv.config({ path: findEnvWithToken(undefined, tokenKey), quiet: true, overwrite: true });
-loadDotenv(); // Load .env file if it exists to populate process.env with tokens
-
-// Support --token CLI argument to override GITHUB_ACCESS_TOKEN
-const cliArgv = getArgs({
-  string: ['token']
-});
-/** @type {string|undefined} */
-const GITHUB_ACCESS_TOKEN =
-  cliArgv.token || process.env.ACCESS_TOKEN || process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
 
 /**
  * Get a temporary file or directory path
@@ -87,9 +78,27 @@ async function getConfig(options = {}) {
   }
 }
 
+/**
+ * Get GitHub access token from CLI args or environment variables.
+ * Checks --token CLI argument, then ACCESS_TOKEN, GITHUB_TOKEN, GH_TOKEN env vars.
+ * @returns {string|undefined}
+ */
+function getGithubToken() {
+  // dotenv should always loaded
+  loadDotenv();
+
+  const cliArgv = getArgs({
+    string: ['token']
+  });
+
+  // const config = getConfig();
+
+  return cliArgv.token || process.env.ACCESS_TOKEN || process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
+}
+
 module.exports = {
   getTempPath,
-  GITHUB_ACCESS_TOKEN,
+  getGithubToken,
   loadDotenv,
   getConfig
 };

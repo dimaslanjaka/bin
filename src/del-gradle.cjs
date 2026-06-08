@@ -1,17 +1,40 @@
-const glob = require('glob');
-const path = require('upath');
-const { del } = require('./utils/index.cjs');
+const { getArgs } = require('./utils/index.cjs');
+const { cleanGradleBuildDirs, cleanGradleCacheDirs } = require('./cache-cleaner/gradle.cjs');
 
-const globStream = new glob.Glob(['**/build.gradle'], {
-  withFileTypes: false,
-  cwd: process.cwd(),
-  ignore: ['**/node_modules/**', '**/vendor/**']
+const argv = getArgs({
+  boolean: ['h', 'help', 'g', 'global'],
+  alias: {
+    h: 'help',
+    g: 'global'
+  }
 });
 
-globStream.stream().on('data', (result) => {
-  const fullPath = path.resolve(process.cwd(), result);
-  const base = path.dirname(fullPath);
-  const buildFolder = path.join(base, 'build');
-  console.log('delete build folder', buildFolder);
-  del(buildFolder);
+if (argv.help) {
+  console.log(`
+del-gradle — Clean Gradle build directories and caches
+
+Usage:
+  del-gradle [options]
+
+Options:
+  -h, --help     Show this help message
+  -g, --global   Also delete Gradle cache/temp directories from the user home (~/.gradle/)
+
+Examples:
+  del-gradle                      # Clean project build/ directories only
+  del-gradle --global             # Clean build/ dirs + user home Gradle caches
+  del-gradle -g                   # Short alias for --global
+`);
+  process.exit(0);
+}
+
+(async () => {
+  await cleanGradleBuildDirs();
+
+  if (argv.global) {
+    await cleanGradleCacheDirs();
+  }
+})().catch((err) => {
+  console.error('Failed to clean Gradle directories:', err.message);
+  process.exit(1);
 });

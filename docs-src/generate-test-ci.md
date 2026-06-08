@@ -1,6 +1,11 @@
 # Generate Test CI Step
 
-Scans the repository for test files using glob patterns and generates a GitHub Actions workflow YAML (`.github/workflows/test.yml`) with individual test steps for each detected file. Untracked (non-git) files are automatically skipped.
+Scans the repository for test files using glob patterns and generates GitHub Actions YAML files from JS fixtures:
+
+- `.github/workflows/test.yml` — workflow with individual test steps for each detected file
+- `.github/actions/setup-environments/action.yml` — composite action from the JS fixture
+
+Untracked (non-git) test files are automatically skipped.
 
 ## Usage
 
@@ -48,8 +53,9 @@ generate-test-ci -o .github/workflows/ci.yml -p "src/**/*.test.ts" --ignore "**/
 1. **Collect**: All files matching the given glob patterns are collected using the `glob` library.
 2. **Filter**: Files not tracked by git are skipped (so untracked files don't end up in the committed action).
 3. **Classify**: Each file is categorized by extension (`.mjs` → `test-esm`, `.cjs` → `test-cjs`, `.ts` → `jest` directly, others → `npm test`).
-4. **Generate**: A GitHub Actions workflow YAML is produced, with each test file as a separate `run` step.
-5. **Write**: The YAML is written to the specified output path (default `.github/workflows/test.yml`).
+4. **Generate workflow**: A GitHub Actions workflow YAML is produced, with each test file as a separate `run` step.
+5. **Write workflow**: The workflow YAML is written to the specified output path (default `.github/workflows/test.yml`).
+6. **Generate action**: The composite action fixture (`ci-yaml-fixtures/setup-environments-data.cjs`) is serialized to `.github/actions/setup-environments/action.yml`, keeping the reusable action in sync with its JS source.
 
 ## Source
 

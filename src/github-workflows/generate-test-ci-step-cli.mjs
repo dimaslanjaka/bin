@@ -6,7 +6,8 @@ import yaml from 'yaml';
 import { execSync } from 'child_process';
 import { glob } from 'glob';
 import { getArgs } from '../utils/index.cjs';
-import actionObject from './workflow-test-data.cjs';
+import actionObject from './ci-yaml-fixtures/workflow-test-data.cjs';
+import setupEnvironmentsObject from './ci-yaml-fixtures/setup-environments-data.cjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -121,6 +122,18 @@ async function main() {
     // prettier is optional — skip formatting if unavailable
   }
   console.log(`Generated ${actionFile} with ${files.length} test steps.`);
+
+  // Generate .github/actions/setup-environments/action.yml from the JS fixture
+  const setupEnvironmentsFile = path.resolve(process.cwd(), '.github/actions/setup-environments/action.yml');
+  const setupYamlContent = yaml.stringify(setupEnvironmentsObject);
+  fs.ensureDirSync(path.dirname(setupEnvironmentsFile));
+  fs.writeFileSync(setupEnvironmentsFile, setupYamlContent, 'utf-8');
+  try {
+    execSync(`npx -y prettier@latest -w "${setupEnvironmentsFile}"`, { stdio: 'inherit', cwd: process.cwd() });
+  } catch {
+    // prettier is optional — skip formatting if unavailable
+  }
+  console.log(`Generated ${setupEnvironmentsFile}.`);
 }
 
 main();

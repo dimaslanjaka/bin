@@ -69,7 +69,8 @@
       "icon": "terminal-powershell"
     }
   },
-  "terminal.integrated.defaultProfile.windows": "Command Prompt",
+  "terminal.integrated.defaultProfile.windows": "Short PowerShell 7",
+  "terminal.integrated.fontFamily": "MesloLGM Nerd Font",
   "files.autoSave": "onWindowChange",
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",

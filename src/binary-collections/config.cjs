@@ -24,6 +24,7 @@ loadDotenv(); // Load .env file if it exists to populate process.env with tokens
 const cliArgv = getArgs({
   string: ['token']
 });
+/** @type {string|undefined} */
 const GITHUB_ACCESS_TOKEN =
   cliArgv.token || process.env.ACCESS_TOKEN || process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
 
@@ -45,7 +46,7 @@ const CONFIG_SEARCH_PLACES = Object.freeze([
 /**
  * Search for project configuration using cosmiconfig.
  *
- * Only these files are supported:
+ * By default looks for these files:
  * - `binary-collections.config.js`
  * - `binary-collections.config.cjs`
  * - `binary-collections.config.mjs`
@@ -53,17 +54,25 @@ const CONFIG_SEARCH_PLACES = Object.freeze([
  * No `.rc`, JSON, YAML, or `package.json` config is supported.
  *
  * @param {object} [options] - Optional configuration overrides.
+ * @param {string} [options.optionName] - Override the cosmiconfig module name ('binary-collections' by default).
+ *   When set, searchPlaces are generated as `{optionName}.config.{js,cjs,mjs}`.
  * @param {string} [options.searchFrom] - Directory to start searching from.
  * @param {string} [options.stopDir] - Directory to stop searching upwards.
  * @returns {Promise<import('./config-types').BinaryCollectionsConfig|null>}
  */
 async function getConfig(options = {}) {
+  const moduleName = options.optionName || 'binary-collections';
   const from = path.resolve(options.searchFrom || process.env.INIT_CWD || process.cwd());
 
-  const explorer = cosmiconfig('binary-collections', {
+  const searchPlaces =
+    moduleName === 'binary-collections'
+      ? CONFIG_SEARCH_PLACES
+      : [`${moduleName}.config.js`, `${moduleName}.config.cjs`, `${moduleName}.config.mjs`];
+
+  const explorer = cosmiconfig(moduleName, {
     searchStrategy: 'project',
     stopDir: options.stopDir,
-    searchPlaces: CONFIG_SEARCH_PLACES
+    searchPlaces
   });
 
   try {

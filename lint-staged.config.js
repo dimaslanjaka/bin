@@ -7,7 +7,7 @@ export default {
   '**/*.{js,cjs,mjs,ts,jsx,tsx}': (files) => {
     if (!files.length) return [];
     // Return an array of ESLint commands for staged files
-    return files.map((file) => `npx eslint --fix --max-warnings=0 "${file}"`);
+    return files.map((file) => `corepack yarn exec eslint --fix --max-warnings=0 "${file}"`);
   },
 
   // Prettier for JSON, CSS, SCSS, LESS, YAML, SQL

@@ -12,6 +12,15 @@ export default {
   // GitHub token for API access (can also be set via environment variables)
   githubToken: process.env.GITHUB_TOKEN || 'your-github-token-here',
 
+  // Resolutions normalization mappings for node-package-packer
+  // Replaces pinned commit hashes in package.json resolutions with branch/tag names before pack
+  normalizeResolutions: [
+    { pkg: 'cross-spawn', to: 'private' },
+    { pkg: 'binary-collections', to: 'master' },
+    { pkg: 'git-command-helper', to: 'pre-release' },
+    { pkg: 'sbg-utility', to: 'sbg-utility' }
+  ],
+
   // Opencode API keys (replace with your actual keys)
   opencode: {
     keys: [

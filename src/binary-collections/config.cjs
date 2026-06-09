@@ -7,6 +7,8 @@ const { getArgs } = require('../utils/index.cjs');
 const { findEnvWithToken } = require('../utils/findEnvFiles.cjs');
 const dotenv = require('dotenv');
 const { cosmiconfig } = require('cosmiconfig');
+const os = require('os');
+const fs = require('fs-extra');
 
 /**
  * Load .env file containing a token variable.
@@ -24,12 +26,29 @@ const loadDotenv = (tokenKey = /ACCESS_TOKEN|GITHUB_TOKEN/) =>
   });
 
 /**
- * Get a temporary file or directory path
- * @param {...string} segments - Path segments to join with the temp directory
- * @returns {string} The full temporary path
+ * Get a temporary file or directory path under the project's temp directory.
+ * Does NOT create the directory — the caller is responsible for that.
+ *
+ * @param {...string} segments - Path segments to join with the temp root.
+ * @returns {string} The full temporary path rooted at `TEMP_DIR` env var or `<cwd>/tmp`.
  */
 function getTempPath(...segments) {
   return path.join(process.env.TEMP_DIR || path.join(process.cwd(), 'tmp'), ...segments);
+}
+
+/**
+ * Create a unique temporary directory and return its path.
+ * Creates the directory immediately via `fs.mkdtempSync`.
+ *
+ * @param {object} [options] - Optional settings.
+ * @param {string} [options.prefix='binary-collections-'] - Prefix for the directory name.
+ * @param {boolean} [options.global=false] - Use OS temp dir instead of project temp root.
+ * @returns {string} Absolute path to the newly created temp directory.
+ */
+function makeTempDir(options = {}) {
+  const { prefix = 'binary-collections-', global = false } = options;
+  const tempDir = global ? os.tmpdir() : getTempPath();
+  return fs.mkdtempSync(path.join(tempDir, prefix));
 }
 
 const CONFIG_SEARCH_PLACES = Object.freeze([
@@ -107,6 +126,7 @@ module.exports = {
   getTempPath,
   getGithubToken,
   loadDotenv,
-  getConfig
+  getConfig,
+  makeTempDir
 };
 module.exports.default = module.exports;

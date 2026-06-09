@@ -205,6 +205,16 @@ jobs:
           else
             echo "Skipping missing test file: test/node-package-packer/build-tarball.test.mjs"
           fi
+      - name: 🧪 Run tests in test/node-package-packer/normalize-resolutions.test.mjs
+        id: run-test-node-package-packer-normalize-resolutions-test-mjs
+        shell: bash
+        run: >-
+          if [ -f "test/node-package-packer/normalize-resolutions.test.mjs" ];
+          then
+            bash bin/test-esm --testPathPatterns="normalize-resolutions.test.mjs"
+          else
+            echo "Skipping missing test file: test/node-package-packer/normalize-resolutions.test.mjs"
+          fi
       - name: 🧪 Run tests in
           test/node-package-packer/transform-workspace-to-tarball.test.mjs
         id: run-test-node-package-packer-transform-workspace-to-tarball-test-mjs

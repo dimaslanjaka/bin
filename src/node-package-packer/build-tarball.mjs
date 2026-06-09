@@ -1,160 +1,12 @@
 import fs from 'fs-extra';
 import { file_to_hash } from 'sbg-utility';
 import path from 'upath';
-import buildReadme from './build-readme.mjs';
 import { getArgs } from '../utils/index.cjs';
 import * as crossSpawn from 'cross-spawn';
-import { globSync } from 'glob';
-import { getWorkspacesInfo } from './get-workspaces.cjs';
-import { getGithubRawUrl } from 'git-command-helper';
-
-function slugifyPkgName(str) {
-  return str.replace(/\//g, '-').replace(/@/g, '');
-}
-
-/**
- * Build a map of workspace package name → version from the monorepo workspaces.
- * @param {string} dirname Repository root directory.
- * @returns {Record<string, string>}
- */
-function resolveWorkspaceVersions(dirname) {
-  const rootPkg = fs.readJsonSync(path.join(dirname, 'package.json'));
-  const workspacePatterns = rootPkg.workspaces || [];
-  const versionMap = {};
-
-  for (const pattern of workspacePatterns) {
-    const matches = globSync(pattern, { cwd: dirname, absolute: true });
-    for (const wsDir of matches) {
-      const wsPkgPath = path.join(wsDir, 'package.json');
-      if (fs.existsSync(wsPkgPath)) {
-        try {
-          const wsPkg = fs.readJsonSync(wsPkgPath);
-          if (wsPkg.name && wsPkg.version) {
-            versionMap[wsPkg.name] = wsPkg.version;
-          }
-        } catch {
-          // skip invalid package.json
-        }
-      }
-    }
-  }
-
-  return versionMap;
-}
-
-/**
- * Transform workspace protocol references in package.json dependency fields.
- * Yarn uses `workspace:*`, `workspace:^`, `workspace:~` to reference sibling
- * workspace packages. These must be replaced with real version ranges before
- * running `npm pack` or `yarn pack` to avoid "Workspace not found" errors.
- *
- * Creates a backup at `.package.json.bak` and writes the transformed file.
- * Returns a restore function to undo the changes.
- *
- * @param {string} dirname Repository root directory.
- * @returns {Promise<() => void>} Restore function to revert package.json.
- */
-async function transformWorkspaceProtocols(dirname) {
-  const pkgPath = path.join(dirname, 'package.json');
-  const original = await fs.readFile(pkgPath, 'utf-8');
-  const pkg = JSON.parse(original);
-  const versionMap = resolveWorkspaceVersions(dirname);
-  const workspaceDepFields = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'];
-  let modified = false;
-
-  const info = await getWorkspacesInfo(process.cwd(), { absolutePaths: false });
-  const workspaces = info.workspaces.map((i) => {
-    return {
-      path: i.path,
-      name: i.name
-    };
-  });
-
-  for (const field of workspaceDepFields) {
-    const deps = pkg[field];
-    if (!deps) continue;
-    for (const [name, version] of Object.entries(deps)) {
-      if (typeof version !== 'string') continue;
-
-      const match = version.match(/^workspace:(.+)$/);
-      if (!match) continue;
-
-      // check if package in local workspace
-      if (workspaces.length > 0) {
-        const find = workspaces.find((w) => w.name === name);
-        if (find) {
-          const isGit = fs.existsSync(path.join(find.path, '.git')) || fs.existsSync(path.join(process.cwd(), '.git'));
-          if (isGit) {
-            // whenever git folder (root or workspace), get github raw url of release(s)/${name}.tgz
-            const tarballPath = [
-              path.join(find.path, 'releases', `${name}.tgz`),
-              path.join(find.path, 'release', `${name}.tgz`)
-            ].filter(fs.existsSync)[0];
-            if (tarballPath) {
-              console.log('found tarball', tarballPath);
-              try {
-                // get tarball github raw url
-                const rawUrl = await getGithubRawUrl(tarballPath);
-                deps[name] = rawUrl;
-                modified = true;
-                console.log(`[info] transformed "${name}" from "${version}" to "${rawUrl}"`);
-                continue;
-              } catch (err) {
-                console.warn(
-                  `[warn] failed to resolve GitHub URL for "${name}" tarball, falling back to version range`,
-                  err
-                );
-              }
-            }
-          }
-        }
-      }
-
-      const wsProtocol = match[1]; // e.g. "*" or "^" or "~"
-      const actualVersion = versionMap[name];
-
-      if (!actualVersion) {
-        console.warn(`[warn] workspace package "${name}" not found, keeping "${version}"`);
-        continue;
-      }
-
-      let replacement;
-      if (wsProtocol === '*') {
-        replacement = actualVersion;
-      } else if (wsProtocol === '^') {
-        replacement = `^${actualVersion}`;
-      } else if (wsProtocol === '~') {
-        replacement = `~${actualVersion}`;
-      } else {
-        // custom semver range after workspace: (e.g. workspace:1.2.3)
-        replacement = wsProtocol;
-      }
-
-      deps[name] = replacement;
-      modified = true;
-      console.log(`[info] transformed "${name}" from "${version}" to "${replacement}"`);
-    }
-  }
-
-  if (!modified) {
-    // no changes needed, return noop restore
-    return () => {};
-  }
-
-  // Write backup
-  const bakPath = path.join(dirname, '.package.json.bak');
-  await fs.writeFile(bakPath, original, 'utf-8');
-
-  // Write transformed
-  await fs.writeJson(pkgPath, pkg, { spaces: 2, EOL: '\n' });
-
-  return () => {
-    if (fs.existsSync(bakPath)) {
-      fs.copyFileSync(bakPath, pkgPath);
-      fs.rmSync(bakPath, { force: true });
-    }
-  };
-}
+import { bundleWithYarn } from './pack-with-yarn.mjs';
+import { bundleWithNpm } from './pack-with-npm.mjs';
+import { bundleWithBun } from './pack-with-bun.mjs';
+import { transformWorkspaceProtocols, resolveWorkspaceVersions } from './transform-workspace-protocols.mjs';
 
 function resolveNewestTarball(dirname, candidateNames) {
   const candidates = new Set();
@@ -226,95 +78,38 @@ export async function getPackageHashes(dirname, releaseDir) {
 }
 
 /**
- * Build release tarballs using the Yarn pack output.
- * @param {string} dirname Repository root directory.
- * @param {object} packagejson Parsed package.json content.
- * @param {string} releaseDir Release output directory.
- * @param {object} argv Parsed CLI arguments.
- * @param {boolean} withFilename Whether to keep the requested filename variant.
- * @param {boolean} isCI Whether the process is running in CI.
+ * Pack the current project into a tarball and prepare release metadata.
+ *
+ * Determines which package manager to use (bun → yarn → npm) based on
+ * lockfile presence and CLI flags (`--yarn`, `--bun`). Before packing,
+ * transforms `workspace:*` / `workspace:^` / `workspace:~` protocol
+ * references in `package.json` to resolved version ranges, then restores
+ * the original after packing completes (even on failure).
+ *
+ * Tarballs are emitted into `releases/` (or `release/` as fallback).
+ * After packing, delegates to the tool-specific bundler
+ * (`bundleWithBun`, `bundleWithYarn`, or `bundleWithNpm`) for post-processing.
+ *
+ * @param {import("minimist").ParsedArgs} [customArgs={}] - Override CLI argument parsing.
+ *   Properties are merged with parsed `process.argv` via `getArgs()`.
+ *   Supported keys include `yarn` (boolean), `bun` (boolean),
+ *   `fn`/`filename` (boolean) to force a named tarball, and any other
+ *   args consumed by downstream bundlers.
+ * @param {string} [cwd] - Working directory for packing. Defaults to
+ *   `customArgs.cwd` if set, otherwise `process.cwd()`.
  * @returns {Promise<void>}
  */
-export async function bundleWithYarn(dirname, packagejson, releaseDir, argv, withFilename, isCI) {
-  await buildReadme(dirname, packagejson, releaseDir, argv, isCI);
-
-  const targetFname =
-    argv['fn'] || argv['filename'] || slugifyPkgName(`${packagejson.name}-${packagejson.version}.tgz`);
-  const tgz = resolveNewestTarball(dirname, [
-    'package.tgz',
-    slugifyPkgName(`${packagejson.name}-v${packagejson.version}.tgz`)
-  ]);
-
-  if (!tgz) {
-    throw new Error(`No Yarn pack tarball found in ${dirname}`);
-  }
-
-  if (withFilename) {
-    const tgzlatest = path.join(releaseDir, targetFname + '.tgz');
-    fs.copySync(tgz, tgzlatest, { overwrite: true });
-  } else {
-    const tgzlatest = path.join(releaseDir, slugifyPkgName(`${packagejson.name}.tgz`));
-    const tgzversion = path.join(releaseDir, targetFname);
-
-    fs.copySync(tgz, tgzlatest, { overwrite: true });
-    fs.copySync(tgz, tgzversion, { overwrite: true });
-  }
-
-  fs.rmSync(tgz, { recursive: true, force: true });
-
-  await getPackageHashes(dirname, releaseDir);
-}
-
-/**
- * Build release tarballs using the npm pack output.
- * @param {string} dirname Repository root directory.
- * @param {object} packagejson Parsed package.json content.
- * @param {string} releaseDir Release output directory.
- * @param {object} argv Parsed CLI arguments.
- * @param {boolean} isCI Whether the process is running in CI.
- * @returns {Promise<void>}
- */
-export async function bundleWithNpm(dirname, packagejson, releaseDir, argv, isCI) {
-  const filename = slugifyPkgName(`${packagejson.name}-${packagejson.version}.tgz`);
-  const tgz = path.join(dirname, filename);
-  const tgzversion = path.join(releaseDir, filename);
-
-  if (!fs.existsSync(tgz)) {
-    const filename2 = slugifyPkgName(`${packagejson.name}-${packagejson.version}.tgz`);
-    const origintgz = path.join(dirname, filename2);
-    if (fs.existsSync(origintgz) && origintgz !== tgz) {
-      fs.renameSync(origintgz, tgz);
-    }
-  }
-  const tgzlatest = path.join(releaseDir, slugifyPkgName(`${packagejson.name}.tgz`));
-
-  if (!fs.existsSync(path.dirname(tgzlatest))) {
-    fs.mkdirpSync(path.dirname(tgzlatest));
-  }
-
-  await buildReadme(dirname, packagejson, releaseDir, argv, isCI);
-
-  if (fs.existsSync(tgz)) {
-    fs.copySync(tgz, tgzlatest);
-    fs.copySync(tgz, tgzversion);
-    if (fs.existsSync(tgz)) fs.rmSync(tgz);
-
-    await getPackageHashes(dirname, releaseDir);
-  }
-}
-
-/**
- * Resolve CLI context and run the pack workflow.
- * @returns {Promise<void>}
- */
-export async function bundle(customArgs = {}) {
+export async function bundle(customArgs = {}, cwd) {
   const args = Object.assign(customArgs, getArgs());
+  cwd = cwd || args.cwd || process.cwd();
   const withYarn = args.yarn || args._.includes('-yarn') || args._.includes('--yarn');
-  const releaseDir1 = path.join(process.cwd(), 'release');
-  const releaseDir2 = path.join(process.cwd(), 'releases');
+  const withBun = args.bun || args._.includes('-bun') || args._.includes('--bun');
+  const releaseDir1 = path.join(cwd, 'release');
+  const releaseDir2 = path.join(cwd, 'releases');
   const releaseDir = !fs.existsSync(releaseDir2) ? releaseDir1 : releaseDir2;
-  const isYarn = fs.existsSync(path.join(process.cwd(), 'yarn.lock')) || withYarn;
-  const packagejson = fs.readJSONSync(path.join(process.cwd(), 'package.json'));
+  const isBun = fs.existsSync(path.join(cwd, 'bun.lockb')) || fs.existsSync(path.join(cwd, 'bun.lock')) || withBun;
+  const isYarn = !isBun && (fs.existsSync(path.join(cwd, 'yarn.lock')) || withYarn);
+  const packagejson = fs.readJSONSync(path.join(cwd, 'package.json'));
   const withFilename = args['fn'] || args['filename'] ? true : false;
   /**
    * is current device is Github Actions
@@ -328,14 +123,18 @@ export async function bundle(customArgs = {}) {
 
   // Transform workspace protocol references (workspace:^, workspace:*, workspace:~)
   // to real version ranges before packing, then restore after.
-  const restorePkg = await transformWorkspaceProtocols(process.cwd());
+  const restorePkg = await transformWorkspaceProtocols(cwd);
 
   try {
-    const result = crossSpawn.sync(withYarn ? 'yarn' : 'npm', ['pack'], {
-      cwd: process.cwd(),
-      stdio: 'ignore',
-      env: { PATH: process.env.PATH }
-    });
+    const result = crossSpawn.sync(
+      isBun ? 'bun' : isYarn ? 'yarn' : 'npm',
+      isBun ? ['pm', 'pack', '--ignore-scripts', '--destination', releaseDir] : ['pack'],
+      {
+        cwd: cwd,
+        stdio: 'ignore',
+        env: { PATH: process.env.PATH }
+      }
+    );
 
     if (result.error) {
       throw result.error;
@@ -345,20 +144,22 @@ export async function bundle(customArgs = {}) {
     restorePkg();
   }
 
-  if (isYarn) {
-    await bundleWithYarn(process.cwd(), packagejson, releaseDir, args, withFilename, isCI);
+  if (isBun) {
+    await bundleWithBun(cwd, packagejson, releaseDir, args, isCI);
+  } else if (isYarn) {
+    await bundleWithYarn(cwd, packagejson, releaseDir, args, withFilename, isCI);
   } else {
-    await bundleWithNpm(process.cwd(), packagejson, releaseDir, args, isCI);
+    await bundleWithNpm(cwd, packagejson, releaseDir, args, isCI);
   }
 }
 
-export { slugifyPkgName, resolveWorkspaceVersions, transformWorkspaceProtocols, resolveNewestTarball };
+export { resolveWorkspaceVersions, transformWorkspaceProtocols, resolveNewestTarball };
 
 export default {
   bundleWithYarn,
   bundleWithNpm,
+  bundleWithBun,
   getPackageHashes,
-  slugifyPkgName,
   resolveWorkspaceVersions,
   transformWorkspaceProtocols,
   resolveNewestTarball

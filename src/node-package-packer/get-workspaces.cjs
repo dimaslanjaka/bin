@@ -6,24 +6,34 @@ const CryptoJS = require('crypto-js');
 /** @type {Map<string, import('./get-workspaces-types').WorkspacesInfo>} */
 const workspacesCache = new Map();
 
-/** @returns {string} */
-function getCacheFilePath() {
-  return path.resolve(path.join(process.cwd(), 'tmp', 'binary-collections', 'get-workspaces.json'));
+/**
+ * @param {string} [rootDir] - Project root directory. Defaults to `process.cwd()`.
+ * @returns {string}
+ */
+function getCacheFilePath(rootDir) {
+  const dir = rootDir || process.cwd();
+  return path.resolve(path.join(dir, 'tmp', 'binary-collections', 'get-workspaces.json'));
 }
 
-/** @returns {Promise<Record<string, import('./get-workspaces-types').WorkspacesInfo>>} */
-async function readDiskCache() {
+/**
+ * @param {string} [rootDir] - Project root directory. Defaults to `process.cwd()`.
+ * @returns {Promise<Record<string, import('./get-workspaces-types').WorkspacesInfo>>}
+ */
+async function readDiskCache(rootDir) {
   try {
-    const content = await fs.readFile(getCacheFilePath(), 'utf8');
+    const content = await fs.readFile(getCacheFilePath(rootDir), 'utf8');
     return JSON.parse(content);
   } catch {
     return {};
   }
 }
 
-/** @param {Record<string, import('./get-workspaces-types').WorkspacesInfo>} data */
-async function writeDiskCache(data) {
-  const filePath = getCacheFilePath();
+/**
+ * @param {string} [rootDir] - Project root directory. Defaults to `process.cwd()`.
+ * @param {Record<string, import('./get-workspaces-types').WorkspacesInfo>} data
+ */
+async function writeDiskCache(rootDir, data) {
+  const filePath = getCacheFilePath(rootDir);
   await fs.ensureDir(path.dirname(filePath));
   await fs.writeFile(filePath, JSON.stringify(data, null, 2));
 }
@@ -255,7 +265,7 @@ async function getWorkspacesInfo(rootDir = process.cwd(), options = {}) {
     }
 
     // L2: disk cache
-    const diskCache = await readDiskCache();
+    const diskCache = await readDiskCache(resolvedRoot);
     if (diskCache[cacheKey]) {
       workspacesCache.set(cacheKey, diskCache[cacheKey]);
       return diskCache[cacheKey];
@@ -265,7 +275,7 @@ async function getWorkspacesInfo(rootDir = process.cwd(), options = {}) {
     const result = await computeWorkspacesInfo(resolvedRoot, options);
     workspacesCache.set(cacheKey, result);
     diskCache[cacheKey] = result;
-    await writeDiskCache(diskCache);
+    await writeDiskCache(resolvedRoot, diskCache);
     return result;
   }
 
@@ -274,11 +284,12 @@ async function getWorkspacesInfo(rootDir = process.cwd(), options = {}) {
 
 /**
  * Clear the workspaces cache (in-memory and disk).
+ * @param {string} [rootDir] - Project root directory. Defaults to `process.cwd()`.
  */
-async function clearWorkspacesCache() {
+async function clearWorkspacesCache(rootDir) {
   workspacesCache.clear();
   try {
-    await fs.unlink(getCacheFilePath());
+    await fs.unlink(getCacheFilePath(rootDir));
   } catch {
     // ignore if file doesn't exist
   }

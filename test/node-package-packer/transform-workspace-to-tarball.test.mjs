@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 function setWorkspaceDeps(pkgJsonPath, localPackageNames) {
   const pkg = fs.readJSONSync(pkgJsonPath);
 
-  const targets = ['ai-toolkit', 'git-command-helper', 'cross-spawn'];
+  const targets = ['@dimaslanjaka/ai-toolkit', 'git-command-helper', 'cross-spawn'];
 
   const sections = ['dependencies', 'devDependencies'];
 
@@ -50,8 +50,8 @@ describe("focus on dimaslanjaka's workspaces", () => {
   beforeAll(async () => {
     // Backup package.json
     fs.copyFileSync(pkgJsonPath, pkgJsonBackupPath);
-    // modify ai-toolkit, git-command-helper, cross-spawn into workspace:^ on dependencies or devDependencies smarter
-    setWorkspaceDeps(pkgJsonPath, ['ai-toolkit', 'git-command-helper', 'cross-spawn']);
+    // modify @dimaslanjaka/ai-toolkit, git-command-helper, cross-spawn into workspace:^ on dependencies or devDependencies smarter
+    setWorkspaceDeps(pkgJsonPath, ['@dimaslanjaka/ai-toolkit', 'git-command-helper', 'cross-spawn']);
     // transform workspace:^ protocol into tarball url
     release = await transformWorkspaceProtocols(rootDir);
   });
@@ -62,7 +62,7 @@ describe("focus on dimaslanjaka's workspaces", () => {
     fs.moveSync(pkgJsonBackupPath, pkgJsonPath, { overwrite: true });
   });
 
-  it.each(['cross-spawn', 'git-command-helper', 'ai-toolkit'])('%s should be a tarball URL', (pkgName) => {
+  it.each(['cross-spawn', 'git-command-helper', '@dimaslanjaka/ai-toolkit'])('%s should be a tarball URL', (pkgName) => {
     const pkg = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf-8'));
     const version = pkg.dependencies?.[pkgName] ?? pkg.devDependencies?.[pkgName];
     expect(version).toMatch(/^https?:\/\/.+\.tgz$/);

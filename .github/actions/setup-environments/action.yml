@@ -8,7 +8,7 @@ inputs:
   python-version:
     description: Python version to install (skip Python setup if empty)
     required: false
-    default: ''
+    default: ""
   prefix-cache-key:
     description: Prefix for cache keys
     required: false

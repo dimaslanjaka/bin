@@ -1,11 +1,15 @@
-const packages = [
+const { filterRepoInfo } = require('./repo-verifier.cjs');
+
+const RepoInfo = [
   { repo: 'dimaslanjaka/git-command-helper', path: 'packages/git-command-helper', ref: 'pre-release' },
   { repo: 'dimaslanjaka/node-cross-spawn', path: 'packages/cross-spawn', ref: 'private' },
   { repo: 'dimaslanjaka/eslint-base-config', path: 'packages/eslint-base-config', ref: 'master' },
   { repo: 'dimaslanjaka/ai-toolkit', path: 'packages/ai-toolkit', ref: 'master' },
-  { repo: 'dimaslanjaka/static-blog-generator', path: 'packages/sbg-utility', ref: 'sbg-utility' }
+  { repo: 'dimaslanjaka/static-blog-generator', path: 'packages/sbg-utility', ref: 'sbg-utility' },
+  { repo: 'dimaslanjaka/binary-collections', path: 'packages/binary-collections', ref: 'master' }
 ];
 
+const filteredRepoInfo = filterRepoInfo(RepoInfo, { logPrefix: '[setup-environments-data]' });
 const action = {
   name: 'Setup CI Environment',
   description: 'Setup Node.js, Python, Bun, Corepack/Yarn, cache, virtual environment, and PATH for CI workflows',
@@ -97,7 +101,7 @@ const action = {
           ref: 'test'
         }
       },
-      ...packages.map((p) => ({
+      ...filteredRepoInfo.map((p) => ({
         name: `⬇️ Checkout ${p.path}`,
         uses: 'actions/checkout@v6',
         with: {

@@ -72,6 +72,7 @@ export function restoreResolutions(rootDir) {
  * (binary-collections.config.js) or falls back to defaults.
  * Backup is stored under getTempPath('normalize-resolutions/').
  * @param {string} rootDir - Project root directory containing package.json
+ * @returns {Promise<boolean>} `true` if changes were made (backup saved), `false` if no-op.
  */
 export async function normalizeResolutions(rootDir) {
   const packageJsonPath = path.join(rootDir, 'package.json');
@@ -82,7 +83,7 @@ export async function normalizeResolutions(rootDir) {
   const pkg = JSON.parse(raw);
   if (!pkg.resolutions || Object.keys(pkg.resolutions).length === 0) {
     console.log('[normalize-resolutions] no resolutions to normalize');
-    return;
+    return false;
   }
 
   const backupPath = getBackupPath(rootDir);
@@ -113,4 +114,5 @@ export async function normalizeResolutions(rootDir) {
     }
     console.log('[normalize-resolutions] no changes needed');
   }
+  return changed;
 }

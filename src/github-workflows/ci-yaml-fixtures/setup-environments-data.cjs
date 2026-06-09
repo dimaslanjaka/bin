@@ -1,3 +1,10 @@
+const packages = [
+  { repo: 'dimaslanjaka/git-command-helper', path: 'packages/git-command-helper', ref: 'pre-release' },
+  { repo: 'dimaslanjaka/node-cross-spawn', path: 'packages/cross-spawn', ref: 'private' },
+  { repo: 'dimaslanjaka/eslint-base-config', path: 'packages/eslint-base-config', ref: 'master' },
+  { repo: 'dimaslanjaka/ai-toolkit', path: 'packages/ai-toolkit', ref: 'master' }
+];
+
 const action = {
   name: 'Setup CI Environment',
   description: 'Setup Node.js, Python, Bun, Corepack/Yarn, cache, virtual environment, and PATH for CI workflows',
@@ -89,26 +96,16 @@ const action = {
           ref: 'test'
         }
       },
-      {
-        name: '⬇️ Checkout packages/git-command-helper',
+      ...packages.map((p) => ({
+        name: `⬇️ Checkout ${p.path}`,
         uses: 'actions/checkout@v6',
         with: {
-          repository: 'dimaslanjaka/git-command-helper',
-          path: 'packages/git-command-helper',
+          repository: p.repo,
+          path: p.path,
           token: '${{ inputs.token }}',
-          ref: 'pre-release'
+          ref: p.ref
         }
-      },
-      {
-        name: '⬇️ Checkout packages/cross-spawn',
-        uses: 'actions/checkout@v6',
-        with: {
-          repository: 'dimaslanjaka/node-cross-spawn',
-          path: 'packages/cross-spawn',
-          token: '${{ inputs.token }}',
-          ref: 'private'
-        }
-      },
+      })),
       {
         name: '🔁 Pull & update submodules recursively',
         'continue-on-error': true,
@@ -287,9 +284,32 @@ const action = {
       },
       {
         name: '🌐 Install global packages',
+        'continue-on-error': true,
         if: "steps.cache.outputs.cache-hit != 'true'",
         shell: 'bash',
         run: 'npm i -g typescript ts-node gulp-cli hexo-cli webpack-cli'
+      },
+      {
+        name: '♻️ Clean install dependencies',
+        'continue-on-error': true,
+        shell: 'bash',
+        run: [
+          '# Delete dependency directories recursively (monorepo-aware)',
+          'for dir in "node_modules" ".venv" "venv" "vendor"; do',
+          '  find . -type d -name "$dir" -prune -exec rm -rf {} + 2>/dev/null || true',
+          'done',
+          '',
+          '# Install project dependencies',
+          'if [ -f "yarn.lock" ] || [ -f ".yarnrc.yml" ]; then',
+          '  find . -type f -name "yarn.lock" -delete 2>/dev/null || true',
+          '  yarn install',
+          'elif [ -f "package-lock.json" ]; then',
+          '  find . -type f -name "package-lock.json" -delete 2>/dev/null || true',
+          '  npm install',
+          'elif [ -f "package.json" ]; then',
+          '  npm install',
+          'fi'
+        ].join('\n')
       },
       {
         name: '📂 Add custom bins to PATH',

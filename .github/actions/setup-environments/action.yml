@@ -78,6 +78,20 @@ runs:
         path: packages/cross-spawn
         token: ${{ inputs.token }}
         ref: private
+    - name: ⬇️ Checkout packages/eslint-base-config
+      uses: actions/checkout@v6
+      with:
+        repository: dimaslanjaka/eslint-base-config
+        path: packages/eslint-base-config
+        token: ${{ inputs.token }}
+        ref: master
+    - name: ⬇️ Checkout packages/ai-toolkit
+      uses: actions/checkout@v6
+      with:
+        repository: dimaslanjaka/ai-toolkit
+        path: packages/ai-toolkit
+        token: ${{ inputs.token }}
+        ref: master
     - name: 🔁 Pull & update submodules recursively
       continue-on-error: true
       shell: bash

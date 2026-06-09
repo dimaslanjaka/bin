@@ -48,16 +48,16 @@ jobs:
         shell: bash
         run: >-
           if [ -f "test/clean-github-actions-caches.test.cjs" ]; then
-            bash bin/test-cjs --testPathPatterns="clean-github-actions-caches.test.cjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="clean-github-actions-caches.test.cjs"
           else
             echo "Skipping missing test file: test/clean-github-actions-caches.test.cjs"
           fi
       - name: 🧪 Run tests in test/filemanager/rmpath.test.mjs
         id: run-test-filemanager-rmpath-test-mjs
         shell: bash
-        run: |-
+        run: >-
           if [ -f "test/filemanager/rmpath.test.mjs" ]; then
-            bash bin/test-esm --testPathPatterns="rmpath.test.mjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="filemanager/rmpath.test.mjs"
           else
             echo "Skipping missing test file: test/filemanager/rmpath.test.mjs"
           fi
@@ -66,25 +66,25 @@ jobs:
         shell: bash
         run: >-
           if [ -f "test/find-node-modules.test.ts" ]; then
-            node node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --testPathPatterns="find-node-modules.test.ts"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="find-node-modules.test.ts"
           else
             echo "Skipping missing test file: test/find-node-modules.test.ts"
           fi
       - name: 🧪 Run tests in test/getFileTreeString.test.cjs
         id: run-test-getFileTreeString-test-cjs
         shell: bash
-        run: |-
+        run: >-
           if [ -f "test/getFileTreeString.test.cjs" ]; then
-            bash bin/test-cjs --testPathPatterns="getFileTreeString.test.cjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="getFileTreeString.test.cjs"
           else
             echo "Skipping missing test file: test/getFileTreeString.test.cjs"
           fi
       - name: 🧪 Run tests in test/getLatestCommit.test.mjs
         id: run-test-getLatestCommit-test-mjs
         shell: bash
-        run: |-
+        run: >-
           if [ -f "test/getLatestCommit.test.mjs" ]; then
-            bash bin/test-esm --testPathPatterns="getLatestCommit.test.mjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="getLatestCommit.test.mjs"
           else
             echo "Skipping missing test file: test/getLatestCommit.test.mjs"
           fi
@@ -93,79 +93,79 @@ jobs:
         shell: bash
         run: >-
           if [ -f "test/git/git-diff-staged-ai.test.mjs" ]; then
-            bash bin/test-esm --testPathPatterns="git-diff-staged-ai.test.mjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="git/git-diff-staged-ai.test.mjs"
           else
             echo "Skipping missing test file: test/git/git-diff-staged-ai.test.mjs"
           fi
       - name: 🧪 Run tests in test/git/git-diff.test.cjs
         id: run-test-git-git-diff-test-cjs
         shell: bash
-        run: |-
+        run: >-
           if [ -f "test/git/git-diff.test.cjs" ]; then
-            bash bin/test-cjs --testPathPatterns="git-diff.test.cjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="git/git-diff.test.cjs"
           else
             echo "Skipping missing test file: test/git/git-diff.test.cjs"
           fi
       - name: 🧪 Run tests in test/git/git-fix-focused.test.cjs
         id: run-test-git-git-fix-focused-test-cjs
         shell: bash
-        run: |-
+        run: >-
           if [ -f "test/git/git-fix-focused.test.cjs" ]; then
-            bash bin/test-cjs --testPathPatterns="git-fix-focused.test.cjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="git/git-fix-focused.test.cjs"
           else
             echo "Skipping missing test file: test/git/git-fix-focused.test.cjs"
           fi
       - name: 🧪 Run tests in test/git/git-fix.help.test.cjs
         id: run-test-git-git-fix-help-test-cjs
         shell: bash
-        run: |-
+        run: >-
           if [ -f "test/git/git-fix.help.test.cjs" ]; then
-            bash bin/test-cjs --testPathPatterns="git-fix.help.test.cjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="git/git-fix.help.test.cjs"
           else
             echo "Skipping missing test file: test/git/git-fix.help.test.cjs"
           fi
       - name: 🧪 Run tests in test/git/git-fix.options.test.cjs
         id: run-test-git-git-fix-options-test-cjs
         shell: bash
-        run: |-
+        run: >-
           if [ -f "test/git/git-fix.options.test.cjs" ]; then
-            bash bin/test-cjs --testPathPatterns="git-fix.options.test.cjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="git/git-fix.options.test.cjs"
           else
             echo "Skipping missing test file: test/git/git-fix.options.test.cjs"
           fi
       - name: 🧪 Run tests in test/git/git-fix.summary.test.cjs
         id: run-test-git-git-fix-summary-test-cjs
         shell: bash
-        run: |-
+        run: >-
           if [ -f "test/git/git-fix.summary.test.cjs" ]; then
-            bash bin/test-cjs --testPathPatterns="git-fix.summary.test.cjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="git/git-fix.summary.test.cjs"
           else
             echo "Skipping missing test file: test/git/git-fix.summary.test.cjs"
           fi
       - name: 🧪 Run tests in test/git/git-user-config.test.cjs
         id: run-test-git-git-user-config-test-cjs
         shell: bash
-        run: |-
+        run: >-
           if [ -f "test/git/git-user-config.test.cjs" ]; then
-            bash bin/test-cjs --testPathPatterns="git-user-config.test.cjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="git/git-user-config.test.cjs"
           else
             echo "Skipping missing test file: test/git/git-user-config.test.cjs"
           fi
       - name: 🧪 Run tests in test/git/git-utils.test.cjs
         id: run-test-git-git-utils-test-cjs
         shell: bash
-        run: |-
+        run: >-
           if [ -f "test/git/git-utils.test.cjs" ]; then
-            bash bin/test-cjs --testPathPatterns="git-utils.test.cjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="git/git-utils.test.cjs"
           else
             echo "Skipping missing test file: test/git/git-utils.test.cjs"
           fi
       - name: 🧪 Run tests in test/gitattributes-parse.test.cjs
         id: run-test-gitattributes-parse-test-cjs
         shell: bash
-        run: |-
+        run: >-
           if [ -f "test/gitattributes-parse.test.cjs" ]; then
-            bash bin/test-cjs --testPathPatterns="gitattributes-parse.test.cjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="gitattributes-parse.test.cjs"
           else
             echo "Skipping missing test file: test/gitattributes-parse.test.cjs"
           fi
@@ -174,25 +174,25 @@ jobs:
         shell: bash
         run: >-
           if [ -f "test/gitattributes-update.test.cjs" ]; then
-            bash bin/test-cjs --testPathPatterns="gitattributes-update.test.cjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="gitattributes-update.test.cjs"
           else
             echo "Skipping missing test file: test/gitattributes-update.test.cjs"
           fi
       - name: 🧪 Run tests in test/gitattributes.test.cjs
         id: run-test-gitattributes-test-cjs
         shell: bash
-        run: |-
+        run: >-
           if [ -f "test/gitattributes.test.cjs" ]; then
-            bash bin/test-cjs --testPathPatterns="gitattributes.test.cjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="gitattributes.test.cjs"
           else
             echo "Skipping missing test file: test/gitattributes.test.cjs"
           fi
       - name: 🧪 Run tests in test/node-executor.test.cjs
         id: run-test-node-executor-test-cjs
         shell: bash
-        run: |-
+        run: >-
           if [ -f "test/node-executor.test.cjs" ]; then
-            bash bin/test-cjs --testPathPatterns="node-executor.test.cjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="node-executor.test.cjs"
           else
             echo "Skipping missing test file: test/node-executor.test.cjs"
           fi
@@ -202,7 +202,7 @@ jobs:
         run: >-
           if [ -f "test/node-package-packer/normalize-resolutions.test.mjs" ];
           then
-            bash bin/test-esm --testPathPatterns="normalize-resolutions.test.mjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="node-package-packer/normalize-resolutions.test.mjs"
           else
             echo "Skipping missing test file: test/node-package-packer/normalize-resolutions.test.mjs"
           fi
@@ -212,7 +212,7 @@ jobs:
         run: >-
           if [ -f "test/node-package-packer/resolve-newest-tarball.test.mjs" ];
           then
-            bash bin/test-esm --testPathPatterns="resolve-newest-tarball.test.mjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="node-package-packer/resolve-newest-tarball.test.mjs"
           else
             echo "Skipping missing test file: test/node-package-packer/resolve-newest-tarball.test.mjs"
           fi
@@ -223,7 +223,7 @@ jobs:
         run: >-
           if [ -f "test/node-package-packer/resolve-workspace-versions.test.mjs"
           ]; then
-            bash bin/test-esm --testPathPatterns="resolve-workspace-versions.test.mjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="node-package-packer/resolve-workspace-versions.test.mjs"
           else
             echo "Skipping missing test file: test/node-package-packer/resolve-workspace-versions.test.mjs"
           fi
@@ -232,7 +232,7 @@ jobs:
         shell: bash
         run: >-
           if [ -f "test/node-package-packer/scoped-package.test.mjs" ]; then
-            bash bin/test-esm --testPathPatterns="scoped-package.test.mjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="node-package-packer/scoped-package.test.mjs"
           else
             echo "Skipping missing test file: test/node-package-packer/scoped-package.test.mjs"
           fi
@@ -241,7 +241,7 @@ jobs:
         shell: bash
         run: >-
           if [ -f "test/node-package-packer/slugify-pkg-name.test.mjs" ]; then
-            bash bin/test-esm --testPathPatterns="slugify-pkg-name.test.mjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="node-package-packer/slugify-pkg-name.test.mjs"
           else
             echo "Skipping missing test file: test/node-package-packer/slugify-pkg-name.test.mjs"
           fi
@@ -253,7 +253,7 @@ jobs:
           if [ -f
           "test/node-package-packer/transform-workspace-protocols.test.mjs" ];
           then
-            bash bin/test-esm --testPathPatterns="transform-workspace-protocols.test.mjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="node-package-packer/transform-workspace-protocols.test.mjs"
           else
             echo "Skipping missing test file: test/node-package-packer/transform-workspace-protocols.test.mjs"
           fi
@@ -265,16 +265,16 @@ jobs:
           if [ -f
           "test/node-package-packer/transform-workspace-to-tarball.test.mjs" ];
           then
-            bash bin/test-esm --testPathPatterns="transform-workspace-to-tarball.test.mjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="node-package-packer/transform-workspace-to-tarball.test.mjs"
           else
             echo "Skipping missing test file: test/node-package-packer/transform-workspace-to-tarball.test.mjs"
           fi
       - name: 🧪 Run tests in test/print-tree-tarball.test.mjs
         id: run-test-print-tree-tarball-test-mjs
         shell: bash
-        run: |-
+        run: >-
           if [ -f "test/print-tree-tarball.test.mjs" ]; then
-            bash bin/test-esm --testPathPatterns="print-tree-tarball.test.mjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="print-tree-tarball.test.mjs"
           else
             echo "Skipping missing test file: test/print-tree-tarball.test.mjs"
           fi
@@ -283,7 +283,7 @@ jobs:
         shell: bash
         run: >-
           if [ -f "test/readline-mock.test.ts" ]; then
-            node node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --testPathPatterns="readline-mock.test.ts"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="readline-mock.test.ts"
           else
             echo "Skipping missing test file: test/readline-mock.test.ts"
           fi
@@ -292,7 +292,7 @@ jobs:
         shell: bash
         run: >-
           if [ -f "test/remove-module.test.ts" ]; then
-            node node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --testPathPatterns="remove-module.test.ts"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="remove-module.test.ts"
           else
             echo "Skipping missing test file: test/remove-module.test.ts"
           fi
@@ -301,7 +301,7 @@ jobs:
         shell: bash
         run: >-
           if [ -f "test/replaceRawWithLatestHash.test.mjs" ]; then
-            bash bin/test-esm --testPathPatterns="replaceRawWithLatestHash.test.mjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="replaceRawWithLatestHash.test.mjs"
           else
             echo "Skipping missing test file: test/replaceRawWithLatestHash.test.mjs"
           fi
@@ -310,16 +310,16 @@ jobs:
         shell: bash
         run: >-
           if [ -f "test/resolvePackageResolutionUpdates.test.mjs" ]; then
-            bash bin/test-esm --testPathPatterns="resolvePackageResolutionUpdates.test.mjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="resolvePackageResolutionUpdates.test.mjs"
           else
             echo "Skipping missing test file: test/resolvePackageResolutionUpdates.test.mjs"
           fi
       - name: 🧪 Run tests in test/rm-node-modules.test.cjs
         id: run-test-rm-node-modules-test-cjs
         shell: bash
-        run: |-
+        run: >-
           if [ -f "test/rm-node-modules.test.cjs" ]; then
-            bash bin/test-cjs --testPathPatterns="rm-node-modules.test.cjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="rm-node-modules.test.cjs"
           else
             echo "Skipping missing test file: test/rm-node-modules.test.cjs"
           fi
@@ -328,7 +328,7 @@ jobs:
         shell: bash
         run: >-
           if [ -f "test/run-by-checksum/runChecksum-cli.spawn.test.mjs" ]; then
-            bash bin/test-esm --testPathPatterns="runChecksum-cli.spawn.test.mjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="run-by-checksum/runChecksum-cli.spawn.test.mjs"
           else
             echo "Skipping missing test file: test/run-by-checksum/runChecksum-cli.spawn.test.mjs"
           fi
@@ -337,7 +337,7 @@ jobs:
         shell: bash
         run: >-
           if [ -f "test/run-by-checksum/runChecksum-cli.test.mjs" ]; then
-            bash bin/test-esm --testPathPatterns="runChecksum-cli.test.mjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="run-by-checksum/runChecksum-cli.test.mjs"
           else
             echo "Skipping missing test file: test/run-by-checksum/runChecksum-cli.test.mjs"
           fi
@@ -346,7 +346,7 @@ jobs:
         shell: bash
         run: >-
           if [ -f "test/run-by-checksum/runChecksum-dry-run.test.mjs" ]; then
-            bash bin/test-esm --testPathPatterns="runChecksum-dry-run.test.mjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="run-by-checksum/runChecksum-dry-run.test.mjs"
           else
             echo "Skipping missing test file: test/run-by-checksum/runChecksum-dry-run.test.mjs"
           fi
@@ -355,25 +355,25 @@ jobs:
         shell: bash
         run: >-
           if [ -f "test/run-by-checksum/runChecksum.test.mjs" ]; then
-            bash bin/test-esm --testPathPatterns="runChecksum.test.mjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="run-by-checksum/runChecksum.test.mjs"
           else
             echo "Skipping missing test file: test/run-by-checksum/runChecksum.test.mjs"
           fi
       - name: 🧪 Run tests in test/submodule-install.test.cjs
         id: run-test-submodule-install-test-cjs
         shell: bash
-        run: |-
+        run: >-
           if [ -f "test/submodule-install.test.cjs" ]; then
-            bash bin/test-cjs --testPathPatterns="submodule-install.test.cjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="submodule-install.test.cjs"
           else
             echo "Skipping missing test file: test/submodule-install.test.cjs"
           fi
       - name: 🧪 Run tests in test/utils/fetchResponse.test.mjs
         id: run-test-utils-fetchResponse-test-mjs
         shell: bash
-        run: |-
+        run: >-
           if [ -f "test/utils/fetchResponse.test.mjs" ]; then
-            bash bin/test-esm --testPathPatterns="fetchResponse.test.mjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="utils/fetchResponse.test.mjs"
           else
             echo "Skipping missing test file: test/utils/fetchResponse.test.mjs"
           fi
@@ -382,7 +382,7 @@ jobs:
         shell: bash
         run: >-
           if [ -f "test/utils/isGitRepository.test.cjs" ]; then
-            bash bin/test-cjs --testPathPatterns="isGitRepository.test.cjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="utils/isGitRepository.test.cjs"
           else
             echo "Skipping missing test file: test/utils/isGitRepository.test.cjs"
           fi
@@ -391,7 +391,7 @@ jobs:
         shell: bash
         run: >-
           if [ -f "test/utils/isGitRepository.test.js" ]; then
-            npm test -- --testPathPatterns="isGitRepository.test.js"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="utils/isGitRepository.test.js"
           else
             echo "Skipping missing test file: test/utils/isGitRepository.test.js"
           fi
@@ -400,7 +400,7 @@ jobs:
         shell: bash
         run: >-
           if [ -f "test/validate-tarball-npm.test.cjs" ]; then
-            bash bin/test-cjs --testPathPatterns="validate-tarball-npm.test.cjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="validate-tarball-npm.test.cjs"
           else
             echo "Skipping missing test file: test/validate-tarball-npm.test.cjs"
           fi
@@ -409,7 +409,7 @@ jobs:
         shell: bash
         run: >-
           if [ -f "test/validate-tarball-yarn.test.cjs" ]; then
-            bash bin/test-cjs --testPathPatterns="validate-tarball-yarn.test.cjs"
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="validate-tarball-yarn.test.cjs"
           else
             echo "Skipping missing test file: test/validate-tarball-yarn.test.cjs"
           fi

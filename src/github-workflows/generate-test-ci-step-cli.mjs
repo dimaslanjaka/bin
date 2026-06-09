@@ -76,20 +76,38 @@ async function main() {
   const patterns = argv.pattern ? (Array.isArray(argv.pattern) ? argv.pattern : [argv.pattern]) : DEFAULT_PATTERNS;
 
   const ignorePatterns = argv.ignore ? (Array.isArray(argv.ignore) ? argv.ignore : [argv.ignore]) : [];
+  let isModule = false;
+  const pkgJsonPath = path.resolve(process.cwd(), 'package.json');
+  if (fs.existsSync(pkgJsonPath)) {
+    const pkgJson = fs.readJsonSync(pkgJsonPath);
+    isModule = pkgJson.type === 'module';
+  }
 
   const files = await collectTests(patterns, ignorePatterns);
   for (const file of files) {
-    const ext = (path.extname(file) || '').toLowerCase();
+    // const ext = (path.extname(file) || '').toLowerCase();
     const filename = path.basename(file);
+    let pathPattern = filename;
+    const isDirnameTestOrRoot = [/tests?$/, /__tests?__/].some((rg) => rg.test(path.dirname(file)));
+    if (!isDirnameTestOrRoot) {
+      pathPattern = path.relative(process.cwd(), file).replace(/^(__tests?__|tests?)\//, '');
+    }
+    // console.log(path.dirname(file), isDirnameTestOrRoot, { pathPattern });
     let runCmd;
-    if (ext === '.mjs') {
-      runCmd = `if [ -f "${file}" ]; then\n  bash bin/test-esm --testPathPatterns="${filename}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
-    } else if (ext === '.cjs') {
-      runCmd = `if [ -f "${file}" ]; then\n  bash bin/test-cjs --testPathPatterns="${filename}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
-    } else if (ext === '.ts') {
-      runCmd = `if [ -f "${file}" ]; then\n  node node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --testPathPatterns="${filename}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
+    // if (ext === '.mjs') {
+    //   runCmd = `if [ -f "${file}" ]; then\n  bash bin/test-esm --testPathPatterns="${filename}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
+    // } else if (ext === '.cjs') {
+    //   runCmd = `if [ -f "${file}" ]; then\n  bash bin/test-cjs --testPathPatterns="${filename}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
+    // } else if (ext === '.ts') {
+    //   runCmd = `if [ -f "${file}" ]; then\n  node node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --testPathPatterns="${filename}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
+    // } else {
+    //   runCmd = `if [ -f "${file}" ]; then\n  npm test -- --testPathPatterns="${filename}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
+    // }
+
+    if (isModule) {
+      runCmd = `if [ -f "${file}" ]; then\n  node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="${pathPattern}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
     } else {
-      runCmd = `if [ -f "${file}" ]; then\n  npm test -- --testPathPatterns="${filename}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
+      runCmd = `if [ -f "${file}" ]; then\n  node node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="${pathPattern}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
     }
 
     // Skip files that are not tracked by git (untracked files shouldn't be included in committed actions)

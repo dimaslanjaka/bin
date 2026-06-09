@@ -15,8 +15,12 @@ const nonGitDir = path.join(os.tmpdir(), 'non-git-dir');
 
 fs.ensureDirSync(nonGitDir);
 
-// ⚠️ avoid overwriting global process.cwd (breaks libs/tests unpredictably)
-// instead expose helper
+/**
+ * Get the repo directory path used as a working directory for tests.
+ * Does NOT modify the global process.cwd.
+ *
+ * @returns {string} The absolute path to the test repo directory.
+ */
 const getCwd = () => repoDir;
 
 module.exports = {
@@ -27,7 +31,14 @@ module.exports = {
 };
 
 /**
- * shared runner to remove duplication
+ * Run a command synchronously with spawnSync and throw on non-zero exit.
+ * Shares common spawn options across test helpers to reduce duplication.
+ *
+ * @param {string} cmd - The command to execute.
+ * @param {string[]} args - Arguments to pass to the command.
+ * @param {import('child_process').SpawnSyncOptions} [opts={}] - Additional spawn options merged over defaults.
+ * @returns {import('child_process').SpawnSyncReturns} The result from spawnSync.
+ * @throws {Error} If the command exits with a non-zero status code.
  */
 function run(cmd, args, opts = {}) {
   const result = spawnSync(cmd, args, {
@@ -47,6 +58,10 @@ function run(cmd, args, opts = {}) {
   return result;
 }
 
+/**
+ * Ensure the test repository exists at `repoDir`, cloning it if absent.
+ * Uses the `test` branch of the dimaslanjaka/test-repo GitHub repository.
+ */
 function ensureRepoExists() {
   const gitDir = path.join(repoDir, '.git');
 
@@ -62,6 +77,11 @@ function ensureRepoExists() {
   );
 }
 
+/**
+ * Ensure the test repo is set up as a yarn project with known dependencies.
+ * Initialises a package.json, adds `jquery`/`lodash` as dependencies and
+ * `binary-collections` as a devDependency, and creates or renames the lockfile.
+ */
 function ensureYarnProject() {
   const pkgJson = path.join(repoDir, 'package.json');
   const yarnLock = path.join(repoDir, 'yarn.lock');
@@ -99,6 +119,14 @@ function ensureYarnProject() {
   }
 }
 
+/**
+ * Install the local `binary-collections` tarball into the test repo.
+ * Supports yarn and npm package managers.
+ *
+ * @param {'yarn'|'npm'} [packageManager='yarn'] - The package manager to use for installation.
+ * @returns {import('child_process').SpawnSyncReturns} The result from the install command.
+ * @throws {Error} If the tarball is missing at the expected path or an unsupported package manager is given.
+ */
 function installTarball(packageManager = 'yarn') {
   const TGZ_PATH = path.resolve(__dirname, '../releases/bin.tgz');
 

@@ -2,10 +2,10 @@
 import fs from 'fs-extra';
 import path from 'upath';
 import { fileURLToPath } from 'url';
-import yaml from 'yaml';
 import { execSync } from 'child_process';
 import { glob } from 'glob';
 import { getArgs } from '../utils/index.cjs';
+import { writeYamlFile } from './utils.cjs';
 import actionObject from './ci-yaml-fixtures/workflow-test-data.cjs';
 import setupEnvironmentsObject from './ci-yaml-fixtures/setup-environments-data.cjs';
 
@@ -129,18 +129,6 @@ async function main() {
       shell: 'bash',
       run: runCmd
     });
-  }
-
-  function writeYamlFile(filePath, obj) {
-    const resolved = path.resolve(process.cwd(), filePath);
-    fs.ensureDirSync(path.dirname(resolved));
-    fs.writeFileSync(resolved, yaml.stringify(obj), 'utf-8');
-    try {
-      execSync(`npx -y prettier -w "${resolved}"`, { stdio: 'ignore', cwd: process.cwd() });
-    } catch {
-      // prettier is optional — skip formatting if unavailable
-    }
-    return resolved;
   }
 
   writeYamlFile(actionFile, actionObject);

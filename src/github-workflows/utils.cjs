@@ -7,6 +7,10 @@
 
 const axios = require('axios');
 const { spawn } = require('cross-spawn');
+const path = require('upath');
+const fs = require('fs-extra');
+const yaml = require('yaml');
+const { execSync } = require('child_process');
 const { getGithubToken } = require('../binary-collections/config.cjs');
 
 const BASE = 'https://api.github.com';
@@ -213,6 +217,27 @@ async function getJobs(owner, repo, runId) {
   return data.jobs || [];
 }
 
+// ─── YAML file writer ────────────────────────────────────────
+
+/**
+ * Serialize a JS object to YAML and write it to a file.
+ * Creates parent directories if needed. Formats with prettier if available.
+ * @param {string} filePath - Output file path (relative or absolute)
+ * @param {object} obj - JS object to serialize
+ * @returns {string} Resolved absolute path to the written file
+ */
+function writeYamlFile(filePath, obj) {
+  const resolved = path.resolve(process.cwd(), filePath);
+  fs.ensureDirSync(path.dirname(resolved));
+  fs.writeFileSync(resolved, yaml.stringify(obj), 'utf-8');
+  try {
+    execSync(`npx -y prettier -w "${resolved}"`, { stdio: 'ignore', cwd: process.cwd() });
+  } catch {
+    // prettier is optional — skip formatting if unavailable
+  }
+  return resolved;
+}
+
 module.exports = {
   BASE,
   getHeaders,
@@ -226,5 +251,6 @@ module.exports = {
   getCurrentRepo,
   getOwnerRepo,
   getLatestRun,
-  getJobs
+  getJobs,
+  writeYamlFile
 };

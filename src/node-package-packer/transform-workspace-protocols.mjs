@@ -130,6 +130,7 @@ export async function transformWorkspaceProtocols(dirname) {
 
   if (!modified) {
     // no changes needed, return noop restore
+    console.log('[transform-workspace] no workspace: references found');
     return () => {};
   }
 

@@ -116,34 +116,45 @@ export async function bundle(customArgs = {}, cwd) {
    */
   const isCI = process.env.GITHUB_ACTION && process.env.GITHUB_ACTIONS;
 
+  console.log(`[bundle] cwd=${cwd} releaseDir=${releaseDir} isYarn=${isYarn} isBun=${isBun}`);
+  console.log(`[bundle] packCmd=${isBun ? 'bun pm pack' : isYarn ? 'yarn pack' : 'npm pack'}`);
+
   // create released directory when not exist
   if (!fs.existsSync(releaseDir)) {
     fs.mkdirpSync(releaseDir, { recursive: true });
+    console.log(`[bundle] created release dir ${releaseDir}`);
   }
 
   // Transform workspace protocol references (workspace:^, workspace:*, workspace:~)
   // to real version ranges before packing, then restore after.
+  console.log('[bundle] transforming workspace protocols...');
   const restorePkg = await transformWorkspaceProtocols(cwd);
+  console.log('[bundle] workspace protocols done');
 
   try {
+    console.log('[bundle] spawning pack command...');
     const result = crossSpawn.sync(
       isBun ? 'bun' : isYarn ? 'yarn' : 'npm',
       isBun ? ['pm', 'pack', '--ignore-scripts', '--destination', releaseDir] : ['pack'],
       {
         cwd: cwd,
-        stdio: 'ignore',
-        env: { PATH: process.env.PATH }
+        stdio: 'inherit',
+        env: { ...process.env }
       }
     );
+    console.log('[bundle] pack command exited with status=' + result.status);
 
     if (result.error) {
       throw result.error;
     }
   } finally {
     // Restore original package.json regardless of pack success/failure
+    console.log('[bundle] restoring package.json...');
     restorePkg();
+    console.log('[bundle] restore done');
   }
 
+  console.log('[bundle] running post-pack bundler...');
   if (isBun) {
     await bundleWithBun(cwd, packagejson, releaseDir, args, isCI);
   } else if (isYarn) {
@@ -151,6 +162,7 @@ export async function bundle(customArgs = {}, cwd) {
   } else {
     await bundleWithNpm(cwd, packagejson, releaseDir, args, isCI);
   }
+  console.log('[bundle] done');
 }
 
 export { resolveWorkspaceVersions, transformWorkspaceProtocols, resolveNewestTarball };

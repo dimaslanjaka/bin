@@ -13,10 +13,10 @@ const bundledPackages = [
   'is-file-stream',
   'strip-ansi',
   'ansi-regex',
-  'sbg-utility',
-  'through2',
-  'git-command-helper',
-  'cross-spawn'
+  // 'sbg-utility',
+  'through2'
+  // 'git-command-helper',
+  // 'cross-spawn'
 ];
 
 /**

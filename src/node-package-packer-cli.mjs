@@ -21,21 +21,26 @@ if (args.h || args.help) {
 }
 
 (async () => {
+  console.log('[packer] loading build-tarball module...');
   const { bundle } = await import('./node-package-packer/build-tarball.mjs');
+  console.log('[packer] module loaded, starting bundle...');
 
   let didNormalize = false;
   if (args['normalize-resolutions']) {
+    console.log('[packer] normalizing resolutions...');
     didNormalize = await normalizeResolutions(process.cwd());
+    console.log('[packer] resolutions normalized');
   }
 
   try {
     await bundle();
+    console.log('[packer] bundle completed');
   } finally {
     if (didNormalize) {
       restoreResolutions(process.cwd());
     }
   }
 })().catch((error) => {
-  console.error(error);
+  console.error('[packer] error:', error);
   process.exit(1);
 });

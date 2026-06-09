@@ -67,18 +67,18 @@
     "url": "git+https://github.com/dimaslanjaka/bin"
   },
   "dependencies": {
+    "@dimaslanjaka/ai-toolkit": "https://github.com/dimaslanjaka/ai-toolkit/raw/refs/heads/master/release/dimaslanjaka-ai-toolkit.tgz",
     "@opencode-ai/plugin": "^1.16.2",
     "@yarnpkg/core": "^4.7.0",
-    "ai-toolkit": "workspace:^",
     "ansi-colors": "^4.1.3",
     "axios": "^1.16.1",
     "better-sqlite3": "^12.10.0",
     "cosmiconfig": "^9.0.1",
-    "cross-spawn": "workspace:^",
+    "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/e48db3235351bbcb9394b21766b2d477cc6b7dd2/release/cross-spawn.tgz",
     "crypto-js": "^4.2.0",
     "dotenv": "^17.4.2",
     "fs-extra": "^11.3.5",
-    "git-command-helper": "workspace:^",
+    "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/4e7f8475eafa0974c170893de354026967a71776/release/git-command-helper.tgz",
     "glob": "^13.0.6",
     "jsonc-parser": "^3.3.1",
     "minimatch": "^10.2.5",
@@ -153,7 +153,7 @@
     "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/4e7f8475eafa0974c170893de354026967a71776/release/git-command-helper.tgz",
     "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/1ca385787f7287155b547c5b97d5ffd5bcfab482/packages/sbg-utility/release/sbg-utility.tgz",
     "@dimaslanjaka/eslint-base-config": "https://github.com/dimaslanjaka/eslint-base-config/raw/d646d368cd8c87576f80c9f5822c4fc090b23b4c/release/dimaslanjaka-eslint-base-config.tgz",
-    "ai-toolkit": "https://github.com/dimaslanjaka/ai-toolkit/raw/633040ea8a63b7f93f48650bcd835f525b8ed260/release/ai-toolkit.tgz"
+    "@dimaslanjaka/ai-toolkit": "https://github.com/dimaslanjaka/ai-toolkit/raw/refs/heads/master/release/dimaslanjaka-ai-toolkit.tgz"
   },
   "bin": {
     "actions-badge": "lib/github-workflows/workflow-badge-cli.cjs",

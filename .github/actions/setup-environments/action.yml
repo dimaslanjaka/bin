@@ -92,6 +92,13 @@ runs:
         path: packages/ai-toolkit
         token: ${{ inputs.token }}
         ref: master
+    - name: ⬇️ Checkout packages/sbg-utility
+      uses: actions/checkout@v6
+      with:
+        repository: dimaslanjaka/static-blog-generator
+        path: packages/sbg-utility
+        token: ${{ inputs.token }}
+        ref: sbg-utility
     - name: 🔁 Pull & update submodules recursively
       continue-on-error: true
       shell: bash

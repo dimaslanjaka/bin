@@ -2,7 +2,8 @@ const packages = [
   { repo: 'dimaslanjaka/git-command-helper', path: 'packages/git-command-helper', ref: 'pre-release' },
   { repo: 'dimaslanjaka/node-cross-spawn', path: 'packages/cross-spawn', ref: 'private' },
   { repo: 'dimaslanjaka/eslint-base-config', path: 'packages/eslint-base-config', ref: 'master' },
-  { repo: 'dimaslanjaka/ai-toolkit', path: 'packages/ai-toolkit', ref: 'master' }
+  { repo: 'dimaslanjaka/ai-toolkit', path: 'packages/ai-toolkit', ref: 'master' },
+  { repo: 'dimaslanjaka/static-blog-generator', path: 'packages/sbg-utility', ref: 'sbg-utility' }
 ];
 
 const action = {

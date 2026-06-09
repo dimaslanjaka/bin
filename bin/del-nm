@@ -1,8 +1,9 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-# put these on top of file
+# cygwin encoding fix
+(set -o igncr) 2>/dev/null && set -o igncr;
 
-(set -o igncr) 2>/dev/null && set -o igncr; # cygwin encoding fix
+set -euo pipefail
 
 # absolute path working directory
 basecwd=${PWD}
@@ -32,6 +33,24 @@ if [ -f ".env" ]; then
   # Export the vars in .env into your shell:
   export $(egrep -v '^#' .env | xargs)
 fi
+
+if [ ! -d "node_modules" ]; then
+  echo "node_modules not found in current folder."
+  exit 0
+fi
+
+TARGET="/tmp/node_modules_delete_${RANDOM}"
+
+echo "Moving node_modules to:"
+echo "$TARGET"
+
+mv "node_modules" "$TARGET"
+
+echo "Done. node_modules moved."
+echo "Deleting in background..."
+
+rm -rf "$TARGET" &
+
 
 node_modules=()
 locks=()
@@ -89,16 +108,8 @@ for i in "${indexes[@]}" ; do
     sorted+=("${paths[i]}")
 done
 
-#printf "%s\n" "${sorted[@]}"
+printf "%s\n" "${sorted[@]}"
 
-echo "removing node_modules and caches"
-
-for file in "${sorted[@]}"; do
-    rm -rf "$file" && echo "removed $file" &
-done
-
-wait
-
-echo "cleaning tmp"
-
-find . -name "tmp" -exec rm -rf '{}' +
+# for file in "${sorted[@]}"; do
+#     rm -rf "$file" && echo "removed $file" &
+# done

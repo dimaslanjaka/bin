@@ -1,0 +1,27 @@
+[install]
+# closest to Yarn nodeLinker: node-modules
+# Bun valid values: "hoisted" or "isolated"
+# "hoisted" = npm/Yarn-like flat node_modules
+# "isolated" = pnpm-like stricter workspace isolation
+linker = "hoisted"
+
+# closest to enableImmutableInstalls: false
+# false means bun install may update bun.lock
+frozenLockfile = false
+
+# closest to enableScripts: true
+# false means do NOT ignore scripts
+ignoreScripts = false
+
+# closest to taskPoolConcurrency for lifecycle scripts only
+concurrentScripts = 8
+
+# optional: Bun text lockfile
+saveTextLockfile = true
+
+[install.cache]
+# Bun defaults to global cache: ~/.bun/install/cache
+# Use this only if you really want project-local cache
+# dir = "./.bun/cache"
+disable = false
+disableManifest = false

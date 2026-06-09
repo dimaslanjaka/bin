@@ -19,7 +19,7 @@ import { writefile } from 'sbg-utility';
 import path from 'upath';
 import { getTempPath } from '../binary-collections/config.cjs';
 import { sha256 } from '../run-by-checksum/hash.cjs';
-import * as ai from 'ai-toolkit';
+import * as ai from '@dimaslanjaka/ai-toolkit';
 import { getArgs } from '../utils/index.cjs';
 
 /**

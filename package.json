@@ -103,7 +103,7 @@
     "@babel/plugin-syntax-import-assertions": "^7.28.6",
     "@babel/preset-env": "^7.29.2",
     "@babel/preset-typescript": "^7.28.5",
-    "@dimaslanjaka/eslint-base-config": "https://github.com/dimaslanjaka/eslint-base-config/raw/d646d368cd8c87576f80c9f5822c4fc090b23b4c/release/dimaslanjaka-eslint-base-config.tgz",
+    "@dimaslanjaka/eslint-base-config": "^1.0.2",
     "@rollup/plugin-alias": "^6.0.0",
     "@rollup/plugin-babel": "^7.0.0",
     "@rollup/plugin-commonjs": "^29.0.3",

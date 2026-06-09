@@ -6,7 +6,7 @@ const RepoInfo = [
   { repo: 'dimaslanjaka/eslint-base-config', path: 'packages/eslint-base-config', ref: 'master' },
   { repo: 'dimaslanjaka/ai-toolkit', path: 'packages/ai-toolkit', ref: 'master' },
   { repo: 'dimaslanjaka/static-blog-generator', path: 'packages/sbg-utility', ref: 'sbg-utility' },
-  { repo: 'dimaslanjaka/binary-collections', path: 'packages/binary-collections', ref: 'master' }
+  { repo: 'dimaslanjaka/bin', path: 'packages/binary-collections', ref: 'master' }
 ];
 
 const filteredRepoInfo = filterRepoInfo(RepoInfo, { logPrefix: '[setup-environments-data]' });

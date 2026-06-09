@@ -33,6 +33,7 @@ const defaultBin = {
   'undo-commit': 'lib/git/undo-commit.cjs',
   'undo-last-commit': 'lib/git/undo-commit.cjs',
   'git-undo-commit': 'lib/git/undo-commit.cjs',
+  'generate-ci': 'lib/github-workflows/generate-ci-cli.cjs',
   'undo-staged': 'lib/git/undo-staged.cjs',
   'git-undo-staged': 'lib/git/undo-staged.cjs',
   'rm-node-modules': 'lib/rm-node-module-cli.cjs',

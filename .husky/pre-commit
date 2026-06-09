@@ -9,7 +9,7 @@ node src/github-workflows/generate-test-ci-step-cli.mjs
 if [ -n "$GITHUB_ACTIONS" ] || [ -n "$CI" ]; then
   echo "CI environment detected — skipping git add of generated action"
 else
-  git add .github/workflows/test.yml .github/actions/setup-environments/action.yml
+  git add .github/workflows/test.yml .github/actions/setup-environments/action.yml .github/workflows/build-release.yml
 fi
 
 # Run lint-staged through Yarn so the local binary is resolved consistently

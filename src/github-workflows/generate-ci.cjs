@@ -3,7 +3,7 @@ const fs = require('fs-extra');
 const cp = require('cross-spawn');
 
 function generateCI(cwd = undefined) {
-  const scripts = ['generate-test-ci-step-cli'].map((name) => {
+  const scripts = ['generate-test-ci-step-cli', 'generate-build-release-ci-cli'].map((name) => {
     const exts = ['.cjs', '.mjs'];
     const searchDir = [__dirname, path.join(__dirname, '..'), path.join(__dirname, '../..')];
     if (cwd) {

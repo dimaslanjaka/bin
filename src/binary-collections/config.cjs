@@ -109,3 +109,4 @@ module.exports = {
   loadDotenv,
   getConfig
 };
+module.exports.default = module.exports;

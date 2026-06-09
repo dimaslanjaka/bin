@@ -75,11 +75,11 @@
     "axios": "^1.16.1",
     "better-sqlite3": "^12.10.0",
     "cosmiconfig": "^9.0.1",
-    "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/e48db3235351bbcb9394b21766b2d477cc6b7dd2/release/cross-spawn.tgz",
+    "cross-spawn": "^7.0.6",
     "crypto-js": "^4.2.0",
     "dotenv": "^17.4.2",
     "fs-extra": "^11.3.5",
-    "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/4e7f8475eafa0974c170893de354026967a71776/release/git-command-helper.tgz",
+    "git-command-helper": "^2.1.1",
     "glob": "^13.0.6",
     "jsonc-parser": "^3.3.1",
     "minimatch": "^10.2.5",
@@ -103,7 +103,7 @@
     "@babel/plugin-syntax-import-assertions": "^7.28.6",
     "@babel/preset-env": "^7.29.2",
     "@babel/preset-typescript": "^7.28.5",
-    "@dimaslanjaka/eslint-base-config": "^1.0.2",
+    "@dimaslanjaka/eslint-base-config": "https://github.com/dimaslanjaka/eslint-base-config/raw/d646d368cd8c87576f80c9f5822c4fc090b23b4c/release/dimaslanjaka-eslint-base-config.tgz",
     "@rollup/plugin-alias": "^6.0.0",
     "@rollup/plugin-babel": "^7.0.0",
     "@rollup/plugin-commonjs": "^29.0.3",
@@ -149,12 +149,7 @@
   ],
   "packageManager": "yarn@4.9.2",
   "resolutions": {
-    "@types/through2": "https://github.com/dimaslanjaka/nodejs-package-types/raw/refs/heads/through2/release/types-through2.tgz",
-    "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/e48db3235351bbcb9394b21766b2d477cc6b7dd2/release/cross-spawn.tgz",
-    "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/4e7f8475eafa0974c170893de354026967a71776/release/git-command-helper.tgz",
-    "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/1ca385787f7287155b547c5b97d5ffd5bcfab482/packages/sbg-utility/release/sbg-utility.tgz",
-    "@dimaslanjaka/eslint-base-config": "https://github.com/dimaslanjaka/eslint-base-config/raw/d646d368cd8c87576f80c9f5822c4fc090b23b4c/release/dimaslanjaka-eslint-base-config.tgz",
-    "@dimaslanjaka/ai-toolkit": "https://github.com/dimaslanjaka/ai-toolkit/raw/refs/heads/master/release/dimaslanjaka-ai-toolkit.tgz"
+    "@types/through2": "https://github.com/dimaslanjaka/nodejs-package-types/raw/refs/heads/through2/release/types-through2.tgz"
   },
   "bin": {
     "actions-badge": "lib/github-workflows/workflow-badge-cli.cjs",

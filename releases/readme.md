@@ -2,6 +2,8 @@
 ## Releases
 | version | tarball url |
 | :--- | :--- |
+| latest | https://github.com/dimaslanjaka/bin/raw/3708379/releases/bin.tgz |
+| latest | https://github.com/dimaslanjaka/bin/raw/master/releases/bin.tgz |
 
 use this tarball with `resolutions`:
 ```json

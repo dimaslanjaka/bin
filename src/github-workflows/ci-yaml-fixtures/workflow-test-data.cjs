@@ -40,10 +40,10 @@ const workflow = {
             'prefix-cache-key': '${{ runner.os }}-test-'
           }
         },
-        {
-          name: '📦 Install dependencies',
-          run: `touch yarn.lock && corepack yarn install`
-        },
+        // {
+        //   name: '📦 Install dependencies',
+        //   run: `touch yarn.lock && corepack yarn install`
+        // },
         {
           name: '🔨 Build project',
           run: 'corepack yarn build'

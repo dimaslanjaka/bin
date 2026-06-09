@@ -44,7 +44,7 @@
     "!./packages"
   ],
   "scripts": {
-    "build": "tsc -b tsconfig.build.json && npm run build-tsup && npm run build-exports",
+    "build": "tsc -p tsconfig.build.json && npm run build-tsup && npm run build-exports",
     "build-exports": "node -r ts-node/register -r dotenv/config build.mjs",
     "build-packages": "yarn workspaces foreach --worktree --exclude=binary-collections --no-private run build",
     "build-rollup": "rollup -c rollup.config.js",
@@ -189,6 +189,7 @@
     "file-downloader": "lib/downloader-cli.cjs",
     "find-node-modules": "lib/find-node-modules-cli.cjs",
     "free-chatgpt": "lib/free-chatgpt.cjs",
+    "generate-ci": "lib/github-workflows/generate-ci-cli.cjs",
     "generate-test-ci": "src/github-workflows/generate-test-ci-step-cli.mjs",
     "get-latest-workflow": "lib/github-workflows/get-latest-workflow-status-cli.cjs",
     "get-latest-workflow-status": "lib/github-workflows/get-latest-workflow-status-cli.cjs",

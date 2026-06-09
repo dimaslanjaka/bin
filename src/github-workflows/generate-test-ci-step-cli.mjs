@@ -136,7 +136,7 @@ async function main() {
     fs.ensureDirSync(path.dirname(resolved));
     fs.writeFileSync(resolved, yaml.stringify(obj), 'utf-8');
     try {
-      execSync(`npx -y prettier@latest -w "${resolved}"`, { stdio: 'ignore', cwd: process.cwd() });
+      execSync(`npx -y prettier -w "${resolved}"`, { stdio: 'ignore', cwd: process.cwd() });
     } catch {
       // prettier is optional — skip formatting if unavailable
     }

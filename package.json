@@ -30,12 +30,11 @@
   },
   "types": "lib/index.d.ts",
   "files": [
-    "binaries/**/*",
-    "lib/**/*",
-    "docs-src/*.md",
+    "binaries/",
+    "lib/",
+    "docs-src/",
     ".puppeterrc.cjs",
-    "requirements.txt",
-    ".github/**/*"
+    "requirements.txt"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json && npm run build-tsup && npm run build-exports",

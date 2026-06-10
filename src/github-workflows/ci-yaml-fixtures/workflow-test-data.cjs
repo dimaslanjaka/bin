@@ -37,7 +37,7 @@ const workflow = {
             'node-version': '${{ env.CI_NODE_VERSION }}',
             'python-version': '${{ env.CI_PYTHON_VERSION }}',
             token: '${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN || github.token }}',
-            'prefix-cache-key': '${{ runner.os }}-test-'
+            'prefix-cache-key': '${{ runner.os }}-${{ github.event.repository.name }}-'
           }
         },
         // {

@@ -68,7 +68,7 @@ const workflow = {
             'node-version': '24.x',
             'python-version': '3.11',
             token: '${{ secrets.ACCESS_TOKEN || github.token }}',
-            'prefix-cache-key': '${{ runner.os }}-'
+            'prefix-cache-key': '${{ runner.os }}-${{ github.event.repository.name }}-'
           }
         },
         // {

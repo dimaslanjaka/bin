@@ -22,4 +22,12 @@ export interface BinaryCollectionsConfig {
   nvidia?: {
     keys: KeyData[];
   };
+
+  /** package packer options */
+  packer?: {
+    /** Filter tarball entries during cleanup. Return false to exclude an entry. */
+    onFilter?: (entryPath: string) => boolean | Promise<boolean>;
+    /** Callback invoked after tarball cleanup finishes. */
+    onFinish?: (tarballPath: string) => any | Promise<any>;
+  };
 }

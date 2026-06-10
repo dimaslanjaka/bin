@@ -79,6 +79,7 @@
     "minimist": "^1.2.8",
     "moment-timezone": "^0.6.2",
     "openai": "^6.41.0",
+    "pify": "^6.1.0",
     "proxy-agent": "^8.0.1",
     "ps-node": "^0.1.6",
     "puppeteer": "^25.0.4",

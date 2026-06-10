@@ -41,6 +41,24 @@ export default {
       }
       // Add more keys as needed
     ]
+  },
+
+  // Package packer options for node-package-packer
+  // Controls post-pack tarball cleanup behavior
+  packer: {
+    // Filter entries from the packed tarball. Return false to exclude.
+    // Runs after built-in workspace artifact stripping.
+    onFilter: (entryPath) => {
+      // Example: exclude node_modules from the tarball
+      if (entryPath.includes('node_modules')) return false;
+      return true;
+    },
+    // Callback invoked after tarball cleanup finishes
+    // Fires regardless of whether entries were removed.
+    // Supports sync, async, or Node-style (err, result) callbacks.
+    onFinish: (tarballPath) => {
+      console.log(`Tarball cleaned: ${tarballPath}`);
+    }
   }
 
   // Other configuration options can go here

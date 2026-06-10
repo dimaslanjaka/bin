@@ -194,6 +194,15 @@ jobs:
           else
             echo "Skipping missing test file: test/node-executor.test.cjs"
           fi
+      - name: 🧪 Run tests in test/node-package-packer/clean-tarball.test.cjs
+        id: run-test-node-package-packer-clean-tarball-test-cjs
+        shell: bash
+        run: >-
+          if [ -f "test/node-package-packer/clean-tarball.test.cjs" ]; then
+            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="node-package-packer/clean-tarball.test.cjs"
+          else
+            echo "Skipping missing test file: test/node-package-packer/clean-tarball.test.cjs"
+          fi
       - name: 🧪 Run tests in test/node-package-packer/normalize-resolutions.test.mjs
         id: run-test-node-package-packer-normalize-resolutions-test-mjs
         shell: bash

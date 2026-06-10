@@ -66,7 +66,43 @@ create a `binary-collections.config.js` (or `.cjs`/`.mjs`) in your project root 
 [example config file](https://github.com/dimaslanjaka/bin/blob/4ded256ce94e6bacc78ef2a02afc5ae837437b02/binary-collections.config-example.js#L15-L22)
 for the expected format.
 
+### Config-driven Tarball Cleanup (`packer`)
+
+After the pack step completes, the packer automatically strips **workspace artifact
+entries** from the generated `.tgz` to reduce size — these include:
+
+- Submodule release tarballs (`packages/<name>/release/*.tgz`)
+- Submodule release directories (`packages/<name>/releases/*.tgz`)
+- Yarn releases inside submodules (`packages/<name>/.yarn/releases/*.cjs`)
+
+You can extend or customize this cleanup via `binary-collections.config.js` under the
+`packer` key:
+
+| Callback | Signature | Description |
+| :--- | :--- | :--- |
+| `packer.onFilter` | `(entryPath: string) => boolean \| Promise<boolean>` | Return `false` to exclude additional entries from the tarball. Runs **after** the built-in artifact check. |
+| `packer.onFinish` | `(tarballPath: string) => void \| Promise<void>` | Invoked after cleanup finishes (fires even if no entries were removed). Supports sync, async, and Node-style `(err, result)` callbacks (promisified via `pify`). |
+
+Example:
+
+```js
+export default {
+  packer: {
+    // Exclude node_modules from the packed tarball
+    onFilter: (entryPath) => {
+      if (entryPath.includes('node_modules')) return false;
+      return true;
+    },
+    // Log or upload the cleaned tarball
+    onFinish: (tarballPath) => {
+      console.log(`Tarball ready: ${tarballPath}`);
+    }
+  }
+};
+```
+
 ### Source
 
 - CLI entry: [`src/node-package-packer-cli.mjs`](../src/node-package-packer-cli.mjs)
 - Resolution normalizer: [`src/node-package-packer/normalize-resolutions.mjs`](../src/node-package-packer/normalize-resolutions.mjs)
+- Tarball cleaner: [`src/node-package-packer/clean-tarball.cjs`](../src/node-package-packer/clean-tarball.cjs)

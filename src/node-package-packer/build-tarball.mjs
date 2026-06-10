@@ -2,7 +2,8 @@ import fs from 'fs-extra';
 import { file_to_hash } from 'sbg-utility';
 import path from 'upath';
 import * as crossSpawn from 'cross-spawn';
-import * as tar from 'tar';
+import { getConfig } from '../binary-collections/config.cjs';
+import { cleanTarball } from './clean-tarball.cjs';
 import { bundleWithYarn } from './pack-with-yarn.mjs';
 import { bundleWithNpm } from './pack-with-npm.mjs';
 import { bundleWithBun } from './pack-with-bun.mjs';
@@ -80,87 +81,6 @@ export async function getPackageHashes(dirname, releaseDir) {
 }
 
 /**
- * Patterns for workspace artifact entries inside the pack tarball that are not
- * needed in the published package (submodule release tarballs, yarn releases).
- */
-const workspaceArtifactPatterns = [
-  /^package\/packages\/[^/]+\/release\/.+\.tgz$/,
-  /^package\/packages\/[^/]+\/releases\/.+\.tgz$/,
-  /^package\/packages\/[^/]+\/\.yarn\/releases\/.+\.cjs$/
-];
-
-/**
- * Check if a tarball entry path matches a workspace artifact pattern.
- * @param {string} entryPath - Path inside the tarball.
- * @returns {boolean}
- */
-function isWorkspaceArtifact(entryPath) {
-  return workspaceArtifactPatterns.some((re) => re.test(entryPath));
-}
-
-/**
- * Post-process a pack tarball: remove workspace artifact entries (submodule
- * release tarballs, yarn releases) that bloat the output. Works by extracting
- * to a temp directory with a filter, then repacking.
- *
- * @param {string} tarballPath - Path to the .tgz file to clean.
- * @returns {Promise<void>}
- */
-async function cleanTarball(tarballPath) {
-  if (!fs.existsSync(tarballPath)) return;
-
-  const dir = path.dirname(tarballPath);
-  const tmpDir = path.join(dir, '.tmp-tarball-clean');
-  const basename = path.basename(tarballPath);
-
-  // Track removed entries for logging
-  const removed = [];
-
-  try {
-    // Ensure temp directory exists before extracting into it
-    fs.mkdirpSync(tmpDir);
-
-    // Extract everything to tmp, filtering out artifacts
-    await tar.extract({
-      file: tarballPath,
-      cwd: tmpDir,
-      filter: (entryPath) => {
-        if (isWorkspaceArtifact(entryPath)) {
-          removed.push(entryPath);
-          return false;
-        }
-        return true;
-      }
-    });
-
-    if (removed.length > 0) {
-      // Remove original tarball
-      fs.removeSync(tarballPath);
-      // Repack from temp dir
-      await tar.create(
-        {
-          file: tarballPath,
-          gzip: true,
-          cwd: tmpDir,
-          portable: true
-        },
-        ['.']
-      );
-
-      for (const entry of removed) {
-        console.log(`[bundle] stripped from tarball: ${entry}`);
-      }
-      console.log(`[bundle] cleaned ${basename}: removed ${removed.length} workspace artifact entries`);
-    }
-  } finally {
-    // Always clean up temp dir
-    if (fs.existsSync(tmpDir)) {
-      fs.removeSync(tmpDir);
-    }
-  }
-}
-
-/**
  * Pack the current project into a tarball and prepare release metadata.
  *
  * Before packing, transforms `workspace:*` / `workspace:^` / `workspace:~`
@@ -187,6 +107,13 @@ export async function bundle(options = {}) {
   const isBun = pm === 'bun';
   const isYarn = pm === 'yarn';
   const packagejson = fs.readJSONSync(path.join(cwd, 'package.json'));
+
+  // Load project config for optional callbacks (packer.onFilter, packer.onFinish)
+  const config = await getConfig({ searchFrom: cwd }).catch(() => null);
+  const packerCallbacks = {
+    onFilter: config?.packer?.onFilter,
+    onFinish: config?.packer?.onFinish
+  };
   /**
    * is current device is Github Actions
    */
@@ -251,7 +178,7 @@ export async function bundle(options = {}) {
   // source files on disk.
   const tarballs = fs.readdirSync(releaseDir).filter((f) => f.endsWith('.tgz'));
   for (const tarball of tarballs) {
-    await cleanTarball(path.join(releaseDir, tarball));
+    await cleanTarball(path.join(releaseDir, tarball), packerCallbacks);
   }
 
   console.log('[bundle] done');

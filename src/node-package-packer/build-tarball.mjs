@@ -3,6 +3,7 @@ import { file_to_hash } from 'sbg-utility';
 import path from 'upath';
 import { getArgs } from '../utils/index.cjs';
 import * as crossSpawn from 'cross-spawn';
+import { globSync } from 'glob';
 import { bundleWithYarn } from './pack-with-yarn.mjs';
 import { bundleWithNpm } from './pack-with-npm.mjs';
 import { bundleWithBun } from './pack-with-bun.mjs';
@@ -80,6 +81,33 @@ export async function getPackageHashes(dirname, releaseDir) {
 }
 
 /**
+ * Collect large artifact files from workspace packages that bloat the pack tarball.
+ * These are artifacts from submodule builds (release tarballs, yarn releases) that
+ * are not needed in the root package's pack output.
+ *
+ * @param {string} cwd - Repository root directory.
+ * @returns {Array<{path: string, sizeMB: number}>} List of large artifact files.
+ */
+function collectWorkspaceArtifacts(cwd) {
+  const patterns = ['packages/*/release/*.tgz', 'packages/*/releases/*.tgz', 'packages/*/.yarn/releases/*.cjs'];
+  const files = [];
+  for (const pattern of patterns) {
+    const matches = globSync(pattern, { cwd: cwd });
+    for (const match of matches) {
+      const absPath = path.resolve(cwd, match);
+      try {
+        const stat = fs.statSync(absPath);
+        const sizeMB = stat.size / (1024 * 1024);
+        files.push({ path: absPath, sizeMB });
+      } catch {
+        // file may have been removed by a concurrent process
+      }
+    }
+  }
+  return files;
+}
+
+/**
  * Pack the current project into a tarball and prepare release metadata.
  *
  * Determines which package manager to use (bun → yarn → npm) based on
@@ -131,6 +159,17 @@ export async function bundle(customArgs = {}, cwd) {
   console.log('[bundle] transforming workspace protocols...');
   const restorePkg = await transformWorkspaceProtocols(cwd);
   console.log('[bundle] workspace protocols done');
+
+  // Remove large workspace artifacts before packing to avoid tarball bloat.
+  // Yarn Berry includes workspace packages in `yarn pack` output by default,
+  // and submodule build artifacts (release tarballs, yarn releases) can exceed
+  // release size limits (e.g., GitHub's 30 MB). These are git-tracked files in
+  // submodules, so they're always recoverable via `git checkout`.
+  const workspaceArtifacts = collectWorkspaceArtifacts(cwd);
+  for (const { path: filePath, sizeMB } of workspaceArtifacts) {
+    fs.removeSync(filePath);
+    console.log(`[bundle] removed workspace artifact ${path.relative(cwd, filePath)} (${sizeMB.toFixed(1)} MB)`);
+  }
 
   try {
     console.log('[bundle] spawning pack command...');

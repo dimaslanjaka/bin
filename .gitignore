@@ -26,6 +26,10 @@ vendor/
 docs/index.md
 docs/docs-src/
 site/
-.opencode.keys.json*
+.opencode/*
+!.opencode/opencode.json
+!.opencode/opencode.jsonc
+.venv/
+venv/
 binary-collections.config.js
 opencode_exports/

@@ -58,7 +58,9 @@ export async function getPackageHashes(dirname, releaseDir) {
   for (let i = 0; i < readDir.length; i++) {
     const file = readDir[i];
     const stat = fs.statSync(file);
-    const size = `${parseFloat(stat.size / Math.pow(1024, 1)).toFixed(2)} KB`;
+    const sizeKB = parseFloat(stat.size / Math.pow(1024, 1)).toFixed(2);
+    console.log(`[tarball] ${path.basename(file)}: ${sizeKB} KB`);
+    const size = `${sizeKB} KB`;
     hashes = Object.assign({}, hashes, {
       [path.toUnix(file).replace(path.toUnix(dirname), '')]: {
         integrity: {
@@ -110,13 +112,12 @@ export async function bundle(customArgs = {}, cwd) {
   const isBun = fs.existsSync(path.join(cwd, 'bun.lockb')) || fs.existsSync(path.join(cwd, 'bun.lock')) || withBun;
   const isYarn = !isBun && (fs.existsSync(path.join(cwd, 'yarn.lock')) || withYarn);
   const packagejson = fs.readJSONSync(path.join(cwd, 'package.json'));
-  const withFilename = args['fn'] || args['filename'] ? true : false;
   /**
    * is current device is Github Actions
    */
   const isCI = process.env.GITHUB_ACTION && process.env.GITHUB_ACTIONS;
 
-  console.log(`[bundle] cwd=${cwd} releaseDir=${releaseDir} isYarn=${isYarn} isBun=${isBun}`);
+  console.log(`[bundle] cwd=${cwd}\n releaseDir=${releaseDir}\n isYarn=${isYarn}\n isBun=${isBun}`);
   console.log(`[bundle] packCmd=${isBun ? 'bun pm pack' : isYarn ? 'yarn pack' : 'npm pack'}`);
 
   // create released directory when not exist
@@ -158,7 +159,7 @@ export async function bundle(customArgs = {}, cwd) {
   if (isBun) {
     await bundleWithBun(cwd, packagejson, releaseDir, args, isCI);
   } else if (isYarn) {
-    await bundleWithYarn(cwd, packagejson, releaseDir, args, withFilename, isCI);
+    await bundleWithYarn(cwd, packagejson, releaseDir, args, isCI);
   } else {
     await bundleWithNpm(cwd, packagejson, releaseDir, args, isCI);
   }

@@ -10,15 +10,15 @@ import { resolveNewestTarball, getPackageHashes } from './build-tarball.mjs';
  * @param {object} packagejson Parsed package.json content.
  * @param {string} releaseDir Release output directory.
  * @param {object} argv Parsed CLI arguments.
- * @param {boolean} withFilename Whether to keep the requested filename variant.
  * @param {boolean} isCI Whether the process is running in CI.
  * @returns {Promise<void>}
  */
-export async function bundleWithYarn(dirname, packagejson, releaseDir, argv, withFilename, isCI) {
+export async function bundleWithYarn(dirname, packagejson, releaseDir, argv, isCI) {
   console.log('[yarn-bundler] building readme...');
   await buildReadme(dirname, packagejson, releaseDir, argv, isCI);
   console.log('[yarn-bundler] readme done');
 
+  const withFilename = argv['fn'] || argv['filename'] ? true : false;
   const rawFname = argv['fn'] || argv['filename'] || slugifyPkgName(`${packagejson.name}-${packagejson.version}.tgz`);
   const targetFname = rawFname.endsWith('.tgz') ? rawFname : rawFname + '.tgz';
 

@@ -18,12 +18,16 @@
     "url": "https://webmanajemen.com"
   },
   "type": "module",
-  "main": "lib/index.cjs",
+  "main": "lib/index.js",
   "exports": {
     ".": {
       "require": {
         "default": "./lib/index.cjs",
         "types": "./lib/index.d.ts"
+      },
+      "import": {
+        "default": "./lib/index.mjs",
+        "types": "./lib/index.d.mts"
       }
     },
     "./package.json": "./package.json"

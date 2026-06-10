@@ -67,9 +67,23 @@ const baseOption = {
 
 build({
   ...baseOption,
-  format: ['cjs'],
-  outExtension() {
-    return { js: '.cjs', dts: '.d.cts' };
+  format: ['cjs', 'esm'],
+  banner(ctx) {
+    if (ctx.format === 'esm') {
+      return {
+        js: `import { createRequire } from 'module'; const require = createRequire(import.meta.url);`
+      };
+    }
+  },
+  outExtension({ format }) {
+    switch (format) {
+      case 'cjs':
+        return { js: '.cjs', dts: '.d.cts' };
+      case 'esm':
+        return { js: '.mjs', dts: '.d.mts' };
+      default:
+        return { js: '.js', dts: '.d.ts' };
+    }
   }
 }).catch((err) => {
   console.error('Build failed:', err);

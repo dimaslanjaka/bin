@@ -4,8 +4,8 @@
 # Auto-stage submodule pointer changes in parent repo
 git submodule status | awk '{print $2}' | xargs -r git add
 
-# Generate composite run-tests action and stage it for commit
-node src/github-workflows/generate-test-ci-step-cli.mjs
+# Regenerate workflow/action YAML files from source fixtures and stage for commit
+node src/github-workflows/generate-ci-cli.mjs
 if [ -n "$GITHUB_ACTIONS" ] || [ -n "$CI" ]; then
   echo "CI environment detected — skipping git add of generated action"
 else

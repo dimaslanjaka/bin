@@ -1,9 +1,8 @@
 import fs from 'fs-extra';
 import { file_to_hash } from 'sbg-utility';
 import path from 'upath';
-import { getArgs } from '../utils/index.cjs';
 import * as crossSpawn from 'cross-spawn';
-import { globSync } from 'glob';
+import * as tar from 'tar';
 import { bundleWithYarn } from './pack-with-yarn.mjs';
 import { bundleWithNpm } from './pack-with-npm.mjs';
 import { bundleWithBun } from './pack-with-bun.mjs';
@@ -81,69 +80,122 @@ export async function getPackageHashes(dirname, releaseDir) {
 }
 
 /**
- * Collect large artifact files from workspace packages that bloat the pack tarball.
- * These are artifacts from submodule builds (release tarballs, yarn releases) that
- * are not needed in the root package's pack output.
- *
- * @param {string} cwd - Repository root directory.
- * @returns {Array<{path: string, sizeMB: number}>} List of large artifact files.
+ * Patterns for workspace artifact entries inside the pack tarball that are not
+ * needed in the published package (submodule release tarballs, yarn releases).
  */
-function collectWorkspaceArtifacts(cwd) {
-  const patterns = ['packages/*/release/*.tgz', 'packages/*/releases/*.tgz', 'packages/*/.yarn/releases/*.cjs'];
-  const files = [];
-  for (const pattern of patterns) {
-    const matches = globSync(pattern, { cwd: cwd });
-    for (const match of matches) {
-      const absPath = path.resolve(cwd, match);
-      try {
-        const stat = fs.statSync(absPath);
-        const sizeMB = stat.size / (1024 * 1024);
-        files.push({ path: absPath, sizeMB });
-      } catch {
-        // file may have been removed by a concurrent process
+const workspaceArtifactPatterns = [
+  /^package\/packages\/[^/]+\/release\/.+\.tgz$/,
+  /^package\/packages\/[^/]+\/releases\/.+\.tgz$/,
+  /^package\/packages\/[^/]+\/\.yarn\/releases\/.+\.cjs$/
+];
+
+/**
+ * Check if a tarball entry path matches a workspace artifact pattern.
+ * @param {string} entryPath - Path inside the tarball.
+ * @returns {boolean}
+ */
+function isWorkspaceArtifact(entryPath) {
+  return workspaceArtifactPatterns.some((re) => re.test(entryPath));
+}
+
+/**
+ * Post-process a pack tarball: remove workspace artifact entries (submodule
+ * release tarballs, yarn releases) that bloat the output. Works by extracting
+ * to a temp directory with a filter, then repacking.
+ *
+ * @param {string} tarballPath - Path to the .tgz file to clean.
+ * @returns {Promise<void>}
+ */
+async function cleanTarball(tarballPath) {
+  if (!fs.existsSync(tarballPath)) return;
+
+  const dir = path.dirname(tarballPath);
+  const tmpDir = path.join(dir, '.tmp-tarball-clean');
+  const basename = path.basename(tarballPath);
+
+  // Track removed entries for logging
+  const removed = [];
+
+  try {
+    // Ensure temp directory exists before extracting into it
+    fs.mkdirpSync(tmpDir);
+
+    // Extract everything to tmp, filtering out artifacts
+    await tar.extract({
+      file: tarballPath,
+      cwd: tmpDir,
+      filter: (entryPath) => {
+        if (isWorkspaceArtifact(entryPath)) {
+          removed.push(entryPath);
+          return false;
+        }
+        return true;
       }
+    });
+
+    if (removed.length > 0) {
+      // Remove original tarball
+      fs.removeSync(tarballPath);
+      // Repack from temp dir
+      await tar.create(
+        {
+          file: tarballPath,
+          gzip: true,
+          cwd: tmpDir,
+          portable: true
+        },
+        ['.']
+      );
+
+      for (const entry of removed) {
+        console.log(`[bundle] stripped from tarball: ${entry}`);
+      }
+      console.log(`[bundle] cleaned ${basename}: removed ${removed.length} workspace artifact entries`);
+    }
+  } finally {
+    // Always clean up temp dir
+    if (fs.existsSync(tmpDir)) {
+      fs.removeSync(tmpDir);
     }
   }
-  return files;
 }
 
 /**
  * Pack the current project into a tarball and prepare release metadata.
  *
- * Determines which package manager to use (bun → yarn → npm) based on
- * lockfile presence and CLI flags (`--yarn`, `--bun`). Before packing,
- * transforms `workspace:*` / `workspace:^` / `workspace:~` protocol
- * references in `package.json` to resolved version ranges, then restores
- * the original after packing completes (even on failure).
+ * Before packing, transforms `workspace:*` / `workspace:^` / `workspace:~`
+ * protocol references in `package.json` to resolved version ranges, then
+ * restores the original after packing completes (even on failure).
  *
  * Tarballs are emitted into `releases/` (or `release/` as fallback).
  * After packing, delegates to the tool-specific bundler
  * (`bundleWithBun`, `bundleWithYarn`, or `bundleWithNpm`) for post-processing.
  *
- * @param {import("minimist").ParsedArgs} [customArgs={}] - Override CLI argument parsing.
- *   Properties are merged with parsed `process.argv` via `getArgs()`.
- *   Supported keys include `yarn` (boolean), `bun` (boolean),
- *   `fn`/`filename` (boolean) to force a named tarball, and any other
- *   args consumed by downstream bundlers.
- * @param {string} [cwd] - Working directory for packing. Defaults to
- *   `customArgs.cwd` if set, otherwise `process.cwd()`.
+ * @param {object} [options] - Bundle options.
+ * @param {string} [options.cwd] - Working directory for packing (default: process.cwd()).
+ * @param {'yarn'|'bun'|'npm'} [options.pm] - Package manager to use (default: 'npm').
+ * @param {string} [options.filename] - Custom output filename (without .tgz extension).
+ * @param {boolean} [options.commit] - Auto-commit tarballs via git (default: false).
  * @returns {Promise<void>}
  */
-export async function bundle(customArgs = {}, cwd) {
-  const args = Object.assign(customArgs, getArgs());
-  cwd = cwd || args.cwd || process.cwd();
-  const withYarn = args.yarn || args._.includes('-yarn') || args._.includes('--yarn');
-  const withBun = args.bun || args._.includes('-bun') || args._.includes('--bun');
+export async function bundle(options = {}) {
+  const { cwd: cwdOption = process.cwd(), pm = 'npm', filename, commit = false } = options;
+  const cwd = cwdOption;
   const releaseDir1 = path.join(cwd, 'release');
   const releaseDir2 = path.join(cwd, 'releases');
   const releaseDir = !fs.existsSync(releaseDir2) ? releaseDir1 : releaseDir2;
-  const isBun = fs.existsSync(path.join(cwd, 'bun.lockb')) || fs.existsSync(path.join(cwd, 'bun.lock')) || withBun;
-  const isYarn = !isBun && (fs.existsSync(path.join(cwd, 'yarn.lock')) || withYarn);
+  const isBun = pm === 'bun';
+  const isYarn = pm === 'yarn';
   const packagejson = fs.readJSONSync(path.join(cwd, 'package.json'));
   /**
    * is current device is Github Actions
    */
   const isCI = process.env.GITHUB_ACTION && process.env.GITHUB_ACTIONS;
+
+  // Build args object for downstream bundlers (bundleWithYarn/Npm/Bun, buildReadme)
+  const args = {};
+  if (filename) args.fn = filename;
+  if (commit) args.commit = true;
 
   console.log(`[bundle] cwd=${cwd}\n releaseDir=${releaseDir}\n isYarn=${isYarn}\n isBun=${isBun}`);
   console.log(`[bundle] packCmd=${isBun ? 'bun pm pack' : isYarn ? 'yarn pack' : 'npm pack'}`);
@@ -159,17 +211,6 @@ export async function bundle(customArgs = {}, cwd) {
   console.log('[bundle] transforming workspace protocols...');
   const restorePkg = await transformWorkspaceProtocols(cwd);
   console.log('[bundle] workspace protocols done');
-
-  // Remove large workspace artifacts before packing to avoid tarball bloat.
-  // Yarn Berry includes workspace packages in `yarn pack` output by default,
-  // and submodule build artifacts (release tarballs, yarn releases) can exceed
-  // release size limits (e.g., GitHub's 30 MB). These are git-tracked files in
-  // submodules, so they're always recoverable via `git checkout`.
-  const workspaceArtifacts = collectWorkspaceArtifacts(cwd);
-  for (const { path: filePath, sizeMB } of workspaceArtifacts) {
-    fs.removeSync(filePath);
-    console.log(`[bundle] removed workspace artifact ${path.relative(cwd, filePath)} (${sizeMB.toFixed(1)} MB)`);
-  }
 
   try {
     console.log('[bundle] spawning pack command...');
@@ -202,6 +243,17 @@ export async function bundle(customArgs = {}, cwd) {
   } else {
     await bundleWithNpm(cwd, packagejson, releaseDir, args, isCI);
   }
+
+  // Post-process: strip workspace artifact files from the generated tarballs.
+  // Yarn/Npm pack includes workspace packages and their build artifacts
+  // (submodule release tarballs, yarn releases), which can bloat the output
+  // past GitHub's 30 MB limit. We extract, filter, and repack — never touching
+  // source files on disk.
+  const tarballs = fs.readdirSync(releaseDir).filter((f) => f.endsWith('.tgz'));
+  for (const tarball of tarballs) {
+    await cleanTarball(path.join(releaseDir, tarball));
+  }
+
   console.log('[bundle] done');
 }
 

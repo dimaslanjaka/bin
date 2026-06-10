@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 import path from 'upath';
 import { getTempPath } from '../../src/binary-collections/config.cjs';
 import { fileURLToPath } from 'url';
-import { describe, it, expect, afterEach } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll, afterEach, jest } from '@jest/globals';
 import * as cp from 'cross-spawn';
 import { bundle } from '../../src/node-package-packer/build-tarball.mjs';
 
@@ -17,6 +17,8 @@ const releaseDir = path.join(config.path, 'release');
 
 describe('Scoped package packing', () => {
   beforeAll(() => {
+    // Silence console.log during tests
+    jest.spyOn(console, 'log').mockImplementation(() => {});
     // Set up a temporary directory for the test
     fs.ensureDirSync(config.path);
     // Create a minimal package.json for packing
@@ -39,13 +41,17 @@ describe('Scoped package packing', () => {
     fs.emptyDirSync(releaseDir);
   });
 
+  afterAll(() => {
+    jest.restoreAllMocks();
+  });
+
   it('should pack a scoped package with Yarn', async () => {
     // Ensure yarn.lock exists for Yarn packing
     fs.writeFileSync(path.join(config.path, 'yarn.lock'), '');
     // Install dependencies
-    cp.spawnSync('yarn', ['install'], { cwd: config.path, stdio: 'inherit' });
+    cp.spawnSync('yarn', ['install'], { cwd: config.path, stdio: 'pipe' });
     // Pack the package using the build-tarball function
-    await bundle({ _: ['-yarn'], cwd: config.path });
+    await bundle({ cwd: config.path, pm: 'yarn' });
 
     expect(fs.existsSync(releaseDir)).toBe(true);
     const tarballs = fs.readdirSync(releaseDir).filter((file) => file.endsWith('.tgz'));
@@ -56,10 +62,10 @@ describe('Scoped package packing', () => {
     // Ensure yarn.lock exists for Yarn packing
     fs.writeFileSync(path.join(config.path, 'yarn.lock'), '');
     // Install dependencies
-    cp.spawnSync('yarn', ['install'], { cwd: config.path, stdio: 'inherit' });
+    cp.spawnSync('yarn', ['install'], { cwd: config.path, stdio: 'pipe' });
     // Pack the package using the build-tarball function
-    await bundle({ _: ['-yarn'], cwd: config.path, filename: 'custom-package.tgz' });
-    await bundle({ _: [], cwd: config.path, filename: 'without-ext' });
+    await bundle({ cwd: config.path, pm: 'yarn', filename: 'custom-package.tgz' });
+    await bundle({ cwd: config.path, pm: 'yarn', filename: 'without-ext' });
 
     const releaseDir = path.join(config.path, 'release');
     expect(fs.existsSync(releaseDir)).toBe(true);

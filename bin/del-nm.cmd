@@ -16,6 +16,12 @@ call :scan "%ROOT%"
 
 if "%COUNT%"=="0" (
   echo No node_modules found.
+
+  if exist "%TRASH%\" (
+    echo Deleting tmp trash in background...
+    start "" /b cmd /d /c rd /s /q "%TRASH%" ^>nul 2^>nul
+  )
+
   exit /b 0
 )
 
@@ -35,7 +41,7 @@ exit /b 0
 :scan
 set "CURRENT=%~1"
 
-for /d %%D in ("%CURRENT%\*") do (
+for /d %%D in ("!CURRENT!\*") do (
   set "NAME=%%~nxD"
   set "FULL=%%~fD"
 

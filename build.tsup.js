@@ -12,11 +12,11 @@ const bundledPackages = [
   'node-cache',
   'is-file-stream',
   'strip-ansi',
-  'ansi-regex'
-  // 'sbg-utility',
-  // 'through2'
-  // 'git-command-helper',
-  // 'cross-spawn'
+  'ansi-regex',
+  'axios',
+  'proxy-agent',
+  'https-proxy-agent',
+  'socks-proxy-agent'
 ];
 
 /**

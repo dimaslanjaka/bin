@@ -333,6 +333,12 @@ runs:
         elif [ -f "package.json" ]; then
           npm install
         fi
+    - name: 🏗️ Run prepare script (if present)
+      continue-on-error: true
+      shell: bash
+      run: node -e "const
+        p=require('./package.json');if(p.scripts&&p.scripts.prepare){process.exit(0)}else{process.exit(1)}"
+        && npm run prepare || echo 'No prepare script found, skipping'
     - name: 📂 Add custom bins to PATH
       shell: bash
       run: |-

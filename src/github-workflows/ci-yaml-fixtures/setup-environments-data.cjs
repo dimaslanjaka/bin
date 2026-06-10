@@ -335,7 +335,7 @@ const action = {
       },
       {
         name: '♻️ Clean install dependencies',
-        if: 'steps.install.conclusion === "failure"',
+        if: 'steps.install.conclusion == "failure"',
         shell: 'bash',
         run: [
           '# Delete dependency directories recursively (monorepo-aware)',

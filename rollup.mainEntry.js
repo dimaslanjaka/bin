@@ -1,8 +1,8 @@
 import alias from '@rollup/plugin-alias';
+import babel from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
-import typescript from '@rollup/plugin-typescript';
 import fs from 'fs-extra';
 import path from 'upath';
 import { extractLocalFiles } from './src/utils/extract-local-files.js';
@@ -33,20 +33,21 @@ export default [
       }),
       json(),
       resolve({ preferBuiltins: true, extensions: ['.js', '.mjs', '.cjs', '.ts', '.json', '.node'] }),
-      typescript({
-        tsconfig: false,
-        allowSyntheticDefaultImports: true,
-        esModuleInterop: true,
-        resolveJsonModule: true,
-        moduleResolution: 'bundler',
-        target: 'ES2019',
-        module: 'ESNext',
-        declaration: false,
-        strict: false,
-        noEmitOnError: false,
-        noEmit: false,
-        outDir: undefined,
-        exclude: ['**/node_modules/**', '**/dist/**', '**/test*/**', '**/tmp/**', '**/packages/**']
+      babel({
+        babelHelpers: 'bundled',
+        extensions: ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'],
+        exclude: ['**/node_modules/**', '**/dist/**', '**/test*/**', '**/tmp/**', '**/packages/**'],
+        presets: [
+          '@babel/preset-typescript',
+          [
+            '@babel/preset-env',
+            {
+              targets: {
+                node: '18'
+              }
+            }
+          ]
+        ]
       }),
       commonjs({ extensions: ['.js', '.mjs', '.cjs', '.ts', '.json', '.node'] })
     ],

@@ -198,7 +198,7 @@ const workflow = {
           id: 'changes',
           shell: 'bash',
           run: [
-            "PATHS=( ':(glob)release*/*.tgz' ':(glob)dist/**' ':(glob)lib/**' )",
+            "PATHS=( ':(glob)release*/*.tgz' )",
             '',
             'TRACKED=$(git diff --name-only HEAD -- "${PATHS[@]}" || true)',
             'UNTRACKED=$(git ls-files --others --exclude-standard -- "${PATHS[@]}" || true)',
@@ -246,7 +246,7 @@ const workflow = {
           name: '➕ Add build files to git',
           if: "steps.changes.outputs.files_changed == 'true'",
           'continue-on-error': true,
-          run: ['git add -- dist/ lib/ release/ releases/ 2>/dev/null || true'].join('\n')
+          run: ['git add -- release/ releases/ 2>/dev/null || true'].join('\n')
         },
         {
           name: '⬇️ Pull latest before push',

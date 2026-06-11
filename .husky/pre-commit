@@ -15,6 +15,13 @@ fi
 # Run lint-staged through Yarn so the local binary is resolved consistently
 corepack yarn exec lint-staged --config lint-staged.config.js
 
+# ---- git merge driver setup (idempotent) ----
+if ! git config --get merge.resolve_hash.driver >/dev/null; then
+  git config merge.resolve_hash.name "Resolve generated checksum"
+  git config merge.resolve_hash.driver true
+  echo "[OK] registered resolve_hash merge driver"
+fi
+
 # Verify release tarballs do not exceed 10MB
 check_tarballs() {
   dir="$1"

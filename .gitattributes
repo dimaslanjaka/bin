@@ -63,3 +63,13 @@ post-commit text eol=lf
 *.{cmd,bat,ps1,sh,cmd1,cmd2,bat1,bat2,vbs} text eol=crlf
 *.{png,jpg,jpeg,gif,ico,svg,bmp,webp,avif,tiff,tif,psd,ai,eps,raw} binary
 *.{zip,tar,gz,7z,rar,exe,dll,so,bin,jar,war,ear,apk,msi,deb,rpm,iso,img,dmg,pdf,mp3,mp4,mov,avi,mkv,flv,wmv,ogg,webm,wav,aac,m4a,otf,ttf,woff,woff2,eot} binary
+
+# Auto-resolve generated release metadata conflicts
+# Special cases, run this to set up the merge driver:
+# git config merge.resolve_hash.name "Resolve generated release files"
+# Then set the driver command based on your shell:
+# git config merge.resolve_hash.driver true
+# To verify, run:
+# git config --local --get-regexp "^merge"
+release/metadata.json eol=lf merge=resolve_hash
+release/readme.md eol=lf merge=resolve_hash

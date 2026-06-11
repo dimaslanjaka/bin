@@ -19,16 +19,16 @@
   },
   "type": "module",
   "main": "lib/index.cjs",
+  "module": "lib/index.mjs",
+  "types": "lib/index.d.ts",
   "exports": {
     ".": {
-      "require": {
-        "default": "./lib/index.cjs",
-        "types": "./lib/index.d.ts"
-      }
+      "import": "./lib/index.mjs",
+      "require": "./lib/index.cjs",
+      "types": "./lib/index.d.ts"
     },
     "./package.json": "./package.json"
   },
-  "types": "lib/index.d.ts",
   "files": [
     "binaries/",
     "lib/",
@@ -37,11 +37,14 @@
     "requirements.txt"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && npm run build-tsup && npm run build-exports",
+    "build": "npm run build-tsup && npm run build-exports && npm run build-mainEntry",
     "build-exports": "node -r ts-node/register -r dotenv/config build.mjs",
     "build-packages": "yarn workspaces foreach --worktree --exclude=binary-collections --no-private run build",
     "build-rollup": "rollup -c rollup.config.js",
     "build-tsup": "node build.tsup.js",
+    "build-ts": "tsc -p tsconfig.build.json",
+    "build-dts": "tsc -p tsconfig.dts.json",
+    "build-mainEntry": "npm run build-dts && rollup -c rollup.mainEntry.js",
     "clean": "rimraf lib tmp/dist binaries",
     "pack": "node src/node-package-packer-cli.mjs --yarn --filename=bin",
     "prepare": "husky",
@@ -94,9 +97,11 @@
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
+    "@babel/parser": "^7.29.7",
     "@babel/plugin-syntax-import-assertions": "^7.28.6",
     "@babel/preset-env": "^7.29.2",
     "@babel/preset-typescript": "^7.28.5",
+    "@babel/traverse": "^7.29.7",
     "@dimaslanjaka/eslint-base-config": "^1.0.2",
     "@rollup/plugin-alias": "^6.0.0",
     "@rollup/plugin-babel": "^7.0.0",
@@ -106,6 +111,7 @@
     "@rollup/plugin-typescript": "^12.3.0",
     "@types/babel__core": "^7",
     "@types/babel__preset-env": "^7",
+    "@types/babel__traverse": "^7",
     "@types/better-sqlite3": "^7.6.13",
     "@types/crypto-js": "^4",
     "@types/fs-extra": "^11",

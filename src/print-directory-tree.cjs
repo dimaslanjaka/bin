@@ -5,60 +5,7 @@ const { execSync } = require('child_process');
 const { sha256 } = require('./run-by-checksum/hash.cjs');
 const glob = require('glob');
 const sbgUtil = require('sbg-utility');
-
-/**
- * Generates a directory/file tree string from a hash array of file paths and hashes.
- *
- * @param {string[]} hashArray - Array of strings in the format 'relative/path/to/file hash'.
- * @returns {string} The directory/file tree as a string, with file hashes.
- */
-function getFileTreeString(hashArray) {
-  const tree = {};
-  // Map file paths to hashes for quick lookup
-  const hashMap = {};
-  for (const entry of hashArray) {
-    const [filePath, hash] = entry.split(' ');
-    hashMap[filePath] = hash;
-    const parts = filePath.split('/');
-    let current = tree;
-    for (let i = 0; i < parts.length; i++) {
-      const part = parts[i];
-      if (i === parts.length - 1) {
-        current[part] = null; // file
-      } else {
-        current[part] = current[part] || {};
-        current = current[part];
-      }
-    }
-  }
-  /**
-   * Recursively builds the tree string for a given node.
-   *
-   * @param {Object} node - The current node in the tree.
-   * @param {string} prefix - The prefix for the current tree level.
-   * @param {string} parentPath - The path to the current node.
-   * @returns {string[]} Array of lines representing the tree structure.
-   */
-  function printNode(node, prefix = '', parentPath = '') {
-    const keys = Object.keys(node).sort();
-    let lines = [];
-    keys.forEach((key, idx) => {
-      const isLast = idx === keys.length - 1;
-      const branch = isLast ? '└── ' : '├── ';
-      const currentPath = parentPath ? parentPath + '/' + key : key;
-      if (node[key] === null) {
-        // file: show hash
-        lines.push(prefix + branch + key + ' [' + (hashMap[currentPath] || '') + ']');
-      } else {
-        lines.push(prefix + branch + key + '/');
-        lines = lines.concat(printNode(node[key], prefix + (isLast ? '    ' : '│   '), currentPath));
-      }
-    });
-    return lines;
-  }
-  return printNode(tree, '', '').join('\n');
-}
-
+const getFileTreeString = require('./utils/getFileTreeString.cjs');
 /**
  * Main function that generates a directory tree with file hashes.
  * @param {object} argv - Parsed CLI arguments.
@@ -205,4 +152,7 @@ async function mainPrintDirectoryTree(argv) {
   }
 }
 
-module.exports = { mainPrintDirectoryTree, getFileTreeString };
+module.exports = { mainPrintDirectoryTree };
+
+// Provide a "default" alias for consumers that import the compiled ESM default
+module.exports.default = module.exports;

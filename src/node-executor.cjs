@@ -129,3 +129,6 @@ child.on('error', (error) => {
   console.error(error.message);
   process.exit(1);
 });
+
+// Provide a "default" alias for consumers that import the compiled ESM default
+module.exports.default = module.exports;

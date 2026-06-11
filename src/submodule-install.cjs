@@ -208,3 +208,6 @@ function runGit(args, returnResult = false) {
 
   return result.stdout || '';
 }
+
+// Provide a "default" alias for consumers that import the compiled ESM default
+module.exports.default = module.exports;

@@ -48,3 +48,4 @@ async function removeSubmodule(submodulePath) {
 }
 
 module.exports = removeSubmodule;
+module.exports.default = removeSubmodule;

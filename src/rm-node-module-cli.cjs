@@ -78,3 +78,6 @@ main().catch((e) => {
   console.error(ansiColors.red(e instanceof Error ? e.stack || e.message : String(e)));
   process.exitCode = 1;
 });
+
+// Provide a "default" alias for consumers that import the compiled ESM default
+module.exports.default = module.exports;

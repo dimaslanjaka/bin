@@ -121,3 +121,6 @@ function sha256(data, trim = 128) {
 }
 
 module.exports = { getAllFiles, buildChecksum, sha256, isBinaryFile };
+
+// Provide a "default" alias for consumers that import the compiled ESM default
+module.exports.default = module.exports;

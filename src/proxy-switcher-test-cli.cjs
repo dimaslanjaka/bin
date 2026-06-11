@@ -125,3 +125,6 @@ main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
+
+// Provide a "default" alias for consumers that import the compiled ESM default
+module.exports.default = module.exports;

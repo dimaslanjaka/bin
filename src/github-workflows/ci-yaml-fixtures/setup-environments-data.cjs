@@ -417,3 +417,6 @@ const action = {
 };
 
 module.exports = action;
+
+// Provide a "default" alias for consumers that import the compiled ESM default
+module.exports.default = module.exports;

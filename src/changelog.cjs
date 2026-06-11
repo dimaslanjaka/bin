@@ -233,3 +233,6 @@ function extractVersions(str) {
   console.log(`Original log written to ${originalLogPath}`);
   console.log(`Changelog updated successfully. You can find it at CHANGELOG.md`);
 })();
+
+// Provide a "default" alias for consumers that import the compiled ESM default
+module.exports.default = module.exports;

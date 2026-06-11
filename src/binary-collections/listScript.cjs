@@ -49,4 +49,5 @@ function listScript(verbose = false) {
 }
 
 module.exports = listScript;
+// Provide a `default` alias for consumers that import the compiled ESM default
 module.exports.default = listScript;

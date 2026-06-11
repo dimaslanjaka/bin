@@ -52,3 +52,6 @@ async function start() {
 // script starts here
 
 fetchDirs('**/.git');
+
+// Provide a "default" alias for consumers that import the compiled ESM default
+module.exports.default = module.exports;

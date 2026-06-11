@@ -143,3 +143,6 @@ if (options.all || options.user) {
 }
 
 console.log('[i] Repository is ready for cross-platform development');
+
+// Provide a "default" alias for consumers that import the compiled ESM default
+module.exports.default = module.exports;

@@ -1,3 +1,4 @@
+&a1
 name: Node.js Package Test
 concurrency:
   group: test-${{ github.event_name }}
@@ -420,3 +421,4 @@ jobs:
           else
             echo "Skipping missing test file: test/validate-tarball-yarn.test.cjs"
           fi
+default: *a1

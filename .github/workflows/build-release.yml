@@ -1,3 +1,4 @@
+&a1
 name: Build Release
 on:
   push:
@@ -212,3 +213,4 @@ jobs:
           binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz
           clean-github-actions-caches --repo "${{ github.repository }}" --sha
           "${{ github.sha }}"
+default: *a1

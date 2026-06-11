@@ -1,3 +1,4 @@
+import { describe, expect, test } from '@jest/globals';
 import { spawnSync } from 'child_process';
 import path from 'upath';
 

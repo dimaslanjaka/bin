@@ -1,4 +1,3 @@
-&a1
 name: Setup CI Environment
 description: Setup Node.js, Python, Bun, Corepack/Yarn, cache, virtual
   environment, and PATH for CI workflows
@@ -403,4 +402,3 @@ runs:
         echo "MACHINE=${{ steps.set-env.outputs.machine }}" >> $GITHUB_OUTPUT
 
         echo "CACHE_HIT=${{ steps.cache.outputs.cache-hit }}" >> $GITHUB_OUTPUT
-default: *a1

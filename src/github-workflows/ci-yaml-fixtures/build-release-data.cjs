@@ -223,6 +223,12 @@ const workflow = {
           ].join('\n')
         },
         {
+          name: '🗑️ Detach submodules to prevent lint-staged errors',
+          if: "steps.changes.outputs.files_changed == 'true'",
+          shell: 'bash',
+          run: "find . -maxdepth 2 -name '.git' -not -path './.git' -type f -delete"
+        },
+        {
           shell: 'bash',
           name: '📋 Show changed files',
           run: 'echo "Changed files: ${{ steps.changes.outputs.files }}"'

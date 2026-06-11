@@ -2,12 +2,11 @@ name: Deploy Docs
 
 on:
   push:
-    branches:
-      - master
-      - main
-    paths-ignore:
-      - '**/*.tgz'
-      - '**/release*/**'
+    paths:
+      - docs-src/**/*.md
+      - mkdocs.yml
+      - hooks/**/*.py
+      - readme.md
 
 permissions:
   contents: read

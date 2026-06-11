@@ -13,6 +13,7 @@ const defaultBin = {
   'clean-github-actions-cache': 'lib/github-workflows/clean-github-actions-caches-cli.cjs',
   'clean-github-actions-caches': 'lib/github-workflows/clean-github-actions-caches-cli.cjs',
   'clear-gh-caches': 'lib/github-workflows/clean-github-actions-caches-cli.cjs',
+  'clear-github-caches': 'lib/github-workflows/clean-github-actions-caches-cli.cjs',
   'clear-github-actions-cache': 'lib/github-workflows/clean-github-actions-caches-cli.cjs',
   'clear-github-actions-caches': 'lib/github-workflows/clean-github-actions-caches-cli.cjs',
   copy: 'lib/file/copy-cli.cjs',

@@ -27,6 +27,7 @@ docs/index.md
 docs/docs-src/
 site/
 .opencode/*
+!.opencode/agents/
 !.opencode/opencode.json*
 !.opencode/smart-title.json*
 .venv/

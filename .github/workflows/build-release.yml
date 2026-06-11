@@ -179,12 +179,7 @@ jobs:
       - name: ➕ Add build files to git
         if: steps.changes.outputs.files_changed == 'true'
         continue-on-error: true
-        run: |-
-          git config set advice.addIgnoredFile false
-          git add release || true
-          git add releases || true
-          git add dist || true
-          git add lib || true
+        run: git add -- dist/ lib/ release/ releases/ 2>/dev/null || true
       - name: ⬇️ Pull latest before push
         run: git pull -X theirs
         if: steps.changes.outputs.files_changed == 'true'

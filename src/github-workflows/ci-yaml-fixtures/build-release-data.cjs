@@ -246,13 +246,7 @@ const workflow = {
           name: '➕ Add build files to git',
           if: "steps.changes.outputs.files_changed == 'true'",
           'continue-on-error': true,
-          run: [
-            'git config set advice.addIgnoredFile false',
-            'git add release || true',
-            'git add releases || true',
-            'git add dist || true',
-            'git add lib || true'
-          ].join('\n')
+          run: ['git add -- dist/ lib/ release/ releases/ 2>/dev/null || true'].join('\n')
         },
         {
           name: '⬇️ Pull latest before push',

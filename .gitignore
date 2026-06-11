@@ -27,8 +27,8 @@ docs/index.md
 docs/docs-src/
 site/
 .opencode/*
-!.opencode/opencode.json
-!.opencode/opencode.jsonc
+!.opencode/opencode.json*
+!.opencode/smart-title.json*
 .venv/
 venv/
 binary-collections.config.js

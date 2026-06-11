@@ -210,6 +210,25 @@ if (stale.length > 0) {
 if (FLAG_WRITE) {
   console.log(`\n📝 Generating fresh exports file at ${OUTPUT_FILE}...\n`);
 
+  // Detect duplicate export names across source files
+  const symbolSources = new Map();
+  for (const [srcFile, syms] of sourceExports) {
+    for (const sym of syms) {
+      if (!symbolSources.has(sym)) symbolSources.set(sym, []);
+      symbolSources.get(sym).push(srcFile);
+    }
+  }
+  const duplicateSymbols = new Set(
+    [...symbolSources.entries()].filter(([, sources]) => sources.length > 1).map(([sym]) => sym)
+  );
+  if (duplicateSymbols.size > 0) {
+    console.log(`   ⚠ ${duplicateSymbols.size} symbol(s) exported from multiple files — aliasing with path prefix`);
+    for (const sym of duplicateSymbols) {
+      const sources = symbolSources.get(sym);
+      console.log(`      ${sym}: ${sources.join(', ')}`);
+    }
+  }
+
   // Collect all source exports grouped by file, sorted by path
   const entries = [...sourceExports.entries()]
     .sort(([a], [b]) => a.localeCompare(b))
@@ -224,13 +243,21 @@ if (FLAG_WRITE) {
       }
 
       // Named exports: export { a, b, c } from './...'
+      // If any symbol appears in multiple files, alias with path prefix (e.g. vscode_storage_CACHE_DIR)
       const named = defaultName ? syms.filter((s) => s !== defaultName) : [...syms];
       if (named.length > 0) {
         const sortedSyms = named.sort();
-        if (sortedSyms.length <= 4) {
-          lines.push(`export { ${sortedSyms.join(', ')} } from '${normalized}';\n`);
+        const hasDupes = sortedSyms.some((s) => duplicateSymbols.has(s));
+        const exportNames = hasDupes
+          ? sortedSyms.map((s) => {
+              const prefix = srcFile.replace(/\.\w+$/, '').replace(/\//g, '_');
+              return duplicateSymbols.has(s) ? `${s} as ${prefix}_${s}` : s;
+            })
+          : sortedSyms;
+        if (exportNames.length <= 4) {
+          lines.push(`export { ${exportNames.join(', ')} } from '${normalized}';\n`);
         } else {
-          lines.push(`export {\n  ${sortedSyms.join(',\n  ')}\n} from '${normalized}';\n`);
+          lines.push(`export {\n  ${exportNames.join(',\n  ')}\n} from '${normalized}';\n`);
         }
       }
 

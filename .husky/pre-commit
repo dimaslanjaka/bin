@@ -1,8 +1,15 @@
 #!/bin/sh
 
-# Update submodules to latest
-# Auto-stage submodule pointer changes in parent repo
-git submodule status | awk '{print $2}' | xargs -r git add
+# Auto-stage submodule pointer changes
+if [ -n "$GITHUB_ACTIONS" ] || [ -n "$CI" ]; then
+  echo "[pre-commit] CI detected — skipping submodule staging"
+else
+  if git submodule status 2>/dev/null; then
+    git submodule status 2>/dev/null | awk '{print $2}' | xargs -r git add 2>/dev/null || true
+  else
+    echo "[pre-commit] Submodules are not fully initialized, skipping submodule staging"
+  fi
+fi
 
 # Regenerate workflow/action YAML files from source fixtures and stage for commit
 node src/github-workflows/generate-ci-cli.mjs

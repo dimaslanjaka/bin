@@ -273,7 +273,7 @@ async function generateTitle(
   }
 }
 
-async function sessionRenamerPlugin(ctx: Parameters<Plugin>[0]): ReturnType<Plugin> {
+export async function sessionRenamerPlugin(ctx: Parameters<Plugin>[0]): ReturnType<Plugin> {
   const config = loadConfig(ctx.directory);
   log(config, 'Plugin loaded with config:', config);
 
@@ -369,7 +369,7 @@ async function sessionRenamerPlugin(ctx: Parameters<Plugin>[0]): ReturnType<Plug
 }
 
 // Named export required by opencode plugin system
-export const sessionRenamer = sessionRenamerPlugin;
+// export const sessionRenamer = sessionRenamerPlugin;
 
 // Also keep default export for compatibility
-export default sessionRenamerPlugin;
+// export default sessionRenamerPlugin;

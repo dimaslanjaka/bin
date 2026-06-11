@@ -1,38 +1,52 @@
-* text=auto eol=lf
 # Default behavior
-* text=auto
+* text=auto eol=lf
 
 # Windows-specific line endings
 *.cmd text eol=crlf
 *.bat text eol=crlf
+*.ps1 text eol=crlf
+*.cmd1 text eol=crlf
+*.cmd2 text eol=crlf
+*.bat1 text eol=crlf
+*.bat2 text eol=crlf
+*.vbs text eol=crlf
 
 # Unix-specific line endings
 *.txt text eol=lf
 *.toml text eol=lf
 *.sql text eol=lf
 *.sh text eol=lf
-*.php text eol=lf filter=spaceonly
+*.php text eol=lf
 
 # JSON and common code formats
-*.json text eol=lf filter=tabspace
-*.ts text eol=lf filter=tabspace
-*.css text eol=lf filter=tabspace
-*.scss text eol=lf filter=tabspace
-*.js text eol=lf filter=tabspace
-*.cjs text eol=lf filter=tabspace
+*.json text eol=lf
+*.ts text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.js text eol=lf
+*.cjs text eol=lf
+*.mjs text eol=lf
 *.java text eol=lf filter=tabspace
 *.kt text eol=lf filter=tabspace
 
 # XML and HTML (commonly use tab size 2)
-*.xml text eol=lf filter=tabspace2
-*.html text eol=lf filter=tabspace2
+*.xml text eol=lf
+*.html text eol=lf
 
 # Python (spaces preferred)
-*.py text eol=lf filter=spaceonly
+*.py text eol=lf
 
-# Pre/Post commit hooks
+# Git hooks
 pre-commit text eol=lf
 post-commit text eol=lf
+pre-push text eol=lf
+prepare-commit-msg text eol=lf
+commit-msg text eol=lf
+pre-rebase text eol=lf
+post-checkout text eol=lf
+post-merge text eol=lf
+post-rewrite text eol=lf
+pre-merge-commit text eol=lf
 
 # Specific filters for spaces
 *.spaceonly text eol=lf filter=spaceonly
@@ -57,10 +71,6 @@ post-commit text eol=lf
 *.rar filter=lfs diff=lfs merge=lfs -text
 *.sqlite filter=lfs diff=lfs merge=lfs -text
 
-# Special cases, run this
-# git config merge.resolve_hash.driver "node bin/create-file-hashes.cjs %O %A %B"
-.husky/hash.txt text eol=lf merge=ours driver=resolve_hash
-*.{cmd,bat,ps1,sh,cmd1,cmd2,bat1,bat2,vbs} text eol=crlf
 *.{png,jpg,jpeg,gif,ico,svg,bmp,webp,avif,tiff,tif,psd,ai,eps,raw} binary
 *.{zip,tar,gz,7z,rar,exe,dll,so,bin,jar,war,ear,apk,msi,deb,rpm,iso,img,dmg,pdf,mp3,mp4,mov,avi,mkv,flv,wmv,ogg,webm,wav,aac,m4a,otf,ttf,woff,woff2,eot} binary
 
@@ -73,3 +83,4 @@ post-commit text eol=lf
 # git config --local --get-regexp "^merge"
 release/metadata.json eol=lf merge=resolve_hash
 release/readme.md eol=lf merge=resolve_hash
+.husky/hash.txt text eol=lf merge=ours driver=resolve_hash

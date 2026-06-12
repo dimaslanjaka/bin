@@ -243,6 +243,16 @@ const workflow = {
           ].join('\n')
         },
         {
+          name: '⚙️ Configure git untracked cache',
+          if: "steps.changes.outputs.files_changed == 'true'",
+          shell: 'bash',
+          run: [
+            'git update-index --untracked-cache',
+            'git update-index --test-untracked-cache',
+            'git update-index --no-untracked-cache'
+          ].join('\n')
+        },
+        {
           name: '➕ Add build files to git',
           if: "steps.changes.outputs.files_changed == 'true'",
           'continue-on-error': true,

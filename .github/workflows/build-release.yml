@@ -176,6 +176,13 @@ jobs:
 
           git config --global user.email
           '41898282+github-actions[bot]@users.noreply.github.com'
+      - name: ⚙️ Configure git untracked cache
+        if: steps.changes.outputs.files_changed == 'true'
+        shell: bash
+        run: |-
+          git update-index --untracked-cache
+          git update-index --test-untracked-cache
+          git update-index --no-untracked-cache
       - name: ➕ Add build files to git
         if: steps.changes.outputs.files_changed == 'true'
         continue-on-error: true

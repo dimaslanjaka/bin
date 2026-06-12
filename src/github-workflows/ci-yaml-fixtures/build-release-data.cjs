@@ -246,7 +246,7 @@ const workflow = {
           name: '➕ Add build files to git',
           if: "steps.changes.outputs.files_changed == 'true'",
           'continue-on-error': true,
-          run: ['git add -- release/ releases/ 2>/dev/null || true'].join('\n')
+          run: ['git add -- release*/ || true'].join('\n')
         },
         {
           name: '⬇️ Pull latest before push',

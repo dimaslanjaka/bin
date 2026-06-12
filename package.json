@@ -72,7 +72,7 @@
     "axios": "^1.17.0",
     "better-sqlite3": "^12.10.0",
     "cosmiconfig": "^9.0.2",
-    "cross-spawn": "^7.0.6",
+    "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/private/release/cross-spawn.tgz",
     "crypto-js": "^4.2.0",
     "dotenv": "^17.4.2",
     "fs-extra": "^11.3.5",
@@ -127,6 +127,7 @@
     "babel-jest": "^30.4.1",
     "browser-sync": "^3.0.4",
     "cross-env": "^10.1.0",
+    "eslint": "^9",
     "globals": "^17.6.0",
     "gulp": "^5.0.1",
     "husky": "^9.1.7",
@@ -156,7 +157,7 @@
     "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/1ca385787f7287155b547c5b97d5ffd5bcfab482/packages/sbg-utility/release/sbg-utility.tgz",
     "@dimaslanjaka/eslint-base-config": "https://github.com/dimaslanjaka/eslint-base-config/raw/84028e4a2892cd5958fbf3e200aacf0f8f0e5700/release/dimaslanjaka-eslint-base-config.tgz",
     "@dimaslanjaka/ai-toolkit": "https://github.com/dimaslanjaka/ai-toolkit/raw/refs/heads/master/release/ai-toolkit.tgz",
-    "binary-collections": "https://github.com/dimaslanjaka/bin/raw/f35e46e28ef266be56931a0fcdaba63ddbaab548/releases/bin.tgz"
+    "binary-collections": "https://github.com/dimaslanjaka/bin/raw/c50682c5c9276c5f07646f33b834987202767f83/releases/bin.tgz"
   },
   "bin": {
     "actions-badge": "lib/github-workflows/workflow-badge-cli.cjs",
@@ -172,6 +173,7 @@
     "clear-gh-caches": "lib/github-workflows/clean-github-actions-caches-cli.cjs",
     "clear-github-actions-cache": "lib/github-workflows/clean-github-actions-caches-cli.cjs",
     "clear-github-actions-caches": "lib/github-workflows/clean-github-actions-caches-cli.cjs",
+    "clear-github-caches": "lib/github-workflows/clean-github-actions-caches-cli.cjs",
     "composer": "binaries/composer.cjs",
     "copy": "lib/file/copy-cli.cjs",
     "copy-file": "lib/file/copy-cli.cjs",

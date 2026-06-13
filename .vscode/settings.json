@@ -1,4 +1,13 @@
 {
+  "files.watcherExclude": {
+    "**/dist/**": true,
+    "**/tmp/**": true,
+    "**/venv/**": true,
+    "**/.venv/**": true,
+    "**/out/**": true,
+    "**/.yarn/**": true,
+    "**/coverage/**": true
+  },
   "terminal.integrated.env.linux": {
     "DEBUG_PKG": "1",
     "ESLINT_USE_FLAT_CONFIG": "true",

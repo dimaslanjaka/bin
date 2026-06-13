@@ -45,7 +45,7 @@
     "build-ts": "tsc -p tsconfig.build.json",
     "build-dts": "tsc -p tsconfig.dts.json",
     "build-mainEntry": "npm run build-dts && rollup -c rollup.mainEntry.js",
-    "clean": "rimraf lib tmp/dist binaries",
+    "clean": "npx -y rimraf lib tmp/dist binaries",
     "pack": "node src/node-package-packer-cli.mjs --yarn --filename=bin --normalize-resolutions",
     "prepare": "husky",
     "puppeteer:browser": "npx -y puppeteer browsers install chrome",

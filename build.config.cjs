@@ -34,7 +34,7 @@ const defaultBin = {
   'free-chatgpt': 'lib/free-chatgpt.cjs',
   'generate-build-ci': 'lib/github-workflows/generate-build-release-ci-cli.cjs',
   'generate-ci': 'lib/github-workflows/generate-ci-cli.cjs',
-  'generate-test-ci': 'src/github-workflows/generate-test-ci-step-cli.mjs',
+  'generate-test-ci': 'src/github-workflows/generate-test-ci-step-cli.cjs',
   'get-latest-workflow': 'lib/github-workflows/get-latest-workflow-status-cli.cjs',
   'get-latest-workflow-status': 'lib/github-workflows/get-latest-workflow-status-cli.cjs',
   'gh-status-badge': 'lib/github-workflows/workflow-badge-cli.cjs',

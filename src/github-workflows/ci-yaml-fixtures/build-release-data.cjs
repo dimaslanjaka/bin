@@ -57,7 +57,8 @@ const workflow = {
           name: '⬇️ Checkout workflow repository',
           uses: 'actions/checkout@v6',
           with: {
-            'fetch-depth': 0
+            'fetch-depth': 0,
+            submodule: 'recursive'
           }
         },
         {

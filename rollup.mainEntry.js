@@ -3,8 +3,8 @@ import babel from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
-import fs from 'fs-extra';
 import path from 'upath';
+import { chunkFileNamesWithExt, entryFileNamesWithExt, externalPackagesFilter } from './rollup.config.js';
 import { extractLocalFiles } from './src/utils/extract-local-files.js';
 
 const input = path.resolve('src/index.ts');
@@ -18,13 +18,17 @@ export default [
         // file: path.toUnix('lib/index.cjs'),
         dir: 'lib',
         format: 'cjs',
-        sourcemap: false
+        sourcemap: false,
+        entryFileNames: entryFileNamesWithExt('cjs'),
+        entryChunkFileNames: chunkFileNamesWithExt('cjs')
       },
       {
         // file: path.toUnix('lib/index.mjs'),
         dir: 'lib',
         format: 'es',
-        sourcemap: false
+        sourcemap: false,
+        entryFileNames: entryFileNamesWithExt('mjs'),
+        entryChunkFileNames: chunkFileNamesWithExt('mjs')
       }
     ],
     plugins: [
@@ -51,12 +55,6 @@ export default [
       }),
       commonjs({ extensions: ['.js', '.mjs', '.cjs', '.ts', '.json', '.node'] })
     ],
-    external: [
-      ...(() => {
-        const pkgPath = path.join(process.cwd(), 'package.json');
-        const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-        return [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.devDependencies || {})];
-      })()
-    ]
+    external: externalPackagesFilter
   }
 ];

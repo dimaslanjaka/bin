@@ -11,9 +11,9 @@ import fs from 'fs';
 const { dependencies = {}, devDependencies = {} } = pkgJson;
 
 // Packages that should be bundled (from tsup config)
-const bundledPackages = ['p-limit', 'deepmerge-ts', 'hexo-is', 'is-stream', 'markdown-it', 'node-cache'];
+export const bundledPackages = ['p-limit', 'deepmerge-ts', 'hexo-is', 'is-stream', 'markdown-it', 'node-cache'];
 
-const externalPackages = [...Object.keys(dependencies), ...Object.keys(devDependencies)].filter((pkgName) => {
+export const externalPackages = [...Object.keys(dependencies), ...Object.keys(devDependencies)].filter((pkgName) => {
   return !bundledPackages.includes(pkgName);
 });
 
@@ -25,7 +25,7 @@ const externalPackages = [...Object.keys(dependencies), ...Object.keys(devDepend
  * @param {string} ext The file extension (e.g. 'js', 'cjs', 'mjs').
  * @returns {(info: { facadeModuleId: string }) => string} Function that generates the output file name for a given entry.
  */
-function entryFileNamesWithExt(ext) {
+export function entryFileNamesWithExt(ext) {
   // Ensure the extension does not start with a dot
   if (ext.startsWith('.')) {
     ext = ext.slice(1);
@@ -62,7 +62,7 @@ function entryFileNamesWithExt(ext) {
  * @param {string} ext The file extension (e.g. 'js', 'cjs', 'mjs').
  * @returns {(info: { name: string }) => string} Function that generates the output file name for a given chunk.
  */
-function chunkFileNamesWithExt(ext) {
+export function chunkFileNamesWithExt(ext) {
   return function ({ name }) {
     // For node_modules chunks, place in dependencies folder
     if (name && name.includes('node_modules')) {
@@ -91,7 +91,7 @@ function chunkFileNamesWithExt(ext) {
  * @param {boolean} isResolved - Whether the import has been resolved.
  * @returns {boolean} True if the module should be external, false if it should be bundled.
  */
-function externalPackagesFilter(source, importer, isResolved) {
+export function externalPackagesFilter(source, importer, isResolved) {
   function getPackageNameFromSource(source) {
     // Handle absolute paths (Windows/Unix)
     const nm = /node_modules[\\/]+([^\\/]+)(?:[\\/]+([^\\/]+))?/.exec(source);

@@ -92,14 +92,54 @@ export async function findWorkingKey(candidates: KeyData[], options?: FindWorkin
   return null;
 }
 
-export async function handleAuthRotate(options?: { proxy?: string; noCache?: boolean }): Promise<void> {
-  // Load keys from project config (binary-collections.config.{js,cjs,mjs} / package.json)
-  const config = await getConfig();
-  const keys: Array<KeyData> | undefined = config?.opencode?.keys;
+/**
+ * Rotates the active OpenCode API key by selecting and testing a working key.
+ *
+ * @remarks
+ * This function performs the following steps:
+ * 1. Loads keys from options, or falls back to the project configuration
+ * 2. Filters out the currently active key
+ * 3. Tests remaining keys against the OpenCode API to find a working one
+ * 4. Updates the auth file with the selected working key
+ *
+ * @param options - Optional configuration for rotation behavior
+ * @param options.proxy - HTTP proxy URL to use for API validation
+ * @param options.noCache - Bypass cache and force fresh API checks
+ * @param options.keys - Custom array of key candidates to test. If provided, overrides config keys.
+ *
+ * @returns A promise that resolves when rotation completes successfully
+ *
+ * @throws Will call `process.exit(1)` if:
+ * - No keys are found in either options or project config
+ * - No auth file exists
+ * - No alternative keys are available
+ * - No working key can be found among candidates
+ *
+ * @example
+ * ```typescript
+ * await handleAuthRotate({
+ *   keys: [{ name: 'custom-key', key: 'sk-...' }],
+ *   proxy: 'http://proxy.example.com'
+ * });
+ * ```
+ */
+export async function handleAuthRotate(options?: {
+  proxy?: string;
+  noCache?: boolean;
+  keys?: KeyData[];
+}): Promise<void> {
+  // Load keys from options, fallback to project config (binary-collections.config.{js,cjs,mjs} / package.json)
+  let keys = options?.keys;
+  if (!keys) {
+    const config = await getConfig();
+    keys = config?.opencode?.keys;
+  }
+
   if (!keys || !Array.isArray(keys) || keys.length === 0) {
     console.error(
-      'No opencode.keys found in project config. ' +
-        'Add an "opencode" section with a "keys" array to your binary-collections.config.{js,cjs,mjs} file.'
+      'No opencode.keys found. ' +
+        'Add an "opencode" section with a "keys" array to your binary-collections.config.{js,cjs,mjs} file, ' +
+        'or pass custom keys in the options.'
     );
     process.exit(1);
   }

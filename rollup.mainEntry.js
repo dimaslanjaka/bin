@@ -3,6 +3,7 @@ import babel from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
+import typescript from '@rollup/plugin-typescript';
 import path from 'upath';
 import { chunkFileNamesWithExt, entryFileNamesWithExt, externalPackagesFilter } from './rollup.config.js';
 import { extractLocalFiles } from './src/utils/extract-local-files.js';
@@ -37,6 +38,9 @@ export default [
       }),
       json(),
       resolve({ preferBuiltins: true, extensions: ['.js', '.mjs', '.cjs', '.ts', '.json', '.node'] }),
+      typescript({
+        tsconfig: './tsconfig.json'
+      }),
       babel({
         babelHelpers: 'bundled',
         extensions: ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'],
@@ -53,7 +57,7 @@ export default [
           ]
         ]
       }),
-      commonjs({ extensions: ['.js', '.mjs', '.cjs', '.ts', '.json', '.node'] })
+      commonjs({ extensions: ['.js', '.mjs', '.cjs', '.json', '.node'] })
     ],
     external: externalPackagesFilter
   }

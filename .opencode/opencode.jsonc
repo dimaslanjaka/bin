@@ -13,6 +13,7 @@
   "snapshot": true,
   "formatter": false,
   "lsp": false,
+
   "plugin": [
     "opencode-helicone-session",
     "oh-my-opencode-slim@latest",
@@ -23,21 +24,75 @@
     "@tarquinen/opencode-dcp@latest",
     "opencode-request-logger@https://github.com/Opencode-DCP/opencode-request-logger.git"
   ],
+
   "instructions": [
     "AGENTS.md",
     ".github/instructions/*.md",
     ".github/*.md",
     "packages/*/AGENTS.md"
   ],
+
   "mcp": {
-    "playwright": {
-      "enabled": true,
-      "type": "local",
-      "command": [
-        "npx",
-        "-y",
-        "@playwright/mcp@latest"
-      ]
-    }
+    // "filesystem": {
+    //   "enabled": true,
+    //   "type": "local",
+    //   "command": [
+    //     "npx",
+    //     "-y",
+    //     "@modelcontextprotocol/server-filesystem",
+    //     "."
+    //   ]
+    // },
+
+    // "git": {
+    //   "enabled": true,
+    //   "type": "local",
+    //   "command": [
+    //     "npx",
+    //     "-y",
+    //     "@modelcontextprotocol/server-git",
+    //     "."
+    //   ]
+    // },
+
+    // "github": {
+    //   "enabled": true,
+    //   "type": "local",
+    //   "command": [
+    //     "npx",
+    //     "-y",
+    //     "@modelcontextprotocol/server-github"
+    //   ]
+    // },
+
+    // "fetch": {
+    //   "enabled": true,
+    //   "type": "local",
+    //   "command": [
+    //     "npx",
+    //     "-y",
+    //     "@modelcontextprotocol/server-fetch"
+    //   ]
+    // },
+
+    // "puppeteer": {
+    //   "enabled": true,
+    //   "type": "local",
+    //   "command": [
+    //     "npx",
+    //     "-y",
+    //     "@modelcontextprotocol/server-puppeteer"
+    //   ]
+    // },
+
+    // "playwright": {
+    //   "enabled": true,
+    //   "type": "local",
+    //   "command": [
+    //     "npx",
+    //     "-y",
+    //     "@playwright/mcp@latest"
+    //   ]
+    // }
   }
 }

@@ -20,7 +20,7 @@ export default [
         format: 'cjs',
         sourcemap: false,
         entryFileNames: entryFileNamesWithExt('cjs'),
-        entryChunkFileNames: chunkFileNamesWithExt('cjs')
+        chunkFileNames: chunkFileNamesWithExt('cjs')
       },
       {
         // file: path.toUnix('lib/index.mjs'),
@@ -28,7 +28,7 @@ export default [
         format: 'es',
         sourcemap: false,
         entryFileNames: entryFileNamesWithExt('mjs'),
-        entryChunkFileNames: chunkFileNamesWithExt('mjs')
+        chunkFileNames: chunkFileNamesWithExt('mjs')
       }
     ],
     plugins: [

@@ -11,7 +11,16 @@ import fs from 'fs';
 const { dependencies = {}, devDependencies = {} } = pkgJson;
 
 // Packages that should be bundled (from tsup config)
-export const bundledPackages = ['p-limit', 'deepmerge-ts', 'hexo-is', 'is-stream', 'markdown-it', 'node-cache'];
+export const bundledPackages = [
+  'p-limit',
+  'deepmerge-ts',
+  'hexo-is',
+  'is-stream',
+  'markdown-it',
+  'node-cache',
+  'glob',
+  '@formatjs/fast-memoize'
+];
 
 export const externalPackages = [...Object.keys(dependencies), ...Object.keys(devDependencies)].filter((pkgName) => {
   return !bundledPackages.includes(pkgName);
@@ -151,13 +160,13 @@ for (let input of inputs) {
         format: 'esm',
         dir: 'lib',
         entryFileNames: entryFileNamesWithExt('mjs'),
-        entryChunkFileNames: chunkFileNamesWithExt('mjs')
+        chunkFileNames: chunkFileNamesWithExt('mjs')
       },
       {
         format: 'cjs',
         dir: 'lib',
         entryFileNames: entryFileNamesWithExt('cjs'),
-        entryChunkFileNames: chunkFileNamesWithExt('cjs')
+        chunkFileNames: chunkFileNamesWithExt('cjs')
       }
     ],
     external: externalPackagesFilter,

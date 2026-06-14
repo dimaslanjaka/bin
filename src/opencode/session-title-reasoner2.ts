@@ -1,6 +1,48 @@
-import type { Plugin } from '@opencode-ai/plugin';
 import moment from 'moment-timezone';
 import { loadConfig, SessionRenamerConfig } from './config.js';
+
+// Plugin context interface - replaces @opencode-ai/plugin Plugin type
+interface PluginContext {
+  directory: string;
+  client: OpenCodeClient;
+}
+
+// OpenCode client interface - represents the session/config client API
+interface OpenCodeClient {
+  session: SessionClient;
+  config: ConfigClient;
+}
+
+interface SessionClient {
+  create: (args: { body: unknown }) => Promise<{ data?: { id: string } }>;
+  delete: (args: { path: { id: string } }) => Promise<void>;
+  update: (args: { path: { id: string }; body: { title: string } }) => Promise<void>;
+  prompt: (args: {
+    path: { id: string };
+    body: {
+      system: string;
+      parts: Array<{ type: string; text: string }>;
+      model?: ModelRef;
+    };
+  }) => Promise<{ data?: { parts?: Array<{ type: string; text: string }> } }>;
+  get?: (args: { path: { id: string } }) => Promise<{ data?: { title?: string } }>;
+}
+
+interface ConfigClient {
+  providers: (args: { query: { directory: string } }) => Promise<{ data?: ProvidersConfigPayload }>;
+}
+
+// Plugin hook interface - represents the return type
+interface PluginHooks {
+  'chat.message': (
+    input: { sessionID: string },
+    output: { message: Message; parts: Array<{ type: string }> }
+  ) => Promise<void>;
+}
+
+interface Message {
+  summary?: { title?: string; body?: string };
+}
 
 export const SYSTEM_PROMPT = `You are a session title generator. Generate a concise, descriptive title for a coding session based on the user's first message.
 
@@ -23,9 +65,6 @@ const tempSessions = new Set<string>();
 const DEFAULT_TITLE_PREFIXES = ['New session - ', 'Child session - '];
 
 type ModelRef = { providerID: string; modelID: string };
-type SessionClientWithGet = {
-  get?: (args: { path: { id: string } }) => Promise<{ data?: { title?: string } }>;
-};
 type ProvidersConfigPayload = {
   providers: Array<{ id: string; models: Record<string, unknown> }>;
   default: Record<string, string>;
@@ -98,10 +137,7 @@ function isProviderModelNotFoundError(error: unknown): boolean {
   return false;
 }
 
-async function getProvidersConfig(
-  client: Parameters<Plugin>[0]['client'],
-  directory: string
-): Promise<ProvidersConfigPayload | null> {
+async function getProvidersConfig(client: OpenCodeClient, directory: string): Promise<ProvidersConfigPayload | null> {
   if (!providersConfigPromise) {
     providersConfigPromise = client.config
       .providers({ query: { directory } })
@@ -113,7 +149,7 @@ async function getProvidersConfig(
 }
 
 async function resolveModelForPrompt(
-  client: Parameters<Plugin>[0]['client'],
+  client: OpenCodeClient,
   directory: string,
   configModel: string
 ): Promise<ModelRef | undefined> {
@@ -194,7 +230,7 @@ function log(config: SessionRenamerConfig, ...args: unknown[]) {
 }
 
 async function generateTitle(
-  client: Parameters<Plugin>[0]['client'],
+  client: OpenCodeClient,
   config: SessionRenamerConfig,
   userMessage: string,
   directory: string
@@ -273,7 +309,7 @@ async function generateTitle(
   }
 }
 
-export async function sessionRenamerPlugin(ctx: Parameters<Plugin>[0]): ReturnType<Plugin> {
+export async function sessionRenamerPlugin(ctx: PluginContext): Promise<PluginHooks> {
   const config = loadConfig(ctx.directory);
   log(config, 'Plugin loaded with config:', config);
 
@@ -299,7 +335,7 @@ export async function sessionRenamerPlugin(ctx: Parameters<Plugin>[0]): ReturnTy
         return;
       }
 
-      const sessionClient = ctx.client.session as SessionClientWithGet;
+      const sessionClient = ctx.client.session;
       if (sessionClient.get) {
         try {
           const sessionInfo = await sessionClient.get({ path: { id: sessionID } });

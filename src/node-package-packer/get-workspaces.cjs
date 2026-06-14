@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 const path = require('upath');
-const { glob } = require('glob');
+const glob = require('glob');
 const CryptoJS = require('crypto-js');
 
 /** @type {Map<string, import('./get-workspaces-types').WorkspacesInfo>} */
@@ -154,7 +154,7 @@ async function resolveWorkspacePackageJsonFiles(rootDir, workspacePatterns) {
     return [];
   }
 
-  const files = await glob(includePatterns, {
+  const files = await glob.glob(includePatterns, {
     cwd: rootDir,
     absolute: true,
     nodir: true,

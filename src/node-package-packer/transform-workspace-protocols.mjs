@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import path from 'upath';
-import { globSync } from 'glob';
+import * as glob from 'glob';
 import { getWorkspacesInfo } from './get-workspaces.cjs';
 import { getGithubRawUrl } from 'git-command-helper';
 
@@ -15,7 +15,7 @@ function resolveWorkspaceVersions(dirname) {
   const versionMap = {};
 
   for (const pattern of workspacePatterns) {
-    const matches = globSync(pattern, { cwd: dirname, absolute: true });
+    const matches = glob.globSync(pattern, { cwd: dirname, absolute: true });
     for (const wsDir of matches) {
       const wsPkgPath = path.join(wsDir, 'package.json');
       if (fs.existsSync(wsPkgPath)) {

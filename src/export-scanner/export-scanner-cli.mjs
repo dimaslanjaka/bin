@@ -6,7 +6,7 @@
  */
 
 import fs from 'fs-extra';
-import { globSync } from 'glob';
+import * as glob from 'glob';
 import path from 'upath';
 import { fileURLToPath } from 'url';
 import { getArgs } from '../utils/index.cjs';
@@ -67,7 +67,8 @@ const ignorePatterns = parsedArgs.ignore
 // ─── Main logic ───────────────────────────────────────────────
 
 // 1. Scan src/
-const sourceFiles = globSync('**/*.{ts,js,mjs,cjs,cts,tsx}', { cwd: SRC, nodir: true, dot: false })
+const sourceFiles = glob
+  .globSync('**/*.{ts,js,mjs,cjs,cts,tsx}', { cwd: SRC, nodir: true, dot: false })
   .map((f) => path.join(SRC, f))
   .filter((f) => !shouldIgnore(f, SRC, ignorePatterns))
   .filter((f) => path.basename(f) !== 'index.ts'); // skip entry point itself

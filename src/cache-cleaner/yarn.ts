@@ -1,5 +1,5 @@
 import { spawn } from 'cross-spawn';
-import { glob } from 'glob';
+import * as glob from 'glob';
 import { rimraf } from 'rimraf';
 import * as path from 'path';
 
@@ -65,7 +65,7 @@ export interface FindProjectYarnCachesOptions {
  */
 export async function findProjectYarnCaches(options?: FindProjectYarnCachesOptions): Promise<string[]> {
   const { cwd = process.cwd(), ignore = ['**/.git*', '**/vendor/**'] } = options || {};
-  const results = await glob(['**/.yarn/cache*', '**/.yarn/*.gz'], {
+  const results = await glob.glob(['**/.yarn/cache*', '**/.yarn/*.gz'], {
     cwd,
     ignore,
     dot: true,

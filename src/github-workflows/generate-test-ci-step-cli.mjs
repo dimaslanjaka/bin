@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import path from 'upath';
 import { fileURLToPath } from 'url';
 import { execSync } from 'child_process';
-import { glob } from 'glob';
+import * as glob from 'glob';
 import { getArgs } from '../utils/index.cjs';
 import { writeYamlFile } from './utils.cjs';
 import actionObject from './ci-yaml-fixtures/workflow-test-data.cjs';
@@ -40,7 +40,7 @@ Examples:
 }
 
 async function collectTests(patterns, ignorePatterns) {
-  const entries = await glob(patterns, {
+  const entries = await glob.glob(patterns, {
     onlyFiles: true,
     cwd: process.cwd(),
     ignore: ignorePatterns

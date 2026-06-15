@@ -19,8 +19,12 @@ else
   git add .github/workflows/test.yml .github/actions/setup-environments/action.yml .github/workflows/build-release.yml
 fi
 
-# Run lint-staged through Yarn so the local binary is resolved consistently
-corepack yarn exec lint-staged --config lint-staged.config.js
+# Run lint-staged through Yarn so the local binary is resolved consistently (skips on CI)
+if [ -n "$GITHUB_ACTIONS" ] || [ -n "$CI" ]; then
+  echo "CI environment detected — skipping lint-staged"
+else
+  corepack yarn exec lint-staged --config lint-staged.config.js
+fi
 
 # ---- git merge driver setup (idempotent) ----
 if ! git config --get merge.resolve_hash.driver >/dev/null; then

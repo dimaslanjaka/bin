@@ -58,7 +58,7 @@ const workflow = {
           uses: 'actions/checkout@v6',
           with: {
             'fetch-depth': 0,
-            submodule: 'recursive'
+            submodules: 'recursive'
           }
         },
         {

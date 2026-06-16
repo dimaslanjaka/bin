@@ -28,7 +28,11 @@ const workflow = {
       steps: [
         {
           name: '⬇️ Checkout workflow repository',
-          uses: 'actions/checkout@v6'
+          uses: 'actions/checkout@v6',
+          with: {
+            'fetch-depth': 0,
+            submodules: 'recursive'
+          }
         },
         {
           name: '⬇️ Setup CI Environment',

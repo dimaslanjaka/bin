@@ -49,14 +49,3 @@ function findNodeModules(dir = process.cwd(), callback = null) {
 module.exports = findNodeModules;
 module.exports.default = findNodeModules;
 module.exports.findNodeModules = findNodeModules;
-
-// Support both CommonJS and ESM usage
-if (typeof module !== 'undefined' && require.main === module) {
-  findNodeModules(null, console.log)
-    .then((dirs) => {
-      console.log(`Found ${dirs.length} node_modules directories.`);
-    })
-    .catch((err) => {
-      console.error('Error finding node_modules directories:', err);
-    });
-}

@@ -1,3 +1,5 @@
+const { tarballUrl } = require('./env.cjs');
+
 const workflow = {
   name: 'Build Release',
 
@@ -292,7 +294,7 @@ const workflow = {
         {
           name: '🧹 Clean GitHub Actions cache (npx)',
           'continue-on-error': true,
-          run: 'npx --legacy-peer-deps -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz clean-github-actions-caches --repo "${{ github.repository }}" --sha "${{ github.sha }}"'
+          run: `npx --legacy-peer-deps -y binary-collections@${tarballUrl} --repo "\${{ github.repository }}" --sha "\${{ github.sha }}"`
         }
       ]
     }

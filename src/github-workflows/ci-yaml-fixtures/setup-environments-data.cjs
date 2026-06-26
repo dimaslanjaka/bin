@@ -1,4 +1,5 @@
 // const { filterRepoInfo } = require('./repo-verifier.cjs');
+const { tarballUrl } = require('./env.cjs');
 
 // const RepoInfo = [
 //   { repo: 'dimaslanjaka/git-command-helper', path: 'packages/git-command-helper', ref: 'pre-release' },
@@ -129,7 +130,7 @@ const action = {
           '  git submodule foreach "git submodule sync"',
           '  echo "update submodules"',
           '  npx -y rimraf .git/modules',
-          '  npx --legacy-peer-deps -y binary-collections@https://raw.githubusercontent.com/dimaslanjaka/bin/master/releases/bin.tgz submodule-install',
+          `  npx --legacy-peer-deps -y binary-collections@${tarballUrl} submodule-install`,
           'else',
           '  echo "No submodules found or .gitmodules is empty, skipping update."',
           '  exit 0',

@@ -94,6 +94,11 @@ const action = {
 
     steps: [
       {
+        name: '🔑 Configure git credentials for GitLab',
+        shell: 'bash',
+        run: 'git config --global url."https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.com/".insteadOf "https://gitlab.com/"'
+      },
+      {
         name: '⬇️ Checkout test-repo',
         uses: 'actions/checkout@v6',
         with: {

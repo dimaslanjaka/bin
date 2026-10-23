@@ -5,6 +5,14 @@
 # -----------------------------
 
 echo "[bcc] Attempting local binary-collections..."
+# Try running the local binary if it exists relative to this script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOCAL_BIN="$SCRIPT_DIR/../lib/binary-collections.cjs"
+if [ -f "$LOCAL_BIN" ]; then
+  node "$LOCAL_BIN" "$@"
+  if [ $? -eq 0 ]; then exit 0; fi
+fi
+
 npm exec --legacy-peer-deps --yes --package=binary-collections -- binary-collections "$@"
 status=$?
 

@@ -6,6 +6,11 @@ REM BCC – Binary Collections CLI Runner with Remote Fallback
 REM -----------------------------
 
 echo [bcc] Attempting local binary-collections...
+if exist "%~dp0..\lib\binary-collections.cjs" (
+    node "%~dp0..\lib\binary-collections.cjs" %*
+    if %ERRORLEVEL% EQU 0 exit /b 0
+)
+
 npm exec --legacy-peer-deps --yes --package=binary-collections -- binary-collections %*
 if %ERRORLEVEL% EQU 0 (
     echo [bcc] Local binary-collections succeeded.

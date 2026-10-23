@@ -35,6 +35,11 @@ const action = {
       description: 'GitHub token for accessing resources',
       required: false,
       default: '${{ github.token }}'
+    },
+    gitlab_token: {
+      description: 'GitLab token for accessing resources',
+      required: false,
+      default: ''
     }
   },
 
@@ -96,7 +101,7 @@ const action = {
       {
         name: '🔑 Configure git credentials for GitLab',
         shell: 'bash',
-        run: 'git config --global url."https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.com/".insteadOf "https://gitlab.com/"'
+        run: 'git config --global url."https://oauth2:${{ inputs.gitlab_token }}@gitlab.com/".insteadOf "https://gitlab.com/"'
       },
       {
         name: '⬇️ Checkout test-repo',

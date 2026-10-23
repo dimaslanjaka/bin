@@ -167,6 +167,27 @@ describe('normalizeResolutions()', () => {
       'https://github.com/dimaslanjaka/static-blog-generator/raw/sbg-utility/packages/sbg-utility/release/sbg-utility.tgz'
     );
   });
+
+  test('loads normalization mappings from the package root', async () => {
+    const dir = makeTempDir({ prefix: 'norm-res-' });
+    tmpDirs.push(dir);
+    writePackageJson(dir, {
+      resolutions: {
+        'custom-pkg':
+          'https://example.com/custom-pkg/raw/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/release/custom-pkg.tgz'
+      }
+    });
+    fs.writeFileSync(
+      path.join(dir, 'binary-collections.config.cjs'),
+      'module.exports = { normalizeResolutions: [{ pkg: "custom-pkg", to: "stable" }] };\n'
+    );
+
+    await normalizeResolutions(dir);
+
+    expect(readPackageJson(dir).resolutions['custom-pkg']).toBe(
+      'https://example.com/custom-pkg/raw/stable/release/custom-pkg.tgz'
+    );
+  });
 });
 
 // ---------------------------------------------------------------------------

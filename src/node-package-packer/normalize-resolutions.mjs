@@ -76,7 +76,7 @@ export function restoreResolutions(rootDir) {
  */
 export async function normalizeResolutions(rootDir) {
   const packageJsonPath = path.join(rootDir, 'package.json');
-  const config = await getConfig();
+  const config = await getConfig({ searchFrom: rootDir });
   const resolutionsNormalize = config?.normalizeResolutions || DEFAULT_RESOLUTIONS_NORMALIZE;
 
   const raw = fs.readFileSync(packageJsonPath, 'utf-8');

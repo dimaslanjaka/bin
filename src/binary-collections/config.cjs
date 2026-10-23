@@ -104,8 +104,10 @@ async function getConfig(options = {}) {
     }
 
     const workspaceRoot = memoize(findYarnRootWorkspace)({ base_dir: from });
-    const workspaceResult = await explorer.search(workspaceRoot);
-    if (workspaceResult?.config) return workspaceResult.config;
+    if (workspaceRoot) {
+      const workspaceResult = await explorer.search(workspaceRoot);
+      if (workspaceResult?.config) return workspaceResult.config;
+    }
 
     return null;
   } catch (error) {

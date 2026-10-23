@@ -93,15 +93,6 @@ jobs:
           else
             echo "Skipping missing test file: test/getLatestCommit.test.mjs"
           fi
-      - name: 🧪 Run tests in test/git/git-diff-staged-ai.test.mjs
-        id: run-test-git-git-diff-staged-ai-test-mjs
-        shell: bash
-        run: >-
-          if [ -f "test/git/git-diff-staged-ai.test.mjs" ]; then
-            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="git/git-diff-staged-ai.test.mjs"
-          else
-            echo "Skipping missing test file: test/git/git-diff-staged-ai.test.mjs"
-          fi
       - name: 🧪 Run tests in test/git/git-diff.test.cjs
         id: run-test-git-git-diff-test-cjs
         shell: bash

@@ -7,7 +7,6 @@ import { md5, writefile } from 'sbg-utility';
 import path from 'upath';
 import { fileURLToPath } from 'url';
 import { getTempPath } from '../binary-collections/config.cjs';
-import { runChatGpt } from '../utils/chatgpt.js';
 import { getArgs } from '../utils/index.cjs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -18,12 +17,10 @@ const positional = args._ || [];
 // Output path using centralized temp directory configuration
 const FILENAME = md5((positional[0] || 'default') + JSON.stringify(args));
 const DIFF_OUTPUT = getTempPath(`git-diff/${FILENAME}.txt`);
-const GPT_DIFF_OUTPUT = getTempPath(`git-diff/gpt-${FILENAME}.txt`);
 const CACHE_DIR = path.dirname(DIFF_OUTPUT);
 
 // Relative paths for display in logs
 const DIFF_OUTPUT_RELATIVE = path.relative(process.cwd(), DIFF_OUTPUT);
-const GPT_DIFF_OUTPUT_RELATIVE = path.relative(process.cwd(), GPT_DIFF_OUTPUT);
 
 // Ensure output directory exists
 fs.ensureDirSync(CACHE_DIR, { mode: 0o755 });
@@ -37,20 +34,17 @@ function showHelp() {
   console.log('  git-diff --unstaged FILE  Show unstaged diff of specified file');
   console.log('  git-diff --unstaged       Show unstaged diff of all files');
   console.log('  git-diff -u               Same as --unstaged');
-  console.log('  git-diff --ai             Run ChatGPT automation for commit message');
   console.log('  git-diff --help | -h      Show this help message');
   console.log('');
   console.log(`💾 Output is saved to: ${DIFF_OUTPUT_RELATIVE}`);
-  console.log(`🤖 GPT prompt is saved to: ${GPT_DIFF_OUTPUT_RELATIVE}`);
   process.exit(0);
 }
 
 /**
  * Executes a git diff command and saves the output to configured temp files.
  *
- * This function runs the specified git command, captures its output, and saves it to two files:
+ * This function runs the specified git command, captures its output, and saves it to one file:
  * - A standard diff output file for manual inspection
- * - A GPT-formatted prompt file for generating conventional commit messages
  *
  * @param {string} command - The git command to execute (e.g., "git --no-pager diff --staged")
  * @param {string} successMessage - Message to display when the command executes successfully
@@ -92,12 +86,8 @@ function runGitDiff(command, successMessage, errorMessage) {
     }
 
     writefile(DIFF_OUTPUT, result);
-    writefile(
-      GPT_DIFF_OUTPUT,
-      `Hello!\nCan you create a conventional commit message by diff content below:\n\n\`\`\`${result}\n\`\`\`\n\nGive me result as codeblock with language "text" only.\n\nThank you!`
-    );
     console.log(`✅ ${successMessage}`);
-    console.log(`💾 GPT diff prompt saved to "${ansiColors.green(GPT_DIFF_OUTPUT_RELATIVE)}"`);
+    console.log(`💾 Diff saved to "${ansiColors.green(DIFF_OUTPUT_RELATIVE)}"`);
     return true;
   } catch (error) {
     console.error(`❌ ${errorMessage}`);
@@ -192,10 +182,8 @@ async function mainGitDiff() {
   const useUnstaged = args.unstaged || args.u;
   const fileFromFlag = typeof args.unstaged === 'string' ? args.unstaged : typeof args.u === 'string' ? args.u : null;
 
-  let hasDiff = false;
-
   if (args['staged-only'] || args.s || args.S) {
-    hasDiff = runGitDiff(
+    runGitDiff(
       'git --no-pager diff --staged',
       `Full staged diff saved to "${ansiColors.green(DIFF_OUTPUT_RELATIVE)}"`,
       'Failed to save staged diff'
@@ -205,7 +193,7 @@ async function mainGitDiff() {
     const file = positional[0] || fileFromFlag;
     if (!file) {
       const fullDiffModeLabel = useUnstaged ? 'unstaged' : 'unstaged';
-      hasDiff = runGitDiff(
+      runGitDiff(
         'git --no-pager diff',
         `Full ${fullDiffModeLabel} diff saved to "${ansiColors.green(DIFF_OUTPUT_RELATIVE)}"`,
         "Failed to save all diff's"
@@ -214,19 +202,10 @@ async function mainGitDiff() {
       const untrackedDiff = getUntrackedDiff();
       if (untrackedDiff) {
         const UNTRACKED_DIFF_OUTPUT = getTempPath(`git-diff/untracked-${FILENAME}.txt`);
-        const UNTRACKED_GPT_DIFF_OUTPUT = getTempPath(`git-diff/gpt-untracked-${FILENAME}.txt`);
         const UNTRACKED_DIFF_OUTPUT_RELATIVE = path.relative(process.cwd(), UNTRACKED_DIFF_OUTPUT);
 
         writefile(UNTRACKED_DIFF_OUTPUT, untrackedDiff);
-        writefile(
-          UNTRACKED_GPT_DIFF_OUTPUT,
-          `Hello!\nCan you create a conventional commit message by diff content below:\n\n\`\`\`${untrackedDiff}\n\`\`\`\n\nGive me result as codeblock with language "text" only.\n\nThank you!`
-        );
         console.log(`✅ Untracked file diff saved to "${ansiColors.green(UNTRACKED_DIFF_OUTPUT_RELATIVE)}"`);
-        console.log(
-          `💾 AI diff prompt saved to "${ansiColors.green(path.relative(process.cwd(), UNTRACKED_GPT_DIFF_OUTPUT))}"`
-        );
-        hasDiff = true;
       }
     } else {
       let fileDiffMode = useUnstaged ? 'unstaged' : 'staged';
@@ -236,7 +215,7 @@ async function mainGitDiff() {
         fileDiffMode = 'unstaged';
       }
 
-      hasDiff = runGitDiff(
+      runGitDiff(
         fileDiffMode === 'unstaged' ? `git --no-pager diff -- "${file}"` : `git --no-pager diff --cached -- "${file}"`,
         `${fileDiffMode[0].toUpperCase() + fileDiffMode.slice(1)} diff of "${file}" saved to "${ansiColors.green(
           DIFF_OUTPUT_RELATIVE
@@ -245,48 +224,7 @@ async function mainGitDiff() {
       );
     }
   }
-
-  if (hasDiff) {
-    // Generate command prompt for opencode CLI
-    const opencodePrompt = [
-      '',
-      '🤖 OpenCode Prompt Helper',
-      '────────────────────────',
-      '',
-      '📄 App Prompt:',
-      `   Generate a conventional commit message from diff file: ${DIFF_OUTPUT}`,
-      '',
-      '💻 CLI Command:',
-      `   opencode run "Generate a conventional commit message from diff file ${DIFF_OUTPUT}"`,
-      ''
-    ];
-
-    const opencodePromptPath = getTempPath(`git-diff/opencode-${FILENAME}.txt`);
-    writefile(opencodePromptPath, opencodePrompt.join('\n'));
-
-    console.log(`✅ OpenCode prompt saved to "${ansiColors.green(path.relative(process.cwd(), opencodePromptPath))}"`);
-  }
-
-  // Generate commit message prompt from ChatGPT (only if --ai is specified)
-  if (args.ai) {
-    try {
-      await runChatGpt({ headless: true, questionFile: GPT_DIFF_OUTPUT });
-    } catch (error) {
-      console.error('❌ Error running ChatGPT:', error.message);
-      console.error('💡 Try running with visible browser mode or check if Chrome is installed');
-    }
-  } else {
-    console.log('💡 Use --ai flag to generate commit message with ChatGPT');
-  }
 }
 
 export default runGitDiff;
-export {
-  CACHE_DIR,
-  DIFF_OUTPUT,
-  DIFF_OUTPUT_RELATIVE,
-  runGitDiff as gitDiff,
-  GPT_DIFF_OUTPUT,
-  GPT_DIFF_OUTPUT_RELATIVE,
-  mainGitDiff
-};
+export { CACHE_DIR, DIFF_OUTPUT, DIFF_OUTPUT_RELATIVE, runGitDiff as gitDiff, mainGitDiff };

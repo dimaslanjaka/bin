@@ -28,7 +28,6 @@ export const DEFAULT_IGNORE_PATTERNS = [
   'utils/extract-local-files.js',
   'utils/eslint-helper.cjs',
   'git/git-diff.js',
-  'git/git-diff-staged-ai.mjs',
   /\.builder\./,
   'export-scanner/'
 ];

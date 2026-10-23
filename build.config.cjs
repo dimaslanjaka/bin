@@ -39,7 +39,6 @@ const defaultBin = {
   'get-latest-workflow-status': 'lib/github-workflows/get-latest-workflow-status-cli.cjs',
   'gh-status-badge': 'lib/github-workflows/workflow-badge-cli.cjs',
   'git-diff': 'lib/git/git-diff-cli.cjs',
-  'git-diff-staged-ai': 'lib/git/git-diff-staged-ai-cli.cjs',
   'git-fix': 'lib/git/git-fix.cjs',
   'git-purge': 'lib/git/git-purge.cjs',
   'git-undo-commit': 'lib/git/undo-commit.cjs',

@@ -34,3 +34,5 @@ site/
 venv/
 binary-collections.config.js
 opencode_exports/
+.omo/
+.codebase-memory/

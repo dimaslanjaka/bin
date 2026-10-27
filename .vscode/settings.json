@@ -228,5 +228,6 @@
   ],
   "[yaml]": {
     "editor.defaultFormatter": "redhat.vscode-yaml"
-  }
+  },
+  "python.terminal.useEnvFile": true
 }

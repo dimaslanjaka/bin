@@ -156,6 +156,7 @@
     "got": "11.8.2"
   },
   "bin": {
+    "9router": "binaries/9router.cjs",
     "actions-badge": "lib/github-workflows/workflow-badge-cli.cjs",
     "binary-collections": "lib/binary-collections.cjs",
     "binary-executor": "binaries/binary-executor.cjs",
@@ -221,6 +222,7 @@
     "nodekill": "binaries/nodekill.cjs",
     "npm-run-series": "lib/npm-run-series.cjs",
     "nrs": "lib/npm-run-series.cjs",
+    "omniroute": "binaries/omniroute.cjs",
     "opc": "lib/opencode-cli.cjs",
     "opencode-cli": "lib/opencode-cli.cjs",
     "pack-node-package": "lib/node-package-packer-cli.cjs",

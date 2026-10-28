@@ -6,16 +6,16 @@ import { getGithubRawUrl } from 'git-command-helper';
 
 /**
  * Build a map of workspace package name → version from the monorepo workspaces.
- * @param {string} dirname Repository root directory.
+ * @param {string} workspaceDir Repository root directory.
  * @returns {Record<string, string>}
  */
-function resolveWorkspaceVersions(dirname) {
-  const rootPkg = fs.readJsonSync(path.join(dirname, 'package.json'));
+function resolveWorkspaceVersions(workspaceDir) {
+  const rootPkg = fs.readJsonSync(path.join(workspaceDir, 'package.json'));
   const workspacePatterns = rootPkg.workspaces || [];
   const versionMap = {};
 
   for (const pattern of workspacePatterns) {
-    const matches = glob.globSync(pattern, { cwd: dirname, absolute: true });
+    const matches = glob.globSync(pattern, { cwd: workspaceDir, absolute: true });
     for (const wsDir of matches) {
       const wsPkgPath = path.join(wsDir, 'package.json');
       if (fs.existsSync(wsPkgPath)) {
@@ -43,14 +43,14 @@ function resolveWorkspaceVersions(dirname) {
  * Creates a backup at `.package.json.bak` and writes the transformed file.
  * Returns a restore function to undo the changes.
  *
- * @param {string} dirname Repository root directory.
+ * @param {string} workspaceDir Repository root directory.
  * @returns {Promise<() => void>} Restore function to revert package.json.
  */
-export async function transformWorkspaceProtocols(dirname) {
-  const pkgPath = path.join(dirname, 'package.json');
+export async function transformWorkspaceProtocols(workspaceDir) {
+  const pkgPath = path.join(workspaceDir, 'package.json');
   const original = await fs.readFile(pkgPath, 'utf-8');
   const pkg = JSON.parse(original);
-  const versionMap = resolveWorkspaceVersions(dirname);
+  const versionMap = resolveWorkspaceVersions(workspaceDir);
   const workspaceDepFields = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'];
   let modified = false;
 
@@ -135,7 +135,7 @@ export async function transformWorkspaceProtocols(dirname) {
   }
 
   // Write backup
-  const bakPath = path.join(dirname, '.package.json.bak');
+  const bakPath = path.join(workspaceDir, '.package.json.bak');
   await fs.writeFile(bakPath, original, 'utf-8');
 
   // Write transformed

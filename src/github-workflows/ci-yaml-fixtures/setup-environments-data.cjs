@@ -245,7 +245,11 @@ const action = {
           'mkdir -p "${HOME}/.npm-global"',
           'npm config set prefix "${HOME}/.npm-global"',
           '# fix EALLOWREMOTE error occurs in npm v12+',
-          'npm config set allow-remote all',
+          'if npm config set allow-remote all 2>/dev/null; then',
+          '  echo "npm allow-remote configured successfully"',
+          'else',
+          '  echo "npm allow-remote configuration failed or not supported in this npm version"',
+          'fi',
           'echo "${HOME}/.npm-global/bin" >> $GITHUB_PATH',
           'echo "CACHE_NPM_USER_GLOBAL=${HOME}/.npm-global" >> $GITHUB_ENV',
           'echo "CACHE_NPM_USER_GLOBAL=${HOME}/.npm-global" >> $GITHUB_OUTPUT'

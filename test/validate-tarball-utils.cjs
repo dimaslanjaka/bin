@@ -120,13 +120,17 @@ function prepareInstallation(type) {
     expect(fs.existsSync(target)).toBe(false);
   }
 
-  // Ensure the test project has a package.json (initialize if missing)
+  // Ensure the test project has a package.json (re-clone if missing or corrupt)
   const pkgJson = path.join(repoDir, 'package.json');
-  if (!fs.existsSync(pkgJson)) {
-    spawnSync('npm', ['init', '-y'], { cwd: repoDir, stdio: 'ignore', shell: true });
+  let pkgObj;
+  try {
+    pkgObj = JSON.parse(fs.readFileSync(pkgJson, 'utf8'));
+  } catch {
+    // File is missing or contains invalid JSON — re-clone the test repo
+    fs.removeSync(repoDir);
+    ensureRepoExists();
+    pkgObj = JSON.parse(fs.readFileSync(pkgJson, 'utf8'));
   }
-
-  const pkgObj = JSON.parse(fs.readFileSync(pkgJson, 'utf8'));
   const projectObj = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../package.json'), 'utf8'));
   pkgObj.resolutions = Object.assign(pkgObj.resolutions || {}, projectObj.resolutions);
   pkgObj.dependencies = {};

@@ -5,22 +5,23 @@ applyTo: 'docs-src/**'
 
 When asked to create or update CLI documentation for commands or subcommands in this project:
 
-1. Run `yarn run build` first to generate `lib/` and `tmp/bin-mapping.json`
-2. Read aliases from `build.config.cjs` (defaultBin object) and `tmp/bin-mapping.json`
-3. Read existing markdown files in `docs-src/` to understand documentation patterns
-4. Analyze the CLI source file under `src/` (not `lib/` - lib is auto-generated)
-5. Create documentation in `docs-src/` following this structure:
+1. Read the relevant existing markdown file in `docs-src/` and match its heading and example style.
+2. Read aliases from `build.config.cjs`; run `yarn build` when the current generated mapping is missing or stale.
+3. Analyze the CLI source file under `src/` (not `lib/` - lib is auto-generated).
+4. Create or update the command-specific file in `docs-src/` and link to existing documentation instead of duplicating it.
+
+Use the local documentation structure rather than introducing a new template. At minimum, include:
 
 ```markdown
 # Title
 
 description
 
-# Usage
+## Usage
 
 the usage description, including aliases
 
-# Source
+## Source
 
 the link to source file on folder `src` (not folder `lib`).
 ```

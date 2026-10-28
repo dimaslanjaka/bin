@@ -7,6 +7,8 @@ When asked to create a commit from staged git changes:
 
 ## Workflow
 
+Use this workflow only when the user explicitly asks to commit staged changes.
+
 ### Step 1 — Capture Staged Diff
 Run `git diff --staged` to capture all staged changes. Analyze the diff output thoroughly.
 
@@ -25,7 +27,7 @@ Format: `<type>(<scope>): <subject>`
 **Footer (optional):** Include `BREAKING CHANGE:` for breaking API changes, or `Closes #123` / `Fixes #456` for issue references.
 
 ### Step 3 — Save & Commit
-1. Write the commit message to `commit.txt`
+1. Write the commit message to `commit.txt` only when that file is already part of the requested commit workflow
 2. Run `git commit -F commit.txt`
 
 ## Rules

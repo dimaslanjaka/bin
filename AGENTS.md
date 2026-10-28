@@ -4,12 +4,19 @@ Compact CLI toolkit repo. Every line here answers "would an agent miss this with
 
 ## Build Pipeline
 
-- **`yarn build`** = `tsc -b tsconfig.build.json` → `build.tsup.js` (tsup) → `node build.mjs` (bin gen + shebangs)
+- **`yarn build`** runs `build.tsup.js`, `build.mjs` through `build-exports`, then generates declarations and the main entry through `build-mainEntry`.
 - Build outputs: `lib/` (compiled), `binaries/` (bundled wrappers). **Never edit these folders** — edit in `src/`, then rebuild.
 - `build.mjs` regenerates the `package.json` `bin` field from `lib/*.cjs` + `bin/*` + `build.config.cjs` `defaultBin`. The bin field is **auto-generated** — do not hand-edit.
 - `yarn clean` removes `lib/`, `tmp/dist`, `binaries/`.
 - `yarn pack` creates a release tarball in `releases/`.
 - `build.config.cjs` contains `defaultBin` (alias mappings) and `generateMapping()` used by the build.
+
+## Adding a Command
+
+- Add the implementation under the matching `src/` area and add tests under `test/`.
+- Add or update aliases in `build.config.cjs` when the command needs a default binary mapping.
+- Run `yarn build` to regenerate `lib/`, `binaries/`, `package.json`'s `bin` field, and `tmp/bin-mapping.json`.
+- Do not hand-edit generated output or the generated `bin` field.
 
 ## Pre-Commit Hook
 
@@ -90,4 +97,4 @@ All packages under `packages/` are **git submodules**. Do not modify them from t
 - **`docs-src/`** has 41 markdown files documenting each CLI command. Link to these instead of duplicating docs.
 - **Mkdocs docs** use Python hooks (`hooks/pre-generate-docs.py`, `hooks/copy_docs_src.py`) to copy `docs-src/` → `docs/` and expand README → index.md before mkdocs validates nav.
 - **ESM/CJS dual builds**: tsup outputs `.cjs` and `.mjs` variants for each source file. The main entry is `lib/index.js` (ESM), with CJS fallback via `lib/index.cjs`.
-- The `.env` file is loaded by `test/env.cjs` and some scripts. Check it for local config.
+- `test/env.cjs` loads `.env` when present. Do not print or inspect `.env` unless a task explicitly requires a named variable; prefer existing helpers and documented configuration.

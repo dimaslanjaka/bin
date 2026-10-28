@@ -12,11 +12,11 @@ else
 fi
 
 # Regenerate workflow/action YAML files from source fixtures and stage for commit
-node src/github-workflows/generate-ci-cli.mjs
+node src/github-workflows/generate-test-ci-step-cli.mjs
 if [ -n "$GITHUB_ACTIONS" ] || [ -n "$CI" ]; then
   echo "CI environment detected — skipping git add of generated action"
 else
-  git add .github/workflows/test.yml .github/actions/setup-environments/action.yml .github/workflows/build-release.yml
+  git add .github/workflows/test.yml .github/actions/setup-environments/action.yml
 fi
 
 # Run lint-staged through Yarn so the local binary is resolved consistently (skips on CI)

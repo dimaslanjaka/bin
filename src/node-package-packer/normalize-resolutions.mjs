@@ -76,7 +76,15 @@ export function restoreResolutions(rootDir) {
  */
 export async function normalizeResolutions(rootDir) {
   const packageJsonPath = path.join(rootDir, 'package.json');
-  const config = await getConfig({ searchFrom: rootDir });
+  let config = null;
+  try {
+    config = await Promise.race([
+      getConfig({ searchFrom: rootDir }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('getConfig timeout')), 5000))
+    ]).catch(() => null);
+  } catch {
+    config = null;
+  }
   const resolutionsNormalize = config?.normalizeResolutions || DEFAULT_RESOLUTIONS_NORMALIZE;
 
   const raw = fs.readFileSync(packageJsonPath, 'utf-8');

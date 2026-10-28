@@ -188,6 +188,30 @@ describe('normalizeResolutions()', () => {
       'https://example.com/custom-pkg/raw/stable/release/custom-pkg.tgz'
     );
   });
+
+  test('falls back to defaults when config loading fails or times out', async () => {
+    const dir = makeTempDir({ prefix: 'norm-res-' });
+    tmpDirs.push(dir);
+    // sbg-utility is in DEFAULT_RESOLUTIONS_NORMALIZE
+    writePackageJson(dir, {
+      resolutions: {
+        'sbg-utility':
+          'https://github.com/dimaslanjaka/static-blog-generator/raw/1ca385787f7287155b547c5b97d5ffd5bcfab482/packages/sbg-utility/release/sbg-utility.tgz'
+      }
+    });
+    // Create a broken config file to trigger failure
+    fs.writeFileSync(
+      path.join(dir, 'binary-collections.config.cjs'),
+      'module.exports = { throw new Error("critical failure") };\n'
+    );
+
+    await normalizeResolutions(dir);
+
+    const pkg = readPackageJson(dir);
+    expect(pkg.resolutions['sbg-utility']).toBe(
+      'https://github.com/dimaslanjaka/static-blog-generator/raw/sbg-utility/packages/sbg-utility/release/sbg-utility.tgz'
+    );
+  });
 });
 
 // ---------------------------------------------------------------------------

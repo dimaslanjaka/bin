@@ -103,10 +103,19 @@ async function getConfig(options = {}) {
       if (parentResult?.config) return parentResult.config;
     }
 
-    const workspaceRoot = memoize(findYarnRootWorkspace)({ base_dir: from });
+    let workspaceRoot = null;
+    try {
+      workspaceRoot = memoize(findYarnRootWorkspace)({ base_dir: from });
+    } catch {
+      workspaceRoot = null;
+    }
     if (workspaceRoot) {
-      const workspaceResult = await explorer.search(workspaceRoot);
-      if (workspaceResult?.config) return workspaceResult.config;
+      try {
+        const workspaceResult = await explorer.search(workspaceRoot);
+        if (workspaceResult?.config) return workspaceResult.config;
+      } catch {
+        // ignore workspace search error
+      }
     }
 
     return null;

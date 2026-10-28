@@ -38,7 +38,7 @@ export default {
     // Use babel-jest for .tsx, .jsx, .js, .mjs, .cjs files
     '^.+\\.(tsx|jsx|js|mjs|cjs)$': 'babel-jest'
   },
-  transformIgnorePatterns: ['/node_modules/(?!(@react|react|react-dom|react-router-dom)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(@react|react|react-dom|react-router-dom|@formatjs)/)'],
   modulePathIgnorePatterns: ['<rootDir>/lib', '<rootDir>/releases'],
   testTimeout: 120000
 };

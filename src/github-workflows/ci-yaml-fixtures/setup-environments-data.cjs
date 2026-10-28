@@ -244,6 +244,8 @@ const action = {
           'fi',
           'mkdir -p "${HOME}/.npm-global"',
           'npm config set prefix "${HOME}/.npm-global"',
+          '# fix EALLOWREMOTE error occurs in npm v12+',
+          'npm config set allow-remote all',
           'echo "${HOME}/.npm-global/bin" >> $GITHUB_PATH',
           'echo "CACHE_NPM_USER_GLOBAL=${HOME}/.npm-global" >> $GITHUB_ENV',
           'echo "CACHE_NPM_USER_GLOBAL=${HOME}/.npm-global" >> $GITHUB_OUTPUT'

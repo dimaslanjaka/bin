@@ -3,6 +3,7 @@ const fs = require('fs-extra');
 const { spawnSync } = require('child_process');
 const os = require('os');
 const dotenv = require('dotenv');
+const { ensureCloned } = require('../src/git/ensureCloned.cjs');
 
 const envPath = path.join(__dirname, '../.env');
 if (fs.existsSync(envPath)) {
@@ -61,20 +62,10 @@ function run(cmd, args, opts = {}) {
 /**
  * Ensure the test repository exists at `repoDir`, cloning it if absent.
  * Uses the `test` branch of the dimaslanjaka/test-repo GitHub repository.
+ * Delegates to ensureCloned which also verifies remote URL, branch, and git root.
  */
 function ensureRepoExists() {
-  const gitDir = path.join(repoDir, '.git');
-
-  if (fs.existsSync(gitDir)) return;
-
-  run(
-    'git',
-    ['clone', '--single-branch', '--branch', 'test', 'https://github.com/dimaslanjaka/test-repo.git', repoDir],
-    {
-      stdio: 'inherit',
-      shell: false
-    }
-  );
+  ensureCloned('https://github.com/dimaslanjaka/test-repo.git', 'test', repoDir);
 }
 
 /**

@@ -4,7 +4,7 @@ const { globSync } = require('glob');
 
 const cwd = process.cwd();
 const dirs = [
-  { name: 'lib/', rel: 'lib', exts: ['.cjs', '.mjs', '.js'] },
+  { name: 'lib/', rel: 'lib', exts: ['.cjs', '.mjs'] },
   { name: 'binaries/', rel: 'binaries', exts: ['.cjs'] }
 ];
 

@@ -77,13 +77,18 @@ export function restoreResolutions(rootDir) {
 export async function normalizeResolutions(rootDir) {
   const packageJsonPath = path.join(rootDir, 'package.json');
   let config = null;
+  let timeoutId = null;
   try {
     config = await Promise.race([
       getConfig({ searchFrom: rootDir }),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('getConfig timeout')), 5000))
+      new Promise((_, reject) => {
+        timeoutId = setTimeout(() => reject(new Error('getConfig timeout')), 5000);
+      })
     ]).catch(() => null);
   } catch {
     config = null;
+  } finally {
+    if (timeoutId !== null) clearTimeout(timeoutId);
   }
   const resolutionsNormalize = config?.normalizeResolutions || DEFAULT_RESOLUTIONS_NORMALIZE;
 

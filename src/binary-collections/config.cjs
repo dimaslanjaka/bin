@@ -9,8 +9,6 @@ const dotenv = require('dotenv');
 const { cosmiconfig } = require('cosmiconfig');
 const os = require('os');
 const fs = require('fs-extra');
-const { memoize } = require('@formatjs/fast-memoize');
-const { findYarnRootWorkspace } = require('sbg-utility');
 
 /**
  * Load .env file containing a token variable.
@@ -101,21 +99,6 @@ async function getConfig(options = {}) {
       if (parent === from) continue;
       const parentResult = await explorer.search(parent);
       if (parentResult?.config) return parentResult.config;
-    }
-
-    let workspaceRoot = null;
-    try {
-      workspaceRoot = memoize(findYarnRootWorkspace)({ base_dir: from });
-    } catch {
-      workspaceRoot = null;
-    }
-    if (workspaceRoot) {
-      try {
-        const workspaceResult = await explorer.search(workspaceRoot);
-        if (workspaceResult?.config) return workspaceResult.config;
-      } catch {
-        // ignore workspace search error
-      }
     }
 
     return null;

@@ -30,19 +30,30 @@ This command is available under the following aliases:
 
 ### Options
 
-| Flag | Description |
-| :--- | :--- |
-| `-h`, `--help` | Show help message |
-| `-y`, `--yarn` | Force `yarn pack` instead of `npm pack` |
-| `-d`, `--verbose` | Enable verbose output |
-| `--fn`, `--filename` | Set output filename variant |
+| Flag                      | Description                                                                                                                    |
+| :------------------------ | :----------------------------------------------------------------------------------------------------------------------------- |
+| `-h`, `--help`            | Show help message                                                                                                              |
+| `-y`, `--yarn`            | Force `yarn pack` instead of `npm pack`                                                                                        |
+| `-b`, `--bun`             | Force `bun pm pack` instead of `npm pack`                                                                                      |
+| `-d`, `--verbose`         | Enable verbose output                                                                                                          |
+| `--fn`, `--filename`      | Set output filename variant                                                                                                    |
+| `--commit`                | Auto-commit tarballs via git after packing                                                                                     |
 | `--normalize-resolutions` | Replace pinned commit hashes in `resolutions` with branch names before packing, then restore the original `package.json` after |
 
 ### Description
 
-- Runs `npm pack` or `yarn pack` to create a tarball in the project root.
+- Runs `npm pack`, `yarn pack`, or `bun pm pack` to create a tarball in the project root.
 - Copies the tarball into the release folder and writes `metadata.json` with integrity hashes.
 - Generates a release README that lists available tarballs and raw GitHub URLs.
+- With `--commit`, auto-stages and commits the produced tarballs via git after packing.
+
+### Package Manager Auto-detection
+
+When no `--yarn` or `--bun` flag is given, the packer auto-detects the package manager from lockfiles:
+
+- `bun.lockb` / `bun.lock` → uses `bun pm pack`
+- `yarn.lock` → uses `yarn pack`
+- (fallback) → uses `npm pack`
 
 ### Normalize Resolutions (`--normalize-resolutions`)
 
@@ -78,10 +89,10 @@ entries** from the generated `.tgz` to reduce size — these include:
 You can extend or customize this cleanup via `binary-collections.config.js` under the
 `packer` key:
 
-| Callback | Signature | Description |
-| :--- | :--- | :--- |
-| `packer.onFilter` | `(entryPath: string) => boolean \| Promise<boolean>` | Return `false` to exclude additional entries from the tarball. Runs **after** the built-in artifact check. |
-| `packer.onFinish` | `(tarballPath: string) => void \| Promise<void>` | Invoked after cleanup finishes (fires even if no entries were removed). Supports sync, async, and Node-style `(err, result)` callbacks (promisified via `pify`). |
+| Callback          | Signature                                            | Description                                                                                                                                                      |
+| :---------------- | :--------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packer.onFilter` | `(entryPath: string) => boolean \| Promise<boolean>` | Return `false` to exclude additional entries from the tarball. Runs **after** the built-in artifact check.                                                       |
+| `packer.onFinish` | `(tarballPath: string) => void \| Promise<void>`     | Invoked after cleanup finishes (fires even if no entries were removed). Supports sync, async, and Node-style `(err, result)` callbacks (promisified via `pify`). |
 
 Example:
 

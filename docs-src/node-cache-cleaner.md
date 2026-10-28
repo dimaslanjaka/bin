@@ -10,9 +10,9 @@ node-cache-cleaner [options]
 
 ### Options
 
-| Option | Description |
-|--------|-------------|
-| `-h, --help` | Show this help message |
+| Option         | Description                                 |
+| -------------- | ------------------------------------------- |
+| `-h, --help`   | Show this help message                      |
 | `-g, --global` | Also clean NPM, Yarn, and NPX global caches |
 
 ### Description
@@ -64,9 +64,9 @@ ycw [options]
 
 ### Options
 
-| Option | Description |
-|--------|-------------|
-| `-h, --help` | Show help message |
+| Option                   | Description                        |
+| ------------------------ | ---------------------------------- |
+| `-h, --help`             | Show help message                  |
 | `-c, --concurrent <num>` | Maximum parallel jobs (default: 4) |
 
 ### Description
@@ -97,11 +97,11 @@ del-nodemodules [options]
 
 ### Options
 
-| Option | Description |
-|--------|-------------|
-| `--force`, `-f` | Actually delete (default is dry-run mode) |
+| Option               | Description                                        |
+| -------------------- | -------------------------------------------------- |
+| `--force`, `-f`      | Actually delete (default is dry-run mode)          |
 | `-c, --concurrent N` | Set concurrent removals (default: 2, or CPU count) |
-| `-h, --help` | Show help message |
+| `-h, --help`         | Show help message                                  |
 
 ### Description
 
@@ -112,7 +112,7 @@ del-nodemodules [options]
 
 ### Source
 
-See [`src/del-node-modules.js`](../src/del-node-modules.js)
+See [`src/del-node-modules.cjs`](../src/del-node-modules.cjs)
 
 ---
 
@@ -137,7 +137,7 @@ Finds and deletes all `.yarn/cache*` directories and `.yarn/*.gz` files under th
 
 ### Source
 
-See [`src/del-yarn-caches.js`](../src/del-yarn-caches.js)
+See [`src/del-yarn-caches.ts`](../src/del-yarn-caches.ts)
 
 ---
 
@@ -160,10 +160,10 @@ rm-node-modules [options]
 
 ### Options
 
-| Option | Description |
-|--------|-------------|
-| `--force` | Actually delete (default is dry-run mode) |
-| `-h, --help` | Show help message |
+| Option       | Description                               |
+| ------------ | ----------------------------------------- |
+| `--force`    | Actually delete (default is dry-run mode) |
+| `-h, --help` | Show help message                         |
 
 ### Description
 
@@ -182,4 +182,3 @@ yarn run rm-node-modules
 ### Source
 
 See [`src/rm-node-module-cli.cjs`](../src/rm-node-module-cli.cjs).
-

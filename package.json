@@ -153,6 +153,7 @@
     "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/f3f4bde1887798c308928fc76dc590b23de992ea/release/cross-spawn.tgz",
     "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/6b3d00c2ffb72f7aa7dd55a39d022c68eb33ebda/release/git-command-helper.tgz",
     "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/1ca385787f7287155b547c5b97d5ffd5bcfab482/packages/sbg-utility/release/sbg-utility.tgz",
+    "@dimaslanjaka/eslint-base-config": "https://github.com/dimaslanjaka/eslint-base-config/raw/38b2d13009cff91841d0cd36a161924df021fbc7/release/dimaslanjaka-eslint-base-config.tgz",
     "got": "11.8.2"
   },
   "bin": {

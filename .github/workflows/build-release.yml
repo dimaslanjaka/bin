@@ -133,7 +133,9 @@ jobs:
 
       - name: ✅ Verify compiled output
         id: verify-compiled
-        run: node test/test-compiled.cjs
+        run: |
+          node test/test-compiled.cjs
+          jest --runInBand --forceExit --testTimeout=120000 --testPathIgnorePatterns=\\.mjs$ --detectOpenHandles --testPathPatterns=validate-tarball-yarn.test.cjs
 
       - name: 🕵️‍♂️ Check for changes in build artifacts
         id: changes

@@ -46,7 +46,7 @@ jobs:
         run: git config --global url."https://oauth2:${{ secrets.GITLAB_TOKEN
           }}@gitlab.com/".insteadOf "https://gitlab.com/"
       - name: ⬇️ Checkout workflow repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive

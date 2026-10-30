@@ -82,8 +82,28 @@ const defaultBin = {
   'wf-status': 'lib/github-workflows/get-latest-workflow-status-cli.cjs',
   'workflow-badge': 'lib/github-workflows/workflow-badge-cli.cjs',
   'y-install': 'lib/yarn-per-branch-lock-installer.cjs',
-  'yarn-install': 'lib/yarn-per-branch-lock-installer.cjs'
+  'yarn-install': 'lib/yarn-per-branch-lock-installer.cjs',
+  'proxy-switcher-test': 'lib/proxy-switcher-test-cli.cjs'
 };
+
+/**
+ * Check whether a filename is a generated or internal bundle file.
+ *
+ * @param {string} filename
+ * @returns {boolean}
+ */
+function isGeneratedFile(filename) {
+  return (
+    // CommonJS generated helpers
+    /^_commonjsHelpers(?:-|$)/i.test(filename) ||
+    // index2, index3, etc.
+    /^index\d+$/i.test(filename) ||
+    // index-XXXXXXXX
+    /^index-[A-Za-z0-9_-]{8,}$/.test(filename) ||
+    // Hash suffix, e.g. config-BsYMdUd0
+    /-[A-Za-z0-9_-]{8}$/.test(filename)
+  );
+}
 
 /**
  * Generate mapping for package.json "bin" from `lib/*.cjs` and `bin/*`.
@@ -114,6 +134,16 @@ function generateMapping() {
         '**/utils.*',
         '**/*-config.*'
       ]
+    })
+    .filter((file) => {
+      const filename = path.basename(file, path.extname(file));
+
+      if (isGeneratedFile(filename)) {
+        console.log(`[${color.yellow(fnName)}] ${color.gray('Skipped generated file:')} ${color.gray(file)}`);
+        return false;
+      }
+
+      return true;
     })
     .map((file) => {
       // For each lib/*.cjs, find matching bin/*

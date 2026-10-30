@@ -130,8 +130,14 @@ jobs:
               echo "[skip] pack not found"
             fi
           fi
+
+      - name: ✅ Verify compiled output
+        id: verify-compiled
+        run: node test/test-compiled.cjs
+
       - name: 🕵️‍♂️ Check for changes in build artifacts
         id: changes
+        if: steps.verify-compiled.outcome == 'success'
         shell: bash
         run: >-
           PATHS=( ':(glob)release*/*.tgz' )
@@ -189,14 +195,11 @@ jobs:
           git update-index --test-untracked-cache
           git update-index --no-untracked-cache
       - name: ➕ Add build files to git
-        if: steps.changes.outputs.files_changed == 'true'
+        if: steps.changes.outputs.files_changed == 'true' && steps.verify-compiled.outcome == 'success'
         continue-on-error: true
         run: git add -- release*/ || true
-      - name: ⬇️ Pull latest before push
-        run: git pull -X theirs
-        if: steps.changes.outputs.files_changed == 'true'
       - name: 🚀 Push changes to remote
-        if: steps.changes.outputs.files_changed == 'true'
+        if: steps.changes.outputs.files_changed == 'true' && steps.verify-compiled.outcome == 'success'
         shell: bash
         run: >-
           if [ $(git diff --cached --name-only | wc -l) -gt "0" ]; then

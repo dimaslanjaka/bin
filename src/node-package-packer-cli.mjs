@@ -1,13 +1,16 @@
 import path from 'upath';
 import fs from 'fs-extra';
+import { fileURLToPath } from 'url';
 import { getArgs } from './utils/index.cjs';
 import { bundle } from './node-package-packer/build-tarball.mjs';
 import { normalizeResolutions, restoreResolutions } from './node-package-packer/normalize-resolutions.mjs';
 
+const __filename = fileURLToPath(import.meta.url);
+const scriptName = path.toUnix(path.relative(process.cwd(), __filename));
+
 const args = getArgs({ boolean: ['h', 'help', 'normalize-resolutions', 'yarn', 'bun', 'commit'] });
 
 if (args.h || args.help) {
-  const scriptName = path.basename(new URL(import.meta.url).pathname);
   console.log(`Automated tarball (tgz) creator for release folder`);
   console.log(``);
   console.log(`Usage: node ${scriptName} [options]`);

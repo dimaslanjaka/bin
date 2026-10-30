@@ -2,6 +2,11 @@ import 'dotenv/config';
 import minimist from 'minimist';
 import { Octokit } from '@octokit/rest';
 import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'url';
+import path from 'upath';
+
+const __filename = fileURLToPath(import.meta.url);
+const scriptName = path.toUnix(path.relative(process.cwd(), __filename));
 
 const argv = minimist(process.argv.slice(2), {
   string: ['repo', 'token'],
@@ -19,7 +24,7 @@ const argv = minimist(process.argv.slice(2), {
 function usage() {
   console.log(`
 Usage:
-  node del-log.mjs [options]
+  node ${scriptName} [options]
 
 Options:
   --repo, -r       GitHub repository (owner/repo), optional
@@ -33,10 +38,10 @@ Environment:
   GITHUB_TOKEN     Fallback token
 
 Examples:
-  node del-log.mjs
-  node del-log.mjs --repo=dimaslanjaka/hexo-cli
-  node del-log.mjs --dry-run=false
-  node del-log.mjs --repo=dimaslanjaka/hexo-cli --dry-run=false
+  node ${scriptName}
+  node ${scriptName} --repo=dimaslanjaka/hexo-cli
+  node ${scriptName} --dry-run=false
+  node ${scriptName} --repo=dimaslanjaka/hexo-cli --dry-run=false
 `);
 }
 

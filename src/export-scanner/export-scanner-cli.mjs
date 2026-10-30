@@ -13,7 +13,7 @@ import { getArgs } from '../utils/index.cjs';
 import { eslintFix } from '../utils/eslint-helper.cjs';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const scriptName = path.toUnix(path.relative(process.cwd(), __filename));
 const ROOT = path.toUnix(process.cwd());
 const SRC = path.join(ROOT, 'src');
 const DEFAULT_OUTPUT = path.join(SRC, 'index.ts');
@@ -33,7 +33,7 @@ const parsedArgs = getArgs({
 });
 
 if (parsedArgs.help) {
-  console.log(`Usage: node ${__dirname} [options]
+  console.log(`Usage: node ${scriptName} [options]
 
 Scan src/ for exported symbols and compare with index.ts re-exports.
 
@@ -48,11 +48,11 @@ Options:
   -h, --help             Show this help message
 
 Examples:
-  node ${__dirname}                          Dry-run: report missing exports
-  node ${__dirname} -w                        Generate fresh exports file
-  node ${__dirname} -w -o out.ts              Write to custom file
-  node ${__dirname} -i utils/foo.js           Ignore a source file
-  node ${__dirname} -i utils/a.js -i utils/b.js  Ignore multiple files`);
+  node ${scriptName}                          Dry-run: report missing exports
+  node ${scriptName} -w                        Generate fresh exports file
+  node ${scriptName} -w -o out.ts              Write to custom file
+  node ${scriptName} -i utils/foo.js           Ignore a source file
+  node ${scriptName} -i utils/a.js -i utils/b.js  Ignore multiple files`);
   process.exit(0);
 }
 

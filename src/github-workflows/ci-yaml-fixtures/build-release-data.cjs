@@ -62,7 +62,7 @@ const workflow = {
         },
         {
           name: '⬇️ Checkout workflow repository',
-          uses: 'actions/checkout@v6',
+          uses: 'actions/checkout@v7',
           with: {
             'fetch-depth': 0,
             submodules: 'recursive'
@@ -179,7 +179,7 @@ const workflow = {
         },
         {
           name: '📦 Upload compiled artifacts',
-          uses: 'actions/upload-artifact@v4',
+          uses: 'actions/upload-artifact@v7',
           with: {
             name: 'compiled-output',
             path: ['lib/', 'binaries/', 'dist/', '*.lock', 'package-lock.json'].join('\n'),

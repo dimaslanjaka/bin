@@ -105,7 +105,7 @@ const action = {
       },
       {
         name: '⬇️ Checkout test-repo',
-        uses: 'actions/checkout@v6',
+        uses: 'actions/checkout@v7',
         with: {
           repository: 'dimaslanjaka/test-repo',
           path: 'tmp/test-repo',
@@ -115,7 +115,7 @@ const action = {
       },
       // ...filteredRepoInfo.map((p) => ({
       //   name: `⬇️ Checkout ${p.path}`,
-      //   uses: 'actions/checkout@v6',
+      //   uses: 'actions/checkout@v7',
       //   with: {
       //     repository: p.repo,
       //     path: p.path,
@@ -149,7 +149,7 @@ const action = {
       },
       {
         name: '🟢 Setup Node.js',
-        uses: 'actions/setup-node@v6',
+        uses: 'actions/setup-node@v7',
         with: {
           'node-version': '${{ inputs.node-version }}'
         }
@@ -157,7 +157,7 @@ const action = {
       {
         name: '🐍 Setup Python',
         if: "inputs.python-version != ''",
-        uses: 'actions/setup-python@v6',
+        uses: 'actions/setup-python@v7',
         with: {
           'python-version': '${{ inputs.python-version }}'
         }

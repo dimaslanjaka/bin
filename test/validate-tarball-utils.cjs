@@ -228,7 +228,7 @@ function validateBinaries(packageManager) {
     { cmd: 'kill-night-crows', args: ['--help'] },
     { cmd: 'node-executor', args: ['--help'] },
     { cmd: 'py', args: ['--help'] },
-    { cmd: 'git-diff', args: ['--help'] }
+    { cmd: 'tarball-packer', args: ['--help'] }
   ];
 
   for (const { cmd, args } of checks) {

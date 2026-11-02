@@ -101,6 +101,7 @@
     "@babel/preset-typescript": "^7.29.7",
     "@babel/traverse": "^7.29.7",
     "@dimaslanjaka/eslint-base-config": "^1.0.2",
+    "@octokit/rest": "^22.0.1",
     "@rollup/plugin-alias": "^6.0.0",
     "@rollup/plugin-babel": "^7.1.0",
     "@rollup/plugin-commonjs": "^29.0.3",
@@ -149,8 +150,8 @@
   "packageManager": "yarn@4.13.0",
   "resolutions": {
     "@types/through2": "https://github.com/dimaslanjaka/nodejs-package-types/raw/refs/heads/through2/release/types-through2.tgz",
-    "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/f3f4bde1887798c308928fc76dc590b23de992ea/release/cross-spawn.tgz",
-    "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/6b3d00c2ffb72f7aa7dd55a39d022c68eb33ebda/release/git-command-helper.tgz",
+    "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/85a5399f99298c761dcd4b4aaf802dcfec502088/release/cross-spawn.tgz",
+    "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/c20bad2d6f26c83bd6676ebdfe4c49de258153a8/release/git-command-helper.tgz",
     "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/1ca385787f7287155b547c5b97d5ffd5bcfab482/packages/sbg-utility/release/sbg-utility.tgz",
     "@dimaslanjaka/eslint-base-config": "https://github.com/dimaslanjaka/eslint-base-config/raw/38b2d13009cff91841d0cd36a161924df021fbc7/release/dimaslanjaka-eslint-base-config.tgz",
     "got": "11.8.2"

@@ -185,15 +185,18 @@ export function replaceRawWithLatestHash(url, latestHash) {
   }
 
   const branchPrefix = `${parsed.branch}/`;
+  const rawRefsHeadsPrefix = `raw/refs/heads/${branchPrefix}`;
+  const refsHeadsPrefix = `refs/heads/${branchPrefix}`;
   const rawPrefix = parsed.host === 'github.com' ? `raw/${branchPrefix}` : branchPrefix;
-  const refsPrefix = `refs/heads/${branchPrefix}`;
-  const path = parsed.path.startsWith(rawPrefix)
-    ? parsed.path.slice(rawPrefix.length)
-    : parsed.path.startsWith(refsPrefix)
-      ? parsed.path.slice(refsPrefix.length)
-      : parsed.path.startsWith(branchPrefix)
-        ? parsed.path.slice(branchPrefix.length)
-        : parsed.path;
+  const path = parsed.path.startsWith(rawRefsHeadsPrefix)
+    ? parsed.path.slice(rawRefsHeadsPrefix.length)
+    : parsed.path.startsWith(refsHeadsPrefix)
+      ? parsed.path.slice(refsHeadsPrefix.length)
+      : parsed.path.startsWith(rawPrefix)
+        ? parsed.path.slice(rawPrefix.length)
+        : parsed.path.startsWith(branchPrefix)
+          ? parsed.path.slice(branchPrefix.length)
+          : parsed.path;
 
   if (parsed.host === 'github.com') {
     return `https://github.com/${parsed.owner}/${parsed.repo}/raw/${latestHash}/${path}`;

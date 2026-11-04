@@ -92,9 +92,10 @@ for (const file of requiredBinFiles) {
 }
 
 // Build ignore patterns for bin/* files already registered as binaries
+// Also exclude test runner binaries so they don't land in binaries/
 const binIgnores = Object.keys({ ...binBuilder, ...defaultBin })
   .map((key) => `bin/${key}*`)
-  .concat('**/*.txt', '**/*dummy*', '**/bc*');
+  .concat('**/*.txt', '**/*dummy*', '**/bc*', '**/test-cjs*', '**/test-esm*', '**/test-jest*');
 
 // Copy remaining bin/* to binaries/ alongside a named executor copy
 const binFiles = glob
@@ -122,7 +123,10 @@ for (const { filename, executorDestination } of binFiles) {
 }
 
 // Build final bin mapping for package.json
+// Exclude test runner binaries from the published "bin" field
+const EXCLUDED_BIN_KEYS = new Set(['test-cjs', 'test-esm', 'test-jest']);
 const bin = Object.keys({ ...binBuilder, ...defaultBin })
+  .filter((key) => !EXCLUDED_BIN_KEYS.has(key))
   .sort()
   .reduce((acc, key) => {
     acc[key] = path.toUnix(binBuilder[key] || defaultBin[key]);

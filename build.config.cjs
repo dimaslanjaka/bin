@@ -59,6 +59,7 @@ const defaultBin = {
   'pack-tarball': 'lib/node-package-packer-cli.cjs',
   'pkg-res-updater': 'lib/package-resolutions-updater-cli.cjs',
   'pkg-resolutions-updater': 'lib/package-resolutions-updater-cli.cjs',
+  'print-directory-tree': 'lib/print-directory-tree-cli.cjs',
   'print-tarball-tree': 'lib/print-tarball-tree-cli.cjs',
   'print-tree': 'lib/print-tree-cli.cjs',
   'remove-node-module': 'lib/rm-node-module-cli.cjs',

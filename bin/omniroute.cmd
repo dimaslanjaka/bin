@@ -9,6 +9,7 @@ set "PKG_DIR=%NPM_ROOT%\node_modules\omniroute"
 set "VERSION_FILE=%NPM_ROOT%\omniroute.version"
 set "FLAVOR_FILE=%NPM_ROOT%\omniroute-flavor.txt"
 set "FLAVOR=prod"
+set "LOCK_URL=https://github.com/cheaper-inference/OmniRoute/raw/refs/heads/main/package-lock.json"
 
 REM --- Parse custom parameters (stripped before forwarding) ---
 set "FORCE_REINSTALL=0"
@@ -73,11 +74,13 @@ echo [npm] Latest version: !REMOTE_VERSION!
 
 REM --- Check cache ---
 set "NEED_SETUP=1"
+set "NEED_LOCK=0"
 set "LOCAL_VERSION="
 set "STORED_FLAVOR="
 
 if "!FORCE_REINSTALL!"=="1" (
     echo [npm] --reinstall specified, forcing full reinstall.
+    set "NEED_LOCK=1"
 ) else if exist "!VERSION_FILE!" (
     for /f "usebackq delims=" %%a in ("!VERSION_FILE!") do set "LOCAL_VERSION=%%a"
     if "!LOCAL_VERSION!"=="!REMOTE_VERSION!" (
@@ -89,9 +92,11 @@ if "!FORCE_REINSTALL!"=="1" (
         )
     ) else (
         echo [npm] Version changed: !LOCAL_VERSION! to !REMOTE_VERSION!
+        set "NEED_LOCK=1"
     )
 ) else (
     echo [npm] No version file found
+    set "NEED_LOCK=1"
 )
 
 REM --- Check flavor ---
@@ -128,6 +133,18 @@ if "!NEED_SETUP!"=="1" (
     if not exist "package.json" (
         echo [npm] Initializing project...
         call npm init -y
+    )
+
+    REM --- Download lockfile only on first install, reinstall, or version change ---
+    if "!NEED_LOCK!"=="1" (
+        echo [npm] Downloading package-lock.json...
+        curl -fL "!LOCK_URL!" -o "%NPM_ROOT%\package-lock.json.tmp"
+        if errorlevel 1 (
+            del "%NPM_ROOT%\package-lock.json.tmp" 2>nul
+            echo [npm] Warning: failed to download package-lock.json, continuing without it.
+        ) else (
+            move /y "%NPM_ROOT%\package-lock.json.tmp" "%NPM_ROOT%\package-lock.json" >nul
+        )
     )
 
     if exist "node_modules\omniroute" rmdir /s /q "node_modules\omniroute" 2>nul

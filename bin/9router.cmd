@@ -31,6 +31,28 @@ shift
 goto parse_args
 :args_done
 
+REM --- Detect npm version ---
+set "NPM_VERSION="
+for /f "usebackq delims=" %%v in (`npm -v 2^>nul`) do set "NPM_VERSION=%%v"
+
+if not defined NPM_VERSION (
+    echo [npm] npm not found in PATH
+    exit /b 1
+)
+
+set "NPM_MAJOR=0"
+set "NPM_MINOR=0"
+for /f "tokens=1,2 delims=." %%a in ("!NPM_VERSION!") do (
+    set "NPM_MAJOR=%%a"
+    set "NPM_MINOR=%%b"
+)
+
+echo [npm] npm version: !NPM_VERSION!
+
+REM --- Version-dependent install flags ---
+set "NPM_EXTRA_ARGS="
+if !NPM_MAJOR! GEQ 12 set "NPM_EXTRA_ARGS=--allow-remote=all"
+
 if not exist "%NPM_ROOT%" mkdir "%NPM_ROOT%"
 if not exist "%TARBALL_CACHE%" mkdir "%TARBALL_CACHE%"
 
@@ -127,7 +149,7 @@ if "!NEED_SETUP!"=="1" (
     if exist "node_modules\9router" rmdir /s /q "node_modules\9router" 2>nul
 
     echo [npm] Installing 9router...
-    call npm install "!TARBALL!" ^
+    call npm install "!TARBALL!" !NPM_EXTRA_ARGS! ^
         --legacy-peer-deps ^
         --no-audit ^
         --no-fund ^

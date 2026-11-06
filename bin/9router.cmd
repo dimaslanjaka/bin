@@ -138,7 +138,7 @@ if "!NEED_SETUP!"=="1" (
 
     if not exist "package.json" (
         echo [npm] Initializing project...
-        call npm init -y
+        call npm init -y --scope=@dimaslanjaka
         if errorlevel 1 (
             popd
             echo [npm] Project initialization failed.

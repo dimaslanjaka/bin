@@ -133,7 +133,7 @@ if "!NEED_SETUP!"=="1" (
 
     if not exist "package.json" (
         echo [npm] Initializing project...
-        call npm init -y
+        call npm init -y --scope=@dimaslanjaka
     )
 
     REM --- Download lockfile on first install, reinstall, version change, incomplete cache, or if missing ---

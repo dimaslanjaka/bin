@@ -10,6 +10,21 @@ set "VERSION_FILE=%NPM_ROOT%\omniroute.version"
 set "FLAVOR_FILE=%NPM_ROOT%\omniroute-flavor.txt"
 set "FLAVOR=prod"
 
+REM --- Parse custom parameters (stripped before forwarding) ---
+set "FORCE_REINSTALL=0"
+set "PASS_ARGS="
+
+:parse_args
+if "%~1"=="" goto args_done
+if /i "%~1"=="--reinstall" (
+    set "FORCE_REINSTALL=1"
+) else (
+    set PASS_ARGS=!PASS_ARGS! %1
+)
+shift
+goto parse_args
+:args_done
+
 if not exist "%NPM_ROOT%" mkdir "%NPM_ROOT%"
 
 REM --- Fetch latest metadata ---
@@ -39,7 +54,9 @@ set "NEED_SETUP=1"
 set "LOCAL_VERSION="
 set "STORED_FLAVOR="
 
-if exist "!VERSION_FILE!" (
+if "!FORCE_REINSTALL!"=="1" (
+    echo [npm] --reinstall specified, forcing full reinstall.
+) else if exist "!VERSION_FILE!" (
     for /f "usebackq delims=" %%a in ("!VERSION_FILE!") do set "LOCAL_VERSION=%%a"
     if "!LOCAL_VERSION!"=="!REMOTE_VERSION!" (
         if exist "!PKG_DIR!\package.json" (
@@ -68,6 +85,14 @@ if exist "!FLAVOR_FILE!" (
 )
 
 if "!NEED_SETUP!"=="1" (
+    REM --- Remove cached tarball when reinstalling so it is re-downloaded ---
+    if "!FORCE_REINSTALL!"=="1" (
+        if exist "!TARBALL!" (
+            echo [npm] Removing cached tarball...
+            del /f /q "!TARBALL!" 2>nul
+        )
+    )
+
     echo [npm] Downloading tarball...
     curl -fL "!REMOTE_URL!" -o "!TARBALL!.tmp"
     if errorlevel 1 (
@@ -143,4 +168,4 @@ if not defined ENTRY (
     exit /b 1
 )
 
-node "!ENTRY!" %*
+node "!ENTRY!"!PASS_ARGS!

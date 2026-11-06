@@ -108,8 +108,7 @@ function prepareInstallation(type) {
   // Restore only the relevant lock file for the install type
   if (type === 'yarn' && fs.existsSync(yarnLockFileBackup)) {
     fs.renameSync(yarnLockFileBackup, yarnLockFile);
-  }
-  if (type === 'npm' && fs.existsSync(npmLockFileBackup)) {
+  } else if (type === 'npm' && fs.existsSync(npmLockFileBackup)) {
     fs.renameSync(npmLockFileBackup, npmLockFile);
   }
 

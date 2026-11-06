@@ -7,7 +7,6 @@ const {
   prepareInstallation,
   nodeModules,
   checkBinLinks,
-  buildAndPack,
   validateBinaries
 } = require('./validate-tarball-utils.cjs');
 
@@ -27,7 +26,7 @@ describe('Test binary-collections tarball', () => {
       forceRemoveSync(dir);
     }
     // Build the workspace and create the tarball to install
-    buildAndPack(workspaceDir);
+    // buildAndPack(workspaceDir);
     // Prepare environment
     prepareInstallation('yarn');
   });

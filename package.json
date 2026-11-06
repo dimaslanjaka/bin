@@ -182,6 +182,7 @@
     "del-ps": "lib/del-ps-cli.cjs",
     "del-yarn-caches": "lib/del-yarn-caches.cjs",
     "del-yarncaches": "lib/del-yarn-caches.cjs",
+    "delete-failure-workflow-logs": "lib/github-workflows/delete-failure-logs-cli.cjs",
     "delete-packages-node-modules": "binaries/delete-packages-node-modules.cjs",
     "dev": "binaries/dev.cjs",
     "dir-tree": "lib/print-directory-tree-cli.cjs",

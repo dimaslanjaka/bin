@@ -1,6 +1,10 @@
 // rename to binary-collections.config.js and update paths in imports
 
 import path from 'node:path';
+import dotenv from 'dotenv';
+
+// load .env
+dotenv.config({ path: path.resolve(process.cwd(), '.env'), override: true });
 
 export default {
   // Example configuration for binary-collections

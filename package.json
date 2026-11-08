@@ -147,11 +147,11 @@
   "workspaces": [
     "packages/*"
   ],
-  "packageManager": "yarn@4.13.0",
+  "packageManager": "yarn@4.18.1",
   "resolutions": {
     "@types/through2": "https://github.com/dimaslanjaka/nodejs-package-types/raw/refs/heads/through2/release/types-through2.tgz",
     "cross-spawn": "https://github.com/dimaslanjaka/node-cross-spawn/raw/85a5399f99298c761dcd4b4aaf802dcfec502088/release/cross-spawn.tgz",
-    "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/c20bad2d6f26c83bd6676ebdfe4c49de258153a8/release/git-command-helper.tgz",
+    "git-command-helper": "https://github.com/dimaslanjaka/git-command-helper/raw/028ef16009d7ba068d6214c68950773c90e1dfa6/release/git-command-helper.tgz",
     "sbg-utility": "https://github.com/dimaslanjaka/static-blog-generator/raw/1ca385787f7287155b547c5b97d5ffd5bcfab482/packages/sbg-utility/release/sbg-utility.tgz",
     "@dimaslanjaka/eslint-base-config": "https://github.com/dimaslanjaka/eslint-base-config/raw/38b2d13009cff91841d0cd36a161924df021fbc7/release/dimaslanjaka-eslint-base-config.tgz",
     "got": "11.8.2"

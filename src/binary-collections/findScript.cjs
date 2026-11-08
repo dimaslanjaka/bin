@@ -24,31 +24,39 @@ function findScript(scriptName, searchDir = null) {
   ];
 
   try {
-    const pattern = `${scriptName}.{cjs,js,mjs}`;
-    const files = glob.sync(pattern, {
-      cwd: searchDir,
-      ignore: ignorePatterns,
-      absolute: true
-    });
+    // Try exact name first, then with -cli suffix (CLI entry points have -cli on filename)
+    const patterns = [`**/${scriptName}.{cjs,js,mjs}`, `**/${scriptName}-cli.{cjs,js,mjs}`];
+    let files = [];
+    for (const pattern of patterns) {
+      const found = glob.sync(pattern, {
+        cwd: searchDir,
+        ignore: ignorePatterns,
+        absolute: true
+      });
+      if (found.length > 0) {
+        files = found;
+        break;
+      }
+    }
 
     if (files.length > 0) {
       result = files[0];
-    } else {
-      if (pkgJson.bin[scriptName]) {
-        const find = [
-          path.join(searchDir, pkgJson.bin[scriptName]),
-          path.join(process.cwd(), 'node_modules/binary-collections', pkgJson.bin[scriptName]),
-          path.join(__dirname, pkgJson.bin[scriptName]),
-          path.join(path.join(__dirname, '..'), pkgJson.bin[scriptName]),
-          path.join(path.join(__dirname, '../..'), pkgJson.bin[scriptName])
-        ];
-        const filtered = find.filter((file) => fs.existsSync(file));
-        if (filtered.length > 0) {
-          result = filtered[0];
-        } else {
-          console.warn(`⚠️  Script "${scriptName}" not found in ${searchDir}.`);
-          console.warn(`🔍 Searched for: ${pattern} in ${searchDir}`);
-        }
+    } else if (pkgJson.bin[scriptName]) {
+      // Check bin mapping from package.json
+      const binPath = pkgJson.bin[scriptName];
+      const find = [
+        path.join(searchDir, binPath),
+        path.join(process.cwd(), 'node_modules/binary-collections', binPath),
+        path.join(__dirname, binPath),
+        path.join(path.join(__dirname, '..'), binPath),
+        path.join(path.join(__dirname, '../..'), binPath)
+      ];
+      const filtered = find.filter((file) => fs.existsSync(file));
+      if (filtered.length > 0) {
+        result = filtered[0];
+      } else {
+        console.warn(`⚠️  Script "${scriptName}" not found in ${searchDir}.`);
+        console.warn(`🔍 Searched for: ${patterns.join(', ')} in ${searchDir}`);
       }
     }
   } catch (error) {
@@ -71,3 +79,4 @@ function findScript(scriptName, searchDir = null) {
 
 module.exports = findScript;
 module.exports.default = findScript;
+module.exports.findScript = findScript;

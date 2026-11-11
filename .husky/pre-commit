@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Remove "bin" from package.json
+node scripts/remove-bin.cjs
+
 # Auto-stage submodule pointer changes
 if [ -n "$GITHUB_ACTIONS" ] || [ -n "$CI" ]; then
   echo "[pre-commit] CI detected — skipping submodule staging"

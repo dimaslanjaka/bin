@@ -1,0 +1,56 @@
+# --- Umum ---
+tmp/
+.tmp*
+dist/
+build/
+out/
+coverage/
+htmlcov/
+.cache/
+logs/
+*.log
+.git/
+.idea/
+.vscode/
+.DS_Store
+
+# --- Env & secret ---
+.env
+.env.*
+
+# --- JS/TS ---
+node_modules/
+.yarn/
+.pnpm-store/
+.pnp.*
+.next/
+.nuxt/
+.svelte-kit/
+.turbo/
+.parcel-cache/
+*.tsbuildinfo
+*.min.js
+*.map
+
+# --- Python ---
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.ipynb_checkpoints/
+.coverage
+
+# --- PHP ---
+vendor/
+storage/framework/
+bootstrap/cache/
+.phpunit.cache/
+.phpunit.result.cache
+.php-cs-fixer.cache

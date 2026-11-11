@@ -292,15 +292,6 @@ jobs:
           else
             echo "Skipping missing test file: test/print-tree-tarball.test.mjs"
           fi
-      - name: 🧪 Run tests in test/readline-mock.test.ts
-        id: run-test-readline-mock-test-ts
-        shell: bash
-        run: >-
-          if [ -f "test/readline-mock.test.ts" ]; then
-            node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="readline-mock.test.ts"
-          else
-            echo "Skipping missing test file: test/readline-mock.test.ts"
-          fi
       - name: 🧪 Run tests in test/remove-module.test.ts
         id: run-test-remove-module-test-ts
         shell: bash

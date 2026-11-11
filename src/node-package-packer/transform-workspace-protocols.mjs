@@ -54,10 +54,10 @@ export async function transformWorkspaceProtocols(workspaceDir) {
   const workspaceDepFields = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'];
   let modified = false;
 
-  const info = await getWorkspacesInfo(process.cwd(), { absolutePaths: false });
+  const info = await getWorkspacesInfo(workspaceDir, { absolutePaths: true });
   const workspaces = info.workspaces.map((i) => {
     return {
-      path: i.path,
+      path: i.absolutePath,
       name: i.name
     };
   });
@@ -75,7 +75,7 @@ export async function transformWorkspaceProtocols(workspaceDir) {
       if (workspaces.length > 0) {
         const find = workspaces.find((w) => w.name === name);
         if (find) {
-          const isGit = fs.existsSync(path.join(find.path, '.git')) || fs.existsSync(path.join(process.cwd(), '.git'));
+          const isGit = fs.existsSync(path.join(find.path, '.git')) || fs.existsSync(path.join(workspaceDir, '.git'));
           if (isGit) {
             // whenever git folder (root or workspace), get github raw url of release(s)/${name}.tgz
             const tarballPath = [

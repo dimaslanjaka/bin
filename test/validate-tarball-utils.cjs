@@ -155,6 +155,7 @@ function forceRemoveSync(dir) {
   if (!fs.existsSync(dir)) return;
 
   if (process.platform !== 'win32') {
+    spawnSync('chmod', ['-R', '+w', dir], { stdio: 'pipe' });
     const result = spawnSync('rm', ['-rf', dir], { stdio: 'pipe' });
     if (result.status === 0 || !fs.existsSync(dir)) return;
   }

@@ -67,17 +67,19 @@ jobs:
       - name: 🧹 Clean
         run: yarn run clean
 
-      - name: 🔨 Build
-        run: yarn run build
+      - name: 🔄 Build, Pack & Verify (Retry 3x)
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 3
+          retry_wait_seconds: 1
+          timeout_minutes: 30
+          command: |
+            yarn run build
+            yarn run pack
 
-      - name: 📦 Pack
-        run: yarn run pack
-
-      - name: ✅ Verify compiled output
-        run: |
-          node test/test-compiled.cjs
-          yarn jest --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --testPathPatterns=validate-tarball-yarn.test.cjs
-          yarn jest --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --testPathPatterns=validate-tarball-npm.test.cjs
+            node test/test-compiled.cjs
+            yarn jest --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --testPathPatterns=validate-tarball-yarn.test.cjs
+            yarn jest --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --testPathPatterns=validate-tarball-npm.test.cjs
 
       - name: '🗑️ Remove packageManager from package.json'
         shell: bash

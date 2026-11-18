@@ -1,9 +1,13 @@
 import { describe, expect, test } from '@jest/globals';
 import { spawnSync } from 'child_process';
+import { fileURLToPath } from 'url';
 import path from 'upath';
 
+// This suite runs as ESM, so derive the directory from import.meta.url instead of __dirname.
+const testDir = path.dirname(fileURLToPath(import.meta.url));
+
 describe('remove-module CLI --help and -h', () => {
-  const cliPath = path.resolve(__dirname, '../src/remove-module.mjs');
+  const cliPath = path.resolve(testDir, '../src/remove-module.mjs');
 
   function runCli(args: string[]) {
     return spawnSync('node', [cliPath, ...args], {

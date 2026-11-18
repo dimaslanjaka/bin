@@ -118,7 +118,7 @@
   "code-runner.runInTerminal": true,
   "code-runner.saveAllFilesBeforeRun": true,
   "code-runner.executorMapByGlob": {
-    "*.test.{js,ts}": "npx -y jest --testPathPatterns=$fileName",
+    "*.test.{js,ts}": "yarn test --testPathPatterns=\"$fileName\"",
     "*.test.cjs": "test-cjs --testPathPatterns=\"$fileName\"",
     "*.test.mjs": "test-esm --testPathPatterns=\"$fileName\""
   },

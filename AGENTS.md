@@ -34,7 +34,7 @@ Three runner modes for different file types:
 | `.cjs` | `bash bin/test-cjs --testPathPatterns="<pattern>"` |
 | `.mjs` | `bash bin/test-esm --testPathPatterns="<pattern>"` |
 
-- Run all: `yarn test` (or `npm test`)
+- **Do NOT run `yarn test` or `npm test`** (full suite). Always run a single targeted test, e.g. `yarn test --testPathPatterns="remove-module.test.ts"` or `bash bin/test-cjs --testPathPatterns="<pattern>"`.
 - Jest config: `jest.config.js` (ESM), roots in `test/` and `packages/`
 - **Always run `yarn build` before running tests** — tests require the built `lib/` files.
 - `test/env.cjs` loads `.env`, provides shared helpers (`ensureRepoExists`, `ensureYarnProject`, `installTarball`). Read before writing new tests.
@@ -96,5 +96,6 @@ All packages under `packages/` are **git submodules**. Do not modify them from t
 - **Windows launcher scripts** in `bin/` are copied to `binaries/` by the build. `.cmd` wrappers are generated for Windows compatibility.
 - **`docs-src/`** has 41 markdown files documenting each CLI command. Link to these instead of duplicating docs.
 - **Mkdocs docs** use Python hooks (`hooks/pre-generate-docs.py`, `hooks/copy_docs_src.py`) to copy `docs-src/` → `docs/` and expand README → index.md before mkdocs validates nav.
+  - **CI Workflow Pre-Generation:** MkDocs validates nav references before pre-build hooks execute. Always run pre-generation scripts explicitly in CI before `mkdocs build` and preserve necessary directory creation steps.
 - **ESM/CJS dual builds**: tsup outputs `.cjs` and `.mjs` variants for each source file. The main entry is `lib/index.js` (ESM), with CJS fallback via `lib/index.cjs`.
 - `test/env.cjs` loads `.env` when present. Do not print or inspect `.env` unless a task explicitly requires a named variable; prefer existing helpers and documented configuration.

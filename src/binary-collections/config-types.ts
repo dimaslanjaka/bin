@@ -30,4 +30,20 @@ export interface BinaryCollectionsConfig {
     /** Callback invoked after tarball cleanup finishes. */
     onFinish?: (tarballPath: string) => any | Promise<any>;
   };
+
+  /** Test runner configuration consumed by generate-test-ci-step-cli. */
+  testRunner?: {
+    /**
+     * Shell command template for running a single test file.
+     * Tokens: {{file}}, {{filename}}, {{pathPattern}}.
+     * When set, takes precedence over bin/args.
+     */
+    template?: string;
+    /** Runner executable; defaults to jest auto-detected from package.json type. */
+    bin?: string;
+    /** Extra args appended before the --testPathPatterns value. */
+    args?: string[];
+    /** Skip git-untracked test files (default true). */
+    skipUntracked?: boolean;
+  };
 }

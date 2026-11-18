@@ -63,6 +63,26 @@ export default {
     onFinish: (tarballPath) => {
       console.log(`Tarball cleaned: ${tarballPath}`);
     }
+  },
+
+  // Test runner configuration for generate-test-ci-step-cli.
+  // Controls how each discovered test file is executed in the generated CI workflow.
+  // When omitted, the generator falls back to built-in Jest detection
+  // (node --experimental-vm-modules for ESM packages, plain node for CJS).
+  testRunner: {
+    // Shell command template for running a single test file.
+    // Supported tokens:
+    //   {{file}}        relative test file path, e.g. test/foo.test.js
+    //   {{filename}}    basename only, e.g. foo.test.js
+    //   {{pathPattern}} pathPattern used by the built-in Jest fallback
+    // When set, takes precedence over bin/args below.
+    // template: 'npx vitest run {{pathPattern}}',
+    // Runner executable. Defaults to jest auto-detected from package.json type.
+    // bin: 'npx vitest',
+    // Extra args appended before the --testPathPatterns value (ignored when template is set).
+    // args: ['--runInBand', '--forceExit', '--testTimeout=120000'],
+    // Skip git-untracked test files (default true, matches current behavior).
+    // skipUntracked: true
   }
 
   // Other configuration options can go here

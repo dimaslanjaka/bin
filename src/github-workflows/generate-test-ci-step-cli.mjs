@@ -6,6 +6,7 @@ import { execSync } from 'child_process';
 import * as glob from 'glob';
 import { getArgs } from '../utils/index.cjs';
 import { writeYamlFile } from './utils.cjs';
+import { getConfig } from '../binary-collections/config.cjs';
 import actionObject from './ci-yaml-fixtures/workflow-test-data.cjs';
 import setupEnvironmentsObject from './ci-yaml-fixtures/setup-environments-data.cjs';
 
@@ -83,40 +84,60 @@ async function main() {
     isModule = pkgJson.type === 'module';
   }
 
+  // Load project config for testRunner customization
+  const config = await getConfig({ searchFrom: process.cwd() }).catch(() => null);
+  /** @type {import('../binary-collections/config-types').BinaryCollectionsConfig['testRunner']} */
+  const testRunner = config?.testRunner;
+
   const files = await collectTests(patterns, ignorePatterns);
   for (const file of files) {
-    // const ext = (path.extname(file) || '').toLowerCase();
     const filename = path.basename(file);
     let pathPattern = filename;
     const isDirnameTestOrRoot = [/tests?$/, /__tests?__/].some((rg) => rg.test(path.dirname(file)));
     if (!isDirnameTestOrRoot) {
       pathPattern = path.relative(process.cwd(), file).replace(/^(__tests?__|tests?)\//, '');
     }
-    // console.log(path.dirname(file), isDirnameTestOrRoot, { pathPattern });
+
+    // Skip untracked test files unless skipUntracked is explicitly false
+    const skipUntracked = testRunner?.skipUntracked !== false;
+    if (skipUntracked) {
+      try {
+        execSync(`git ls-files --error-unmatch -- "${file}"`, { cwd: process.cwd(), stdio: 'ignore' });
+      } catch {
+        console.warn(`Skipping untracked test file: ${file}`);
+        continue;
+      }
+    }
+
+    // Build the run command
     let runCmd;
-    // if (ext === '.mjs') {
-    //   runCmd = `if [ -f "${file}" ]; then\n  bash bin/test-esm --testPathPatterns="${filename}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
-    // } else if (ext === '.cjs') {
-    //   runCmd = `if [ -f "${file}" ]; then\n  bash bin/test-cjs --testPathPatterns="${filename}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
-    // } else if (ext === '.ts') {
-    //   runCmd = `if [ -f "${file}" ]; then\n  node node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --testPathPatterns="${filename}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
-    // } else {
-    //   runCmd = `if [ -f "${file}" ]; then\n  npm test -- --testPathPatterns="${filename}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
-    // }
-
-    if (isModule) {
-      runCmd = `if [ -f "${file}" ]; then\n  node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="${pathPattern}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
+    if (testRunner?.template) {
+      // Custom template with token substitution
+      const tokens = {
+        file,
+        filename,
+        pathPattern
+      };
+      runCmd = testRunner.template.replace(/\{\{(\w+)\}\}/g, (_, k) => tokens[k] ?? '');
     } else {
-      runCmd = `if [ -f "${file}" ]; then\n  node node_modules/jest/bin/jest.js --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="${pathPattern}"\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
+      // Built-in Jest fallback (current behavior)
+      const base =
+        testRunner?.bin ??
+        (isModule
+          ? 'node --experimental-vm-modules node_modules/jest/bin/jest.js'
+          : 'node node_modules/jest/bin/jest.js');
+      const args = testRunner?.args ?? [
+        '--runInBand',
+        '--forceExit',
+        '--testTimeout=120000',
+        '--detectOpenHandles',
+        '--bail=1'
+      ];
+      runCmd = `${base} ${args.join(' ')} --testPathPatterns="${pathPattern}"`;
     }
 
-    // Skip files that are not tracked by git (untracked files shouldn't be included in committed actions)
-    try {
-      execSync(`git ls-files --error-unmatch -- "${file}"`, { cwd: process.cwd(), stdio: 'ignore' });
-    } catch {
-      console.warn(`Skipping untracked test file: ${file}`);
-      continue;
-    }
+    // Wrap with file existence check
+    runCmd = `if [ -f "${file}" ]; then\n  ${runCmd}\nelse\n  echo "Skipping missing test file: ${file}"\nfi`;
 
     const rawId = file;
     let safeId = rawId.replace(/[^A-Za-z0-9_-]+/g, '-');

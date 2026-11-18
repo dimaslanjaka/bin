@@ -183,6 +183,16 @@ jobs:
           else
             echo "Skipping missing test file: test/gitattributes.test.cjs"
           fi
+      - name: 🧪 Run tests in test/github-workflows/generate-test-ci-step-cli.test.mjs
+        id: run-test-github-workflows-generate-test-ci-step-cli-test-mjs
+        shell: bash
+        run: >-
+          if [ -f "test/github-workflows/generate-test-ci-step-cli.test.mjs" ];
+          then
+            yarn test --runInBand --testTimeout=120000 --detectOpenHandles --bail=1 --testPathPatterns="test/github-workflows/generate-test-ci-step-cli.test.mjs"
+          else
+            echo "Skipping missing test file: test/github-workflows/generate-test-ci-step-cli.test.mjs"
+          fi
       - name: 🧪 Run tests in test/node-executor.test.cjs
         id: run-test-node-executor-test-cjs
         shell: bash

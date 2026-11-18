@@ -141,6 +141,45 @@ function installTarball(packageManager = 'yarn') {
   return run(cmd, args, { cwd: repoDir });
 }
 
+const repoRoot = path.resolve(__dirname, '..');
+
+/**
+ * Reuse an existing test project by rewriting package.json and resetting git.
+ * If the project doesn't exist yet, it will be initialized first.
+ */
+function makeProject({ pkg = { name: 'fixture', version: '1.0.0' }, config = null, tests = {} } = {}) {
+  // Reuse the existing test repo directory
+  const testDir = path.join(repoRoot, 'tmp', 'test-repo');
+
+  // Ensure the test repo exists and is a yarn project
+  ensureRepoExists();
+  ensureYarnProject();
+
+  // Reset to clean committed state and remove untracked files from previous run
+  spawnSync('git', ['reset', '--hard', 'HEAD'], { cwd: testDir });
+  spawnSync('git', ['clean', '-fd'], { cwd: testDir });
+
+  // Rewrite package.json with the provided pkg
+  fs.writeFileSync(path.join(testDir, 'package.json'), JSON.stringify(pkg, null, 2), 'utf8');
+
+  // Rewrite config if provided
+  const configBody = config ? `export default ${JSON.stringify(config, null, 2)};\n` : 'export default {};\n';
+  fs.writeFileSync(path.join(testDir, 'binary-collections.config.mjs'), configBody, 'utf8');
+
+  // Write test files
+  for (const [rel, body] of Object.entries(tests)) {
+    const abs = path.join(testDir, rel);
+    fs.ensureDirSync(path.dirname(abs));
+    fs.writeFileSync(abs, body, 'utf8');
+  }
+
+  // Note: git add is intentionally left to the test caller
+  // This allows tests to control which files are tracked (important for skipUntracked behavior)
+
+  return testDir;
+}
+
 module.exports.ensureRepoExists = ensureRepoExists;
 module.exports.ensureYarnProject = ensureYarnProject;
 module.exports.installTarball = installTarball;
+module.exports.makeProject = makeProject;

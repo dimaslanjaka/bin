@@ -14,7 +14,45 @@ const pkgDir = path.join(nodeModules, 'binary-collections');
 
 jest.setTimeout(360000); // Set a longer timeout for tests
 
-// Function moved to utils file; imported above.
+/**
+ * Detect the installed npm major version (cached).
+ * Returns 0 if the version cannot be determined.
+ * @param {string} cwd
+ * @returns {number}
+ */
+let cachedNpmMajor;
+function getNpmMajor(cwd) {
+  if (cachedNpmMajor !== undefined) return cachedNpmMajor;
+  const res = spawnSync('npm', ['--version'], {
+    cwd,
+    encoding: 'utf8',
+    shell: true
+  });
+  const major = parseInt(
+    String(res.stdout || '')
+      .trim()
+      .split('.')[0],
+    10
+  );
+  cachedNpmMajor = Number.isNaN(major) ? 0 : major;
+  return cachedNpmMajor;
+}
+
+/**
+ * Build `npm install` arguments.
+ * Adds --allow-remote=all only on npm >= 12 (where the default became "none").
+ * Older npm versions would warn about an unknown config, so we skip it there.
+ * @param {string} cwd
+ * @param {...string} extraArgs
+ * @returns {string[]}
+ */
+function npmInstallArgs(cwd, ...extraArgs) {
+  const flags = ['--ignore-scripts'];
+  if (getNpmMajor(cwd) >= 12) {
+    flags.push('--allow-remote=all');
+  }
+  return ['install', ...flags, ...extraArgs];
+}
 
 describe('Test binary-collections tarball', () => {
   const workspaceDir = path.resolve(__dirname, '../');
@@ -33,7 +71,7 @@ describe('Test binary-collections tarball', () => {
 
   it(`should install binary-collections from tarball (${tarballPath}) using npm`, () => {
     // Install the packaged tarball into the test project
-    const result = spawnSync('npm', ['install', '--ignore-scripts', `binary-collections@${tarballPath}`], {
+    const result = spawnSync('npm', npmInstallArgs(repoDir, `file:${tarballPath}`), {
       cwd: repoDir,
       stdio: 'pipe',
       shell: true

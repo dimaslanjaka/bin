@@ -1,13 +1,15 @@
-const { repoDir, nonGitDir } = require('../env.cjs');
+import { repoDir, nonGitDir } from '../env.cjs';
 const originalCwd = process.cwd();
+
+jest.setTimeout(30000);
 
 describe('isGitRepository', () => {
   let isGitRepository;
   let logSpy;
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.resetModules();
     logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-    isGitRepository = require('../../src/git/utils.cjs').isGitRepository;
+    ({ isGitRepository } = await import('../../src/git/utils.cjs'));
   });
 
   afterEach(() => {

@@ -154,34 +154,54 @@ function prepareInstallation(type) {
 function forceRemoveSync(dir) {
   if (!fs.existsSync(dir)) return;
 
-  if (process.platform !== 'win32') {
-    spawnSync('chmod', ['-R', '+w', dir], { stdio: 'pipe' });
-    const result = spawnSync('rm', ['-rf', dir], { stdio: 'pipe' });
-    if (result.status === 0 || !fs.existsSync(dir)) return;
-  }
-
-  // Fallback: recursively make everything writable then remove
-  const walkAndFix = (d) => {
+  // Try direct removal first (works on most systems)
+  try {
+    fs.rmSync(dir, { recursive: true, force: true });
+    return;
+  } catch (initialErr) {
+    if (initialErr.code !== 'EACCES') throw initialErr;
+    // If EACCES, try to fix permissions then retry
     try {
-      const stat = fs.statSync(d);
-      if (stat.isDirectory()) {
-        try {
-          fs.chmodSync(d, 0o755);
-        } catch {}
-        fs.readdirSync(d).forEach(function (child) {
-          walkAndFix(path.join(d, child));
-        });
-      } else {
-        try {
-          fs.chmodSync(d, 0o644);
-        } catch {}
-      }
-    } catch {
-      // skip entries we cannot access
+      spawnSync('chown', ['-R', process.getuid() + ':' + process.getgid(), dir], { stdio: 'pipe' });
+    } catch (chownErr) {
+      console.warn('Warning: Could not chown', dir, chownErr.message);
     }
-  };
-  walkAndFix(dir);
-  if (fs.existsSync(dir)) fs.removeSync(dir);
+    try {
+      spawnSync('chmod', ['-R', '+w', dir], { stdio: 'pipe' });
+    } catch (chmodErr) {
+      console.warn('Warning: Could not chmod', dir, chmodErr.message);
+    }
+    try {
+      fs.rmSync(dir, { recursive: true, force: true });
+    } catch (retryErr) {
+      if (retryErr.code === 'EACCES') {
+        // Fallback: recursively make everything writable then remove
+        const walkAndFix = (d) => {
+          try {
+            const stat = fs.statSync(d);
+            if (stat.isDirectory()) {
+              try {
+                fs.chmodSync(d, 0o755);
+              } catch {}
+              fs.readdirSync(d).forEach(function (child) {
+                walkAndFix(path.join(d, child));
+              });
+            } else {
+              try {
+                fs.chmodSync(d, 0o644);
+              } catch {}
+            }
+          } catch {
+            // skip entries we cannot access
+          }
+        };
+        walkAndFix(dir);
+        if (fs.existsSync(dir)) fs.removeSync(dir);
+      } else {
+        throw retryErr;
+      }
+    }
+  }
 }
 
 /**

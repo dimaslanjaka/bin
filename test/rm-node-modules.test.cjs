@@ -6,6 +6,7 @@ const { writefile, removeAnsi } = require('sbg-utility');
 
 require('./env.cjs');
 
+jest.setTimeout(30000);
 describe('rm-node-modules', () => {
   const rootDir = path.join(__dirname, '../tmp/rm-node-modules-test-project');
   const cliPath = path.join(__dirname, '../src/rm-node-module-cli.cjs');

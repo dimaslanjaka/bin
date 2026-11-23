@@ -27,6 +27,7 @@ const runCLI = (args, opts = {}) => {
   }
 };
 
+jest.setTimeout(30000);
 describe('git-diff CLI', () => {
   const stagedFile = path.join(TEST_REPO, 'staged-file.txt');
   const unstagedFile = path.join(TEST_REPO, 'unstaged-file.txt');

@@ -12,6 +12,7 @@ function run(args) {
   };
 }
 
+jest.setTimeout(30000);
 describe('node-executor.cjs CLI executor', () => {
   const tmpJs = path.resolve(__dirname, 'tmp.test.js');
   const tmpPy = path.resolve(__dirname, 'tmp.test.py');

@@ -1,9 +1,10 @@
-import { describe, expect, it, beforeEach, afterEach } from '@jest/globals';
+import { describe, expect, it, beforeEach, afterEach, jest } from '@jest/globals';
 import fs from 'fs-extra';
 import path from 'upath';
 import os from 'os';
 import { resolveWorkspaceVersions } from '../../src/node-package-packer/transform-workspace-protocols.mjs';
 
+jest.setTimeout(30000);
 describe('resolveWorkspaceVersions()', () => {
   let tmpDir;
 

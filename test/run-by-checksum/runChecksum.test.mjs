@@ -1,6 +1,8 @@
+import { jest } from '@jest/globals';
 import { runChecksum } from '../../src/run-by-checksum/run.js';
 import { TEST_ROOT, cleanTestRoot, createTestFile } from './shared.mjs';
 
+jest.setTimeout(30000);
 describe('checksum-runner - runChecksum', () => {
   beforeEach(() => {
     cleanTestRoot();

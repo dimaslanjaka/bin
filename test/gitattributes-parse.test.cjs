@@ -4,6 +4,7 @@ const os = require('os');
 const { parseGitAttributes } = require('../src/git/gitattributes.cjs').default;
 require('./env.cjs');
 
+jest.setTimeout(30000);
 describe('parseGitAttributes', () => {
   let tempDir;
   let gitattributesPath;

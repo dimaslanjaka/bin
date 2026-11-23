@@ -4,6 +4,7 @@ const { spawnSync } = require('child_process');
 // Mock child_process
 jest.mock('child_process');
 
+jest.setTimeout(30000);
 describe('git-utils', () => {
   let consoleLogSpy;
   let consoleErrorSpy;

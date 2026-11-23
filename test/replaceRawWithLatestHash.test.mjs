@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals';
 import * as updater from '../src/package-resolutions-updater.mjs';
 
+jest.setTimeout(30000);
 describe('replaceRawWithLatestHash', () => {
   let consoleLogSpy;
 

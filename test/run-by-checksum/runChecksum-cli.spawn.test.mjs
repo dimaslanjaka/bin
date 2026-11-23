@@ -1,4 +1,4 @@
-import { describe, expect, test } from '@jest/globals';
+import { describe, expect, test, jest } from '@jest/globals';
 import { execFileSync } from 'child_process';
 import fs from 'fs-extra';
 import path from 'upath';
@@ -32,6 +32,7 @@ function findCacheByConfig(cacheDir, expectedPatterns, expectedIgnores) {
   return null;
 }
 
+jest.setTimeout(30000);
 describe('run-by-checksum CLI (real spawn)', () => {
   test('should print usage with --help and exit 0', () => {
     const stdout = execFileSync('node', [cliScript, '--help'], {

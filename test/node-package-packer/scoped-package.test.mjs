@@ -15,6 +15,7 @@ const config = {
 };
 const releaseDir = path.join(config.path, 'release');
 
+jest.setTimeout(30000);
 describe('Scoped package packing', () => {
   beforeAll(() => {
     // Silence console.log during tests

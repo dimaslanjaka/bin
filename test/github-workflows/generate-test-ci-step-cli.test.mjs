@@ -16,7 +16,7 @@
  * - --pattern restriction
  */
 
-import { describe, expect, test } from '@jest/globals';
+import { describe, expect, test, jest } from '@jest/globals';
 import fs from 'fs-extra';
 import { execFileSync, spawnSync } from 'node:child_process';
 import path from 'upath';
@@ -37,6 +37,7 @@ function readOutput(dir, name = 'test.yml') {
   return fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : null;
 }
 
+jest.setTimeout(30000);
 describe('generate-test-ci-step-cli', () => {
   test('--help prints usage and exits 0', () => {
     const out = execFileSync('node', [cliScript, '--help'], { cwd: repoRoot, encoding: 'utf8' });

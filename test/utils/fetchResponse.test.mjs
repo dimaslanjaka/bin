@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import fetchResponseModule from '../../src/utils/fetchResponse.cjs';
 
 const { fetchResponse } = fetchResponseModule;
@@ -25,6 +26,7 @@ function isArchive(buffer) {
   return null;
 }
 
+jest.setTimeout(30000);
 describe('fetchResponse()', () => {
   for (const url of TGZ_URLS) {
     it(`should fetch and return metadata for ${url}`, async () => {

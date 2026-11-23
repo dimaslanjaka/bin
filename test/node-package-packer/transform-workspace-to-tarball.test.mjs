@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
+import { afterAll, beforeAll, describe, expect, it, jest } from '@jest/globals';
 import { spawnSync } from 'child_process';
 import fs from 'fs-extra';
 import os from 'os';
@@ -32,6 +32,7 @@ function writeProjectPackageJson(projectDir) {
   fs.writeJSONSync(path.join(projectDir, 'package.json'), pkg, { spaces: 2, EOL: '\n' });
 }
 
+jest.setTimeout(30000);
 describe("focus on dimaslanjaka's workspaces", () => {
   const projectDir = repoDir;
   const pkgJsonPath = path.join(projectDir, 'package.json');

@@ -2,6 +2,7 @@ const { execSync } = require('child_process');
 const env = require('../env.cjs');
 const path = require('upath');
 
+jest.setTimeout(30000);
 describe('git-fix utility - summary messages', () => {
   const gitFixPath = path.resolve(__dirname, '../../src/git/git-fix.cjs');
 

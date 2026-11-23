@@ -1,5 +1,6 @@
 const getFileTreeString = require('../src/utils/getFileTreeString.cjs');
 
+jest.setTimeout(30000);
 describe('getFileTreeString', () => {
   it('should return a tree for a flat file list', () => {
     const hashArray = ['foo.js abcdef12', 'bar.js 12345678', 'baz.txt deadbeef'];

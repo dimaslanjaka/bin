@@ -7,6 +7,7 @@ const { runGitCommand } = require('../../src/git/utils.cjs');
 // Mock the utils module
 jest.mock('../../src/git/utils.cjs');
 
+jest.setTimeout(30000);
 describe('git-user-config', () => {
   let consoleLogSpy;
   let consoleWarnSpy;

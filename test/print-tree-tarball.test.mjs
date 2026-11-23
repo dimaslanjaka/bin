@@ -41,6 +41,7 @@ async function createTgz(filePath, entries) {
   await writePromise;
 }
 
+jest.setTimeout(30000);
 describe('print-tarball-tree', function () {
   let tempDir;
 

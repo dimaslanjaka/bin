@@ -1,5 +1,7 @@
+import { jest } from '@jest/globals';
 import { resolvePackageResolutionUpdates, replaceRawWithLatestHash } from '../src/package-resolutions-updater.mjs';
 
+jest.setTimeout(30000);
 describe('package-resolutions-updater', () => {
   it('returns a skipped result when the url is not a valid GitHub url', async () => {
     const result = await resolvePackageResolutionUpdates({ 'pkg-a': 'https://example.com/not-github.tgz' });

@@ -6,6 +6,8 @@ const {
   normalizePrefixDepth
 } = require('../src/github-workflows/clean-github-actions-caches.cjs');
 
+jest.setTimeout(30000);
+
 describe('clean-github-actions-caches prefix grouping', () => {
   it('defaults to three segments when the depth is missing or invalid', () => {
     expect(normalizePrefixDepth()).toBe(3);

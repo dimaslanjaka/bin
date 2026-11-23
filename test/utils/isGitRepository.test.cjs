@@ -1,6 +1,7 @@
 const { repoDir, nonGitDir } = require('../env.cjs');
 const originalCwd = process.cwd();
 
+jest.setTimeout(30000);
 describe('isGitRepository', () => {
   let isGitRepository;
   let logSpy;

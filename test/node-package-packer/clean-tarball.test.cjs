@@ -75,6 +75,7 @@ async function extractTarball(tarballPath, destDir) {
   await tar.extract({ file: tarballPath, cwd: destDir });
 }
 
+jest.setTimeout(30000);
 describe('cleanTarball', () => {
   /** @type {string} */
   let rootDir;

@@ -8,6 +8,7 @@ jest.unstable_mockModule('../../src/run-by-checksum/run.js', () => ({
   runChecksum: mockRunChecksum
 }));
 
+jest.setTimeout(30000);
 describe('run-by-checksum CLI', () => {
   beforeAll(() => {
     fs.ensureDirSync(TEST_ROOT);

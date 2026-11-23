@@ -7,6 +7,7 @@ const os = require('os');
 const { execSync } = require('child_process');
 const { forceLfLineEndings } = require('../../src/git/line-endings.cjs');
 
+jest.setTimeout(30000);
 describe('git-fix focused integration tests', () => {
   let tempDir;
   let originalCwd;

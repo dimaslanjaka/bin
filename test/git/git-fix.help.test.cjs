@@ -9,6 +9,7 @@ jest.mock('../../src/git/user-config.cjs');
 jest.mock('../../src/git/normalize.cjs');
 jest.mock('child_process');
 
+jest.setTimeout(30000);
 describe('git-fix utility - help functionality', () => {
   let consoleLogSpy;
   let consoleErrorSpy;

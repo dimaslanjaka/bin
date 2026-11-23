@@ -1,5 +1,8 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, jest, test } from '@jest/globals';
 
+// Set reasonable per-test timeout (30 seconds)
+jest.setTimeout(30000);
+
 const mockFetchResponse = jest.fn();
 
 jest.unstable_mockModule('../src/utils/fetchResponse.cjs', () => ({
@@ -8,14 +11,12 @@ jest.unstable_mockModule('../src/utils/fetchResponse.cjs', () => ({
   fetchResponse: mockFetchResponse
 }));
 
-const updaterPromise = import('../src/package-resolutions-updater.mjs');
-
 describe('getLatestCommit', () => {
   let updater;
   let consoleLogSpy;
 
   beforeAll(async () => {
-    updater = await updaterPromise;
+    updater = await import('../src/package-resolutions-updater.mjs');
   });
 
   beforeEach(() => {

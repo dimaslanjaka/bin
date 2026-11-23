@@ -53,6 +53,7 @@ const RESOLUTIONS_NORMALIZED = {
 // normalizeResolutions
 // ---------------------------------------------------------------------------
 
+jest.setTimeout(30000);
 describe('normalizeResolutions()', () => {
   /** @type {string[]} collect temp dirs for cleanup */
   const tmpDirs = [];

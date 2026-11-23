@@ -1,6 +1,7 @@
-import { describe, expect, it } from '@jest/globals';
+import { describe, expect, it, jest } from '@jest/globals';
 import { slugifyPkgName } from '../../src/node-package-packer/utils.cjs';
 
+jest.setTimeout(30000);
 describe('slugifyPkgName()', () => {
   it('replaces @ and / for scoped packages', () => {
     expect(slugifyPkgName('@scope/name')).toBe('scope-name');

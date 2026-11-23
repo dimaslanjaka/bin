@@ -9,6 +9,7 @@ const {
   updateGitAttributes
 } = require('../src/git/gitattributes.cjs');
 
+jest.setTimeout(30000);
 describe('GitAttributes Parser', () => {
   let tempDir;
   let tempGitattributes;

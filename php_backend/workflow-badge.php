@@ -6,33 +6,113 @@
  * Spawns the Node CLI (workflow-badge) to generate a detailed SVG badge
  * for the latest GitHub Actions workflow run, then serves it as an image.
  *
- * Query parameters (GET or POST):
- *   --owner     GitHub repository owner (required)
- *   --repo      GitHub repository name (required)
- *   --workflow  Workflow filename or ID to filter by (optional, e.g. "test.yml")
- *   --token     GitHub access token (optional, overrides server env)
- *   --width     SVG width in pixels (optional, default: 520)
- *   --max-steps Max steps shown per job (optional, default: all)
+ * Works in two modes:
+ *   - Web: parameters come from the query string (GET) or form body (POST)
+ *   - CLI: parameters come from command-line flags (debug is always on)
+ *
+ * Parameters (query string / POST field / CLI flag, without the leading "--" on the web):
+ *   owner      GitHub repository owner (required)
+ *   repo       GitHub repository name (required)
+ *   workflow   Workflow filename or ID to filter by (optional, e.g. "test.yml")
+ *   token      GitHub access token (optional, overrides server env)
+ *   width      SVG width in pixels, 200-2000 (optional, default: 520)
+ *   max-steps  Max steps shown per job, 1-200 (optional, default: all)
+ *   debug      Show PHP errors and extra diagnostics (optional, always on in CLI)
  *
  * Environment variables (set on the server):
  *   ACCESS_TOKEN | GITHUB_TOKEN | GH_TOKEN  GitHub token with actions:read scope
  *
- * Usage:
+ * Usage (web):
  *   <img src="https://your-domain.com/php_backend/workflow-badge.php?owner=user&repo=project" />
+ *   <img src="https://your-domain.com/php_backend/workflow-badge.php?owner=user&repo=project&workflow=test.yml" />
+ *   <img src="https://your-domain.com/php_backend/workflow-badge.php?owner=user&repo=project&debug=true" />
+ *
+ * Usage (CLI, both "--key=value" and "--key value" are accepted):
+ *   php php_backend/workflow-badge.php --owner=user --repo=project
+ *   php php_backend/workflow-badge.php --owner user --repo project --workflow build-release.yml
+ *   php php_backend/workflow-badge.php --owner=user --repo=project > badge.svg
+ *
+ * Exit codes:
+ *   0  Success (SVG written to stdout)
+ *   1  Validation error, Node/CLI script not found, or badge generation failed
  */
+
+// ─── Environment detection ────────────────────────────────────────
+$isWindows = PHP_OS_FAMILY   === 'Windows';
+$isCli     = php_sapi_name() === 'cli' || defined('STDIN');
+
+// ─── CLI argument parsing ─────────────────────────────────────────
+/**
+ * Convert CLI flags into $_GET so the rest of the script is mode-agnostic.
+ *
+ * Supported forms:
+ *   --key=value    explicit value
+ *   --key value    value is the next argument (unless it starts with "--")
+ *   --flag         bare flag, stored as "1" (e.g. --debug)
+ *
+ * @param array $argv Raw argument vector (script name at index 0)
+ * @return void
+ */
+function parseCliArgs(array $argv) {
+  $count = count($argv);
+  for ($i = 1; $i < $count; $i++) {
+    $arg = $argv[$i];
+    if (strpos($arg, '--') !== 0 || $arg === '--') {
+      continue; // ignore positional arguments
+    }
+
+    $arg = substr($arg, 2);
+    if (strpos($arg, '=') !== false) {
+      [$key, $value] = explode('=', $arg, 2);
+      $_GET[$key]    = $value;
+    } elseif (isset($argv[$i + 1]) && strpos($argv[$i + 1], '--') !== 0) {
+      $_GET[$arg] = $argv[++$i];
+    } else {
+      $_GET[$arg] = '1';
+    }
+  }
+}
+
+if ($isCli && !empty($_SERVER['argv'])) {
+  parseCliArgs($_SERVER['argv']);
+}
+
+// ─── Debug mode (always active on CLI, enabled via ?debug for web) ─
+$debug = $isCli || isset($_GET['debug']) || isset($_POST['debug']);
+if ($debug) {
+  ini_set('display_errors', '1');
+  ini_set('display_startup_errors', '1');
+  error_reporting(E_ALL);
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────
+/**
+ * Abort with a plain-text error message and a non-zero exit code.
+ *
+ * @param int    $status  HTTP status code (ignored on CLI, which exits with 1)
+ * @param string $message Message shown to the caller
+ * @return void
+ */
+function fail($status, $message) {
+  global $isCli;
+  if (!$isCli) {
+    http_response_code($status);
+    header('Content-Type: text/plain; charset=utf-8');
+  }
+  echo rtrim($message) . "\n";
+  exit(1);
+}
 
 // ─── CORS ───────────────────────────────────────────────────────────
 /**
  * Allow cross-origin requests with full preflight OPTIONS handling.
+ * Does nothing on CLI.
  *
  * @param bool $disableBrowserCache Also emit no-cache headers (default: false)
+ * @return void
  */
 function allowCors($disableBrowserCache = false) {
-  $isCli = (
-    php_sapi_name() === 'cli'
-    || defined('STDIN')
-    || (empty($_SERVER['REMOTE_ADDR']) && !isset($_SERVER['HTTP_USER_AGENT']) && count($_SERVER['argv']) > 0)
-  );
+  global $isCli;
   if ($isCli) {
     return;
   }
@@ -53,7 +133,7 @@ function allowCors($disableBrowserCache = false) {
     header('Access-Control-Allow-Origin: *');
   }
 
-  if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+  if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
     if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
       header('Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE');
     }
@@ -67,7 +147,76 @@ function allowCors($disableBrowserCache = false) {
 
 allowCors();
 
+// ─── Find Node binary path ────────────────────────────────────────
+/**
+ * Locate the Node.js executable.
+ *
+ * Order of resolution:
+ *   1. "where node" (Windows) or "which node" (Unix) from the current PATH
+ *   2. Well-known installation paths for the current OS
+ *
+ * @param bool $isWindows Whether PHP is running on Windows
+ * @return string Absolute path to node, or an empty string if not found
+ */
+function findNodeBinary($isWindows) {
+  // 1. Ask the OS (shell_exec may be disabled on shared hosting)
+  if (function_exists('shell_exec')) {
+    $lookup = $isWindows ? 'where node 2>NUL' : 'which node 2>/dev/null';
+    $output = trim((string) @shell_exec($lookup));
+    if ($output !== '') {
+      // "where" can return several matches, one per line: take the first
+      $lines = preg_split('/\r\n|\r|\n/', $output);
+      $first = trim($lines[0]);
+      if ($first !== '' && file_exists($first)) {
+        return $first;
+      }
+    }
+  }
+
+  // 2. Fallback to common installation paths
+  if ($isWindows) {
+    $candidates = [];
+    foreach (['ProgramFiles', 'ProgramFiles(x86)'] as $envVar) {
+      $base = getenv($envVar);
+      if ($base) {
+        $candidates[] = $base . '\\nodejs\\node.exe';
+      }
+    }
+    $localAppData = getenv('LOCALAPPDATA');
+    if ($localAppData) {
+      $candidates[] = $localAppData . '\\Programs\\nodejs\\node.exe';
+    }
+    $candidates[] = 'C:\\Program Files\\nodejs\\node.exe';
+    $candidates[] = 'C:\\Program Files (x86)\\nodejs\\node.exe';
+    $candidates[] = 'C:\\nvm4w\\nodejs\\node.exe'; // nvm-windows default symlink
+    $username     = getenv('USERNAME');
+    if ($username) {
+      $candidates[] = 'C:\\Users\\' . $username . '\\AppData\\Local\\Programs\\nodejs\\node.exe';
+    }
+  } else {
+    $candidates = [
+      '/usr/local/nvm/versions/node/v22.18.0/bin/node',
+      '/usr/local/bin/node',
+      '/usr/bin/node',
+    ];
+  }
+
+  foreach ($candidates as $candidate) {
+    if (file_exists($candidate)) {
+      return $candidate;
+    }
+  }
+
+  return '';
+}
+
+$nodeBin = findNodeBinary($isWindows);
+if ($nodeBin === '') {
+  fail(500, 'Node binary not found (install Node.js or add it to PATH)');
+}
+
 // ─── Read input parameters ────────────────────────────────────────
+// On CLI these were already copied into $_GET by parseCliArgs().
 $owner    = trim($_GET['owner'] ?? $_POST['owner'] ?? '');
 $repo     = trim($_GET['repo'] ?? $_POST['repo'] ?? '');
 $workflow = trim($_GET['workflow'] ?? $_POST['workflow'] ?? '');
@@ -76,80 +225,53 @@ $maxSteps = trim($_GET['max-steps'] ?? $_POST['max-steps'] ?? '');
 $token    = trim($_GET['token'] ?? $_POST['token'] ?? '');
 
 // ─── Validate required parameters ─────────────────────────────────
-if (empty($owner) || empty($repo)) {
-  http_response_code(400);
-  header('Content-Type: text/plain; charset=utf-8');
-  echo "Missing required parameters: --owner and --repo\n";
-  exit(1);
+if ($owner === '' || $repo === '') {
+  fail(400, 'Missing required parameters: --owner and --repo');
 }
 
 // Only allow safe characters in owner/repo (GitHub usernames + hyphens/dots)
 if (!preg_match('/^[a-zA-Z0-9._-]+$/', $owner)) {
-  http_response_code(400);
-  header('Content-Type: text/plain; charset=utf-8');
-  echo "Invalid --owner parameter\n";
-  exit(1);
+  fail(400, 'Invalid --owner parameter');
 }
 if (!preg_match('/^[a-zA-Z0-9._-]+$/', $repo)) {
-  http_response_code(400);
-  header('Content-Type: text/plain; charset=utf-8');
-  echo "Invalid --repo parameter\n";
-  exit(1);
+  fail(400, 'Invalid --repo parameter');
 }
 
 // ─── Validate optional workflow filter ────────────────────────────
 $workflowArg = [];
-if (!empty($workflow)) {
+if ($workflow !== '') {
   if (!preg_match('/^[a-zA-Z0-9._\/-]+$/', $workflow)) {
-    http_response_code(400);
-    header('Content-Type: text/plain; charset=utf-8');
-    echo "Invalid --workflow parameter\n";
-    exit(1);
+    fail(400, 'Invalid --workflow parameter');
   }
   $workflowArg = ['--workflow', $workflow];
 }
 
 // ─── Validate optional numeric parameters ─────────────────────────
 $widthArg = [];
-if (!empty($width)) {
+if ($width !== '') {
   if (!ctype_digit($width) || intval($width) < 200 || intval($width) > 2000) {
-    http_response_code(400);
-    header('Content-Type: text/plain; charset=utf-8');
-    echo "Invalid --width (must be 200-2000)\n";
-    exit(1);
+    fail(400, 'Invalid --width (must be 200-2000)');
   }
   $widthArg = ['--width', $width];
 }
 
 $maxStepsArg = [];
-if (!empty($maxSteps)) {
+if ($maxSteps !== '') {
   if (!ctype_digit($maxSteps) || intval($maxSteps) < 1 || intval($maxSteps) > 200) {
-    http_response_code(400);
-    header('Content-Type: text/plain; charset=utf-8');
-    echo "Invalid --max-steps (must be 1-200)\n";
-    exit(1);
+    fail(400, 'Invalid --max-steps (must be 1-200)');
   }
   $maxStepsArg = ['--max-steps', $maxSteps];
 }
 
-// ─── Extend PATH for common install locations (NVM, etc.) ──────────
-$nodeExtraPaths = array_filter([
-  glob('/usr/local/nvm/versions/node/*/bin')[0] ?? null,
-  glob('/usr/local/lib/nodejs/*/bin')[0]        ?? null,
-  '/usr/local/nvm/versions/node/v22.18.0/bin',
-]);
-if (!empty($nodeExtraPaths)) {
-  putenv('PATH=' . implode(':', $nodeExtraPaths) . ':' . ($_SERVER['PATH'] ?? getenv('PATH')));
-}
-
 // ─── Locate the Node CLI script ───────────────────────────────────
+// Checked in order: project source, built CJS bundle, installed npm package.
 $projectRoot = dirname(__DIR__);
 $cliScripts  = [
   $projectRoot . '/src/github-workflows/workflow-badge-cli.mjs',
   $projectRoot . '/lib/github-workflows/workflow-badge-cli.cjs',
   $projectRoot . '/node_modules/binary-collections/lib/github-workflows/workflow-badge-cli.cjs',
 ];
-$cliScript = $projectRoot . '/src/github-workflows/workflow-badge-cli.mjs';
+$cliScript = null;
 foreach ($cliScripts as $script) {
   if (file_exists($script)) {
     $cliScript = $script;
@@ -157,47 +279,46 @@ foreach ($cliScripts as $script) {
   }
 }
 
-if (!file_exists($cliScript)) {
-  http_response_code(500);
-  header('Content-Type: text/plain; charset=utf-8');
-  echo "Server error: workflow-badge CLI not found (deploy the full project or run upload-backend)\n";
-  exit(1);
+if ($cliScript === null) {
+  fail(500, 'Server error: workflow-badge CLI not found (deploy the full project or run upload-backend)');
 }
 
-$cmd  = 'node';
+// ─── Build the command ────────────────────────────────────────────
+$cmd  = $nodeBin;
 $args = [
   '--no-warnings=ExperimentalWarning',
   $cliScript,
   '--owner', $owner,
   '--repo',  $repo,
 ];
-if (!empty($token)) {
+if ($token !== '') {
   $args = array_merge($args, ['--token', $token]);
 }
-if (!empty($widthArg)) {
-  $args = array_merge($args, $widthArg);
-}
-if (!empty($maxStepsArg)) {
-  $args = array_merge($args, $maxStepsArg);
-}
-if (!empty($workflowArg)) {
-  $args = array_merge($args, $workflowArg);
-}
+$args = array_merge($args, $widthArg, $maxStepsArg, $workflowArg);
 
 // ─── Execute via proc_open (capture stdout separately from stderr) ─
+// Passing the command as an array avoids shell interpolation entirely.
 $descriptorSpec = [
   0 => ['pipe', 'r'],  // stdin  → pipe (we close immediately)
   1 => ['pipe', 'w'],  // stdout → pipe (SVG output)
-  2 => ['pipe', 'w'],  // stderr → pipe (diagnostics, we log it)
+  2 => ['pipe', 'w'],  // stderr → pipe (diagnostics, shown on failure)
 ];
 
 $process = @proc_open([$cmd, ...$args], $descriptorSpec, $pipes, $projectRoot);
 
 if (!is_resource($process)) {
-  http_response_code(500);
-  header('Content-Type: text/plain; charset=utf-8');
-  echo "Server error: failed to start badge generator (command: $cmd)\n";
-  exit(1);
+  $message = "Server error: failed to start badge generator (command: $cmd)";
+  if ($debug) {
+    $message .= "\n"
+      . 'disable_functions: ' . ini_get('disable_functions') . "\n"
+      . 'open_basedir: ' . ini_get('open_basedir') . "\n"
+      . "nodeBin: $nodeBin\n"
+      . 'node exists: ' . (file_exists($nodeBin) ? 'yes' : 'no') . "\n"
+      . "cliScript: $cliScript\n"
+      . 'cliScript exists: ' . (file_exists($cliScript) ? 'yes' : 'no') . "\n"
+      . "projectRoot: $projectRoot";
+  }
+  fail(500, $message);
 }
 
 // Close stdin immediately (nothing to send to the process)
@@ -207,7 +328,7 @@ fclose($pipes[0]);
 $stdout = stream_get_contents($pipes[1]);
 fclose($pipes[1]);
 
-// Read stderr (diagnostics — optionally log somewhere)
+// Read stderr (diagnostics)
 $stderr = stream_get_contents($pipes[2]);
 fclose($pipes[2]);
 
@@ -215,27 +336,25 @@ $returnCode = proc_close($process);
 
 // ─── Validate output ──────────────────────────────────────────────
 if ($returnCode !== 0) {
-  http_response_code(502);
-  header('Content-Type: text/plain; charset=utf-8');
-  echo "Badge generator exited with code $returnCode\n";
-  if (!empty(trim($stderr))) {
-    echo 'Error: ' . trim($stderr) . "\n";
+  $message = "Badge generator exited with code $returnCode";
+  if (trim($stderr) !== '') {
+    $message .= "\nError: " . trim($stderr);
   }
-  exit(1);
+  fail(502, $message);
 }
 
 if (empty($stdout) || strpos($stdout, '<svg') === false) {
-  http_response_code(502);
-  header('Content-Type: text/plain; charset=utf-8');
-  echo "Badge generator returned unexpected output\n";
-  if (!empty(trim($stderr))) {
-    echo 'Diagnostics: ' . trim($stderr) . "\n";
+  $message = 'Badge generator returned unexpected output';
+  if (trim($stderr) !== '') {
+    $message .= "\nDiagnostics: " . trim($stderr);
   }
-  exit(1);
+  fail(502, $message);
 }
 
 // ─── Serve the SVG ────────────────────────────────────────────────
-header('Content-Type: image/svg+xml; charset=utf-8');
-// Cache for 2 minutes (GitHub API data changes frequently)
-header('Cache-Control: public, max-age=120');
+if (!$isCli) {
+  header('Content-Type: image/svg+xml; charset=utf-8');
+  // Cache for 2 minutes (GitHub API data changes frequently)
+  header('Cache-Control: public, max-age=120');
+}
 echo $stdout;

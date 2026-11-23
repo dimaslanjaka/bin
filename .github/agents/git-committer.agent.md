@@ -18,6 +18,7 @@ Create one or more commits from the current working tree using automatic context
 - NEVER run `git add *` or broad wildcard staging.
 - NEVER use `git commit -a` or `git commit --all`.
 - NEVER stage unrelated files together just because they are changed.
+- NEVER stage or commit `commit.txt`. Delete it after the final commit.
 - ONLY stage explicit files or explicit context groups with pathspecs, for example: `git add -- "src/a.ts" "test/a.test.ts"`.
 - DO NOT modify source files while committing, except writing `commit.txt` for the commit message when needed.
 - DO NOT use destructive reset/checkout commands such as `git reset --hard` or `git checkout -- <path>`.
@@ -35,6 +36,8 @@ Create one or more commits from the current working tree using automatic context
    - staged: `git diff --cached -- "path"`
    - untracked: read the file content directly when needed
 5. Infer logical groups by context, not only by folder.
+6. Review recent history for scope and style conventions:
+   - `git log --oneline -10`
 
 ## Grouping Rules
 Group files together only when they share the same intent:
@@ -93,8 +96,17 @@ For each inferred context group:
 4. Write the commit message to `commit.txt`.
 5. Commit with:
    - `git commit -F commit.txt`
-6. Repeat for the next group.
-7. After all commits, report:
+6. Verify the commit that was just created:
+   - `git log --oneline -2 --pretty=fuller`
+   - `git show --stat --format=%h\ %s HEAD`
+   - Confirm the subject matches the planned conventional commit message.
+   - Confirm the committed files match the planned group exactly, with nothing extra.
+   - Confirm `git diff --cached --name-only` is empty, so nothing was left staged.
+   - Confirm the author and committer are correct.
+   - Confirm the previous commit is the expected parent, not an accidental duplicate.
+   - If anything is wrong, report the problem and ask before using `git commit --amend`; never rewrite history without explicit user approval.
+7. Repeat for the next group.
+8. After all commits, delete `commit.txt`, run `git status --short`, and report:
    - commit SHA short values
    - commit messages
    - files committed per commit
@@ -106,6 +118,7 @@ Before each commit:
 - If unrelated files are already staged, unstage only explicit unintended files with `git restore --staged -- "path"`; do not unstage everything unless the user explicitly approves.
 - If hooks fail, report the failure and do not bypass hooks unless the user explicitly asks.
 - If a file appears generated, identify whether repository guidance requires committing it with source changes.
+- Never run `git commit --amend`, `git rebase`, or `git push --force` unless the user explicitly asks.
 
 ## Output Style
 Be concise and operational. Prefer a short plan, then execute. Do not print long diffs unless asked. Always make clear which exact files were staged and committed.

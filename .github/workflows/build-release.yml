@@ -1,23 +1,27 @@
 name: Build Release
 
 on:
-  push:
-    paths-ignore:
-      - '**/*.tgz'
-      - '**/*.gz'
-      - '**/dist/**'
-      - '**/release*/**'
-      - '**/_auto*/**'
-      - '**/.husky/**'
-      - '**/garbage-collector/**'
-      - '**/codeql/**'
-      - '.github/workflows/tester.yml'
-      - '**/*.log'
-      - '**/*.txt'
-      - '**/*.zip'
-      - '**/test*'
-      - '**/docs/**'
+  # push:
+  # paths-ignore:
+  # - '**/*.tgz'
+  # - '**/*.gz'
+  # - '**/dist/**'
+  # - '**/release*/**'
+  # - '**/_auto*/**'
+  # - '**/.husky/**'
+  # - '**/garbage-collector/**'
+  # - '**/codeql/**'
+  # - '.github/workflows/tester.yml'
+  # - '**/*.log'
+  # - '**/*.txt'
+  # - '**/*.zip'
+  # - '**/test*'
+  # - '**/docs/**'
   workflow_dispatch:
+  workflow_run:
+    workflows: ['Node.js Package Test']
+    types:
+      - completed
 
 concurrency:
   group: build-release
@@ -30,6 +34,7 @@ jobs:
   build-release:
     name: build release
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     env:
       PUPPETEER_SKIP_DOWNLOAD: 'true'
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
@@ -76,10 +81,6 @@ jobs:
           command: |
             yarn run build
             yarn run pack
-
-            node test/test-compiled.cjs
-            yarn jest --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --testPathPatterns=validate-tarball-yarn.test.cjs
-            yarn jest --runInBand --forceExit --testTimeout=120000 --detectOpenHandles --testPathPatterns=validate-tarball-npm.test.cjs
 
       - name: '🗑️ Remove packageManager from package.json'
         shell: bash

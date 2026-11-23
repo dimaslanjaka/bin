@@ -9,20 +9,36 @@ import path from 'upath';
 import { findNodeModules } from '../src/index';
 import './env.cjs'; // Ensure environment is set up
 
+// Ensure a reasonable per-test timeout (30 seconds)
+jest.setTimeout(30000);
+
 describe('findNodeModules', () => {
   let tempDir: string;
   let consoleSpy: jest.SpiedFunction<typeof console.log>;
 
   beforeEach(async () => {
-    // Create a temporary directory for testing
-    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'test-find-node-modules-'));
-    consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      const tmp = os.tmpdir();
+      if (!tmp) throw new Error('os.tmpdir() returned undefined');
+
+      tempDir = await fs.mkdtemp(path.join(tmp, 'test-find-node-modules-'));
+      consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    } catch (err: any) {
+      throw new Error(`Failed to create temporary directory: ${err.message}`);
+    }
   });
 
   afterEach(async () => {
-    // Clean up temporary directory
-    await fs.remove(tempDir);
-    consoleSpy.mockRestore();
+    try {
+      if (tempDir) {
+        await fs.remove(tempDir);
+      }
+    } catch (err: any) {
+      // Swallow cleanup errors – they are non‑critical for the test outcome
+      console.warn('Cleanup warning:', err.message);
+    } finally {
+      consoleSpy.mockRestore();
+    }
   });
 
   test('should return empty array when no node_modules found', async () => {

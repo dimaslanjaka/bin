@@ -73,7 +73,7 @@ jobs:
         run: yarn run clean
 
       - name: 🔄 Build, Pack & Verify (Retry 3x)
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@v4
         with:
           max_attempts: 3
           retry_wait_seconds: 1
